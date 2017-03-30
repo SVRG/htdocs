@@ -16,12 +16,12 @@ include_once "classodbc.php";
  * User: svrg
  * Date: 21.09.16
  * Time: 19:57
- * Р’Р°Р¶РЅРѕ! - РџСЂРё РІСЃС‚Р°РІРєРµ РїСЂРѕРІРµСЂСЏС‚СЊ РїРѕР»СЏ INT! Р•СЃР»Рё РѕРЅРё РїСѓСЃС‚С‹Рµ С‚Рѕ СЃС‚СЂРѕРєР° РЅРµ РІСЃС‚Р°РІРёС‚СЃСЏ
+ * Важно! - При вставке проверять поля INT! Если они пустые то строка не вставится
  */
 
     $db = new DB();
     $odbc = new ODBC();
-    ini_set('max_execution_time', 300); // РЈСЃС‚Р°РЅРѕРІРєР° РІСЂРµРјРµРЅРё С‚Р°Р№Рј-Р°СѓС‚Р° РІРѕ РёР·Р±РµР¶Р°РЅРёСЏ РѕС€РёР±РєРё
+    ini_set('max_execution_time', 300); // Установка времени тайм-аута во избежания ошибки
 
 //----------------------------------------------------------------------------------------------------------------------
     // sql drop table
@@ -39,21 +39,21 @@ include_once "classodbc.php";
 
     $db->query($sql);
 
-    // Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
-    $odbc->sql = "SELECT * FROM РђРґСЂРµСЃР°";
+    // Запросить данные из ODBC
+    $odbc->sql = "SELECT * FROM Адреса";
     $odbc->ex();
 
     $i=1;
 
-    // Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+    // Вставить данные в MySQL
     for ($i; $i <= $odbc->cnt; $i++)
     {
         $row = $odbc->Row($i);
 
-        $kod_adresa = $row['РљРѕРґ_РђРґСЂРµСЃР°'];
-        $adres = $row['РђРґСЂРµСЃ'];
-        $kod_org = $row['РљРѕРґ_РћСЂРіР°РЅРёР·Р°С†РёРё'];
-        $type = $row['РўРёРїРђРґСЂРµСЃР°'];
+        $kod_adresa = $row['Код_Адреса'];
+        $adres = $row['Адрес'];
+        $kod_org = $row['Код_Организации'];
+        $type = $row['ТипАдреса'];
 
         $sql = "INSERT INTO adresa (kod_adresa,adres,kod_org,type) VALUES($kod_adresa,'$adres',$kod_org,$type)";
         $db->query($sql);
@@ -69,13 +69,13 @@ include_once "classodbc.php";
 //
 
 $table = "docum";
-$table_odbc = "Р”РѕРєСѓРјРµРЅС‚С‹";
+$table_odbc = "Документы";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_Р”РѕРєСѓРјРµРЅС‚Р°";       $id = "kod_docum";           $id_type = "INT";
-$f1_odbc="РќР°РёРјРµРЅРѕРІР°РЅРёРµ";        $f1 = "name";                $f1_type = "VARCHAR(255)";
-$f2_odbc="РџСѓС‚СЊ";                $f2 = "path";                $f2_type = "VARCHAR(255)";
-$f3_odbc="Date_CP";             $f3 = "time_mark";           $f3_type = "TIMESTAMP";
+$id_odbc="Код_Документа";       $id = "kod_docum";           $id_type = "INT";
+$f1_odbc="Наименование";        $f1 = "name";                $f1_type = "VARCHAR(255)";
+$f2_odbc="Путь";                $f2 = "path";                $f2_type = "VARCHAR(255)";
+$f3_odbc="Date_CP";             $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -90,11 +90,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -108,7 +108,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,'$field1','$field2','$field3')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -124,13 +124,13 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "docum_dogovory";
-$table_odbc = "Р”РѕРєСѓРјРµРЅС‚С‹Р”РѕРіРѕРІРѕСЂР°";
+$table_odbc = "ДокументыДоговора";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_РЎРІСЏР·Рё";           $id = "kod_docum_dog";       $id_type = "INT";
-$f1_odbc="РљРѕРґ_Р”РѕРєСѓРјРµРЅС‚Р°";       $f1 = "kod_docum";           $f1_type = "INT";
-$f2_odbc="РљРѕРґ_Р”РѕРіРѕРІРѕСЂР°";        $f2 = "kod_dogovora";        $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_mark";           $f3_type = "TIMESTAMP";
+$id_odbc="Код_Связи";           $id = "kod_docum_dog";       $id_type = "INT";
+$f1_odbc="Код_Документа";       $f1 = "kod_docum";           $f1_type = "INT";
+$f2_odbc="Код_Договора";        $f2 = "kod_dogovora";        $f2_type = "INT";
+$f3_odbc="DateCP";              $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -145,11 +145,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -163,7 +163,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -179,15 +179,14 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "dogovor_prim";
-$table_odbc = "РџСЂРёРјРµС‡Р°РЅРёРµР”РѕРіРѕРІРѕСЂР°";
+$table_odbc = "ПримечаниеДоговора";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_РџСЂРёРјРµС‡Р°РЅРёСЏ";      $id = "kod_prim";            $id_type = "INT";
-$f1_odbc="Р”Р°С‚Р°";                $f1 = "data";                $f1_type = "DATE";
-$f2_odbc="РўРµРєСЃС‚";               $f2 = "text";                $f2_type = "TEXT";
-$f3_odbc="РљРѕРґ_Р”РѕРіРѕРІРѕСЂР°";        $f3 = "kod_dogovora";        $f3_type = "INT";
-$f4_odbc="user";                $f4 = "user";                $f4_type = "VARCHAR(20)";
-$f5_odbc="";                    $f5 = "time_mark";           $f5_type = "TIMESTAMP";
+$id_odbc="Код_Примечания";      $id = "kod_prim";            $id_type = "INT";
+$f1_odbc="Текст";               $f1 = "text";                $f1_type = "TEXT";
+$f2_odbc="Код_Договора";        $f2 = "kod_dogovora";        $f2_type = "INT";
+$f3_odbc="user";                $f3 = "user";                $f3_type = "VARCHAR(20)";
+$f4_odbc="Дата";                $f4 = "data";                $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -199,16 +198,15 @@ $sql = "CREATE TABLE $table (
     $f1 $f1_type,
     $f2 $f2_type,
     $f3 $f3_type,
-    $f4 $f4_type,
-    $f5 $f5_type
+    $f4 $f4_type
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -218,11 +216,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field1 = $row[$f1_odbc];
     $field2 = $row[$f2_odbc];
     $field3 = $row[$f3_odbc];
+    $field4 = $row[$f4_odbc];
 
-    $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) VALUES($field_id,'$field1','$field2',$field3,'$field4')";
+    $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) VALUES($field_id,'$field1',$field2,'$field3','$field4')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -239,18 +238,18 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "dogovory";
-$table_odbc = "Р”РѕРіРѕРІРѕСЂС‹";
+$table_odbc = "Договоры";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_РґРѕРіРѕРІРѕСЂР°";        $id = "kod_dogovora";         $id_type = "INT";
-$f1_odbc="РќРѕРјРµСЂ";               $f1 = "nomer";                $f1_type = "VARCHAR(255)";
-$f2_odbc="Р”Р°С‚Р°_СЃРѕСЃС‚Р°РІР»РµРЅРёСЏ";    $f2 = "data_sost";            $f2_type = "DATE";
-$f3_odbc="Р—Р°РєСЂС‹С‚";              $f3 = "zakryt";               $f3_type = "INT";
-$f4_odbc="Р”Р°С‚Р°_Р·Р°РєСЂС‹С‚РёСЏ";       $f4 = "data_zakrytiya";       $f4_type = "DATE";
-$f5_odbc="РљРѕРґ_РѕСЂРіР°РЅРёР·Р°С†РёРё";     $f5 = "kod_org";              $f5_type = "INT";
-$f6_odbc="РљРѕРґ_РСЃРїРѕР»РЅРёС‚РµР»СЏ";     $f6 = "kod_ispolnit";         $f6_type = "INT";
-$f7_odbc="РљРѕРґ_Р“СЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЏ"; $f7 = "kod_gruzopoluchat";    $f7_type = "INT";
-$f8_odbc="DateCP";              $f8 = "time_mark";            $f8_type = "TIMESTAMP";
+$id_odbc="Код_договора";        $id = "kod_dogovora";         $id_type = "INT";
+$f1_odbc="Номер";               $f1 = "nomer";                $f1_type = "VARCHAR(255)";
+$f2_odbc="Дата_составления";    $f2 = "data_sost";            $f2_type = "DATE";
+$f3_odbc="Закрыт";              $f3 = "zakryt";               $f3_type = "INT";
+$f4_odbc="Дата_закрытия";       $f4 = "data_zakrytiya";       $f4_type = "DATE";
+$f5_odbc="Код_организации";     $f5 = "kod_org";              $f5_type = "INT";
+$f6_odbc="Код_Исполнителя";     $f6 = "kod_ispolnit";         $f6_type = "INT";
+$f7_odbc="Код_Грузополучателя"; $f7 = "kod_gruzopoluchat";    $f7_type = "INT";
+$f8_odbc="DateCP";              $f8 = "time_stamp";            $f8_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -270,11 +269,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -290,14 +289,14 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field7 = $row[$f7_odbc];
     $field8 = $row[$f8_odbc];
 
-    if($field7=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ РєРѕРґ РіСЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЏ РїРѕРґСЃС‚Р°РІР»СЏРµРј РєРѕРґ Р·Р°РєР°Р·С‡РёРєР°
+    if($field7=="") // Если не задан код грузополучателя подставляем код заказчика
         $field7=$field5;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8) VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,$field6,$field7,'$field8')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -315,16 +314,16 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "elem";
-$table_odbc = "РќРѕРјРµРЅРєР»Р°С‚СѓСЂР°_Р­РєСЃРїРѕСЂС‚";
+$table_odbc = "Номенклатура_Экспорт";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_СЌР»РµРјРµРЅС‚Р°";        $id = "kod_elem";             $id_type = "INT";
-$f1_odbc="РћР±РѕР·РЅР°С‡РµРЅРёРµ";         $f1 = "obozn";                $f1_type = "VARCHAR(255)";
-$f2_odbc="РќР°РёРјРµРЅРѕРІР°РЅРёРµ";        $f2 = "name";                 $f2_type = "VARCHAR(255)";
-$f3_odbc="РЁР°Р±Р»РѕРЅ";              $f3 = "shablon";              $f3_type = "VARCHAR(255)";
+$id_odbc="Код_элемента";        $id = "kod_elem";             $id_type = "INT";
+$f1_odbc="Обозначение";         $f1 = "obozn";                $f1_type = "VARCHAR(255)";
+$f2_odbc="Наименование";        $f2 = "name";                 $f2_type = "VARCHAR(255)";
+$f3_odbc="Шаблон";              $f3 = "shablon";              $f3_type = "VARCHAR(255)";
 $f4_odbc="NOMEN";               $f4 = "nomen";                $f4_type = "INT";
-$f5_odbc="РЁРёС„СЂ";                $f5 = "shifr";                $f5_type = "VARCHAR(255)";
-$f6_odbc="Date_CP";             $f6 = "time_mark";            $f6_type = "TIMESTAMP";
+$f5_odbc="Шифр";                $f5 = "shifr";                $f5_type = "VARCHAR(255)";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";            $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 $sql = "DROP TABLE $table";
 $db->query($sql);
@@ -341,11 +340,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -359,17 +358,17 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field5 = $row[$f5_odbc];
     $field6 = $row[$f6_odbc];
 
-    if($field4=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ С‚РёРї РЅРѕРјРµРЅРєР»Р°С‚СѓСЂС‹
+    if($field4=="") // Если не задан тип номенклатуры
         $field4=0;
 
-    if($field5!="") // Р•СЃР»Рё РµСЃС‚СЊ РЁРёС„СЂС‚ С‚Рѕ Р·Р°РјРµРЅСЏРµРј РѕР±РѕР·РЅР°С‡РµРЅРёРµ?
+    if($field5!="") // Если есть Шифрт то заменяем обозначение?
         $field1 = $field5;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) VALUES($field_id,'$field1','$field2','$field3',$field4,'$field5','$field6')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -387,16 +386,16 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "kontakty";
-$table_odbc = "РљРѕРЅС‚Р°РєС‚С‹";
+$table_odbc = "Контакты";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ_РљРѕРЅС‚Р°РєС‚Р°";        $id = "kod_kontakta";           $id_type = "INT";
-$f1_odbc="РљРѕРґ_РћСЂРіР°РЅРёР·Р°С†РёРё";     $f1 = "kod_org";                $f1_type = "INT";
-$f2_odbc="Р”РѕР»Р¶РЅРѕСЃС‚СЊ";           $f2 = "dolg";                   $f2_type = "VARCHAR(255)";
-$f3_odbc="Р¤Р°РјРёР»РёСЏ";             $f3 = "famil";                  $f3_type = "VARCHAR(255)";
-$f4_odbc="РРјСЏ";                 $f4 = "name";                   $f4_type = "VARCHAR(255)";
-$f5_odbc="РћС‚С‡РµСЃС‚РІРѕ";            $f5 = "otch";                   $f5_type = "VARCHAR(255)";
-$f6_odbc="Date_CP";             $f6 = "time_mark";              $f6_type = "TIMESTAMP";
+$id_odbc="Код_Контакта";        $id = "kod_kontakta";           $id_type = "INT";
+$f1_odbc="Код_Организации";     $f1 = "kod_org";                $f1_type = "INT";
+$f2_odbc="Должность";           $f2 = "dolg";                   $f2_type = "VARCHAR(255)";
+$f3_odbc="Фамилия";             $f3 = "famil";                  $f3_type = "VARCHAR(255)";
+$f4_odbc="Имя";                 $f4 = "name";                   $f4_type = "VARCHAR(255)";
+$f5_odbc="Отчество";            $f5 = "otch";                   $f5_type = "VARCHAR(255)";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -414,11 +413,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -432,14 +431,14 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field5 = $row[$f5_odbc];
     $field6 = $row[$f6_odbc];
 
-    if($field1=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ С‚РёРї РЅРѕРјРµРЅРєР»Р°С‚СѓСЂС‹
+    if($field1=="") // Если не задан тип номенклатуры
         $field1=0;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) VALUES($field_id,$field1,'$field2','$field3','$field4','$field5','$field6')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -457,13 +456,13 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "kontakty_dogovora";
-$table_odbc = "РљРѕРЅС‚Р°РєС‚РЅС‹РµР›РёС†Р°";
+$table_odbc = "КонтактныеЛица";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґРљРѕРЅС‚Р°РєС‚РЅРѕРіРѕР›РёС†Р°";  $id = "kod_kont_dog";         $id_type = "INT";
-$f1_odbc="РљРѕРґ_РљРѕРЅС‚Р°РєС‚Р°";        $f1 = "kod_kontakta";         $f1_type = "INT";
-$f2_odbc="РљРѕРґ_Р”РѕРіРѕРІРѕСЂР°";        $f2 = "kod_dogovora";         $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_mark";            $f3_type = "TIMESTAMP";
+$id_odbc="КодКонтактногоЛица";  $id = "kod_kont_dog";         $id_type = "INT";
+$f1_odbc="Код_Контакта";        $f1 = "kod_kontakta";         $f1_type = "INT";
+$f2_odbc="Код_Договора";        $f2 = "kod_dogovora";         $f2_type = "INT";
+$f3_odbc="DateCP";              $f3 = "time_stamp";            $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -478,11 +477,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -493,14 +492,14 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field2 = $row[$f2_odbc];
     $field3 = $row[$f3_odbc];
 
-    if($field1=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ С‚РёРї РЅРѕРјРµРЅРєР»Р°С‚СѓСЂС‹
+    if($field1=="") // Если не задан тип номенклатуры
         $field1=0;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -518,25 +517,25 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "org";
-$table_odbc = "РћСЂРіР°РЅРёР·Р°С†РёРё";
+$table_odbc = "Организации";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РћСЂРіР°РЅРёР·Р°С†РёРё";     $id = "kod_org";                $id_type = "INT";
-$f1_odbc="РџРѕРёСЃРє";               $f1 = "poisk";                  $f1_type = "VARCHAR(255)";
-$f2_odbc="РќР°Р·РІР°РЅРёРµ_РєСЂР°С‚";       $f2 = "nazv_krat";              $f2_type = "VARCHAR(255)";
-$f3_odbc="РќР°Р·РІР°РЅРёРµ_РїРѕР»РЅ";       $f3 = "nazv_poln";              $f3_type = "VARCHAR(255)";
-$f4_odbc="РРќРќ";                 $f4 = "inn";                    $f4_type = "VARCHAR(255)";
-$f5_odbc="РљРџРџ";                 $f5 = "kpp";                    $f5_type = "VARCHAR(255)";
-$f6_odbc="Р _СЃС‡";                $f6 = "r_sch";                  $f6_type = "VARCHAR(255)";
-$f7_odbc="Р‘Р°РЅРєР РЎ";              $f7 = "bank_rs";                $f7_type = "VARCHAR(255)";
-$f8_odbc="Рљ_СЃС‡";                $f8 = "k_sch";                  $f8_type = "VARCHAR(255)";
-$f9_odbc="Р‘Р°РЅРєРљРЎ";              $f9 = "bank_ks";                $f9_type = "VARCHAR(255)";
-$f10_odbc="Р‘РРљ";                $f10 = "bik";                   $f10_type = "VARCHAR(255)";
-$f11_odbc="РћРљРџРћ";               $f11 = "okpo";                  $f11_type = "VARCHAR(255)";
-$f12_odbc="РћРљРћРќРҐ";              $f12 = "okonh";                 $f12_type = "VARCHAR(255)";
+$id_odbc="Код_Организации";     $id = "kod_org";                $id_type = "INT";
+$f1_odbc="Поиск";               $f1 = "poisk";                  $f1_type = "VARCHAR(255)";
+$f2_odbc="Название_крат";       $f2 = "nazv_krat";              $f2_type = "VARCHAR(255)";
+$f3_odbc="Название_полн";       $f3 = "nazv_poln";              $f3_type = "VARCHAR(255)";
+$f4_odbc="ИНН";                 $f4 = "inn";                    $f4_type = "VARCHAR(255)";
+$f5_odbc="КПП";                 $f5 = "kpp";                    $f5_type = "VARCHAR(255)";
+$f6_odbc="Р_сч";                $f6 = "r_sch";                  $f6_type = "VARCHAR(255)";
+$f7_odbc="БанкРС";              $f7 = "bank_rs";                $f7_type = "VARCHAR(255)";
+$f8_odbc="К_сч";                $f8 = "k_sch";                  $f8_type = "VARCHAR(255)";
+$f9_odbc="БанкКС";              $f9 = "bank_ks";                $f9_type = "VARCHAR(255)";
+$f10_odbc="БИК";                $f10 = "bik";                   $f10_type = "VARCHAR(255)";
+$f11_odbc="ОКПО";               $f11 = "okpo";                  $f11_type = "VARCHAR(255)";
+$f12_odbc="ОКОНХ";              $f12 = "okonh";                 $f12_type = "VARCHAR(255)";
 $f13_odbc="e_mail";             $f13 = "e_mail";                $f13_type = "VARCHAR(255)";
 $f14_odbc="www";                $f14 = "www";                   $f14_type = "VARCHAR(255)";
-$f15_odbc="Date_CP";            $f15 = "time_mark";             $f15_type = "TIMESTAMP";
+$f15_odbc="Date_CP";            $f15 = "time_stamp";             $f15_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -563,11 +562,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -590,16 +589,16 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field14 = $row[$f14_odbc];
     $field15 = $row[$f15_odbc];
 
-    if($field7=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ РєРѕРґ РіСЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЏ РїРѕРґСЃС‚Р°РІР»СЏРµРј РєРѕРґ Р·Р°РєР°Р·С‡РёРєР°
+    if($field7=="") // Если не задан код грузополучателя подставляем код заказчика
         $field7=$field5;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$f10,$f11,$f12,$f13,$f14,$f15) 
             VALUES($field_id,'$field1','$field2','$field3','$field4','$field5','$field6','$field7',
             '$field8','$field9','$field10','$field11','$field12','$field13','$field14','$field15')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -617,19 +616,19 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "parts";
-$table_odbc = "РџР°СЂС‚РёРё";
+$table_odbc = "Партии";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РїР°СЂС‚РёРё";          $id = "kod_part";               $id_type = "INT";
-$f1_odbc="РљРѕРґ_СЌР»РµРјРµРЅС‚Р°";        $f1 = "kod_elem";               $f1_type = "INT";
+$id_odbc="Код_партии";          $id = "kod_part";               $id_type = "INT";
+$f1_odbc="Код_элемента";        $f1 = "kod_elem";               $f1_type = "INT";
 $f2_odbc="Mod";                 $f2 = "modif";                  $f2_type = "VARCHAR(255)";
-$f3_odbc="РљРѕР»РёС‡РµСЃС‚РІРѕ";          $f3 = "numb";                   $f3_type = "DOUBLE";
-$f4_odbc="Р”Р°С‚Р°_РїРѕСЃС‚Р°РІРєРё";       $f4 = "data_postav";            $f4_type = "DATE";
-$f5_odbc="Р¦РµРЅР°_РўР¤";             $f5 = "price";                  $f5_type = "DOUBLE";
-$f6_odbc="РљРѕРґ_РґРѕРіРѕРІРѕСЂР°";        $f6 = "kod_dogovora";           $f6_type = "INT";
-$f7_odbc="Р’Р°Р»СЋС‚Р°";              $f7 = "val";                    $f7_type = "INT";
-$f8_odbc="РќР”РЎ";                 $f8 = "nds";                    $f8_type = "DOUBLE";
-$f9_odbc="DateCP";              $f9 = "time_mark";              $f9_type = "TIMESTAMP";
+$f3_odbc="Количество";          $f3 = "numb";                   $f3_type = "DOUBLE";
+$f4_odbc="Дата_поставки";       $f4 = "data_postav";            $f4_type = "DATE";
+$f5_odbc="Цена_ТФ";             $f5 = "price";                  $f5_type = "DOUBLE";
+$f6_odbc="Код_договора";        $f6 = "kod_dogovora";           $f6_type = "INT";
+$f7_odbc="Валюта";              $f7 = "val";                    $f7_type = "INT";
+$f8_odbc="НДС";                 $f8 = "nds";                    $f8_type = "DOUBLE";
+$f9_odbc="DateCP";              $f9 = "time_stamp";              $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -650,11 +649,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -671,15 +670,15 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field8 = $row[$f8_odbc];
     $field9 = $row[$f9_odbc];
 
-    if($field7=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ РєРѕРґ РіСЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЏ РїРѕРґСЃС‚Р°РІР»СЏРµРј РєРѕРґ Р·Р°РєР°Р·С‡РёРєР°
+    if($field7=="") // Если не задан код грузополучателя подставляем код заказчика
         $field7=$field5;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9) 
             VALUES($field_id,$field1,'$field2',$field3,'$field4',$field5,$field6,$field7,$field8,'$field9')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -696,17 +695,17 @@ echo "$table_odbc -> $table Inserted: $i";
 //----------------------------------------------------------------------------------------------------------------------
 //
 
-// !Р Р°Р·Р±РёРІР°РµРј РЅР° РґРІРµ С‚Р°Р±Р»РёС†С‹ РїРѕ РєРѕРЅС‚Р°РєС‚Р°Рј Рё РїРѕ РѕСЂРіР°РЅРёР·Р°С†РёРё
+// !Разбиваем на две таблицы по контактам и по организации
 $table = "kontakty_data";
 $table2 = "org_data";
-$table_odbc = "РўРµР»РµС„РѕРЅС‹";
+$table_odbc = "Телефоны";
 
 // Sourse Names                | Dest Names                 | Dest Type
-$id_odbc="РљРѕРґ РўРµР»РµС„РѕРЅР°";        $id = "kod_dat";              $id_type = "INT";
-$f1_odbc="РљРѕРґ_РљРѕРЅС‚Р°РєС‚Р°";        $f1 = "kod_kontakta";         $f1_type = "INT";
-$f2_odbc="РўРµР»РµС„РѕРЅ";             $f2 = "data";                 $f2_type = "VARCHAR(255)";
-$f3_odbc="Date_CP";             $f3 = "time_mark";            $f3_type = "TIMESTAMP";
-$f4_odbc="РљРѕРґ_РћСЂРіР°РЅРёР·Р°С†РёРё";     $f4 = "kod_org";              $f4_type = "INT";
+$id_odbc="Код Телефона";        $id = "kod_dat";              $id_type = "INT";
+$f1_odbc="Код_Контакта";        $f1 = "kod_kontakta";         $f1_type = "INT";
+$f2_odbc="Телефон";             $f2 = "data";                 $f2_type = "VARCHAR(255)";
+$f3_odbc="Date_CP";             $f3 = "time_stamp";            $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f4_odbc="Код_Организации";     $f4 = "kod_org";              $f4_type = "INT";
 
 
 $sql = "DROP TABLE $table";
@@ -732,11 +731,11 @@ $sql = "CREATE TABLE $table2 (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -751,7 +750,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     if($field1!="") {
         $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,'$field2','$field3')";
         $db->query($sql);
-        // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+        // Проверяем записалась ли строка
         $db->query("SELECT * FROM $table WHERE $id=$field_id");
         if($db->cnt!=1)
             echo "!!!!!!!!! Err: ".$sql;
@@ -760,7 +759,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     {
         $sql = "INSERT INTO $table2 ($id,$f4,$f2,$f3) VALUES($field_id,$field4,'$field2','$field3')";
         $db->query($sql);
-        // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+        // Проверяем записалась ли строка
         $db->query("SELECT * FROM $table2 WHERE $id=$field_id");
         if($db->cnt!=1)
             echo "!!!!!!!!! Err: ".$sql;
@@ -782,16 +781,16 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "plat";
-$table_odbc = "РџР»Р°С‚РµР¶Рё";
+$table_odbc = "Платежи";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РїР»Р°С‚РµР¶Р°";         $id = "kod_plat";               $id_type = "INT";
-$f1_odbc="РќРѕРјРµСЂ_РџРџ";            $f1 = "nomer";                  $f1_type = "VARCHAR(255)";
-$f2_odbc="РЎСѓРјРјР°";               $f2 = "summa";                  $f2_type = "DOUBLE";
-$f3_odbc="Р”Р°С‚Р°";                $f3 = "data";                   $f3_type = "DATE";
-$f4_odbc="РџСЂРёРјРµС‡Р°РЅРёРµ";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
-$f5_odbc="РљРѕРґ_РґРѕРіРѕРІРѕСЂР°";        $f5 = "kod_dogovora";           $f5_type = "INT";
-$f6_odbc="Date_CP";             $f6 = "time_mark";              $f6_type = "TIMESTAMP";
+$id_odbc="Код_платежа";         $id = "kod_plat";               $id_type = "INT";
+$f1_odbc="Номер_ПП";            $f1 = "nomer";                  $f1_type = "VARCHAR(255)";
+$f2_odbc="Сумма";               $f2 = "summa";                  $f2_type = "DOUBLE";
+$f3_odbc="Дата";                $f3 = "data";                   $f3_type = "DATE";
+$f4_odbc="Примечание";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
+$f5_odbc="Код_договора";        $f5 = "kod_dogovora";           $f5_type = "INT";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f7_odbc="";                    $f7 = "user";                   $f7_type = "VARCHAR(255)";
 
 
@@ -811,11 +810,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -830,12 +829,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field6 = $row[$f6_odbc];
     $field7 = $row[$f7_odbc];
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7) 
             VALUES($field_id,'$field1',$field2,'$field3','$field4',$field5,'$field6','$field7')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -853,15 +852,15 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "raschet";
-$table_odbc = "Р Р°СЃС‡РµС‚";
+$table_odbc = "Расчет";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_СЂР°СЃС‡РµС‚Р°";         $id = "kod_rascheta";           $id_type = "INT";
-$f1_odbc="РљРѕРґ_РїР°СЂС‚РёРё";          $f1 = "kod_part";               $f1_type = "INT";
-$f2_odbc="РЎСѓРјРјР°";               $f2 = "summa";                  $f2_type = "DOUBLE";
-$f3_odbc="Р”Р°С‚Р°";                $f3 = "data";                   $f3_type = "DATE";
-$f4_odbc="РўРёРї_СЂР°СЃС‡РµС‚Р°";         $f4 = "type_rascheta";          $f4_type = "INT";
-$f5_odbc="";                    $f5 = "time_mark";              $f5_type = "TIMESTAMP";
+$id_odbc="Код_расчета";         $id = "kod_rascheta";           $id_type = "INT";
+$f1_odbc="Код_партии";          $f1 = "kod_part";               $f1_type = "INT";
+$f2_odbc="Сумма";               $f2 = "summa";                  $f2_type = "DOUBLE";
+$f3_odbc="Дата";                $f3 = "data";                   $f3_type = "DATE";
+$f4_odbc="Тип_расчета";         $f4 = "type_rascheta";          $f4_type = "INT";
+$f5_odbc="";                    $f5 = "time_stamp";              $f5_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f6_odbc="";                    $f6 = "user";                   $f6_type = "VARCHAR(255)";
 
 
@@ -880,11 +879,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -898,15 +897,15 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field5 = $row[$f5_odbc];
     $field6 = $row[$f6_odbc];
 
-    if($field4=="") // Р•СЃР»Рё РЅРµ Р·Р°РґР°РЅ РєРѕРґ РіСЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЏ РїРѕРґСЃС‚Р°РІР»СЏРµРј РєРѕРґ Р·Р°РєР°Р·С‡РёРєР°
+    if($field4=="") // Если не задан код грузополучателя подставляем код заказчика
         $field4=1;
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) 
             VALUES($field_id,$field1,$field2,'$field3',$field4,'$field5','$field6')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -924,14 +923,14 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "raschety_plat";
-$table_odbc = "Р Р°СЃС‡РµС‚С‹_РџР»Р°С‚РµР¶Рё";
+$table_odbc = "Расчеты_Платежи";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РїРѕСЃС‚СѓРїР»РµРЅРёСЏ";     $id = "kod_rasch_plat";         $id_type = "INT";
-$f1_odbc="РЎСѓРјРјР°";               $f1 = "summa";                  $f1_type = "DOUBLE";
-$f2_odbc="РљРѕРґ_Р Р°СЃС‡РµС‚Р°";         $f2 = "kod_rascheta";           $f2_type = "INT";
-$f3_odbc="РљРѕРґ_РџР»Р°С‚РµР¶Р°";         $f3 = "kod_plat";               $f3_type = "INT";
-$f4_odbc="";                    $f4 = "time_mark";              $f4_type = "TIMESTAMP";
+$id_odbc="Код_поступления";     $id = "kod_rasch_plat";         $id_type = "INT";
+$f1_odbc="Сумма";               $f1 = "summa";                  $f1_type = "DOUBLE";
+$f2_odbc="Код_Расчета";         $f2 = "kod_rascheta";           $f2_type = "INT";
+$f3_odbc="Код_Платежа";         $f3 = "kod_plat";               $f3_type = "INT";
+$f4_odbc="";                    $f4 = "time_stamp";              $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f5_odbc="";                    $f5 = "user";                   $f5_type = "VARCHAR(255)";
 
 
@@ -949,11 +948,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -964,12 +963,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field2 = $row[$f2_odbc];
     $field3 = $row[$f3_odbc];
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) 
             VALUES($field_id,$field1,$field2,$field3)";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -987,16 +986,16 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "scheta";
-$table_odbc = "РЎС‡РµС‚Р°";
+$table_odbc = "Счета";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РЎС‡РµС‚Р°";           $id = "kod_scheta";             $id_type = "INT";
-$f1_odbc="РќРѕРјРµСЂ";               $f1 = "nomer";                  $f1_type = "VARCHAR(255)";
-$f2_odbc="Р”Р°С‚Р°";                $f2 = "data";                   $f2_type = "DATE";
-$f3_odbc="РЎСѓРјРјР°";               $f3 = "summa";                  $f3_type = "DOUBLE";
-$f4_odbc="РџСЂРёРјРµС‡Р°РЅРёРµ";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
-$f5_odbc="РљРѕРґ_Р”РѕРіРѕРІРѕСЂР°";        $f5 = "kod_dogovora";           $f5_type = "INT";
-$f6_odbc="Date_CP";             $f6 = "time_mark";              $f6_type = "TIMESTAMP";
+$id_odbc="Код_Счета";           $id = "kod_scheta";             $id_type = "INT";
+$f1_odbc="Номер";               $f1 = "nomer";                  $f1_type = "VARCHAR(255)";
+$f2_odbc="Дата";                $f2 = "data";                   $f2_type = "DATE";
+$f3_odbc="Сумма";               $f3 = "summa";                  $f3_type = "DOUBLE";
+$f4_odbc="Примечание";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
+$f5_odbc="Код_Договора";        $f5 = "kod_dogovora";           $f5_type = "INT";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -1014,11 +1013,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -1032,12 +1031,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field5 = $row[$f5_odbc];
     $field6 = $row[$f6_odbc];
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) 
             VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,'$field6')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -1055,19 +1054,19 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "sklad";
-$table_odbc = "РЎРєР»Р°Рґ";
+$table_odbc = "Склад";
 
 // Sourse Names                   | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РѕР±РѕСЂРѕС‚Р°";             $id = "kod_oborota";            $id_type = "INT";
-$f1_odbc="РљРѕРґ_РїР°СЂС‚РёРё";              $f1 = "kod_part";               $f1_type = "INT";
-$f2_odbc="РљРѕР»РёС‡РµСЃС‚РІРѕ";              $f2 = "numb";                   $f2_type = "INT";
-$f3_odbc="РљРѕРґ_РѕРїРµСЂР°С†РёРё";            $f3 = "kod_oper";               $f3_type = "INT";
-$f4_odbc="РќР°РєР»Р°РґРЅР°СЏ";               $f4 = "naklad";                 $f4_type = "VARCHAR(255)";
-$f5_odbc="Р”Р°С‚Р°";                    $f5 = "data";                   $f5_type = "DATE";
+$id_odbc="Код_оборота";             $id = "kod_oborota";            $id_type = "INT";
+$f1_odbc="Код_партии";              $f1 = "kod_part";               $f1_type = "INT";
+$f2_odbc="Количество";              $f2 = "numb";                   $f2_type = "INT";
+$f3_odbc="Код_операции";            $f3 = "kod_oper";               $f3_type = "INT";
+$f4_odbc="Накладная";               $f4 = "naklad";                 $f4_type = "VARCHAR(255)";
+$f5_odbc="Дата";                    $f5 = "data";                   $f5_type = "DATE";
 $f6_odbc="Operator";                $f6 = "oper";                   $f6_type = "VARCHAR(255)";
-$f7_odbc="РџРѕР»СѓС‡РµРЅРѕ";                $f7 = "poluch";                 $f7_type = "INT";
-$f8_odbc="Р”Р°С‚Р°_РћС‚РјРµС‚РєРёРџРѕР»СѓС‡РµРЅРёСЏ";   $f8 = "data_poluch";            $f8_type = "DATE";
-$f9_odbc="DateCP";                  $f9 = "time_mark";              $f9_type = "TIMESTAMP";
+$f7_odbc="Получено";                $f7 = "poluch";                 $f7_type = "INT";
+$f8_odbc="Дата_ОтметкиПолучения";   $f8 = "data_poluch";            $f8_type = "DATE";
+$f9_odbc="DateCP";                  $f9 = "time_stamp";              $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -1088,11 +1087,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -1109,12 +1108,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field8 = $row[$f8_odbc];
     $field9 = $row[$f9_odbc];
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9) 
             VALUES($field_id,$field1,$field2,$field3,'$field4','$field5','$field6',$field7,'$field8','$field9')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -1132,14 +1131,14 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "org_links";
-$table_odbc = "РћСЂРіР°РЅРёР·Р°С†РёРё_СЃРІСЏР·СЊ";
+$table_odbc = "Организации_связь";
 
 // Sourse Names                   | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РЎРІСЏР·Рё";               $id = "kod_link";               $id_type = "INT";
+$id_odbc="Код_Связи";               $id = "kod_link";               $id_type = "INT";
 $f1_odbc="Master";                  $f1 = "master";                 $f1_type = "INT";
 $f2_odbc="Slave";                   $f2 = "slave";                  $f2_type = "INT";
-$f3_odbc="РўРёРї_РЎРІСЏР·Рё";               $f3 = "prim";                   $f3_type = "VARCHAR(255)";
-$f4_odbc="Date_CP";                 $f4 = "time_mark";              $f4_type = "TIMESTAMP";
+$f3_odbc="Тип_Связи";               $f3 = "prim";                   $f3_type = "VARCHAR(255)";
+$f4_odbc="Date_CP";                 $f4 = "time_stamp";              $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -1155,11 +1154,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -1171,12 +1170,12 @@ for ($i; $i <= $odbc->cnt; $i++)
     $field3 = $row[$f3_odbc];
     $field4 = $row[$f4_odbc];
 
-    // Р—Р°РїРёСЃС‹РІР°РµРј СЃС‚СЂРѕРєСѓ
+    // Записываем строку
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) 
             VALUES($field_id,$field1,$field2,'$field3','$field4')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql."<br>";
@@ -1194,13 +1193,13 @@ echo "$table_odbc -> $table Inserted: $i";
 //
 
 $table = "docum_elem";
-$table_odbc = "Р”РѕРєСѓРјРµРЅС‚С‹РР·РґРµР»РёСЏ";
+$table_odbc = "ДокументыИзделия";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РЎРІСЏР·Рё";           $id = "kod_docum_elem";         $id_type = "INT";
-$f1_odbc="РљРѕРґ_Р”РѕРєСѓРјРµРЅС‚Р°";       $f1 = "kod_docum";              $f1_type = "INT";
-$f2_odbc="РљРѕРґ_Р­Р»РµРјРµРЅС‚Р°";        $f2 = "kod_elem";               $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_mark";              $f3_type = "TIMESTAMP";
+$id_odbc="Код_Связи";           $id = "kod_docum_elem";         $id_type = "INT";
+$f1_odbc="Код_Документа";       $f1 = "kod_docum";              $f1_type = "INT";
+$f2_odbc="Код_Элемента";        $f2 = "kod_elem";               $f2_type = "INT";
+$f3_odbc="DateCP";              $f3 = "time_stamp";              $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -1215,11 +1214,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -1233,7 +1232,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
@@ -1248,13 +1247,13 @@ echo "$table_odbc -> $table Inserted: $i";
 //----------------------------------------------------------------------------------------------------------------------
 //
 $table = "docum_org";
-$table_odbc = "Р”РѕРєСѓРјРµРЅС‚С‹РћСЂРіР°РЅРёР·Р°С†РёРё";
+$table_odbc = "ДокументыОрганизации";
 
 // Sourse Names                | Dest Names                   | Dest Type
-$id_odbc="РљРѕРґ_РЎРІСЏР·Рё";           $id = "kod_docum_org";          $id_type = "INT";
-$f1_odbc="РљРѕРґ_Р”РѕРєСѓРјРµРЅС‚Р°";       $f1 = "kod_docum";              $f1_type = "INT";
-$f2_odbc="РљРѕРґ_РћСЂРіР°РЅРёР·Р°С†РёРё";     $f2 = "kod_org";                $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_mark";              $f3_type = "TIMESTAMP";
+$id_odbc="Код_Связи";           $id = "kod_docum_org";          $id_type = "INT";
+$f1_odbc="Код_Документа";       $f1 = "kod_docum";              $f1_type = "INT";
+$f2_odbc="Код_Организации";     $f2 = "kod_org";                $f2_type = "INT";
+$f3_odbc="DateCP";              $f3 = "time_stamp";              $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
@@ -1269,11 +1268,11 @@ $sql = "CREATE TABLE $table (
     )";
 $db->query($sql);
 
-// Р—Р°РїСЂРѕСЃРёС‚СЊ РґР°РЅРЅС‹Рµ РёР· ODBC
+// Запросить данные из ODBC
 $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
-// Р’СЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ РІ MySQL
+// Вставить данные в MySQL
 $i=1;
 for ($i; $i <= $odbc->cnt; $i++)
 {
@@ -1287,7 +1286,7 @@ for ($i; $i <= $odbc->cnt; $i++)
     $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
     $db->query($sql);
 
-    // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РїРёСЃР°Р»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    // Проверяем записалась ли строка
     $db->query("SELECT * FROM $table WHERE $id=$field_id");
     if($db->cnt!=1)
         echo "!!!!!!!!! Err: ".$sql;
