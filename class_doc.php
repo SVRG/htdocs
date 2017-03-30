@@ -321,12 +321,14 @@ class Doc
 //
     /**
      * Примечание договора
+     * @param int $AddForm
+     * @return string
      */
-    public function DocPrim($AddForm=0)
+    public function getPrim($AddForm=0)
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM dogovor_prim WHERE kod_dogovora=$this->kod_dogovora ORDER BY dogovor_prim.data DESC");
+        $rows = $db->rows("SELECT * FROM dogovor_prim WHERE kod_dogovora=$this->kod_dogovora ORDER BY dogovor_prim.time_stamp ASC");
 
         $cnt = $db->cnt;
         $res = "";
@@ -346,20 +348,19 @@ class Doc
                                         </tr>
                                       </table>
                                     <input type="hidden" name="AddPrim" value="1" />
-                                    </form>';
+                    </form>';
             $res.= Func::Cansel();
-            return $res;
         }
 
         if ($cnt == 0)
             return $res;
 
         // Формируем таблицу
-        echo '<br>Примечание<br>';
-        echo '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-        echo '<tr bgcolor="#CCCCCC" >
-        <td width="80">Дата</td>
-        <td>Текст</td>';
+        $res.= 'Примечание
+                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC" >
+                    <td width="80">Дата</td>
+                    <td>Текст</td>';
 
         // Заполняем данными
         for ($i = 0; $i < $cnt; $i++) {
@@ -369,12 +370,14 @@ class Doc
             if($row['user']!="")
                 $user = "<br>".$row['user'];
 
-            echo '<tr>
-                    <td>' . Func::DateE($row['data']) . $user . '</td>
-                    <td>' . $row['text'] . '</td>
-                 </tr>';
+            $res.=  '<tr>
+                        <td>' . Func::DateE($row['time_stamp']) . $user . '</td>
+                        <td>' . $row['text'] . '</td>
+                     </tr>';
         }
-        echo '</table>';
+        $res.= '</table>';
+
+        return $res;
     }
 //--------------------------------------------------------------------
 //
@@ -427,7 +430,7 @@ class Doc
 
         $res = 'Количество Записей: ' . $cnt . '<br>';
 
-        $res.= '<table border=0 cellspacing=0 cellpadding=0>';
+        $res.= '<table border=0 cellspacing=0 cellpadding=0 width="50%">';
         $res.= '<tr bgcolor="#CCCCCC"><td>Номер Договора</td><td>Организация</td></tr>';
 
         for ($i = 0; $i < $cnt; $i++) {
@@ -436,13 +439,12 @@ class Doc
 
             if ($row['kod_org'] == 683)
                 $res.= '<tr bgcolor="#8fe8a1"><td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
-                    <td width="150"><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
+                    <td width="80%"><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                     </tr>';
             else
                 $res.= '<tr><td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
-              <td width="150"><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
+              <td width="80%"><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
               </tr>';
-
         }
         $res.= '</table>';
 
@@ -921,15 +923,8 @@ class Doc
     }
 //-----------------------------------------------------------------------
 // История по Складу
-    public function SGPHistory($Date = '')
+    public function SGPHistory()
     {
-        if ($Date == '') {
-            if (date('m') > 2)
-                $Date = '#' . (date('m') - 2) . '/01' . '/' . date('y') . '#';// первое число 2 месяца назад
-            else
-                $Date = '#' . (9) . '/01' . '/' . (date('y') - 1) . '#';// первое число 2 месяца назад
-        }
-
         $db = new Db();
 
         $rows = $db->rows("SELECT * FROM view_sklad");
