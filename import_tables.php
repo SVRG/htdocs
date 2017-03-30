@@ -34,7 +34,7 @@ include_once "classodbc.php";
     adres TEXT,
     kod_org INT,
     type INT,
-    time_mark TIMESTAMP
+    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
 
     $db->query($sql);
@@ -186,7 +186,7 @@ $id_odbc="Код_Примечания";      $id = "kod_prim";            $id_type = "INT";
 $f1_odbc="Текст";               $f1 = "text";                $f1_type = "TEXT";
 $f2_odbc="Код_Договора";        $f2 = "kod_dogovora";        $f2_type = "INT";
 $f3_odbc="user";                $f3 = "user";                $f3_type = "VARCHAR(20)";
-$f4_odbc="Дата";                $f4 = "data";                $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f4_odbc="Дата";                $f4 = "time_stamp";          $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
 $sql = "DROP TABLE $table";
