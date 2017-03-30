@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="windows-1251">
+    <file url="file://$PROJECT_DIR$/Connections/roo.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_db.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_doc.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_docum.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_elem.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_func.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_kont.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_org.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_part.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/classodbc.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config.ini" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_add_elem.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_cont.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_cont_list.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_doclist.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_dogovor.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_elem.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_nomen.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_org.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_orglist.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_part.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_pays.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/header.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/import_tables.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/index.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/menu/menu.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/upload.php" charset="UTF-8" />
+    <file url="PROJECT" charset="windows-1251" />
+  </component>
+</project>
