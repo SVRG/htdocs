@@ -462,12 +462,12 @@ else
                 if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
                     echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim');
 
+                    $add_prim = 0;
                     if (isset($_POST['Flag']))
-                        if ($_POST['Flag'] == 'AddPrim') {
-                            echo $D->DocPrim(1);
-                            $_POST['Flag'] = null;
-                        }
-                    $D->DocPrim();
+                        if ($_POST['Flag'] == 'AddPrim')
+                            $add_prim = 1;
+
+                    echo $D->getPrim($add_prim);
                 }
                 ?></td>
         </tr>
