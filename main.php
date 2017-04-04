@@ -32,34 +32,31 @@ include_once "security.php";
         elseif ($_GET['sgp'] == 2)
             $sgp = 2;
         else $sgp = -1;
-
     }
 
     if ($sgp == -1)
-        $D->ShowDocList(0);
+        echo $D->getRPlan(0);
     elseif ($sgp == 1)
-        $D->ShowDocList(0);
+        echo $D->getRPlan(0);
     elseif ($sgp == 2)
-        $D->ShowDocList(1);
-
+        echo $D->getRPlan(1);
     elseif (isset($_GET['sgphistory']))
         echo $D->SGPHistory();
 
-/*
- *
-     elseif (isset($_GET['RP'])) // Оплачено
-        echo Doc::getRPlan_by_Elem(' WHERE zakryt=0 AND summa_plat>1  AND kod_ispolnit=683 ');
-    elseif (isset($_GET['RP_VN'])) // todo - план реализации внешний?
-        echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND kod_ispolnit<>683 ");
-    elseif (isset($_GET['RPN'])) // Нет оплаты
-        echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND summa_plat=0  AND kod_ispolnit=683 ");
-    else // Закрытые договоры НВС
-        echo Doc::getRPlan_by_Elem(" WHERE zakryt=1 AND kod_ispolnit=683 ");
-*/
+    /*
+     *
+         elseif (isset($_GET['RP'])) // Оплачено
+            echo Doc::getRPlan_by_Elem(' WHERE zakryt=0 AND summa_plat>1  AND kod_ispolnit=683 ');
+        elseif (isset($_GET['RP_VN'])) // todo - план реализации внешний?
+            echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND kod_ispolnit<>683 ");
+        elseif (isset($_GET['RPN'])) // Нет оплаты
+            echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND summa_plat=0  AND kod_ispolnit=683 ");
+        else // Закрытые договоры НВС
+            echo Doc::getRPlan_by_Elem(" WHERE zakryt=1 AND kod_ispolnit=683 ");
+    */
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
     ?>
-</div>
 </div>
 </body>
 </html>
