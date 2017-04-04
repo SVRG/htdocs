@@ -69,7 +69,7 @@ if (isset($_POST['RsSumm']) and isset($_POST['RsID']) and isset($_POST['SelPPID'
 }
 
 //---------------------------------------------------------------------------
-// Добавление Накладно
+// Добавление Накладной
 if (isset($_POST['Numb']) and isset($_POST['Nacl']) and isset($_POST['DateR']) and isset($_POST['Oper'])) {
     $P->AddNacl($_POST['Numb'], $_POST['Nacl'], $_POST['DateR'], $_POST['Oper'], $_SESSION['MM_Username']);
 

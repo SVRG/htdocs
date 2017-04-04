@@ -4,7 +4,6 @@ $MM_donotCheckaccess = "true";
 
 include_once ("security.php");
 
-
 include_once("class_elem.php");
 
 // Добавить Элемент
