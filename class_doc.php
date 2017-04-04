@@ -105,7 +105,7 @@ class Doc
                       </tr>
                       <tr>
                         <th scope="row">Дата Составления </th>
-                        <td>' . Func::DateE($row['data_sost']) . '</td>
+                        <td>' . Func::Date_from_MySQL($row['data_sost']) . '</td>
                       </tr>
                       <tr>
                         <th scope="row">Заказчик</th>
@@ -160,7 +160,7 @@ class Doc
               <tr>
                 <th scope="row">Дата Составления </th>
                 <td><span id="SDateR">
-                          <input type="text" name="Date" id="SDate" value="' . Func::DateE($this->Data['data_sost']) . '" />
+                          <input type="text" name="Date" id="SDate" value="' . Func::Date_from_MySQL($this->Data['data_sost']) . '" />
                           <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
               </tr>
               <tr>
@@ -229,7 +229,7 @@ class Doc
     /**
      * Платежи по договору
      */
-    public function ShowPP()
+    public function getPP()
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora");
@@ -238,27 +238,29 @@ class Doc
         $cnt = $db->cnt;
 
         if($cnt==0)
-            return;
+            return "";
 
-        echo '<br>Платежные поручения<br>';
-        echo '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-
-        echo '<tr bgcolor="#CCCCCC"><td width="100">Сумма</td>
-            <td width="80">Номер ПП</td>
-            <td width="80">Дата</td>
-            <td>Примечание</td></tr>';
+        $res = '<br>Платежные поручения<br>
+                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC"><td width="100">Сумма</td>
+                        <td width="80">Номер ПП</td>
+                        <td width="80">Дата</td>
+                        <td>Примечание</td>
+                    </tr>';
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
-            echo '<tr>
+            $res.= '<tr>
                         <td>' . Func::Rub($row['summa']) . '</td>
                         <td>' . $row['nomer'] . '</td>
-                        <td>' . Func::DateE($row['data']) . '</td>
+                        <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
-                 </tr>';
+                    </tr>';
         }
-        echo '</table>';
+        $res.= '</table>';
+
+        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
     /**
@@ -314,7 +316,7 @@ class Doc
             echo '<tr>
                         <td>' . $row['nomer']             . '</td>
                         <td>' . Func::Rub($row['summa']) . '</td>
-                        <td>' . Func::DateE($row['data']) . '</td>
+                        <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '<br>' . Func::ActForm('', '<input type="hidden" name="InvID" id="InvID" value="' . $row['kod_scheta'] . '" />', 'Удалить Счет', 'DelInv') . '</td>
                     </tr>';
         }
@@ -393,7 +395,7 @@ class Doc
                 $user = "<br>".$row['user'];
 
             $res.=  '<tr>
-                        <td>' . Func::DateE($row['time_stamp']) . $user . '</td>
+                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . '</td>
                         <td>' . $row['text'] . '</td>
                      </tr>';
         }
@@ -512,7 +514,7 @@ class Doc
 
                 $row = $rows[$i - 1];
 
-                $d = Func::DateE($row['data']);
+                $d = Func::Date_from_MySQL($row['data']);
 
                 if ($d <> '-') {
                     $m = explode('.', $d);
@@ -522,7 +524,7 @@ class Doc
 
             $row = $rows[$i];
 
-            $d = Func::DateE($row['data']); // Дата
+            $d = Func::Date_from_MySQL($row['data']); // Дата
 
             $cm = '-';
             $cy = '-';
@@ -622,7 +624,7 @@ class Doc
             $summa_raspred = (double)$row['summa_raspred']; // Сумма которая уже распределена
             $kod_plat = (int)$row['kod_plat']; // Код платежа
             $nomer = $row['nomer']; // Номер платежа
-            $data = Func::DateE($row['data']); // Дата платежа
+            $data = Func::Date_from_MySQL($row['data']); // Дата платежа
             $ostat = $summa - $summa_raspred; // Остаток платежа который можно распределить
 
             if (($ostat) > 0)
@@ -655,6 +657,7 @@ class Doc
     {
         $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
+        $Date = func::Date_to_MySQL($Date);
 
         $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$Numb,$Summ,'$Date','$Prim')");
     }
@@ -711,6 +714,7 @@ class Doc
         if (!isset($Prim)) $Prim = '-';
 
         $db = new Db();
+        $Date = func::Date_to_MySQL($Date);
 
         $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,'$Numb',$Summ,'$Date','$Prim')");
 
@@ -806,7 +810,7 @@ class Doc
             //$summa_plat = round((double)$row['summa_plat'], 2); // Сумма платежей по партии / Договору
 
             // Строки
-            $Dt = Func::DateE($data_postav); // Дата поставки
+            $Dt = Func::Date_from_MySQL($data_postav); // Дата поставки
 
             $Mod = '';            // Модификация
             if ($modif != '')
@@ -845,7 +849,7 @@ class Doc
                                 <td align='right'>" . $proc . "</td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
-                                <td align='right'>" . Func::DateE($data_postav) . "</td>
+                                <td align='right'>" . Func::Date_from_MySQL($data_postav) . "</td>
                                 <td align='right'>" . $part_summa_str . $Val . $NDS . "</td>
                          </tr>";
 
@@ -954,7 +958,7 @@ class Doc
                     <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</td>
                     <td >' . (int)$row['numb'] . '</td>
                     <td>' . $row['naklad'] . '</td>
-                    <td>' . Func::DateE($row['data']) . '</td>
+                    <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                     <td>' . $row['oper'] . '</td>
                     <td>' . Func::Proc($procent) . '</td>
                 </tr>';
@@ -980,6 +984,8 @@ class Doc
     public function Add($nomer, $data_sost, $kod_org, $VN = 0)
     {
         $db = new Db();
+
+        $data_sost = func::Date_to_MySQL($data_sost);
 
         if ((int)$VN == 0)
             $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,683)";
@@ -1016,26 +1022,16 @@ class Doc
 //--------------------------------------------------------------
 //
     /**
-     * Закрытие договора
+     * Закрытие договора или отмена закрытия
+     * @param int $zakryt - 1-Закрыть, 0 - отмена закрытия
      */
-    public function Close()
+    public function Close($zakryt=1)
     {
         $db = new Db();
 
         $now = date('y.m.d');
 
-        $db->query("UPDATE dogovory SET zakryt = 1, data_zakrytiya='$now' WHERE kod_dogovora=$this->kod_dogovora");
-    }
-//-----------------------------------------------------------------------
-//
-    /**
-     * Закрытие договора
-     */
-    public function Open()
-    {
-        $db = new Db();
-
-        $db->query("UPDATE dogovory SET zakryt = 0, data_zakrytiya='' WHERE kod_dogovora=$this->kod_dogovora");
+        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now' WHERE kod_dogovora=$this->kod_dogovora");
     }
 //-----------------------------------------------------------------------
 //
@@ -1048,7 +1044,7 @@ class Doc
      */
     public function Edit($Numb, $Date, $kod_org, $IspID)
     {
-        $DateR = func::DateR($Date);
+        $DateR = func::Date_to_MySQL($Date);
         $db = new Db();
         $db->query("UPDATE dogovory SET nomer = '$Numb', data_sost='$DateR', kod_org=$kod_org, kod_ispolnit=$IspID WHERE kod_dogovora=$this->kod_dogovora");
     }
@@ -1150,7 +1146,7 @@ class Doc
             $mod = $row['modif']; // Модификация
             $numb = (int)$row['numb']; // Количество
             //$ostatok = (int)$row['numb_otgruz']; // ??? Уточнить
-            $data = Func::DateE($row['data_postav']); // Дата поставки
+            $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
             $price = round((double)$row['price'], 2); // Цена
             $val = ""; // Валюта
             $price_nds = round($price * (1 + (double)$row['nds']), 2); // Цена с НДС
