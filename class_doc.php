@@ -190,17 +190,39 @@ class Doc
 //
     /**
      * Список договоров
-     * @param int $VN: 1 - внешний; 0 - внутренний
+     * @param int $VN : 1 - внешний; 0 - внутренний
+     * @return string
      */
-    public function ShowDocList($VN = 0)
+    public function getRPlan($VN = 0)
     {
         if ($VN == 0) //Если договор поставки
-            $sql = " WHERE kod_ispolnit=683 AND zakryt=0";
+            $sql = /** @lang SQL */
+                "SELECT 
+                    * 
+                    FROM 
+                      view_rplan 
+                    WHERE 
+                      kod_ispolnit=683 AND zakryt<>1 
+                    ORDER BY 
+                      obozn ASC,
+                      numb DESC";
+
         else // Если договор внешний
-            $sql = " WHERE kod_org=683 AND zakryt=0";
+            $sql = /** @lang SQL */
+                "SELECT 
+                    * 
+                    FROM 
+                      view_rplan 
+                    WHERE 
+                      kod_org=683 AND zakryt<>1 
+                    ORDER BY 
+                      obozn ASC, 
+                      numb DESC";
 
-        echo $this->getRPlan_by_Elem($sql);
+        $db = new Db();
+        $rows = $db->rows($sql); // Массив данных
 
+        return $this->getRPlan_by_Elem($rows);
     }
 //--------------------------------------------------------------
 //
@@ -260,7 +282,7 @@ class Doc
 
         $rows = $db->rows($sql);
 
-        return $this->GroupByDoc($rows);
+        return $this->getRPlan_by_Doc($rows);
     }
 //--------------------------------------------------------------
 //
@@ -315,7 +337,7 @@ class Doc
                                   WHERE kod_elem=$kod_elem
                                   ORDER BY kod_dogovora DESC"); // Код договора по убыванию
 
-        return Doc::GroupByDoc($rows);
+        return Doc::getRPlan_by_Doc($rows);
     }
 //--------------------------------------------------------------
 //
@@ -711,44 +733,14 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
 // Вывод списка договоров по заданному запросу
 // Сортировка по Элементам
-// Строка плана rplan
-    /*
-    dogovory.kod_dogovora,
-    dogovory.nomer,
-    org.kod_org,
-    org.nazv_krat,
-    parts.modif,
-    parts.numb,
-    elem.`name`,
-    parts.data_postav,
-    parts.nds,
-    parts.numb*price*(1+parts.nds) AS part_summa,
-    parts.val,
-    parts.price,
-    elem.kod_elem,
-    view_sklad_otgruzka.numb AS numb_otgruz,
-    elem.obozn,
-    parts.kod_part,
-    dogovory.zakryt,
-    dogovory.kod_ispolnit
-    */
     /**
      * График поставок в тек. и след. месяцах по Изделиям. (План Реализации)
-     * Доделать - группировку по изделиям и итоговые суммы!
-     * @param string $WHERE - критерии отбора
-     * @param string $ORDER_BY - сортировка
-     * @param string $GROUP_BY - группировка
+     * @param $rplan_rows
      * @return string
      */
-    static public function getRPlan_by_Elem($WHERE = '', $ORDER_BY = ' ORDER BY obozn ', $GROUP_BY = ' GROUP BY view_rplan.kod_dogovora ')
+    static public function getRPlan_by_Elem($rplan_rows)
     {
-        $db = new Db();
-
-        $sql = "SELECT * FROM view_rplan" . $WHERE . $GROUP_BY . $ORDER_BY;//
-
-        $rows = $db->rows($sql); // Массив данных
-
-        $cnt = $db->cnt; // Количество записей
+        $cnt = count($rplan_rows); // Количество записей
 
         if ($cnt == 0) return "Список договоров пуст";// "RPlan with current SQL = $sql is empty"; // Если данных нет то выходим
 
@@ -760,7 +752,7 @@ class Doc
                     <td width=\"180\">Номер Договора</td>
                     <td>Организация</td>
                     <td width=\"100\">Дата</td>
-                    <td width=\"100\">Сумма Партии</td>
+                    <td width=\"100\">Сумма с НДС</td>
                 </tr>";
 
         // Создаем таблицу
@@ -778,13 +770,12 @@ class Doc
         // Вывод плана
         for ($i = 0; $i < $cnt; $i++) {
 
-            $row = $rows[$i];
+            $row = $rplan_rows[$i];
 
-            // Данные
-            $numb_otgruz = 0;// (int)$row['numb_otgruz'];
+            // Партия
+            $kod_part = (int)$row['kod_part']; // Код партии
+            $numb_otgruz = Part::getNumbOtgruz($kod_part);
             $numb = (int)$row['numb'];
-
-            // Остаток - что еще надо отгрузить. Если все отгружено то переходим к след. шагу
             if ($numb_otgruz != $numb)
                 $ostat = $numb - $numb_otgruz;
             else
@@ -793,35 +784,31 @@ class Doc
             // Договор
             $kod_dogovora = (int)$row['kod_dogovora']; // Код договора
             $nomer = $row['nomer']; // номер договора
-            //$annulir = ""; // Аннулирован
             $kod_org = (int)$row['kod_org']; // Код организации (Заказчик)
             $nazv_krat = $row['nazv_krat']; // Название Заказчика
-            //$kod_ispolnit = $row['kod_ispolnit']; // Код исполнителя
-            //$ispolnit_nazv_krat = $row['ispolnit_nazv_krat']; // Название исполнителя
 
-            // Партия
-            //$kod_part = (int)$row['kod_part']; // Код партии
+            // Если заказчик НВС - то выводим исполнителя
+            if($kod_org==683) {
+                $kod_org = $row['kod_ispolnit']; // Код исполнителя
+                $nazv_krat = $row['ispolnit_nazv_krat'];
+            }
+
             $kod_elem = (int)$row['kod_elem']; // Код элемента
             $obozn = $row['obozn']; // Обозначение
             //$name = $row['name']; // Название
             $modif = $row['modif']; // Модификация
-            //$numb = (int)$row['numb']; // Количество
-            //$ostatok = (int)$row['numb_otgruz']; // todo - Доделать
-            $price = round((double)$row['price'], 2); // Цена
+            //$price = round((double)$row['price'], 2); // Цена
             $val = (int)$row['val']; // Валюта
-            //$price_nds = round($price * (1 + (double)$row['nds']), 2); // Цена с НДС
-            $part_summa = round((double)$row['part_summa'], 2); // Сумма партии
-            //$oplacheno = ""; // Процент оплаты
+            $price_nds = round($row['price'] * (1 + (double)$row['nds']), 2); // Цена с НДС
+            $part_summa = (double)$price_nds*$ostat; // Сумма партии
             $data_postav = $row['data_postav'];
             $nds = round((double)$row['nds'], 2);
             //$summa_plat = round((double)$row['summa_plat'], 2); // Сумма платежей по партии / Договору
-            //$dogovor_summa = round((double)$row['dogovor_summa'], 2); // Сумма договора - Зачем?
 
             // Строки
-            // Модификация
             $Dt = Func::DateE($data_postav); // Дата поставки
 
-            $Mod = '';
+            $Mod = '';            // Модификация
             if ($modif != '')
                 $Mod = " ($modif)";
 
@@ -844,7 +831,7 @@ class Doc
             $itog_summ += $part_summa;// Итоговая Сумма по всем партиям
 
             // Сумма партии
-            $price_str = Func::Rub($price);
+            $part_summa_str = Func::Rub($part_summa);
 
             if ($zebra == "#FFFFFF")
                 $zebra = "#E6E6E6";
@@ -859,7 +846,7 @@ class Doc
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right'>" . Func::DateE($data_postav) . "</td>
-                                <td align='right'>" . $price_str . $Val . $NDS . "</td>
+                                <td align='right'>" . $part_summa_str . $Val . $NDS . "</td>
                          </tr>";
 
             $rowm = 0;
@@ -903,7 +890,7 @@ class Doc
         }
 
         // Формируем заголовок для плана на след. месяцы
-        $res .= "<tr bgcolor=\"#CCCCCC\">
+        $res .= "<tr bgcolor=\"#21ba42\">
                     <td>Поставка в следующих месяцах</td>
                     <td width=\"100\"></td>
                     <td></td>
@@ -1024,7 +1011,7 @@ class Doc
                                         view_rplan.kod_dogovora DESC,
                                         view_rplan.name ASC");
 
-        return Doc::GroupByDoc($rows);
+        return Doc::getRPlan_by_Doc($rows);
     }
 //--------------------------------------------------------------
 //
@@ -1262,7 +1249,7 @@ class Doc
      * @param $rplan_rows
      * @return string
      */
-    static public function GroupByDoc($rplan_rows)
+    static public function getRPlan_by_Doc($rplan_rows)
     {
         $cnt = count($rplan_rows);
 
