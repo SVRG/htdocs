@@ -71,9 +71,8 @@ class Part
                 $modif = ' (' . $row['modif'] . ')'; // Модификация
 
             $numb = (int)$row['numb']; // Количество товара в партии
-            $numb_otgruz = (int)""; // Доработать! Запросить - Количество отгруженного товара по партии
+            $numb_otgruz = self::getNumbOtgruz($row['kod_part']); // Количество отгруженного товара по партии
             $part_summa = (double)$row['part_summa'];
-            //Доработать! Остаток к отгрузке надо запросить отдельно ------------------------------------------------------------------------
             $ost = $numb - $numb_otgruz; // Осталось отгрузить
             $ostatok = ""; // Строка для вывода остатка по отгрузке
 
@@ -785,6 +784,33 @@ class Part
 
         if($summ_plat >0 and $part_summa >0)
             $res = (int)($summ_plat / $part_summa * 100);
+
+        return $res;
+    }
+//
+//-------------------------------------------------------------------------
+    /**
+     * @param $kod_part
+     * @return int
+     */
+    public static function getNumbOtgruz($kod_part)
+    {
+        $db = new Db();
+
+        $rows = $db->rows("
+                            SELECT
+                              view_sklad_otgruzka.kod_part,
+                              Sum(view_sklad_otgruzka.numb) AS summ_numb
+                            FROM
+                              view_sklad_otgruzka
+                            WHERE
+                              view_sklad_otgruzka.kod_part = $kod_part
+                            GROUP BY
+                              view_sklad_otgruzka.kod_part");
+        if($db->cnt==0)
+            return 0;
+
+        $res = $rows[0]['summ_numb'];
 
         return $res;
     }
