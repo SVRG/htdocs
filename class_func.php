@@ -1,13 +1,14 @@
 <?php
+
 //include_once('Thumbnail.php');
 
 class Func
 {
 
-    public $green =  '#ADFAC2'; // Зеленый
+    public $green = '#ADFAC2'; // Зеленый
     public $orange = '#FFD222'; // Оранж
-    public $red =    '#F18585'; // Красный
-    public $grey =   '#CCCCCC'; // Серый
+    public $red = '#F18585'; // Красный
+    public $grey = '#CCCCCC'; // Серый
     public $yellow = '#FFFF99'; // Желтый
 //----------------------------------------------------------------------------------------------------------------------
     /**
@@ -44,10 +45,15 @@ class Func
 
 //----------------------------------------------------------------------------------------------------------------------
 // Преобразуем дату в формат yyyymmdd для MySQL
-    public static function DateR($Date = 0)
+    /**
+     * @param string $Date
+     * @return string
+     */
+    public static function Date_to_MySQL($Date = "")
     {
 
-        if ($Date == 0) return date('y.m.d');
+        if ($Date == "")
+            return date('y.m.d');
 
         $date_corrected = explode('.', $Date);
         $date_corrected = $date_corrected[2] . $date_corrected[1] . $date_corrected[0];
@@ -56,21 +62,25 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Дата в формате yy-mm-dd в формат dd.mm.yyyy
-    public static function DateE($Dt = 0)
+// Дата в формате MySQL yy-mm-dd в формат dd.mm.yyyy
+    /**
+     * @param string $MySQL_Date
+     * @return string
+     */
+    public static function Date_from_MySQL($MySQL_Date = "")
     {
 
         $res = '';
 
-        if ($Dt==0)
+        if ($MySQL_Date == "")
             return date('y.m.d');
 
-        $d = explode(' ', $Dt);
+        $d = explode(' ', $MySQL_Date);
 
-        if(count($d)>=1)
+        if (count($d) >= 1)
             $de = explode('-', $d[0]);
         else
-            return $Dt;
+            return $MySQL_Date;
 
         if (count($de) > 1) {
             if ($de[2] > 0 and $de[1] > 0 and $de[0] > 0)
@@ -153,8 +163,7 @@ class Func
     {
         $res = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
 
-        if($Echo==1)
-        {
+        if ($Echo == 1) {
             echo $res;
             return "";
         }
@@ -249,6 +258,7 @@ class Func
         $s = strtr($s, $lat, $rus);
         return $s;
     } // function lat2rus($s)
+
 //----------------------------------------------------------------------------------------------------------------------
     static public function _strip($s)
     {
