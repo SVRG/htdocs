@@ -55,7 +55,7 @@ class Part
 
         // Если запрос не был передан в параметрах
         if ($SQL == "")
-            $SQL = "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora";
+            $SQL = "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora ORDER BY data_postav ASC"; // Сначала старые партии
 
         $rows = $db->rows($SQL);
         $cnt = $db->cnt;
@@ -96,7 +96,7 @@ class Part
             $price = (double)$row['price'];
 
             // Дата поставки------------------------------------------------------------------------------
-            $data_postav = Func::DateE($row['data_postav']);
+            $data_postav = Func::Date_from_MySQL($row['data_postav']);
 
             // Окраска отруженных партий в зелёный
             $ind = '';// Индикатор окраски даты поставки
@@ -182,7 +182,7 @@ class Part
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
-            $date = ' от ' . Func::DateE($row['data']); // Дата документа
+            $date = ' от ' . Func::Date_from_MySQL($row['data']); // Дата документа
 
             $naklad = $row['numb'] . '(№' . $row['naklad'] . $date . ')'; // Номер документа и дата
 
@@ -229,7 +229,7 @@ class Part
     public function PayGraph($Edit = false)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschet WHERE kod_part=$this->kod_part"); //
+        $rows = $db->rows("SELECT * FROM raschet WHERE kod_part=$this->kod_part ORDER BY data ASC"); //
 
         $cnt = $db->cnt;
 
@@ -252,7 +252,7 @@ class Part
             $raschet_summa = (double)$row['summa'];
             $kod_rascheta = $row['kod_rascheta'];
             $summa_pays = $this->SummPlatByRasch($kod_rascheta);
-            $data = Func::DateE($row['data']);
+            $data = Func::Date_from_MySQL($row['data']);
             $summa = Func::Rub($row['summa']);
             $type_rascheta = $row['type_rascheta'];
 
@@ -315,7 +315,7 @@ class Part
 
             // Данные
             $summa_raspred = (double)$row['summa_raspred'];
-            $data_plat = Func::DateE($row['data_plat']);
+            $data_plat = Func::Date_from_MySQL($row['data_plat']);
             $summa_plat_str = Func::Rub($row['summa_raspred']);
             $nomer = $row['nomer'];
             $prim = $row['prim'];
@@ -353,7 +353,7 @@ class Part
     {
         $db = new Db();
         $PartID = $this->kod_part;
-
+        $Date = func::Date_to_MySQL($Date);
         $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($PartID,$Summ,'$Date',$Type)");
     }
 //------------------------------------------------------------------------
@@ -383,7 +383,7 @@ class Part
             $row = $rows[$i];
             $PartID = $row['kod_part'];
             $Summ = $row['part_summa'];
-            $Date = Func::NowE(); // Текущий момент времени
+            $Date = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
             $Type = 2; //ОК- расчет
 
             $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($PartID,$Summ,'$Date',$Type)");
@@ -425,12 +425,15 @@ class Part
 
         $raschet_summa = round($part_summa * $AVPr, 2); // Сумма расчета
 
+        $AVDate = func::Date_to_MySQL($AVDate);
+
         $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$raschet_summa,'$AVDate',1)");
 
         $ostatok = $part_summa - $raschet_summa;
 
         if ($ostatok > 0) {
-            $OKDate = Func::DateE($this->Data['data_postav']); // Дата окончательного расчета = дата поставки
+            $data_postav = $rows[0]['data_postav'];
+            $OKDate = Func::Date_to_MySQL($data_postav); // Дата окончательного расчета = дата поставки
             $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$ostatok,'$OKDate',2)");
         }
     }
@@ -447,13 +450,14 @@ class Part
     {
         $db = new Db();
         $PartID = $this->kod_part;
+        $Date = func::Date_to_MySQL($Date);
 
         $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($PartID,$Numb,'$Nacl','$Date',$Oper,'$Operator')");
 
         return;
     }
 //-----------------------------------------------------------------------
-    // Данные: NaclR, DateR, NumbR
+    // Данные: NaclR, Date_to_MySQL, NumbR
     // Форма добавления накладной - поставка=отгрузка/ заказ=поступление
     public function Form_AddNaclSM($Numb = 1, $Act = 1)
     {
@@ -472,7 +476,7 @@ class Part
                               </tr>
                               <tr>
                                 <td>Дата</td>
-                                <td><input type="text" name="DateR" id="DateR" value="' . Func::NowE() . '" /></td>
+                                <td><input type="text" name="Date_to_MySQL" id="Date_to_MySQL" value="' . Func::NowE() . '" /></td>
                               </tr>
                               <tr>
                                 <td>Кол-во </td>
@@ -507,7 +511,7 @@ class Part
     public function Add($ElemID, $Numb = 1, $PDate, $PriceTF = 0, $Mod = '', $NDS = 18, $VAL = 1)
     {
         $db = new Db();
-
+        $PDate = func::Date_to_MySQL($PDate);
         $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$ElemID,$Numb,'$PDate',$PriceTF,'$Mod',$NDS,$VAL)");
 
     }
@@ -527,7 +531,7 @@ class Part
         $db = new Db();
         $PartID = $this->kod_part;
 
-        $PDate = func::DateR($PDate);
+        $PDate = func::Date_to_MySQL($PDate);
 
         $db->query("UPDATE parts SET kod_elem=$ElemID, numb=$Numb, data_postav='$PDate',price=$PriceTF,modif='$Mod',nds=$NDS,val=$VAL WHERE kod_part=$PartID");
 
@@ -551,7 +555,7 @@ class Part
         //Данные
         $kod_elem = (int)$row['kod_elem'];
         $modif = $row['modif'];
-        $data_postav = Func::DateE($row['data_postav']);
+        $data_postav = Func::Date_from_MySQL($row['data_postav']);
         $numb = $row['numb'];
         $price = $row['price'];
         $val = (int)$row['val'];
