@@ -22,10 +22,31 @@ include_once "classodbc.php";
     $db = new DB();
     $odbc = new ODBC();
     ini_set('max_execution_time', 300); // Установка времени тайм-аута во избежания ошибки
+//
+    // sql to create table
+    $sql = "DROP TABLE IF EXISTS `users`;
+            CREATE TABLE `users` (
+              `userid` int(11) NOT NULL AUTO_INCREMENT,
+              `Name` varchar(20) NOT NULL DEFAULT '',
+              `Pass` varchar(10) DEFAULT NULL,
+              `FName` varchar(40) DEFAULT NULL,
+              `rt` varchar(40) DEFAULT NULL,
+              PRIMARY KEY (`userid`)
+            ) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=cp1251;
+    ";
+    $db->query($sql);
+
+    $sql = "INSERT INTO `users` VALUES (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin');
+    INSERT INTO `users` VALUES (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper');
+    INSERT INTO `users` VALUES (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper');
+    INSERT INTO `users` VALUES (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper');
+    INSERT INTO `users` VALUES (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper');
+    INSERT INTO `users` VALUES (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper');";
+    $db->query($sql);
 
 //----------------------------------------------------------------------------------------------------------------------
     // sql drop table
-    $sql = "DROP TABLE adresa";
+    $sql = /** @lang SQL */ "DROP TABLE IF EXISTS adresa";
     $db->query($sql);
 
     // sql to create table
@@ -43,10 +64,8 @@ include_once "classodbc.php";
     $odbc->sql = "SELECT * FROM Адреса";
     $odbc->ex();
 
-    $i=1;
-
     // Вставить данные в MySQL
-    for ($i; $i <= $odbc->cnt; $i++)
+    for ($i=1; $i <= $odbc->cnt; $i++)
     {
         $row = $odbc->Row($i);
 
@@ -75,10 +94,10 @@ $table_odbc = "Документы";
 $id_odbc="Код_Документа";       $id = "kod_docum";           $id_type = "INT";
 $f1_odbc="Наименование";        $f1 = "name";                $f1_type = "VARCHAR(255)";
 $f2_odbc="Путь";                $f2 = "path";                $f2_type = "VARCHAR(255)";
-$f3_odbc="Date_CP";             $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="Date_CP";             $f3 = "time_stamp";          $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -95,8 +114,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -130,10 +148,10 @@ $table_odbc = "ДокументыДоговора";
 $id_odbc="Код_Связи";           $id = "kod_docum_dog";       $id_type = "INT";
 $f1_odbc="Код_Документа";       $f1 = "kod_docum";           $f1_type = "INT";
 $f2_odbc="Код_Договора";        $f2 = "kod_dogovora";        $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="DateCP";              $f3 = "time_stamp";          $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -150,8 +168,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -189,7 +206,7 @@ $f3_odbc="user";                $f3 = "user";                $f3_type = "VARCHAR
 $f4_odbc="Дата";                $f4 = "time_stamp";          $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -207,8 +224,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -249,10 +265,10 @@ $f4_odbc="Дата_закрытия";       $f4 = "data_zakrytiya";       $f4_type = "DATE";
 $f5_odbc="Код_организации";     $f5 = "kod_org";              $f5_type = "INT";
 $f6_odbc="Код_Исполнителя";     $f6 = "kod_ispolnit";         $f6_type = "INT";
 $f7_odbc="Код_Грузополучателя"; $f7 = "kod_gruzopoluchat";    $f7_type = "INT";
-$f8_odbc="DateCP";              $f8 = "time_stamp";            $f8_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f8_odbc="DateCP";              $f8 = "time_stamp";           $f8_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -274,8 +290,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -323,9 +338,9 @@ $f2_odbc="Наименование";        $f2 = "name";                 $f2_type = "VARCHA
 $f3_odbc="Шаблон";              $f3 = "shablon";              $f3_type = "VARCHAR(255)";
 $f4_odbc="NOMEN";               $f4 = "nomen";                $f4_type = "INT";
 $f5_odbc="Шифр";                $f5 = "shifr";                $f5_type = "VARCHAR(255)";
-$f6_odbc="Date_CP";             $f6 = "time_stamp";            $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";           $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -345,8 +360,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -395,10 +409,10 @@ $f2_odbc="Должность";           $f2 = "dolg";                   $f2_type = "VARC
 $f3_odbc="Фамилия";             $f3 = "famil";                  $f3_type = "VARCHAR(255)";
 $f4_odbc="Имя";                 $f4 = "name";                   $f4_type = "VARCHAR(255)";
 $f5_odbc="Отчество";            $f5 = "otch";                   $f5_type = "VARCHAR(255)";
-$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";             $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -418,8 +432,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -462,10 +475,10 @@ $table_odbc = "КонтактныеЛица";
 $id_odbc="КодКонтактногоЛица";  $id = "kod_kont_dog";         $id_type = "INT";
 $f1_odbc="Код_Контакта";        $f1 = "kod_kontakta";         $f1_type = "INT";
 $f2_odbc="Код_Договора";        $f2 = "kod_dogovora";         $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_stamp";            $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="DateCP";              $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -482,8 +495,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -535,10 +547,10 @@ $f11_odbc="ОКПО";               $f11 = "okpo";                  $f11_type = "VAR
 $f12_odbc="ОКОНХ";              $f12 = "okonh";                 $f12_type = "VARCHAR(255)";
 $f13_odbc="e_mail";             $f13 = "e_mail";                $f13_type = "VARCHAR(255)";
 $f14_odbc="www";                $f14 = "www";                   $f14_type = "VARCHAR(255)";
-$f15_odbc="Date_CP";            $f15 = "time_stamp";             $f15_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f15_odbc="Date_CP";            $f15 = "time_stamp";            $f15_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -567,8 +579,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -628,10 +639,10 @@ $f5_odbc="Цена_ТФ";             $f5 = "price";                  $f5_type = "DOUB
 $f6_odbc="Код_договора";        $f6 = "kod_dogovora";           $f6_type = "INT";
 $f7_odbc="Валюта";              $f7 = "val";                    $f7_type = "INT";
 $f8_odbc="НДС";                 $f8 = "nds";                    $f8_type = "DOUBLE";
-$f9_odbc="DateCP";              $f9 = "time_stamp";              $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f9_odbc="DateCP";              $f9 = "time_stamp";             $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -654,8 +665,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -704,13 +714,13 @@ $table_odbc = "Телефоны";
 $id_odbc="Код Телефона";        $id = "kod_dat";              $id_type = "INT";
 $f1_odbc="Код_Контакта";        $f1 = "kod_kontakta";         $f1_type = "INT";
 $f2_odbc="Телефон";             $f2 = "data";                 $f2_type = "VARCHAR(255)";
-$f3_odbc="Date_CP";             $f3 = "time_stamp";            $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="Date_CP";             $f3 = "time_stamp";           $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f4_odbc="Код_Организации";     $f4 = "kod_org";              $f4_type = "INT";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
-$sql = "DROP TABLE $table2";
+$sql = "DROP TABLE IF EXISTS $table2";
 $db->query($sql);
 
 // sql to create table
@@ -736,8 +746,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -790,11 +799,11 @@ $f2_odbc="Сумма";               $f2 = "summa";                  $f2_type = "DOUB
 $f3_odbc="Дата";                $f3 = "data";                   $f3_type = "DATE";
 $f4_odbc="Примечание";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
 $f5_odbc="Код_договора";        $f5 = "kod_dogovora";           $f5_type = "INT";
-$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";             $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f7_odbc="";                    $f7 = "user";                   $f7_type = "VARCHAR(255)";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -815,8 +824,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -860,11 +868,11 @@ $f1_odbc="Код_партии";          $f1 = "kod_part";               $f1_type = "INT"
 $f2_odbc="Сумма";               $f2 = "summa";                  $f2_type = "DOUBLE";
 $f3_odbc="Дата";                $f3 = "data";                   $f3_type = "DATE";
 $f4_odbc="Тип_расчета";         $f4 = "type_rascheta";          $f4_type = "INT";
-$f5_odbc="";                    $f5 = "time_stamp";              $f5_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f5_odbc="";                    $f5 = "time_stamp";             $f5_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f6_odbc="";                    $f6 = "user";                   $f6_type = "VARCHAR(255)";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -884,8 +892,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -930,11 +937,11 @@ $id_odbc="Код_поступления";     $id = "kod_rasch_plat";         $id_type = "INT"
 $f1_odbc="Сумма";               $f1 = "summa";                  $f1_type = "DOUBLE";
 $f2_odbc="Код_Расчета";         $f2 = "kod_rascheta";           $f2_type = "INT";
 $f3_odbc="Код_Платежа";         $f3 = "kod_plat";               $f3_type = "INT";
-$f4_odbc="";                    $f4 = "time_stamp";              $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f4_odbc="";                    $f4 = "time_stamp";             $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $f5_odbc="";                    $f5 = "user";                   $f5_type = "VARCHAR(255)";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -953,8 +960,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -995,10 +1001,10 @@ $f2_odbc="Дата";                $f2 = "data";                   $f2_type = "DATE
 $f3_odbc="Сумма";               $f3 = "summa";                  $f3_type = "DOUBLE";
 $f4_odbc="Примечание";          $f4 = "prim";                   $f4_type = "VARCHAR(255)";
 $f5_odbc="Код_Договора";        $f5 = "kod_dogovora";           $f5_type = "INT";
-$f6_odbc="Date_CP";             $f6 = "time_stamp";              $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f6_odbc="Date_CP";             $f6 = "time_stamp";             $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -1018,8 +1024,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -1066,10 +1071,10 @@ $f5_odbc="Дата";                    $f5 = "data";                   $f5_type = "
 $f6_odbc="Operator";                $f6 = "oper";                   $f6_type = "VARCHAR(255)";
 $f7_odbc="Получено";                $f7 = "poluch";                 $f7_type = "INT";
 $f8_odbc="Дата_ОтметкиПолучения";   $f8 = "data_poluch";            $f8_type = "DATE";
-$f9_odbc="DateCP";                  $f9 = "time_stamp";              $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f9_odbc="DateCP";                  $f9 = "time_stamp";             $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -1092,8 +1097,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -1138,10 +1142,10 @@ $id_odbc="Код_Связи";               $id = "kod_link";               $id_type = "
 $f1_odbc="Master";                  $f1 = "master";                 $f1_type = "INT";
 $f2_odbc="Slave";                   $f2 = "slave";                  $f2_type = "INT";
 $f3_odbc="Тип_Связи";               $f3 = "prim";                   $f3_type = "VARCHAR(255)";
-$f4_odbc="Date_CP";                 $f4 = "time_stamp";              $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f4_odbc="Date_CP";                 $f4 = "time_stamp";             $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -1159,8 +1163,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -1199,10 +1202,10 @@ $table_odbc = "ДокументыИзделия";
 $id_odbc="Код_Связи";           $id = "kod_docum_elem";         $id_type = "INT";
 $f1_odbc="Код_Документа";       $f1 = "kod_docum";              $f1_type = "INT";
 $f2_odbc="Код_Элемента";        $f2 = "kod_elem";               $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_stamp";              $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="DateCP";              $f3 = "time_stamp";             $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -1219,8 +1222,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -1253,10 +1255,10 @@ $table_odbc = "ДокументыОрганизации";
 $id_odbc="Код_Связи";           $id = "kod_docum_org";          $id_type = "INT";
 $f1_odbc="Код_Документа";       $f1 = "kod_docum";              $f1_type = "INT";
 $f2_odbc="Код_Организации";     $f2 = "kod_org";                $f2_type = "INT";
-$f3_odbc="DateCP";              $f3 = "time_stamp";              $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$f3_odbc="DateCP";              $f3 = "time_stamp";             $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-$sql = "DROP TABLE $table";
+$sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
 
 // sql to create table
@@ -1273,8 +1275,7 @@ $odbc->sql = "SELECT * FROM $table_odbc";
 $odbc->ex();
 
 // Вставить данные в MySQL
-$i=1;
-for ($i; $i <= $odbc->cnt; $i++)
+for ($i=1; $i <= $odbc->cnt; $i++)
 {
     $row = $odbc->Row($i);
 
@@ -1297,5 +1298,592 @@ $sql = "ALTER TABLE $table MODIFY $id INT AUTO_INCREMENT PRIMARY KEY";
 $db->query($sql);
 
 echo "$table_odbc -> $table Inserted: $i";
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_docum_elem";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_docum_elem AS 
+        SELECT
+            docum_elem.kod_elem,
+            docum.`name`,
+            docum.path,
+            docum.kod_docum
+        FROM
+            docum
+        INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovor_data";
+$db->query($sql);
+
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovor_data AS 
+        SELECT
+            view_dogovory_nvs.kod_dogovora,
+            view_dogovory_nvs.nomer,
+            view_dogovory_nvs.data_sost,
+            view_dogovory_nvs.kod_org,
+            view_dogovory_nvs.zakryt,
+            view_dogovory_nvs.nazv_krat,
+            view_dogovory_nvs.kod_ispolnit,
+            view_dogovory_nvs.ispolnit_nazv_krat,
+            ROUND(IFNULL(dogovor_summa,0),2) AS dogovor_summa,
+            ROUND(IFNULL(summa_plat,0),2) AS summa_plat,
+            ROUND(IFNULL(dogovor_summa,0),2)-ROUND(IFNULL(summa_plat,0),2) AS dogovor_ostat
+        FROM
+            view_dogovory_nvs
+        LEFT JOIN view_dogovor_summa ON view_dogovor_summa.kod_dogovora = view_dogovory_nvs.kod_dogovora
+        LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora = view_dogovory_nvs.kod_dogovora 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovor_summa";
+$db->query($sql);
+
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovor_summa AS 
+        SELECT
+            parts.kod_dogovora,
+            Sum(parts.price*parts.numb*(1+parts.nds)) AS dogovor_summa
+        FROM
+            parts
+        GROUP BY
+            parts.kod_dogovora
+        ORDER BY
+            parts.kod_dogovora DESC 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovor_summa_plat";
+$db->query($sql);
+
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovor_summa_plat AS 
+        SELECT
+            Sum(plat.summa) AS summa_plat,
+            plat.kod_dogovora
+        FROM
+            plat
+        GROUP BY
+            plat.kod_dogovora
+        ORDER BY
+            plat.kod_dogovora DESC
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovory_elem";
+$db->query($sql);
+
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovory_elem AS 
+        SELECT
+            view_dogovory_nvs.kod_dogovora,
+            view_dogovory_nvs.nomer,
+            view_dogovory_nvs.data_sost,
+            view_dogovory_nvs.kod_org,
+            view_dogovory_nvs.nazv_krat,
+            view_dogovory_nvs.zakryt,
+            view_dogovory_nvs.kod_ispolnit,
+            view_dogovory_nvs.ispolnit_nazv_krat,
+            parts.kod_elem
+        FROM
+            parts
+        INNER JOIN view_dogovory_nvs ON view_dogovory_nvs.kod_dogovora = parts.kod_dogovora 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovory_nvs";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovory_nvs AS 
+        SELECT
+            dogovory.kod_dogovora,
+            dogovory.nomer,
+            dogovory.data_sost,
+            dogovory.kod_org,
+            org.nazv_krat,
+            dogovory.zakryt,
+            dogovory.kod_ispolnit,
+            org_ispolnit.nazv_krat AS ispolnit_nazv_krat
+        FROM
+            dogovory
+        INNER JOIN org ON dogovory.kod_org = org.kod_org
+        INNER JOIN org AS org_ispolnit ON dogovory.kod_ispolnit = org_ispolnit.kod_org
+        ORDER BY
+            dogovory.data_sost DESC
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovory_parts";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_dogovory_parts AS 
+        SELECT
+            dogovory.kod_dogovora,
+            dogovory.nomer,
+            org.kod_org,
+            org.nazv_krat,
+            parts.modif,
+            parts.numb,
+            parts.data_postav,
+            ROUND(parts.nds, 2) AS nds,
+            ROUND(
+                IFNULL(
+                    parts.numb * price * (1 + parts.nds),
+                    0
+                ),
+                2
+            ) AS part_summa,
+            parts.val,
+            parts.price,
+            elem.kod_elem,
+            elem.obozn,
+            parts.kod_part,
+            dogovory.zakryt,
+            dogovory.kod_ispolnit,
+            elem.`name`,
+            ispolnit.nazv_krat AS ispolnit_nazv_krat
+        FROM
+            dogovory
+        INNER JOIN parts ON dogovory.kod_dogovora = parts.kod_dogovora
+        INNER JOIN org ON org.kod_org = dogovory.kod_org
+        INNER JOIN elem ON elem.kod_elem = parts.kod_elem
+        INNER JOIN org AS ispolnit ON ispolnit.kod_org = dogovory.kod_ispolnit
+        ORDER BY
+            dogovory.kod_dogovora DESC 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_elem";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_elem AS 
+        SELECT
+            elem.kod_elem,
+            elem.obozn,
+            elem.`name`,
+            elem.shablon,
+            elem.nomen,
+            elem.shifr,
+            elem.time_stamp
+        FROM
+            elem
+        ORDER BY
+            elem.obozn ASC,
+            elem.nomen DESC 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_elem_org";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_elem_org AS 
+        SELECT
+            view_dogovory_parts.kod_org,
+            view_dogovory_parts.kod_elem,
+            view_dogovory_parts.nazv_krat,
+            Sum(view_dogovory_parts.numb) AS numb
+        FROM
+            view_dogovor_summa_plat
+        INNER JOIN view_dogovory_parts ON view_dogovor_summa_plat.kod_dogovora = view_dogovory_parts.kod_dogovora
+        GROUP BY
+            view_dogovory_parts.kod_org,
+            view_dogovory_parts.kod_elem,
+            view_dogovory_parts.nazv_krat
+        ORDER BY
+            numb DESC
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_kontakty_dogovora";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+       "CREATE 
+        VIEW view_kontakty_dogovora AS 
+        SELECT
+            kontakty.kod_kontakta,
+            kontakty.kod_org,
+            kontakty.dolg,
+            kontakty.famil,
+            kontakty.`name`,
+            kontakty.otch,
+            kontakty_dogovora.kod_dogovora,
+            org.nazv_krat
+        FROM
+            kontakty
+        INNER JOIN kontakty_dogovora ON kontakty.kod_kontakta = kontakty_dogovora.kod_kontakta
+        INNER JOIN org ON kontakty.kod_org = org.kod_org 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_org_nomen";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+       "CREATE 
+        VIEW view_org_nomen AS 
+        SELECT
+            view_dogovory_parts.kod_org,
+            view_dogovory_parts.kod_elem,
+            Sum(view_dogovory_parts.numb) AS numb,
+            view_dogovory_parts.`name`
+        FROM
+            view_dogovory_parts
+        GROUP BY
+            view_dogovory_parts.kod_org,
+            view_dogovory_parts.kod_elem,
+            view_dogovory_parts.`name`
+        ORDER BY
+        numb DESC 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_phones_kontakts";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_phones_kontakts AS 
+        SELECT
+            kontakty.kod_kontakta,
+            kontakty.dolg,
+            kontakty.famil,
+            kontakty.`name`,
+            kontakty.otch,
+            phones.phone,
+            phones.prim
+        FROM
+            kontakty
+        INNER JOIN phones ON kontakty.kod_kontakta = phones.kod_kontakta
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_plat";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_plat AS 
+        SELECT
+            plat.nomer,
+            plat.summa,
+            plat.`data`,
+            plat.prim,
+            view_dogovory_nvs.kod_dogovora,
+            view_dogovory_nvs.nomer AS nomer_dogovora,
+            view_dogovory_nvs.kod_org,
+            view_dogovory_nvs.nazv_krat,
+            view_plat_raspred.summa_raspred,
+            plat.kod_plat
+        FROM
+            plat
+        INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
+        LEFT JOIN view_plat_raspred ON plat.kod_plat = view_plat_raspred.kod_plat 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_plat_raspred";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_plat_raspred AS 
+        SELECT
+            plat.kod_plat,
+            SUM(raschety_plat.summa) AS summa_raspred
+        FROM
+            raschety_plat
+        INNER JOIN plat ON plat.kod_plat = raschety_plat.kod_plat
+        GROUP BY
+            plat.kod_plat 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_raschety_plat";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_raschety_plat AS 
+        SELECT
+            raschet.kod_rascheta,
+            raschet.kod_part,
+            raschet.summa AS raschet_summa,
+            raschet.`data` AS data_rascheta,
+            raschet.type_rascheta,
+            raschety_plat.kod_plat,
+            raschety_plat.summa AS summa_raspred,
+            plat.nomer,
+            plat.`data` AS data_plat,
+            plat.prim,
+            plat.kod_dogovora
+        FROM
+            raschet
+        INNER JOIN raschety_plat ON raschet.kod_rascheta = raschety_plat.kod_rascheta
+        INNER JOIN plat ON raschety_plat.kod_plat = plat.kod_plat
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_raschety_summ_plat";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_raschety_summ_plat AS 
+        SELECT
+            raschet.kod_rascheta,
+            IFNULL(raschety_plat.summa, 0) AS summa_plat,
+            raschet.kod_part,
+            raschet.summa
+        FROM
+            raschet
+        LEFT JOIN raschety_plat ON raschety_plat.kod_rascheta = raschet.kod_rascheta
+        GROUP BY
+            raschet.kod_rascheta 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_rplan";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_rplan AS 
+        SELECT
+            view_dogovory_parts.kod_dogovora,
+            view_dogovory_parts.nomer,
+            view_dogovory_parts.kod_org,
+            view_dogovory_parts.nazv_krat,
+            view_dogovory_parts.modif,
+            view_dogovory_parts.numb,
+            view_dogovory_parts.data_postav,
+            ROUND(nds, 2) AS nds,
+            ROUND(IFNULL(part_summa, 0), 2) AS part_summa,
+            view_dogovory_parts.val,
+            view_dogovory_parts.price,
+            view_dogovory_parts.kod_elem,
+            view_dogovory_parts.obozn,
+            view_dogovory_parts.kod_part,
+            view_dogovory_parts.zakryt,
+            view_dogovory_parts.kod_ispolnit,
+            view_dogovory_parts.`name`,
+            view_dogovory_parts.ispolnit_nazv_krat
+        FROM
+            view_dogovory_parts 
+        ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_scheta_dogovora";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_scheta_dogovora AS 
+        SELECT
+            scheta.nomer,
+            scheta.`data`,
+            view_dogovory_nvs.kod_ispolnit,
+            view_dogovory_nvs.ispolnit_nazv_krat,
+            view_dogovory_nvs.kod_org,
+            view_dogovory_nvs.data_sost,
+            view_dogovory_nvs.kod_dogovora,
+            view_dogovory_nvs.nazv_krat
+        FROM
+          view_dogovory_nvs
+        INNER JOIN scheta ON view_dogovory_nvs.kod_dogovora = scheta.kod_dogovora 
+                ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_scheta_dogovory_all";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_scheta_dogovory_all AS 
+        SELECT
+            kod_org,
+            kod_dogovora,
+            nomer,
+            kod_ispolnit,
+            ispolnit_nazv_krat,
+            data_sost,
+            nazv_krat
+        FROM
+            view_dogovory_nvs
+        UNION ALL
+            SELECT
+                kod_org,
+                kod_dogovora,
+                nomer,
+                kod_ispolnit,
+                ispolnit_nazv_krat,
+                DATA,
+                nazv_krat
+            FROM
+                view_scheta_dogovora
+            ORDER BY
+                data_sost DESC 
+                ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_sklad";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_sklad AS 
+        SELECT
+            sklad.kod_part,
+            sklad.numb,
+            elem.`name`,
+            dogovory.kod_dogovora,
+            dogovory.nomer,
+            elem.kod_elem,
+            sklad.naklad,
+            org.kod_org,
+            org.nazv_krat,
+            sklad.oper,
+            sklad.kod_oper,
+            view_dogovor_summa.dogovor_summa,
+            view_dogovor_summa_plat.summa_plat,
+            sklad.`data`,
+            sklad.kod_oborota,
+            sklad.poluch
+        FROM
+            sklad
+        INNER JOIN parts ON sklad.kod_part = parts.kod_part
+        INNER JOIN elem ON parts.kod_elem = elem.kod_elem
+        INNER JOIN dogovory ON parts.kod_dogovora = dogovory.kod_dogovora
+        INNER JOIN org ON dogovory.kod_org = org.kod_org
+        LEFT JOIN view_dogovor_summa ON dogovory.kod_dogovora = view_dogovor_summa.kod_dogovora
+        AND dogovory.kod_dogovora = view_dogovor_summa.kod_dogovora
+        LEFT JOIN view_dogovor_summa_plat ON dogovory.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
+        WHERE
+            sklad.kod_oper = 2
+        ORDER BY
+            sklad.`data` DESC
+                ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_sklad_otgruzka";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_sklad_otgruzka AS 
+        SELECT
+            sklad.kod_part,
+            sklad.numb,
+            sklad.kod_oper
+        FROM
+            sklad
+        WHERE
+            sklad.kod_oper = 2 
+                ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_sklad_postuplenie";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+    "CREATE 
+        VIEW view_sklad_postuplenie AS 
+        SELECT
+            sklad.kod_part,
+            sklad.numb,
+            sklad.kod_oper
+        FROM
+            sklad
+        WHERE
+            sklad.kod_oper = 1
+                ";
+$db->query($sql);
+
 ?>
 </html>
