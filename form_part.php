@@ -21,7 +21,7 @@ $P->kod_dogovora = $_GET['kod_dogovora'];
 // Edit Партии
 if (isset($_POST['EditPart'])) {
 
-    $P->Edit($_POST['SelElemID'], $_POST['Numb'], $_POST['SDateR'], $_POST['PriceTF'], $_POST['Mod'], $_POST['NDS'], $_POST['VAL']);
+    $P->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
 
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
@@ -70,12 +70,22 @@ if (isset($_POST['RsSumm']) and isset($_POST['RsID']) and isset($_POST['SelPPID'
 
 //---------------------------------------------------------------------------
 // Добавление Накладной
-if (isset($_POST['Numb']) and isset($_POST['Nacl']) and isset($_POST['DateR']) and isset($_POST['Oper'])) {
-    $P->AddNacl($_POST['Numb'], $_POST['Nacl'], $_POST['DateR'], $_POST['Oper'], $_SESSION['MM_Username']);
+if(isset($_POST['AddEditNacl']))
+    if (isset($_POST['numb']) and isset($_POST['naklad']) and isset($_POST['data']) and isset($_POST['kod_oper'])) {
+        $P->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
+
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    }
+
+//---------------------------------------------------------------------------
+// Отметка о Получении накладной
+if (isset($_POST['PostNacl'])) {
+    $P->kod_dogovora = $D->kod_dogovora;
+
+    $P->PostNacl($_POST['PostNacl']);
 
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-
 
 //---------------------------------------------------------------------------
 // Формирование Расчетов по схеме АВ-ОК
@@ -99,7 +109,6 @@ if (isset($_POST['AVPr']) and isset($_POST['Date'])) {
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>Партия</title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <script src="SpryAssets/SpryValidationSelect.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <link href="SpryAssets/SpryValidationSelect.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -112,7 +121,7 @@ include_once("header.php");
 <!-- end masthead -->
 <div class="style1" id="pagecell1">
     <!--pagecell1-->
-    <p><?php
+    <?php
         $D->ShowDoc();
 
 
@@ -130,12 +139,10 @@ include_once("header.php");
 
                 // Форма Редактирования партии
                 if ($_POST['Flag'] == 'EditPartForm')
-                    $P->EditForm();
+                    $P->formAddEdit();
 
             } else
                 $P->ShowPart(0); // Партия
-
-            echo '<br>' . Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Редактировать Партию', 'EditPartForm');
 
             // График платежей
             $P->PayGraph(true);
@@ -149,54 +156,15 @@ include_once("header.php");
 
             if (isset($_POST['Flag'])) {
                 // Форма для добавления Расчета
-                if ($_POST['Flag'] == 'AddRS') {
-                    echo '<form id="form1" name="form1" method="post" action="">
-                              <table width="293" border="1">
-                                <tr>
-                                    <td width="105">Сумма</td>
-                                    <td width="172">
-                                        <span id="sprytextfield1">
-                                            <input name="Summ" type="text" id="text1" />
-                                            <span class="textfieldRequiredMsg">A value is required.</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Дата</td>
-                                    <td>
-                                        <span id="sprytextfield2">
-                                            <input type="text" name="Date" id="text2" />
-                                            <span class="textfieldRequiredMsg">A value is required.</span>
-                                            <span class="textfieldInvalidFormatMsg">Invalid format.</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Тип</td>
-                                    <td>
-                                        <span id="spryselect1">
-                                              <select name="Type" id="select1">
-                                                  <option value="1">Аванс</option>
-                                                  <option value="2">Ок. Расчет</option>
-                                              </select>
-                                              <span class="selectRequiredMsg">Please select an item.</span>
-                                        </span>
-                                  </td>
-                                </tr>
-                              </table>
-                                <input type="submit" name="button" id="button" value="Submit" />
-                          </form>';
-                }
-
-// Авторасчет
+                // Авторасчет
                 $dt = Func::NowE();
                 if ($_POST['Flag'] == 'AddAVOK') {
                     echo "<form id='form1' name='form1' method='post' action=''>
-                              <table width='293' border='1'>
+                              <table width='293' border='0'>
                                     <tr>
                                         <td width='105'>Процент АВ</td>
                                             <td width='172'>
-                                            <span id='sprytextfield1'>
+                                            <span id='sprytextfield_AVPr'>
                                                 <input name='AVPr' type='text' id='text1' value='100'/>
                                                 <span class='textfieldRequiredMsg'>A value is required.</span>
                                             </span>
@@ -205,8 +173,8 @@ include_once("header.php");
                                     <tr>
                                         <td>Дата</td>
                                         <td>
-                                            <span id='sprytextfield2'>
-                                                <input type='text' name='Date' id='text2' value='$dt'/>
+                                            <span id='sprytextfield_data'>
+                                                <input type='text' name='data' id='data' value='$dt'/>
                                                 <span class='textfieldRequiredMsg'>A value is required.</span>
                                                 <span class='textfieldInvalidFormatMsg'>Invalid format.</span>
                                             </span>
@@ -228,17 +196,15 @@ include_once("header.php");
             if (isset($Err)) echo $Err;
         }
         ?>
-    </p>
 </div>
 <script type="text/javascript">
     <!--
-    var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1", "currency");
-    var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "date", {format: "dd.mm.yyyy"});
-    var spryselect1 = new Spry.Widget.ValidationSelect("spryselect1");
+    var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency",{isRequired: true});
+    var sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");
-    var sprytextfield4 = new Spry.Widget.ValidationTextField("DateR", "date", {format: "dd.mm.yyyy", isRequired: true});
-    var sprytextfield5 = new Spry.Widget.ValidationTextField("Nacl", "none");
-    var spryselect12 = new Spry.Widget.ValidationSelect("Oper");
+    var sprytextfield4 = new Spry.Widget.ValidationTextField("data", "date", {format: "dd.mm.yyyy", isRequired: true});
+    var sprytextfield5 = new Spry.Widget.ValidationTextField("naklad", "none");
+    var spryselect12 = new Spry.Widget.ValidationSelect("operator");
     //-->
 </script>
 </body>
