@@ -20,19 +20,18 @@ $Org->getData();
 $c = new Kontact();
 $c->kod_org = $kod_org;
 
-
+//---------------------------------------------------------------------------
 // Добавление Реквизитов
 if (isset($_POST['AddRecvForm'])) {
     $Org->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-
+//---------------------------------------------------------------------------
 // Добавление Контактов
 if (isset($_POST['AddContact']) and (isset($_POST['FName']) or isset($_POST['Name']))) {
     $Org->AddCont($_POST['Dolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-
 //---------------------------------------------------------------------------
 // Вставка Телефон в Контакт
 if (isset($_POST['AddPhone']))
@@ -43,32 +42,33 @@ if (isset($_POST['AddPhone']))
 
         header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
-
+//---------------------------------------------------------------------------
 // Добавление Телефона в Организацию
 if (isset($_POST['AddOrgPhone']) and (isset($_POST['phone']))) {
     $Org->AddPhone($_POST['phone'], $_POST['prim']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-//--------------------
+//---------------------------------------------------------------------------
 // Добавление Адреса в организацию
 if (isset($_POST['AddOrgAdr']) and (isset($_POST['adres']))) {
     $Org->AddAdr($_POST['adres'], $_POST['type']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-//--------------------
-
+//---------------------------------------------------------------------------
 // Добавить Телефон в Контакт
 if (isset($_POST['AddPhone']) and isset($_POST['Numb']) and isset($_POST['ContID'])) {
     $Org->AddCont($_POST['Dolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-
+//---------------------------------------------------------------------------
 // Сохранить
-if (isset($_POST['SaveOrg']) and isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
-    if ($_POST['poisk'] != '' and $_POST['nazv_krat'] != '' and $_POST['nazv_poln'] != '') {
-        $Org->Save($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
-    }
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+if(isset($_POST['FormName']))
+    if($_POST['FormName']=="FormAddEdit")
+        if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
+            if ($_POST['poisk'] != '' and $_POST['nazv_krat'] != '' and $_POST['nazv_poln'] != '') {
+                $Org->Save($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
+            }
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -79,6 +79,8 @@ if (isset($_POST['SaveOrg']) and isset($_POST['poisk']) and isset($_POST['nazv_k
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title><?php echo $Org->Data['nazv_krat']; ?></title>
+    <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -105,14 +107,14 @@ if (isset($_POST['SaveOrg']) and isset($_POST['poisk']) and isset($_POST['nazv_k
                 // SAve-------------------------
                 $Edit = 0;
                 if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'EditForm') {
-                        echo $Org->AddForm(1);
+                    if ($_POST['Flag'] == 'formAddEdit') {
+                        echo $Org->formAddEdit(1);
                         $Edit = 1;
                     }
 
                 if ($Edit == 0)
                     if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                        echo Func::ActButton('', 'Изменить Название', 'EditForm');
+                        echo Func::ActButton('', 'Изменить Название', 'formAddEdit');
                 echo '<br>';
                 // SAve-------------------------
 
@@ -258,6 +260,10 @@ if (isset($_POST['SaveOrg']) and isset($_POST['poisk']) and isset($_POST['nazv_k
         var sprytextfield4 = new Spry.Widget.ValidationTextField("sprytextfield4", "none", {isRequired: false});
         var sprytextfield5 = new Spry.Widget.ValidationTextField("sprytextfield5", "none", {isRequired: false});
         var sprytextfield6 = new Spry.Widget.ValidationTextField("sprytextfield6");
+
+        var sprytextfield_poisk = new Spry.Widget.ValidationTextField("sprytextfield_poisk", "none", {isRequired: true});
+        var sprytextfield_nazv_krat = new Spry.Widget.ValidationTextField("sprytextfield_nazv_krat", "none", {isRequired: true});
+        var sprytextfield_nazv_poln = new Spry.Widget.ValidationTextField("sprytextfield_nazv_poln", "none", {isRequired: true});
         //-->
     </script>
 </div>
