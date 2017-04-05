@@ -73,10 +73,10 @@ if (isset($_POST['Flag']))
 
             $Form = '';
             if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                $Form = Func::ActButton('', 'Изменить', 'EditForm');
+                $Form = Func::ActButton('', 'Изменить', 'formAddEdit');
 
             if (isset($_POST['Flag']))
-                if ($_POST['Flag'] == 'EditForm') {
+                if ($_POST['Flag'] == 'formAddEdit') {
                     $Form = $E->Form();
                 }
 
