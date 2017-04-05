@@ -343,72 +343,51 @@ class Org
      * @param int $Edit
      * @return string
      */
-    public function AddForm($Edit = 0)
+    public function formAddEdit($Edit = 0)
     {
+
+        $poisk = "";
+        $nazv_krat = "";
+        $nazv_poln = "";
 
         if ($Edit == 1) {
 
             $this->getData();
             $row = $this->Data;
 
-            $res = '<form id="form1" name="form1" method="post" action="">
-                      <table width="100%" border="0">
+            $poisk = htmlspecialchars($row['poisk']);
+            $nazv_krat = htmlspecialchars($row['nazv_krat']);
+            $nazv_poln = htmlspecialchars($row['nazv_poln']);
+        }
+
+        $res = /** @lang HTML */
+            '<form id="form1" name="form1" method="post" action="">
+                      <table border="0">
                         <tr>
-                          <td width="100">Наименование для поиска</td>
-                          <td width="398">
-                            <input name="poisk" type="text" id="poisk" size="50" value="' . $row['poisk'] . '" />
-                          </td>
+                          <td width="208">Наименование для поиска</td>
+                          <td><span id="sprytextfield_poisk">
+                            <input name="poisk" type="text" id="poisk" size="30" value="' . $poisk . '" />
+                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Краткое наименование</td>
-                          <td>
-                          <textarea rows=2 cols=50 name="nazv_krat" id="nazv_krat">' . $row['nazv_krat'] . '</textarea>  
-                          </td>
+                          <td><span id="sprytextfield_nazv_krat">
+                            <input name="nazv_krat" type="text" id="nazv_krat" size="30" value="' . $nazv_krat . '" />
+                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Полное наименование</td>
-                          <td>
-                          <textarea rows=2 cols=50 name="nazv_poln" id="nazv_poln">' . $row['nazv_poln'] . '</textarea>  
-                          </td>
+                          <td><span id="sprytextfield_nazv_poln">
+                            <input name="nazv_poln" type="text" id="nazv_poln" size="30" value="' . $nazv_poln . '" />
+                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td><input type="submit" name="button" id="button" value="Сохранить" />
-                          <input type="hidden" name="SaveOrg" id="SaveOrg" value="1" />
-                          <td>&nbsp;</td>
+                          <td><input type="hidden" value="FormAddEdit" name="FormName"></td>
                         </tr>
                       </table>
                     </form>';
             $res .= Func::Cansel(0);
-        } else {
-            $res = '<form id="form1" name="form1" method="post" action="">
-                      <table width="813" border="0">
-                        <tr>
-                          <td width="208">Наименование для поиска</td>
-                          <td width="398"><span id="sprytextfield1">
-                            <input name="poisk" type="text" id="poisk" size="40%" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
-                        </tr>
-                        <tr>
-                          <td>Краткое наименование</td>
-                          <td><span id="sprytextfield2">
-                            <input name="nazv_krat" type="text" id="nazv_krat" size="40%" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
-                        </tr>
-                        <tr>
-                          <td>Полное наименование</td>
-                          <td><span id="sprytextfield3">
-                            <input name="nazv_poln" type="text" id="nazv_poln" size="40%" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
-                        </tr>
-                        <tr>
-                          <td><input type="submit" name="button" id="button" value="Submit" />
-                          <input type="reset" name="button2" id="button2" value="Reset" /></td>
-                          <td>&nbsp;</td>
-                        </tr>
-                      </table>
-                    </form>';
-            $res .= Func::Cansel(0);
-        }
 
         return $res;
     }
