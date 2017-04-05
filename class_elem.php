@@ -129,40 +129,30 @@ class Elem
 //
     /**
      * Вывод списка-выбора Элементов
-     * @param string $Action
-     * @param int $Nomen
      * @return string
      */
-    public function SelList($Action = '', $Nomen = 1)
+    public function SelList()
     {
-        $res = '';
-
-        if ($Action != '')
-            $res .= '<form action="' . $Action . '" method="post">';
-
-        $res .= '<select name="SelElemID" id="SelElemID">';
+        $res = '<select name="kod_elem" id="kod_elem">';
 
         $db = new Db();
 
         $sql = "SELECT * FROM view_elem WHERE nomen=1";
-        if ($Nomen == 0)
-            $sql = "SELECT * FROM view_elem";
 
         $rows = $db->rows($sql);
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-            if ($row['kod_elem'] == $this->kod_elem)
-                $res .= '<option value="' . $row['kod_elem'] . '" selected="selected">' . $row['obozn'] . $row['name'] . '</option>';
-            else
-                $res .= '<option value="' . $row['kod_elem'] . '">' . $row['name'] . '</option>';
+            $selected = "";
+            $kod_elem = $row['kod_elem'];
+            $obozn = $row['obozn'];
+            $name = $row['name'];
 
+            if ($row['kod_elem'] == $this->kod_elem)
+                $selected = " selected='selected'";
+            $res .= "<option value=\"$kod_elem\" $selected > $obozn  \"$name\" </option>";
         }
         $res .= '</select>';
-
-        if ($Action != '')
-            $res .= '<input type="submit" name="Submit" value="Submit" />
-                </form>';
 
         return $res;
     }
