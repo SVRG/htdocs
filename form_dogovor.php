@@ -5,44 +5,7 @@ if (!isset($_SESSION)) {
 $MM_authorizedUsers = "";
 $MM_donotCheckaccess = "true";
 
-// *** Restrict Access To Page: Grant or deny access to this page
-function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup)
-{
-    // For security, start by assuming the visitor is NOT authorized.
-    $isValid = False;
-
-    // When a visitor has logged into this site, the Session variable MM_Username set equal to their username.
-    // Therefore, we know that a user is NOT logged in if that Session variable is blank.
-    if (!empty($UserName)) {
-        // Besides being logged in, you may restrict access to only certain users based on an ID established when they login.
-        // Parse the strings into arrays.
-        $arrUsers = Explode(",", $strUsers);
-        $arrGroups = Explode(",", $strGroups);
-        if (in_array($UserName, $arrUsers)) {
-            $isValid = true;
-        }
-        // Or, you may restrict access to only certain users based on their username.
-        if (in_array($UserGroup, $arrGroups)) {
-            $isValid = true;
-        }
-        if (($strUsers == "") && true) {
-            $isValid = true;
-        }
-    }
-    return $isValid;
-}
-
-$MM_restrictGoTo = "/index.php";
-if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("", $MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {
-    $MM_qsChar = "?";
-    $MM_referrer = $_SERVER['PHP_SELF'];
-    if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
-    if (isset($QUERY_STRING) && strlen($QUERY_STRING) > 0)
-        $MM_referrer .= "?" . $QUERY_STRING;
-    $MM_restrictGoTo = $MM_restrictGoTo . $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
-    header("Location: " . $MM_restrictGoTo);
-    exit;
-}
+include_once "security.php";
 
 include_once("class_doc.php");
 
@@ -71,7 +34,7 @@ $ADMIN = array('admin');
 //---------------------------------------------------------------------------
 // Вставка Партии
 if (isset($_POST['AddPart'])) {
-    $P->Add($_POST['SelElemID'], $_POST['Numb'], $_POST['SDateR'], $_POST['PriceTF'], $_POST['Mod'], $_POST['NDS'], $_POST['VAL']);
+    $P->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
 
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
@@ -92,7 +55,7 @@ if (isset($_POST['AddPP']))
     if (isset($_POST['PPNum']) and isset($_POST['PPSumm']) and isset($_POST['PPDate'])) {
         if (!isset($_POST['PPPrim']))
             $_POST['PPPrim'] = '';
-        $D->AddPay($_POST['PPNum'], $_POST['PPSumm'], Func::DateR($_POST['PPDate']), $_POST['PPPrim']);
+        $D->AddPay($_POST['PPNum'], $_POST['PPSumm'], Func::Date_to_MySQL($_POST['PPDate']), $_POST['PPPrim']);
 
         header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
@@ -154,7 +117,7 @@ if (isset($_POST['Flag']))
 // Отмена Закрытия Договора
 if (isset($_POST['Flag']))
     if ($_POST['Flag'] == 'DocOpen') {
-        $D->Open();
+        $D->Close(0);
         header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 //---------------------------------------------------------------------------
@@ -182,11 +145,13 @@ if (isset($_POST['DelDocum'])) {
 }
 //---------------------------------------------------------------------------
 // Добавление Накладной
-if (isset($_POST['Numb']) and isset($_POST['Nacl']) and isset($_POST['DateR']) and isset($_POST['Oper'])) {
-    $P->AddNacl($_POST['Numb'], $_POST['Nacl'], $_POST['DateR'], $_POST['Oper'], $_SESSION['MM_Username']);
+if(isset($_POST['AddEditNacl']))
+    if (isset($_POST['numb']) and isset($_POST['naklad']) and isset($_POST['data']) and isset($_POST['kod_oper'])) {
+        $P->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
 
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    }
+
 //---------------------------------------------------------------------------
 
 ?>
@@ -267,7 +232,7 @@ else
                     $D->ShowContacts(1);
                     echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddCont');
 
-// Добаление Контакта в Договор    
+                    // Добаление Контакта в Договор
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddCont') {
                             echo '<form id="form1" name="form1" method="post" action="">
@@ -325,7 +290,7 @@ else
                     <?php
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddPartForm') {
-                            $P->AddForm();
+                            $P->formAddEdit(0);
                         }
 
                     // Кнопка Добавить Партию
@@ -348,7 +313,7 @@ else
                 <?php
 
                 // Платежи - ------------------
-                $D->ShowPP();
+                echo $D->getPP();
 
                 // Ввод платежей
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -482,10 +447,7 @@ else
     var sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
     var sprytextfield4 = new Spry.Widget.ValidationTextField("SSummR", "currency");
-    var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {
-        format: "dd.mm.yyyy",
-        isRequired: false
-    });
+    var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {format: "dd.mm.yyyy",isRequired: false});
     var sprytextfield6 = new Spry.Widget.ValidationTextField("STextNR", "none", {isRequired: true});
     var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
     var sprytextfield7 = new Spry.Widget.ValidationTextField("sprytextfield7");
