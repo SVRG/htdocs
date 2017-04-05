@@ -4,7 +4,7 @@ include_once('class_elem.php');
 
 class Part
 {
-    public $kod_part;
+    public $kod_part=0;
     public $kod_dogovora;
     public $Item; // Связанный объект Изделие партии
     public $Parts;// Партии Договора
@@ -84,11 +84,11 @@ class Part
             // Форма добавления накладной
             if ($AddNacl > 0) {
                 if ((int)$row['kod_org'] != 683)
-                    $nacl .= $this->Form_AddNaclSM($ost, 2); // Отгрузка
+                    $nacl .= $this->formAddNacl($ost, 2); // Отгрузка
                 else
-                    $nacl .= $this->Form_AddNaclSM($ost, 1); // Поступление
+                    $nacl .= $this->formAddNacl($ost, 1); // Поступление
             }
-            else
+            elseif($ost>0) // Выводим кнопку Добавить только когда есть отстаток
                 $nacl.= Func::ActForm($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],
                                         "<input type='hidden' name='kod_part' id='kod_part' value='$this->kod_part'  />", 'Добавить', 'AddNacl');
 
@@ -149,9 +149,12 @@ class Part
                     $PRC = $prc;
             }
 
+            // Кнопка редактирования партии
+            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Редактировать Партию', 'EditPartForm');
+
             $res .=
-                '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $row['kod_dogovora'] . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . '</a></td>
+                '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . '</a>'.$btn.'</td>
                       <td width="40">' . (int)$row['numb'] . $ostatok . '</td>
                       <td width="80" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
@@ -440,58 +443,62 @@ class Part
 //--------------------------------------------------------------
 // Добавить Накладную
     /**
-     * @param $Numb
-     * @param $Nacl
-     * @param $Date
-     * @param $Oper
-     * @param $Operator
+     * @param $numb
+     * @param $naklad
+     * @param $data
+     * @param $kod_oper
+     * @param $operator
      */
-    public function AddNacl($Numb, $Nacl, $Date, $Oper, $Operator)
+    public function AddNacl($numb, $naklad, $data, $kod_oper, $operator)
     {
         $db = new Db();
         $PartID = $this->kod_part;
-        $Date = func::Date_to_MySQL($Date);
+        $data = func::Date_to_MySQL($data);
 
-        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($PartID,$Numb,'$Nacl','$Date',$Oper,'$Operator')");
+        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($PartID,$numb,'$naklad','$data',$kod_oper,'$operator')");
 
         return;
     }
 //-----------------------------------------------------------------------
-    // Данные: NaclR, Date_to_MySQL, NumbR
-    // Форма добавления накладной - поставка=отгрузка/ заказ=поступление
-    public function Form_AddNaclSM($Numb = 1, $Act = 1)
+    /**
+     * Форма добавления накладной - поставка=отгрузка/ заказ=поступление
+     * @param int $numb
+     * @param int $Act
+     * @return string
+     */
+    public function formAddNacl($numb = 1, $Act = 1)
     {
 
         if ($Act == 2)
-            $oper = 'Отгрузка<input id="Oper" type="hidden" value="2" name="Oper"/>';
+            $kod_oper = 'Отгрузка<input id="kod_oper" type="hidden" value="2" name="kod_oper"/>';
         else
-            $oper = 'Поступление<input id="Oper" type="hidden" value="1" name="Oper"/>';
+            $kod_oper = 'Поступление<input id="kod_oper" type="hidden" value="1" name="kod_oper"/>';
 
         $res = '
                 <form id="form1" name="form1" method="post" action="">
                 <table width="200" border="0">
                               <tr>
                                 <td>Номер </td>
-                                <td><input type="text" name="Nacl" id="Nacl" /></td>
+                                <td><input type="text" name="naklad" id="naklad" /></td>
                               </tr>
                               <tr>
                                 <td>Дата</td>
-                                <td><input type="text" name="Date_to_MySQL" id="Date_to_MySQL" value="' . Func::NowE() . '" /></td>
+                                <td><input type="text" name="data" id="data" value="' . Func::NowE() . '" /></td>
                               </tr>
                               <tr>
                                 <td>Кол-во </td>
-                                <td><input type="text" name="Numb" id="Numb" value="' . $Numb . '" /></td>
+                                <td><input type="text" name="numb" id="numb" value="' . $numb . '" /></td>
                               </tr>
                               <tr>
-                                <td>Операция</td>
+                                <td></td>
                                 <td>
-                                ' . $oper . '
+                                ' . $kod_oper . '
                                 </td>
                               </tr>
                             </table>
-                <input type="hidden" name="AddNacl" value="1" />
+                <input type="hidden" name="AddEditNacl" value="1" />
                 <input type="hidden" name="kod_part" value='. $this->kod_part .' />
-                <input type="submit" name="button" id="button" value="Submit" />
+                <input type="submit" name="button" id="button" value="Сохранить" />
                 </form>
                 ';
         $res .= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', 'Cansel');
@@ -500,85 +507,76 @@ class Part
 
 //-----------------------------------------------------------------------
     /**
-     * @param $ElemID
-     * @param int $Numb
-     * @param $PDate
-     * @param int $PriceTF
-     * @param string $Mod
-     * @param int $NDS
-     * @param int $VAL
+     * @param $kod_elem
+     * @param int $numb
+     * @param $data_postav
+     * @param int $price
+     * @param string $modif
+     * @param int $nds
+     * @param int $val
      */
-    public function Add($ElemID, $Numb = 1, $PDate, $PriceTF = 0, $Mod = '', $NDS = 18, $VAL = 1)
+    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0, $modif = '', $nds = 18, $val = 1)
     {
         $db = new Db();
-        $PDate = func::Date_to_MySQL($PDate);
-        $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$ElemID,$Numb,'$PDate',$PriceTF,'$Mod',$NDS,$VAL)");
-
-    }
-//-----------------------------------------------------------------------
-    //  Редактирование партии
-    /**
-     * @param $ElemID
-     * @param int $Numb
-     * @param $PDate
-     * @param int $PriceTF
-     * @param string $Mod
-     * @param int $NDS
-     * @param int $VAL
-     */
-    public function Edit($ElemID, $Numb = 1, $PDate, $PriceTF = 0, $Mod = '', $NDS = 18, $VAL = 1)
-    {
-        $db = new Db();
-        $PartID = $this->kod_part;
-
-        $PDate = func::Date_to_MySQL($PDate);
-
-        $db->query("UPDATE parts SET kod_elem=$ElemID, numb=$Numb, data_postav='$PDate',price=$PriceTF,modif='$Mod',nds=$NDS,val=$VAL WHERE kod_part=$PartID");
-
-        //echo "UPDATE parts SET kod_elem=$ElemID, numb=$Numb, data_postav='$PDate',price=$PriceTF,mod='$Mod',nds=$NDS,val=$VAL WHERE kod_part=$PartID";
-
-        return;
+        $data_postav = func::Date_to_MySQL($data_postav);
+        if($this->kod_part==0)
+            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val)");
+        else
+            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
     /**
-     * Форма - Редактирование партии
+     * Форма - Добавление или Редактирование партии
+     * @param int $Edit
      */
-    public function EditForm()
+    public function formAddEdit($Edit=1)
     {
 
-        $db = new Db();
-        $rows = $db->rows("SELECT * FROM parts WHERE kod_part=$this->kod_part");
-
-        $row = $rows[0];
-
         //Данные
-        $kod_elem = (int)$row['kod_elem'];
-        $modif = $row['modif'];
-        $data_postav = Func::Date_from_MySQL($row['data_postav']);
-        $numb = $row['numb'];
-        $price = $row['price'];
-        $val = (int)$row['val'];
-        $nds = (double)$row['nds'];
-
-        $nds_18 = "";
+        $modif = "";
+        $data_postav = func::NowE();
+        $numb = 1;
+        $price = "";
+        $nds_18 = "checked";
         $nds_0 = "";
-        if($nds>0)
-            $nds_18 = "checked";
-        else
-            $nds_0 =  "checked";
-
-        $rub_checked = "";
+        $rub_checked = "checked";
         $usd_checked = "";
-        if($val==1)
-            $rub_checked = "checked";
-        elseif($val==2)
-            $usd_checked = "checked";
+        $form_name = "AddPart";
 
-        // Чтобы подцепить Sellist по номенклатуре
         $E = new Elem();
-        $E->kod_elem = $kod_elem;
 
+        if($Edit==1) {
+
+            $db = new Db();
+            $rows = $db->rows("SELECT * FROM parts WHERE kod_part=$this->kod_part");
+
+            $row = $rows[0];//Данные
+            $form_name = "EditPart";
+            $kod_elem = (int)$row['kod_elem'];
+            $modif = $row['modif'];
+            $data_postav = Func::Date_from_MySQL($row['data_postav']);
+            $numb = $row['numb'];
+            $price = $row['price'];
+            $val = (int)$row['val'];
+            $nds = (double)$row['nds'];
+
+            $nds_0 = "";
+            if ($nds == 0) {
+                $nds_0 = "checked";
+                $nds_18 = "";
+            }
+
+            $rub_checked = "";
+            $usd_checked = "";
+
+            if ($val == 1)
+                $rub_checked = "checked";
+            elseif ($val == 2)
+                $usd_checked = "checked";
+
+            $E->kod_elem = $kod_elem;
+        }
         echo
             '<form id="form1" name="form1" method="post" action="">
                 <table border="0">
@@ -588,96 +586,42 @@ class Part
                   </tr>
                   <tr>
                     <td>Модификация</td>
-                    <td><input type="text" name="Mod" id="Mod" value="' . $modif . '" /></td>
+                    <td><input type="text" name="modif" id="modif" value="' . $modif . '" /></td>
                   </tr>
                   <tr>
                     <td>Дата Поставки </td>
                     <td><span id="SDateR">
-                              <input type="text" name="SDateR" id="SDate" value="' . $data_postav . '" />
+                              <input type="text" name="data_postav" id="data_postav" value="' . $data_postav . '" />
                               <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
                   </tr>
                   <tr>
                     <td>Количество</td>
-                        <td><input type="text" name="Numb" id="Numb" value="' . $numb. '" /></td>
+                        <td><input type="text" name="numb" id="numb" value="' . $numb. '" /></td>
                   </tr>
                   <tr>
                     <td>Цена без НДС</td>
-                    <td><input type="text" name="PriceTF" id="PriceTF" value="' . $price . '" /></td>
+                    <td><input type="text" name="price" id="price" value="' . $price . '" /></td>
                   </tr>
                   <tr>
                        <td>НДС</td>
                        <td>
-                            <input type="radio" name="NDS" value="0.18" ' .$nds_18. '> 18%<br>
-                            <input type="radio" name="NDS" value="0" '. $nds_0 .'> 0%<br>
+                            <input type="radio" name="nds" value="0.18" ' .$nds_18. '> 18%<br>
+                            <input type="radio" name="nds" value="0" '. $nds_0 .'> 0%<br>
                        </td>
                   </tr>
                   <tr>
                    <td>Валюта</td>
-                   <td><input type="radio" name="VAL" value="1" '.$rub_checked.'> RUR<br>
-                   <input type="radio" name="VAL" value="2" '. $usd_checked .'> USD<br>
-                   <input type="radio" name="VAL" value="3"> EURO<br>
+                   <td><input type="radio" name="val" value="1" '.$rub_checked.'> RUR<br>
+                   <input type="radio" name="val" value="2" '. $usd_checked .'> USD<br>
+                   <input type="radio" name="val" value="3"> EURO<br>
                    </td>
                   </tr>
                 </table>
 
-            <input id="EditPartForm" type="hidden" value="1" name="EditPart"/>
+            <input id="EditPartForm" type="hidden" value="1" name="'.$form_name.'"/>
             <input type="submit" value="Сохранить" />
             <br>
             </form>';
-
-        echo Func::Cansel(1);
-    }
-//-----------------------------------------------------------------------
-// Форма - Добавление партии
-    /**
-     *
-     */
-    public function AddForm()
-    {
-        $E = new Elem();
-
-        echo
-            '<form id="form1" name="form1" method="post" action="">
-                <table border="0">
-                  <tr>
-                    <td>Элемент</td>
-                    <td>' . $E->SelList() . '</td>
-                  </tr>
-                  <tr>
-                    <td>Модификация</td>
-                    <td><input type="text" name="Mod" id="Mod" value="" /></td>
-                  </tr>
-                  <tr>
-                    <td>Дата Поставки </td>
-                    <td><span id="SDateR">
-                              <input type="text" name="SDateR" id="SDate" value="' . date('d.m.Y') . '" />
-                              <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
-                  </tr>
-                  <tr>
-                    <td>Количество</td>
-                        <td><input type="text" name="Numb" id="Numb" value="1" /></td>
-                  </tr>
-                  <tr>
-                    <td>Цена без НДС</td>
-                        <td><input type="text" name="PriceTF" id="PriceTF" value="0" /></td>
-                  </tr>
-                  <tr>
-                   <td>НДС</td>
-                   <td><input type="radio" name="NDS" value="0.18" checked> 18%<br><input type="radio" name="NDS" value="0"> 0%<br></td>
-                  </tr>
-                  <tr>
-                   <td>Валюта</td>
-                   <td><input type="radio" name="VAL" value="1" checked> RUR<br>
-                   <input type="radio" name="VAL" value="2"> USD<br>
-                   <input type="radio" name="VAL" value="3"> EURO<br>
-                   </td>
-                  </tr>  
-                </table>
-                
-                <input id="AddPartForm" type="hidden" value="1" name="AddPart"/> 
-                <input type="submit" value="Сохранить" />
-                <br>
-             </form>';
 
         echo Func::Cansel(1);
     }
@@ -706,7 +650,10 @@ class Part
 
     }
 //-------------------------------------------------------------------------
-// Удаление партии
+//
+    /**
+     * Удаление партии
+     */
     public function Delete()
     {
         $db = new Db();
