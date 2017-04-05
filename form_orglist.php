@@ -10,11 +10,13 @@ include_once "security.php";
 include_once("class_org.php");
 
 $org = new Org();
-
+//---------------------------------------------------------------------------
 // Добавление Организации
-if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
-    $org->AddOrg($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+if(isset($_POST['FormName']))
+    if($_POST['FormName']=="FormAddEdit")
+        if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
+            $org->AddOrg($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -41,7 +43,7 @@ if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv
 
         if (isset($_POST['Flag']))
             if ($_POST['Flag'] == 'AddOrg') {
-                echo $org->AddForm();
+                echo $org->formAddEdit();
             }
     }
 
@@ -52,9 +54,9 @@ if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv
 </div>
 <script type="text/javascript">
     <!--
-    var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
-    var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2");
-    var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
+    var sprytextfield_poisk = new Spry.Widget.ValidationTextField("sprytextfield_poisk", "none", {isRequired: true});
+    var sprytextfield_nazv_krat = new Spry.Widget.ValidationTextField("sprytextfield_nazv_krat", "none", {isRequired: true});
+    var sprytextfield_nazv_poln = new Spry.Widget.ValidationTextField("sprytextfield_nazv_poln", "none", {isRequired: true});
     //-->
 </script>
 </body>
