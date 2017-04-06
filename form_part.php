@@ -122,7 +122,7 @@ include_once("header.php");
 <div class="style1" id="pagecell1">
     <!--pagecell1-->
     <?php
-        $D->ShowDoc();
+        $D->formDogovor();
 
 
         $UserG = array('admin', 'oper', 'manager');
@@ -189,7 +189,7 @@ include_once("header.php");
                 }
 
             }
-            $D->ShowPart(1, 1);
+            $D->formParts(1, 1);
             echo '<br>';
         } else {
             $P->PayGraph(false);
