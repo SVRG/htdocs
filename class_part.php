@@ -297,7 +297,7 @@ class Part
         {
             $d = new Doc();
             $d->kod_dogovora = $this->kod_dogovora;
-            $res .= "<br>" . $d->PaySelList('', $Body);
+            $res .= "<br>" . $d->formPaySelList('', $Body);
             return $res;
         }
 
@@ -340,7 +340,7 @@ class Part
             if ($sum < $raschet_summa) {
                 $d = new Doc();
                 $d->kod_dogovora = $this->kod_dogovora;
-                $res .= "<br>" . $d->PaySelList('', $Body);
+                $res .= "<br>" . $d->formPaySelList('', $Body);
             }
         }
         return $res;
@@ -764,5 +764,30 @@ class Part
         $res = $rows[0]['summ_numb'];
 
         return $res;
+    }
+//-------------------------------------------------------------------------
+
+    public function Events()
+    {
+        $event = false;
+
+        if (isset($_POST['AddPart'])) {
+            $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+            $event = true;
+        }
+
+        if (isset($_POST['PostNacl'])) {
+            $this->PostNacl($_POST['PostNacl']);
+            $event = true;
+        }
+
+        if(isset($_POST['AddEditNacl']))
+            if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'],$_POST['kod_oper'])) {
+                $this->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
+                $event = true;
+        }
+
+        if($event)
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 }
