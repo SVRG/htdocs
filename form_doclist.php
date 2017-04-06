@@ -54,7 +54,7 @@ if (isset($_POST['AddDocForm'])) {
         $ed = 1;
         if (isset($_POST['Flag'])) {
             if ($_POST['Flag'] == 'AddDoc')
-                $d->ShowDoc($ed);
+                $d->formDogovor($ed);
         }
 
         if(isset($_POST['Flag']))
@@ -62,7 +62,7 @@ if (isset($_POST['AddDocForm'])) {
         {
             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Договор', 'AddDoc');
         }
-        echo $d->getFullDocList();
+        echo $d->formDocList();
         ?>
     </div>
 </div>
