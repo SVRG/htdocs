@@ -11,15 +11,15 @@ class Org
 //-----------------------------------------------------------
 
     /**
-     * @param int $SelID
+     * @param int $kod_org_selected
      * @param string $Name
      * @param string $ID
      * @return string
      */
-    public static function SelList($SelID = -1, $Name = 'nazv_krat', $ID = 'kod_org')
+    public static function formSelList($kod_org_selected = -1, $Name = 'nazv_krat', $ID = 'kod_org')
     {
-        if (!isset($SelID))
-            $SelID = -1;
+        if (!isset($kod_org_selected))
+            $kod_org_selected = -1;
 
         $res = "<select name='$ID' id='$ID'>";
 
@@ -38,7 +38,7 @@ class Org
             $poisk = $row['poisk'];
 
             $sel = '';
-            if ($row['kod_org'] == $SelID)
+            if ($row['kod_org'] == $kod_org_selected)
                 $sel = "selected";
 
             $N = '';
@@ -220,15 +220,15 @@ class Org
     {
         $doc = new Doc();
         $doc->kod_org = $this->kod_org;
-        return $doc->getDocsByOrg();
+        return $doc->formDocsByOrg();
     }
 //-----------------------------------------------------------
 //
     /**
      * Вывод списка организаций
-     * @return string
+     * @return void|string
      */
-    public function ShowOrgList()
+    public function ShowOrgList($echo=false)
     {
         $db = new DB();
 
@@ -249,6 +249,9 @@ class Org
 	                            <td width="500"></td>
 	                    </tr>';
 
+        if($echo)
+            echo $res;
+
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
@@ -263,19 +266,27 @@ class Org
             if ($nazv_krat != $nazv_poln)
                 $FN = $nazv_poln;
 
-
-            $res.= '<tr>
+            $tab_row= '<tr>
                       <td></td>
                       <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $poisk . '</a></td>
                       <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $nazv_krat . '</a></td>
                       <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $FN . '</a></td>
                       <td>' . Func::Link($www) . '</td>
-		         </tr>';
+		            </tr>';
+            if($echo)
+                echo $tab_row;
+            else
+                $res.=$tab_row;
 
         }
-        $res.= '</table>';
+        $tab_row = '</table>';
 
-        return $res;
+        if($echo)
+            echo $tab_row;
+        else {
+            $res .= $tab_row;
+            return $res;
+        }
     }
 //-----------------------------------------------------------------
 //
@@ -483,7 +494,7 @@ class Org
      */
     public function AddCont($Dolg, $FName, $Name, $PName)
     {
-        $c = new Kontact();
+        $c = new Kontakt();
         $c->kod_org = $this->kod_org;
         $c->AddContToOrg($Dolg, $FName, $Name, $PName);
     }
