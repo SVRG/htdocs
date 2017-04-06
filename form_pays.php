@@ -24,7 +24,7 @@ include_once "security.php";
         $t = date('H:i:s');
         include("class_doc.php");
         $D = new Doc();
-        echo $D->ShowAllPays();
+        echo $D->formAllPays();
         //$D->ShowDocListByID();
         echo 'begin:' . $t . ' end:' . date('H:i:s');
         ?>
