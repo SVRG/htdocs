@@ -17,7 +17,7 @@ $Org = new Org();
 $Org->kod_org = $kod_org;
 $Org->getData();
 
-$c = new Kontact();
+$c = new Kontakt();
 $c->kod_org = $kod_org;
 
 //---------------------------------------------------------------------------
@@ -35,10 +35,10 @@ if (isset($_POST['AddContact']) and (isset($_POST['FName']) or isset($_POST['Nam
 //---------------------------------------------------------------------------
 // Вставка Телефон в Контакт
 if (isset($_POST['AddPhone']))
-    if (isset($_POST['ContID']) and isset($_POST['Numb'])) {
-        $c = new Kontact();
-        $c->kod_kontakta = $_POST['ContID'];
-        $c->AddPhone($_POST['Numb']);
+    if (isset($_POST['kod_kontakta']) and isset($_POST['phone'])) {
+        $c = new Kontakt();
+        $c->kod_kontakta = $_POST['kod_kontakta'];
+        $c->AddPhone($_POST['phone']);
 
         header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
@@ -178,9 +178,9 @@ if(isset($_POST['FormName']))
                     <div class="CollapsiblePanelContent">
                         <?php
                         if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                            echo $c->Contacts(1, "Org");
+                            echo $c->formKontakts(1, "Org");
                         else
-                            echo $c->Contacts(0, "Org");
+                            echo $c->formKontakts(0, "Org");
                         ?>
                     </div>
                 </div>
