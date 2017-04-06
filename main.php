@@ -35,24 +35,24 @@ include_once "security.php";
     }
 
     if ($sgp == -1)
-        echo $D->getRPlan(0);
+        echo $D->formRPlan(0);
     elseif ($sgp == 1)
-        echo $D->getRPlan(0);
+        echo $D->formRPlan(0);
     elseif ($sgp == 2)
-        echo $D->getRPlan(1);
+        echo $D->formRPlan(1);
     elseif (isset($_GET['sgphistory']))
-        echo $D->SGPHistory();
+        echo $D->formSGPHistory();
 
     /*
      *
          elseif (isset($_GET['RP'])) // Оплачено
-            echo Doc::getRPlan_by_Elem(' WHERE zakryt=0 AND summa_plat>1  AND kod_ispolnit=683 ');
+            echo Doc::formRPlan_by_Elem(' WHERE zakryt=0 AND summa_plat>1  AND kod_ispolnit=683 ');
         elseif (isset($_GET['RP_VN'])) // todo - план реализации внешний?
-            echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND kod_ispolnit<>683 ");
+            echo Doc::formRPlan_by_Elem(" WHERE zakryt=0 AND kod_ispolnit<>683 ");
         elseif (isset($_GET['RPN'])) // Нет оплаты
-            echo Doc::getRPlan_by_Elem(" WHERE zakryt=0 AND summa_plat=0  AND kod_ispolnit=683 ");
+            echo Doc::formRPlan_by_Elem(" WHERE zakryt=0 AND summa_plat=0  AND kod_ispolnit=683 ");
         else // Закрытые договоры НВС
-            echo Doc::getRPlan_by_Elem(" WHERE zakryt=1 AND kod_ispolnit=683 ");
+            echo Doc::formRPlan_by_Elem(" WHERE zakryt=1 AND kod_ispolnit=683 ");
     */
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
