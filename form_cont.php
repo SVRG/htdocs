@@ -10,31 +10,15 @@ $UserG1 = array('admin', 'oper', 'manager');
 //---------------------------------------------------------------------------
 include_once("class_kont.php");
 
-$Cont = new Kontact();
+$Kontakt = new Kontakt();
 if (isset($_GET['kod_kontakta']))
-    $Cont->Set($_GET['kod_kontakta']);
+    $Kontakt->Set($_GET['kod_kontakta']);
 elseif (isset($_POST['kod_kontakta']))
-    $Cont->Set($_POST['kod_kontakta']);
+    $Kontakt->Set($_POST['kod_kontakta']);
 else
     die('Контакт не выбран либо ссылка на несуществующий контакт!');
 
-//---------------------------------------------------------------------------
-// Вставка Телефон в Контакт
-if (isset($_POST['AddPhone']))
-    if (isset($_POST['Numb'])) {
-            $Cont->AddPhone($_POST['Numb']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-// Сохранение изменений контакта
-if (isset($_POST['SaveContForm'])) {
-    $Cont->Save($_POST['Dolg'], $_POST['FName'], $_POST['Name'], $_POST['SName']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
+$Kontakt->Events();
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -75,14 +59,14 @@ include_once("class_doc.php");
 
 $Doc = new Doc();
 $Org = new Org();
-$Org->kod_org = $Cont->kod_org;
+$Org->kod_org = $Kontakt->kod_org;
 $Org->getData();
 
 ?>
 <div class="style1" id="pagecell1">
     <table width="100%" border="0" cellspacing="10">
         <tr>
-            <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php echo $Cont->Name; ?></h1>
+            <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php echo $Kontakt->Name; ?></h1>
                 <p><?php
 
 
@@ -91,27 +75,19 @@ $Org->getData();
 
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'EditCont') {
-                            echo $Cont->SaveForm();
+                            echo $Kontakt->formAddEdit(1);
                             Func::Cansel();
                         }
 
-                    ?><br>
-                    Контактная информация<?php echo $Cont->Phones(); ?></p>
-                <form id="form1" name="form1" method="post" action="">
-        <span id="sprytextfield1">
-          <input title="" type="text" name="Numb" id="Numb"/>
-          <span class="textfieldRequiredMsg">A value is required.</span></span>
-                    <label>
-                        <input type="submit" name="button" id="button" value="Добавить"/>
-                    </label>
-                    <input type="hidden" name="AddPhone" id="AddPhone"/>
-                </form>
-                <p>&nbsp;</p></td>
+                    ?>
+                    <br>
+                    Контактная информация<?php echo $Kontakt->formPhones(-1,1); ?>
+            </td>
             <td width="50%" valign="top"><?php echo '<h1>' . $Org->getFormLink() . '</h1>'; ?>
-                <div id="CollapsiblePanel1" class="CollapsiblePanel">
-                    <div class="CollapsiblePanelTab">Реквизиты</div>
-                    <div class="CollapsiblePanelContent"><?php $Org->ShowRecv(); ?></div>
-                </div>
+                    <div id="CollapsiblePanel1" class="CollapsiblePanel">
+                        <div class="CollapsiblePanelTab">Реквизиты</div>
+                        <div class="CollapsiblePanelContent"><?php $Org->ShowRecv(); ?></div>
+                    </div>
             </td>
         </tr>
         <tr>
@@ -121,7 +97,7 @@ $Org->getData();
                     <div class="CollapsiblePanelContent">
                         <?php
                         // Вывод договоров по контакту
-                            echo $Cont->ShowDocs();
+                            echo Doc::formDocsByKontakt($Kontakt->kod_kontakta);
                         ?>
                     </div>
                 </div>
