@@ -123,7 +123,7 @@ class Elem
      */
     public function getDocs()
     {
-        return Doc::getDocByElem($this->kod_elem);
+        return Doc::formDocByElem($this->kod_elem);
     }
 //----------------------------------------------------------------------
 //
