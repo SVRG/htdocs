@@ -36,19 +36,21 @@ if(isset($_POST['FormName']))
     <?php
 
     $UserG = array('admin', 'oper', 'manager');
+    $add_edit = false;
 
     if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
 
         echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Организацию', 'AddOrg');
-
         if (isset($_POST['Flag']))
             if ($_POST['Flag'] == 'AddOrg') {
                 echo $org->formAddEdit();
+                $add_edit = true;
             }
     }
 
     // Вывод список организаций
-        echo $org->ShowOrgList();
+    if(!$add_edit)
+        $org->ShowOrgList(true);
 
     ?>
 </div>
