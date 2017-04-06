@@ -49,7 +49,7 @@ if (isset($_POST['AddDocForm'])) {
     <div id="pageName">
         <?php
 
-        $c = new Kontact();
+        $c = new Kontakt();
 
         echo $c->All();
         ?>
