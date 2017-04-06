@@ -1,7 +1,7 @@
 <?php
 include_once "class_db.php";
 
-class Kontact
+class Kontakt
 {
     public $kod_dogovora = 0; // Код Договора
     public $kod_org = 0; // Код Организации
@@ -9,7 +9,7 @@ class Kontact
     public $Data;
     public $Name;
     public $OrgName;
-    public $ContArray; // Массив контактов по Договору
+    public $KontArray; // Массив контактов по Договору
 
     //------------------------------------------------------------------------
     // Контакты Договора
@@ -18,14 +18,14 @@ class Kontact
      * @param string $Doc_Org -
      * @return int
      */
-    public function GetConts($Doc_Org = "Doc")
+    public function getData($Doc_Org = "Doc")
     {
         $db = new Db();
 
         if ($Doc_Org == "Doc")
-            $this->ContArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=" . $this->kod_dogovora);
+            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=" . $this->kod_dogovora);
         else
-            $this->ContArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=" . $this->kod_org);
+            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=" . $this->kod_org);
 
         return $db->cnt;
     }
@@ -36,10 +36,10 @@ class Kontact
      * @param string $Doc_Org - поиск по Организации или Договору
      * @return string
      */
-    public function Contacts($AddPh = 0, $Doc_Org = "Doc")
+    public function formKontakts($AddPh = 0, $Doc_Org = "Doc")
     {
         // Формируем массив контактов
-        $cnt = $this->GetConts($Doc_Org);
+        $cnt = $this->getData($Doc_Org);
 
         $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
         //$res .= '<tr bgcolor="#CCCCCC" ><td width="200">Контакты</td></tr>';
@@ -47,18 +47,18 @@ class Kontact
         // Если можно добалять телефон то Разрешено "Добавить контакт из списка"
         if ($AddPh !== 0 and $Doc_Org == "Doc") {
             $res .= '<tr bgcolor="#CCCCCC"><td>';
-            $res .= '<br>' . $this->SelListForm(); // Список выбора по организации
+            $res .= '<br>' . $this->formSelList(); // Список выбора по организации
             $res .= '</td></tr>';
         }
 
         if($cnt==0)
-            return $this->SelListForm();
+            return $this->formSelList();
 
         $exc = array();
 
         for ($i = 0; $i < $cnt; $i++) {
 
-            $row = $this->ContArray[$i]; // Строка данных
+            $row = $this->KontArray[$i]; // Строка данных
 
             // Только оригинальные имена
             if (!in_array($row['famil'] . $row['name'] . $row['otch'], $exc)) {
@@ -69,7 +69,7 @@ class Kontact
                 $res .= "<tr><td><a href='form_cont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
 
                 // Если флаг - Добавить телефон
-                $res .= $this->Phones($row['kod_kontakta'], $AddPh); // Форма добавления телефона
+                $res .= $this->formPhones($row['kod_kontakta'], $AddPh); // Форма добавления телефона
 
                 $res .= '</td></tr>';
             }
@@ -86,7 +86,7 @@ class Kontact
      * @param int $Add
      * @return string
      */
-    public function Phones($kod_kontakta=-1, $Add = 0)
+    public function formPhones($kod_kontakta=-1, $Add = 0)
     {
         if($kod_kontakta==-1)
             $kod_kontakta=$this->kod_kontakta;
@@ -125,13 +125,12 @@ class Kontact
         $res .= '</table>';
 
         if ($Add == 1)
-            $res .= '<br><form id="form1" name="form1" method="post" action="">
-           <input type="text" name="Numb" id="Numb" />
-           <input type="checkbox" name="FaxTrue" id="FaxTrue" /> Факс
-           <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
-           <input type="hidden" name="AddPhone" value="AddPhone" />
-           <input type="submit" name="Добавить" id="button" value="Добавить" />
-           </form>';
+            $res .= '<form id="form1" name="form1" method="post" action="">
+                           <input type="text" name="phone" id="phone" />
+                           <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
+                           <input type="hidden" name="formPhones" value="formPhones" />
+                           <input type="submit" name="Добавить" id="button" value="Добавить" />
+                     </form>';
 
         return $res;
     }
@@ -197,18 +196,18 @@ class Kontact
     //
     /**
      * Добавить телефон
-     * @param $Numb
+     * @param $phone
      * @return void
      */
-    public function AddPhone($Numb)
+    public function AddPhone($phone)
     {
         $db = new Db();
         $kod_kontakta = $this->kod_kontakta;
 
-        if (!isset($Numb)) return;
+        if (!isset($phone) or $phone=="") return;
 
         $db->query("INSERT INTO kontakty_data (kod_kontakta,data)
-                    VALUES($kod_kontakta,'$Numb')");
+                    VALUES($kod_kontakta,'$phone')");
     }
     //-----------------------------------------------------------------
     //
@@ -242,7 +241,7 @@ class Kontact
      * Выпадающий Список контактов по организации
      * @return string
      */
-    public function SelList()
+    public function formSelList()
     {
         $db = new Db();
 
@@ -253,7 +252,8 @@ class Kontact
         if ($cnt == 0) return ''; // если нет записей
 
         // Формируем компонет - список
-        $res = "<select name='SLContID' id='SLContID'>";
+        $res = "<form id='form1' name='form1' method='post' action='' >
+                <select name='kod_kontakta' id='kod_kontakta'>";
 
         $exc = array();
 
@@ -270,18 +270,20 @@ class Kontact
                     Func::Mstr($row['name']) . ' ' .
                     Func::Mstr($row['otch']) . ' '
                     . '</option>';
-                array_push($exc, $row['famil']);
             }
         }
 
-        $res .= '</select>';
+        $res .= "</select>
+                    <select name='Status' id='Status'>
+                    <option value='2' selected='selected'>По Договору</option>
+                    <option value='4'>По Отгрузке</option>
+                    <option value='1'>Подписант</option>
+                    <option value='3'>По Финансированию</option>
+                 </select>";
 
-        $res .= "<select name='Status' id='Status'>
-                <option value='2' selected='selected'>По Договору</option>
-                <option value='4'>По Отгрузке</option>
-                <option value='1'>Подписант</option>
-                <option value='3'>По Финансированию</option>
-                </select>";
+        $res.= "<input type='hidden' name='formSelList' id='formSelList' />
+                <input type='submit' name='button' id='button' value='Добавить из списка' />
+                </form>";
 
         return $res;
     }
@@ -297,36 +299,6 @@ class Kontact
         $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora) VALUES($this->kod_kontakta,$DocID)");
     }
 
-    //------------------------------------------------------------------------
-    //
-    /**
-     * Создает форму со списком
-     * @param string $Action
-     * @return string
-     */
-    public function SelListForm($Action = '')
-    {
-        $sl = $this->SelList();
-
-        if ($sl == '') return '';
-
-        $res = "<form id='form1' name='form1' method='post' action='$Action' >"
-            . $sl .
-            "<input type='hidden' name='AddContFromList' id='AddContFromList' />" .
-            "<input type='submit' name='button' id='button' value='Добавить из списка' />
-                </form>";
-        return $res;
-    }
-
-    //------------------------------------------------------------------------
-    // Договоры контакта. Передалать в class_doc!
-    /**
-     *
-     */
-    public function ShowDocs()
-    {
-        return Doc::getDocsByKontakt($this->kod_kontakta);
-    }
     //------------------------------------------------------------------------
     // Save
     /**
@@ -344,42 +316,56 @@ class Kontact
     }
     //------------------------------------------------------------------------
     // Save Form
-    public function SaveForm()
+    public function formAddEdit($Edit=0)
     {
-        $db = new Db();
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta");
 
-        $row = $rows[0];
+        $dolg = "";
+        $famil = "";
+        $name = "";
+        $otch = "";
+
+        if($Edit==1) {
+            $db = new Db();
+            $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta");
+
+            $row = $rows[0];
+
+            $dolg = $row['dolg'];
+            $famil = $row['famil'];
+            $name = $row['name'];
+            $otch = $row['otch'];
+        }
 
         $res = '<form id="form1" name="form1" method="post" action=""><table width="290" border="1">
           <tr>
             <td width="78">Должность</td>
             <td width="256">
               <label>
-                <input name="Dolg" type="text" id="Dolg" size="35" value="' . $row['dolg'] . '" />
+                <input name="dolg" type="text" id="dolg" size="35" value="' . $dolg . '" />
               </label>
             </td>
           </tr>
           <tr>
             <td>Фамилия</td>
-            <td><input name="FName" type="text" id="FName" size="35" value="' . $row['famil'] . '" /></td>
+            <td><input name="famil" type="text" id="famil" size="35" value="' . $famil . '" /></td>
           </tr>
           <tr>
             <td>Имя</td>
-            <td><input name="Name" type="text" id="Name" size="35" value="' . $row['name'] . '" /></td>
+            <td><input name="name" type="text" id="name" size="35" value="' . $name . '" /></td>
           </tr>
           <tr>
             <td>Отчество</td>
-            <td><input name="SName" type="text" id="SName" size="35" value="' . $row['otch'] . '" /></td>
+            <td><input name="otch" type="text" id="otch" size="35" value="' . $otch . '" /></td>
           </tr>
         </table>
           <p>
             <label>
               <input type="submit" name="Save" id="Save" value="Сохранить" />
-              <input type="hidden" name="SaveContForm" id="SaveContForm" />
+              <input type="hidden" name="formAddEdit" id="formAddEdit" />
             </label>
           </p>
         </form>';
+
         return $res;
     }
 
@@ -429,7 +415,7 @@ class Kontact
                 ' ' . Func::Mstr($row['otch']) . '</a></td>
                             <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                             <td>' . Func::Mstr($row['dolg']) . '</td>
-                            <td>' . $this->Phones($row['kod_kontakta']) . '</td>
+                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
                  </tr>';
         }
 
@@ -437,5 +423,42 @@ class Kontact
 
         return $res;
     }
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Перехватчик событий
+     * Добавление телефона в контакт
+     * Добавление контакта из списка
+     *
+     */
+    public function Events()
+    {
+        $event = false;
+
+        if (isset($_POST['formPhones']))
+            if (isset($_POST['kod_kontakta']) and isset($_POST['phone'])) {
+                $this->kod_kontakta = $_POST['kod_kontakta'];
+                $this->AddPhone($_POST['phone']);
+                $event = true;
+            }
+
+        if (isset($_POST['formSelList']))
+            if(isset($_POST['kod_kontakta'])){
+                $this->Set($_POST['kod_kontakta']);
+                $this->AddKontaktToDoc($this->kod_dogovora);
+                $event = true;
+        }
+
+        if (isset($_POST['formAddEdit'])) {
+            $this->Save($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+            $event = true;
+        }
+
+        if($event)
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 }
