@@ -5,135 +5,34 @@ if (!isset($_SESSION)) {
 $MM_authorizedUsers = "";
 $MM_donotCheckaccess = "true";
 
+$UserG = array('admin', 'oper');
+$UserG1 = array('admin', 'oper', 'manager');
+$Edit = false;
+$ADMIN = array('admin');
+
 include_once "security.php";
 
 include_once("class_doc.php");
 
 if(!isset($_GET['kod_dogovora']) and !isset($_POST['kod_dogovora']))
     exit("Не задан Договор");
-
 $D = new Doc();
 if(isset($_GET['kod_dogovora']))
     $D->kod_dogovora = $_GET['kod_dogovora'];
 else
     $D->kod_dogovora = $_POST['kod_dogovora'];
 $D->getData();
-
+$D->Events();
 
 $P = new Part();
 $P->kod_dogovora = $D->kod_dogovora;
-
 if(isset($_POST['kod_part'])) // Если был передан код партии
     $P->kod_part = $_POST['kod_part'];
+$P->Events();
 
-$UserG = array('admin', 'oper');
-$UserG1 = array('admin', 'oper', 'manager');
-$Edit = false;
-$ADMIN = array('admin');
-
-//---------------------------------------------------------------------------
-// Вставка Партии
-if (isset($_POST['AddPart'])) {
-    $P->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Отметка о Получении накладной
-if (isset($_POST['PostNacl'])) {
-    $P->kod_dogovora = $D->kod_dogovora;
-
-    $P->PostNacl($_POST['PostNacl']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Вставка Платежа
-if (isset($_POST['AddPP']))
-    if (isset($_POST['PPNum']) and isset($_POST['PPSumm']) and isset($_POST['PPDate'])) {
-        if (!isset($_POST['PPPrim']))
-            $_POST['PPPrim'] = '';
-        $D->AddPay($_POST['PPNum'], $_POST['PPSumm'], Func::Date_to_MySQL($_POST['PPDate']), $_POST['PPPrim']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Вставка Счета
-if (isset($_POST['AddInv']))
-    if (isset($_POST['InvNum']) and isset($_POST['InvSumm']) and isset($_POST['InvDate'])) {
-
-        $D->AddInvoice($_POST['InvNum'], $_POST['InvSumm'], $_POST['InvDate'], $_POST['InvPrim']);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Вставка Контакта
-if (isset($_POST['AddCont'])) {
-    $D->AddCont($_POST['Dolg'], $_POST['SName'], $_POST['Name'], $_POST['PName']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-
-}
-
-//---------------------------------------------------------------------------
-// Вставка Контакта из Списка
-if (isset($_POST['AddContFromList'])) {
-    $c = new Kontact();
-    $c->Set($_POST['SLContID']);
-    $c->AddKontaktToDoc($D->kod_dogovora);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Вставка Примечения
-if (isset($_POST['AddPrim']))
-    if (isset($_POST['Prim'])) {
-        $D->AddPrim($_POST['Prim'],$_SESSION['MM_Username']);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Вставка Телефон в Контакт
-if (isset($_POST['AddPhone']))
-    if (isset($_POST['kod_kontakta']) and isset($_POST['Numb'])) {
-        $c = new Kontact();
-        $c->kod_kontakta = $_POST['kod_kontakta'];
-        $c->AddPhone($_POST['Numb']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Закрытие Договора
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'DocCloseConf') {
-        $D->Close();
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-//---------------------------------------------------------------------------
-// Отмена Закрытия Договора
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'DocOpen') {
-        $D->Close(0);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-//---------------------------------------------------------------------------
-// Редактирование Договора
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'DocEdit') {
-        $D->Edit($_POST['Numb'], $_POST['Date'], $_POST['SLOrgID'], $_POST['IspID']);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-//---------------------------------------------------------------------------
-// Удаление Счета
-    elseif ($_POST['Flag'] == 'DelInv') {
-        $D->DelInvoice($_POST['InvID']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
+$K = new Kontakt();
+$K->kod_dogovora = $D->kod_dogovora;
+$K->Events();
 
 //---------------------------------------------------------------------------
 // Удаление документов
@@ -143,15 +42,6 @@ if (isset($_POST['DelDocum'])) {
 
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
-//---------------------------------------------------------------------------
-// Добавление Накладной
-if(isset($_POST['AddEditNacl']))
-    if (isset($_POST['numb']) and isset($_POST['naklad']) and isset($_POST['data']) and isset($_POST['kod_oper'])) {
-        $P->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
 //---------------------------------------------------------------------------
 
 ?>
@@ -200,9 +90,9 @@ else
                 <?php
 
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    $D->ShowDoc(0, 1);
+                    $D->formDogovor(0, 1);
                 else
-                    $D->ShowDoc();
+                    $D->formDogovor();
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'DocClose') {
@@ -213,11 +103,11 @@ else
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'DocEditForm')
-                        $D->EditForm();
+                        echo $D->formAddEdit(1);
 
                 echo Func::ActButton('', 'Редактировать Договор', 'DocEditForm');
 
-                echo $D->Docum($Del); // Документы договора
+                echo $D->formDocum($Del); // Документы договора
 
                 ?>
             </td>
@@ -229,59 +119,18 @@ else
                 if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
 
                     // Вывод контактов
-                    $D->ShowContacts(1);
+                    $D->formDocKontakts(1);
                     echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddCont');
 
                     // Добаление Контакта в Договор
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddCont') {
-                            echo '<form id="form1" name="form1" method="post" action="">
-                                      <table width="416" border="0">
-                                        <tr>
-                                          <td width="185">Должность</td>
-                                          <td width="215">
-                                            <input type="text" name="Dolg" id="Dolg" />
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Фамилия</td>
-                                          <td>
-                                            <input type="text" name="SName" id="SName" />
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Имя</td>
-                                          <td>
-                                            <input type="text" name="Name" id="Name" />
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td>Отчество</td>
-                                          <td>
-                                          <input type="text" name="PName" id="PName" />
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                        <td>
-                                        <select name="Status" id="select">
-                                            <option value="2" selected="selected">По Договору</option>
-                                            <option value="3">По Финансированию</option>
-                                            <option value="4">По Отгрузке</option>
-                                            <option value="1">Подписант</option>
-                                        </select>
-                                          </td>
-                                        <td><input type="submit" name="button" id="button" value="Submit" /></td>
-                                        </tr>
-                                      </table>
-                                    <input type="hidden" name="AddCont" value="1" />
-                                    </form>';
-                            Func::Cansel();
+                            echo $K->formAddEdit();
                             $_POST['Flag'] = null;
-
                         }
                 } elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-                    $D->ShowContacts(1);
-                } else $D->ShowContacts(0);
+                    $D->formDocKontakts(1);
+                } else $D->formDocKontakts(0);
 
                 ?></td>
         </tr>
@@ -313,7 +162,7 @@ else
                 <?php
 
                 // Платежи - ------------------
-                echo $D->getPP();
+                echo $D->formPP();
 
                 // Ввод платежей
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -366,7 +215,7 @@ else
             <td width="50%" align="left" valign="top">
                 <?php
                 // Счета ------------------------------------
-                $D->ShowScheta();
+                $D->formScheta();
 
                 // Добавить Счет
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -432,7 +281,7 @@ else
                         if ($_POST['Flag'] == 'AddPrim')
                             $add_prim = 1;
 
-                    echo $D->getPrim($add_prim);
+                    echo $D->formPrim($add_prim);
                 }
                 ?></td>
         </tr>
