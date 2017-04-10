@@ -5,7 +5,7 @@ include_once "class_elem.php";
 
 class Org
 {
-    public $kod_org; // Идентификатор
+    public $kod_org=0; // Идентификатор
     public $Data;
 
 //-----------------------------------------------------------
@@ -59,7 +59,7 @@ class Org
     /**
      * @param int $Edit
      */
-    public function ShowRecv($Edit = 0)
+    public function formRecv($Edit = 0)
     {
         $this->getData();
 
@@ -151,7 +151,7 @@ class Org
      * @param int $Add
      * @return string
      */
-    public function getAdressList($Add = 0)
+    public function formAdressList($Add = 0)
     {
 
         $res = "";
@@ -216,7 +216,7 @@ class Org
      * Договоры по организации
      * @return string
      */
-    public function getDocs()
+    public function formDocs()
     {
         $doc = new Doc();
         $doc->kod_org = $this->kod_org;
@@ -228,7 +228,7 @@ class Org
      * Вывод списка организаций
      * @return void|string
      */
-    public function ShowOrgList($echo=false)
+    public function formOrgList($echo=false)
     {
         $db = new DB();
 
@@ -295,7 +295,7 @@ class Org
      * @param int $Add
      * @return string
      */
-    public function getPhones($Add = 0)
+    public function formPhones($Add = 0)
     {
         if ($Add == 1) {
             echo '<form id="form1" name="form1" method="post" action="">
@@ -487,16 +487,16 @@ class Org
 //
     /**
      * Добавить Контакт
-     * @param $Dolg
-     * @param $FName
-     * @param $Name
-     * @param $PName
+     * @param $dolg
+     * @param $famil
+     * @param $name
+     * @param $otch
      */
-    public function AddCont($Dolg, $FName, $Name, $PName)
+    public function AddKontakt($dolg, $famil, $name, $otch)
     {
         $c = new Kontakt();
         $c->kod_org = $this->kod_org;
-        $c->AddContToOrg($Dolg, $FName, $Name, $PName);
+        $c->AddContToOrg($dolg, $famil, $name, $otch);
     }
 //----------------------------------------------------------------------
 //
@@ -504,26 +504,27 @@ class Org
      * Заказанная номенклатура по Договорам
      * @return string
      */
-    public function OrgNomen()
+    public function formOrgNomen()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_org_nomen WHERE kod_org =" . $this->kod_org);
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT * FROM view_org_nomen WHERE kod_org = $this->kod_org");
+
+        if($db->cnt==0)
+            return "";
 
         $res = '<table border=0 cellspacing=0 cellpadding=0 width="100%">';
 
-        $E = new Elem();
-
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-
-            $E->kod_elem = $row['kod_elem'];
-
-            $form_link = $E->Name();
+            $kod_elem = $row['kod_elem'];
+            $name = $row['name'];
+            $form_link = "<a href='form_elem.php?kod_elem=$kod_elem'>$name</a>";
 
             $res .= '<tr>
-				<td width="100%">' . $form_link . ' </td>
-				<td align="right">' . (int)$row['numb'] . '</td>
-	   		  </tr>';
+                        <td width="100%">' . $form_link . ' </td>
+                        <td align="right">' . (int)$row['numb'] . '</td>
+                      </tr>';
 
         }
         $res .= '</table>';
@@ -539,7 +540,7 @@ class Org
     public function Docum($Del = 0)
     {
         $d = new Docum();
-        return $d->ShowDocum('Org', $this->kod_org, $Del);
+        return $d->formDocum('Org', $this->kod_org, $Del);
     }
 //------------------------------------------------------------------------
 //
@@ -547,7 +548,7 @@ class Org
      * Задолженность по действующим договорам
      * @return string
      */
-    public function Dolg()
+    public function getDolg()
     {
         $db = new DB();
         $sql = "SELECT
@@ -595,11 +596,30 @@ class Org
     }
 
 //------------------------------------------------------------------
-// Должники
-    public function DolgOrg()
+//
+    /**
+     * Должники
+     * @return string
+     */
+    public function formDolgOrg()
     {
         $db = new Db();
-        $rows = $db->query("SELECT * FROM view_dogovor_data WHERE zakryt!=1 AND dogovor_ostat>0");
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT
+                    view_dogovor_data.kod_org,
+                    view_dogovor_data.nazv_krat,
+                    Sum(view_dogovor_data.dogovor_ostat) AS summa_dogovor_ostat
+                    FROM
+                        view_dogovor_data
+                    WHERE
+                        zakryt <> 1
+                    AND dogovor_ostat > 1
+                    AND kod_org <> 683
+                    GROUP BY
+                    view_dogovor_data.kod_org,
+                    view_dogovor_data.nazv_krat
+                    ORDER BY
+                    summa_dogovor_ostat DESC");
 
         $res = '<table><tr><td>Название</td><td>Задолженность</td></tr>';
 
@@ -608,20 +628,26 @@ class Org
 
         $summ = 0;
 
-        for ($i = 1; $i <= $db->cnt; $i++) {
+        for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-            $res .= '<tr><td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td><td>' . Func::Rub($row['dogovor_ostat']) . '</td></tr>';
-            $summ += $row['Задолженность'];
+            $res .= '<tr>
+                        <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
+                        <td align="right">' . Func::Rub($row['summa_dogovor_ostat']) . '</td>
+                     </tr>';
+            $summ += $row['summa_dogovor_ostat'];
         }
-        $res .= '<a href="form_orglist.php?Sort=G">Все Группы</a> ';
-        $res .= '<table>';
+        $res .= '</table>';
         $res .= '<br>Сумма: ' . Func::Rub($summ);
         return $res;
     }
 
 //------------------------------------------------------------------------
-// Ссылка на форму
-public function getFormLink()
+//
+    /**
+     * Ссылка на форму Огранизации
+     * @return string
+     */
+    public function getFormLink()
 {
     if(!isset($this->Data))
     $this->getData();
