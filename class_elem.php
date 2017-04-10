@@ -56,7 +56,8 @@ class Elem
     public function Name($field = 'name', $Link = 1) //
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
 
         if ($db->cnt == 0)
             return "";
@@ -80,7 +81,7 @@ class Elem
     /**
      *
      */
-    public function ShowNomen()
+    public function formNomen()
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_elem WHERE nomen=1");
@@ -106,7 +107,7 @@ class Elem
                 $name = $row['name'];
 
             $res.=  '<tr>
-		  			<td align="left" valign="top">' . $this->getPhoto() . '</td>
+		  			<td align="left" valign="top">' . $this->formPhoto() . '</td>
 		  			<td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['obozn'] . '</h1>' . $name . '</td>
 		         </tr>';
 
@@ -121,7 +122,7 @@ class Elem
      * Договоры по Элементу
      * @return string
      */
-    public function getDocs()
+    public function formDocs()
     {
         return Doc::formDocByElem($this->kod_elem);
     }
@@ -131,7 +132,7 @@ class Elem
      * Вывод списка-выбора Элементов
      * @return string
      */
-    public function SelList()
+    public function formSelList()
     {
         $res = '<select name="kod_elem" id="kod_elem">';
 
@@ -162,16 +163,16 @@ class Elem
      * @param int $Del
      * @return string
      */
-    public function Docum($Del = 0)
+    public function formDocum($Del = 0)
     {
-        return Docum::ShowDocum('Elem', $this->kod_elem, $Del);
+        return Docum::formDocum('Elem', $this->kod_elem, $Del);
     }
 //------------------------------------------------------------------------
 // Фото Элемента
     /**
      * @return string
      */
-    public function getPhoto()
+    public function formPhoto()
     {
         $sql = "SELECT
                         docum.kod_docum,
@@ -204,14 +205,14 @@ class Elem
      * @param $shifr
      * @param int $nomen
      */
-    public function AddElem($obozn, $name, $shifr, $nomen = 1)
+    public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon='')
     {
         $db = new Db();
 
         $obozn = ltrim($obozn);
         $name = ltrim($name);
 
-        $db->query("INSERT INTO elem (obozn,name, nomen, shifr) VALUES('$obozn','$name',$nomen,'$shifr')");
+        $db->query("INSERT INTO elem (obozn,name,nomen, shifr,shablon) VALUES('$obozn','$name',$nomen,'$shifr','$shablon')",1);
 
     }
 //------------------------------------------------------------------------
@@ -236,9 +237,10 @@ class Elem
 //------------------------------------------------------------------------
 //
     /**
+     * Список Организаций которые покупали данный элемент
      * @return string
      */
-    public function OrgByElem()
+    public function formOrgByElem()
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_elem_org WHERE kod_elem=" . $this->kod_elem);
@@ -280,20 +282,36 @@ class Elem
 //-----------------------------------------------------------------------------
 // Форма внесения изменений
     /**
+     * @param int $Edit
      * @return string
      */
-    public function Form()
+    public function formAddEdit($Edit=0)
     {
 
-        $this->getData();
-        $row = $this->Data;
+        $shifr = "";
+        $obozn = "";
+        $name = "";
+        $shablon = "";
+        $FormName = "formAdd";
 
-        $Body = '<table width="521" border="0">
+        if($Edit==1){
+            $this->getData();
+            $row = $this->Data;
+            $shifr = $row['shifr'];
+            $obozn = $row['obozn'];
+            $name = $row['name'];
+            $shablon = $row['shablon'];
+            $FormName = "formEdit";
+        }
+
+        $res = '
+            <form id="form1" name="form1" method="post" action="">
+                  <table width="521" border="0">
                       <tr>
                         <td width="200">Шифр</td>
                         <td width="400">
                           <label>
-                            <input type="text" name="shifr" id="shifr" value="' . $row['shifr'] . '" />
+                            <input type="text" name="shifr" id="shifr" value="' . $shifr . '" />
                           </label>
                         </td>
                     </tr>
@@ -301,7 +319,7 @@ class Elem
                         <td width="200">Обозначение (ДМ)*</td>
                         <td width="400">
                           <label>
-                            <input type="text" name="obozn" id="obozn" value="' . $row['obozn'] . '" />
+                            <input type="text" name="obozn" id="obozn" value="' . $obozn . '" />
                             </label>
                         </td>
                       </tr>
@@ -309,7 +327,7 @@ class Elem
                         <td>Наименование по ТУ*</td>
                         <td>
                           <label>
-                          <textarea rows=7 cols=60 name="name" id="name">' . $row['name'] . '</textarea>  
+                          <textarea rows=7 cols=60 name="name" id="name">' . $name . '</textarea>  
                             </label>
                          </td>
                       </tr>
@@ -317,13 +335,16 @@ class Elem
                         <td>Шаблон Модификаций [Mod]</td>
                         <td>
                           <label>
-                          <textarea rows=2 cols=60 name="shablon" id="shablon">' . $row['shablon'] . '</textarea>  
+                          <textarea rows=2 cols=60 name="shablon" id="shablon">' . $shablon . '</textarea>  
                             </label>
                          </td>
                       </tr>
-                  </table>';
+                  </table>
+                  <input id="'.$FormName.'" type="hidden" value="'.$FormName.'" name="'.$FormName.'"/>
+                  <input type="submit" value="Сохранить" />
+                </form>';
 
-        return Func::ActForm('', $Body, 'Save', 'SaveElem') . Func::Cansel(0);
+        return $res . Func::Cansel(0);
     }
 //------------------------------------------------------------------
 // Удаление элемента с заменой
@@ -367,5 +388,34 @@ class Elem
         }
 
     }
-//------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+    public function Events()
+    {
+        $event = false;
+        if(isset($_GET['setCompl'], $_GET['kod_elem']))
+        {
+            $this->DeleteReplace($_GET['kod_elem']);
+            $event = true;
+        }
+
+        if (isset($_POST['DelDocum'])) {
+            $docum = new Docum();
+            $docum->Delete($_POST['DelDocum']);
+            $event = true;
+        }
+
+        if (isset($_POST['formEdit'], $_POST['obozn'], $_POST['name'])) {
+            $this->Save($_POST['obozn'], $_POST['name'], $_POST['shablon'], $_POST['shifr']);
+            $event = true;
+        }
+
+        if (isset($_POST['formAdd'], $_POST['obozn'], $_POST['name'])) {
+            $this->AddElem($_POST['obozn'], $_POST['name'], $_POST['shifr'], 1, $_POST['shablon']);
+            $event = true;
+        }
+
+        if($event)
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    }
+//----------------------------------------------------------------------------------------------------------------------
 }
