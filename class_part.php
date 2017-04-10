@@ -21,19 +21,16 @@ class Part
     //-------------------------------------------------------------------------
     /**
      * Формируем таблицу партий по договору. На входе rplan
-     * @param int $t -тип вывода(1-таблица с шапкой, 2-только шапка, 3-толко таблица)
      * @param int $sgp - вывод накладных о поступлении на склад и об отгрузке (1-вывод,0-не выводить)
      * @param string $SQL - запрос. По умолчанию - "" = Empty
      * @param int $AddNacl
      * @return string
      */
-    public function getParts($t = 3, $sgp = 0, $SQL = "", $AddNacl = 0)
+    public function getParts($sgp = 0, $SQL = "", $AddNacl = 0)
     {
         // Шапка
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-
-        if ($t != 3) {
-            $res .= '<tr bgcolor="#CCCCCC">
+        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC">
                         <td width="365">Наименование</td>
                         <td width="40">Кол-во</td>
                         <td width="80">Дата Поставки</td>
@@ -44,13 +41,6 @@ class Part
                         <td width="90">Оплата</td>
                     </tr>';
 
-            // Вывод только заголовка
-            if ($t == 2) {
-                $res .= "</table>";
-                return $res;
-            }
-        }
-
         $db = new Db();
 
         // Если запрос не был передан в параметрах
@@ -59,6 +49,9 @@ class Part
 
         $rows = $db->rows($SQL);
         $cnt = $db->cnt;
+
+        if($cnt==0)
+            return $res.'</table>';
 
         $dogovor_proc_pay = Doc::getProcPay($this->kod_dogovora); // Процент платежей по договору. Строка вида "70%"
 
@@ -79,7 +72,7 @@ class Part
             // Вывод накладных о поступлении и Отгрузке с СГП---------------------------------------
             $nacl = ''; // Строка вывода накладных
             if ($sgp == 1)
-                $nacl = $this->SGPAll();
+                $nacl = $this->formSGPAll();
 
             // Форма добавления накладной
             if ($AddNacl > 0) {
@@ -149,12 +142,14 @@ class Part
                     $PRC = $prc;
             }
 
+            $sn = ' s/n '. $row['kod_part']; // Идентификатор партии
+
             // Кнопка редактирования партии
-            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Редактировать Партию', 'EditPartForm');
+            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Редактор', 'EditPartForm');
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . '</a>'.$btn.'</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . $sn . '</a>'.$btn.'</td>
                       <td width="40">' . (int)$row['numb'] . $ostatok . '</td>
                       <td width="80" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
@@ -173,7 +168,7 @@ class Part
      * Все накладные по дате
      * @return string
      */
-    public function SGPAll()
+    public function formSGPAll()
     {
 
         $db = new Db();
@@ -218,18 +213,18 @@ class Part
      * Вывод одной партии по коду PartID с формой добавления накладной, если $AddNacl=1
      * @param int $AddNacl
      */
-    public function ShowPart($AddNacl = 0)
+    public function formPart($AddNacl = 0)
     {
         // Шапка
         $res = '<br>Информация по Партии<br><table border=1 cellspacing=0 cellpadding=0 width="100%">';
 
-        $res .= $this->getParts(1, 1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
+        $res .= $this->getParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
 
         echo $res;
     }
 //--------------------------------------------------------------
     // График Расчетов
-    public function PayGraph($Edit = false)
+    public function formPayGraph($Edit = false)
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM raschet WHERE kod_part=$this->kod_part ORDER BY data ASC"); //
@@ -275,7 +270,7 @@ class Part
                     <td width="80">' . $data . '</td>
                     <td width="100">' . $summa . '</td>
                     <td width="20">' . $type_rascheta . '</td>
-                    <td>' . $this->PPRascheta($kod_rascheta, $Edit, $Body);
+                    <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body);
                     echo Func::ActForm('', "<input type='hidden' name='RsID' value='$kod_rascheta' />", 'Удалить Расчет', 'DelRasch') .
                     "</td>
                     </tr>";
@@ -285,7 +280,7 @@ class Part
     }
 //--------------------------------------------------------------
 // Платежи по Расчету
-    public function PPRascheta($RasID, $Edit = false, $Body = '')
+    public function formPPRascheta($RasID, $Edit = false, $Body = '')
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_raschety_plat WHERE kod_rascheta=$RasID");
@@ -582,7 +577,7 @@ class Part
                 <table border="0">
                   <tr>
                     <td>Элемент</td>
-                    <td>' . $E->SelList() . '</td>
+                    <td>' . $E->formSelList() . '</td>
                   </tr>
                   <tr>
                     <td>Модификация</td>
