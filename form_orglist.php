@@ -50,7 +50,12 @@ if(isset($_POST['FormName']))
 
     // Вывод список организаций
     if(!$add_edit)
-        $org->ShowOrgList(true);
+    {
+        if(isset($_GET['dolg']))
+            echo $org->formDolgOrg();
+        else
+            $org->formOrgList(true);
+    }
 
     ?>
 </div>
