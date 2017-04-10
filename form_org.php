@@ -29,7 +29,7 @@ if (isset($_POST['AddRecvForm'])) {
 //---------------------------------------------------------------------------
 // Добавление Контактов
 if (isset($_POST['AddContact']) and (isset($_POST['FName']) or isset($_POST['Name']))) {
-    $Org->AddCont($_POST['Dolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
+    $Org->AddKontakt($_POST['getDolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
 //---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ if (isset($_POST['AddOrgAdr']) and (isset($_POST['adres']))) {
 //---------------------------------------------------------------------------
 // Добавить Телефон в Контакт
 if (isset($_POST['AddPhone']) and isset($_POST['Numb']) and isset($_POST['ContID'])) {
-    $Org->AddCont($_POST['Dolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
+    $Org->AddKontakt($_POST['getDolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
 //---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ if(isset($_POST['FormName']))
 
                 // Задолженность
 
-                echo '<br>Задолженность: ' . $Org->Dolg();
+                echo '<br>Задолженность: ' . $Org->getDolg();
 
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
@@ -140,7 +140,7 @@ if(isset($_POST['FormName']))
                                 if ($_POST['Flag'] == 'SetRecv')
                                     $Edit = 1;
                         }
-                        $Org->ShowRecv($Edit);
+                        $Org->formRecv($Edit);
 
                         if (in_array($_SESSION['MM_UserGroup'], $UserG))
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Изменить реквизиты', 'SetRecv');
@@ -155,7 +155,7 @@ if(isset($_POST['FormName']))
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Адрес', 'AddOrgAdr');
                         }
 
-                        echo $Org->getAdressList($Add);
+                        echo $Org->formAdressList($Add);
                         //---------------------------------------------------------------------------------
                         // Телефоны
                         $Add = 0;
@@ -163,7 +163,7 @@ if(isset($_POST['FormName']))
                             if ($_POST['Flag'] == 'AddOrgPhone')
                                 $Add = 1;
 
-                        echo $Org->getPhones($Add);
+                        echo $Org->formPhones($Add);
 
                         if (in_array($_SESSION['MM_UserGroup'], $UserG) and $Add != 1) {
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Телефон', 'AddOrgPhone');
@@ -186,16 +186,16 @@ if(isset($_POST['FormName']))
                 </div>
                 <?php
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddCont');
+                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddKontakt');
 
                 if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'AddCont') {
+                    if ($_POST['Flag'] == 'AddKontakt') {
                         echo '<form id="form1" name="form1" method="post" action="">
                                   <table width="436" border="0">
                                     <tr>
                                       <td width="133">Должность</td>
                                       <td width="287">
-                                        <input type="text" name="Dolg" id="Dolg" />
+                                        <input type="text" name="getDolg" id="getDolg" />
                                       </td>
                                     </tr>
                                     <tr>
@@ -234,7 +234,7 @@ if(isset($_POST['FormName']))
                 <div id="CollapsiblePanel3" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Номенклатура по Договорам</div>
                     <div class="CollapsiblePanelContent">
-                        <?php echo $Org->OrgNomen(); ?>
+                        <?php echo $Org->formOrgNomen(); ?>
                     </div>
                 </div>
             </td>
@@ -243,7 +243,7 @@ if(isset($_POST['FormName']))
             <td colspan="2">
                 <div id="CollapsiblePanel4" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Договоры</div>
-                    <div class="CollapsiblePanelContent"><?php echo $Org->getDocs(); ?></div>
+                    <div class="CollapsiblePanelContent"><?php echo $Org->formDocs(); ?></div>
                 </div>
             </td>
         </tr>

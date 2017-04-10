@@ -21,33 +21,9 @@ if (isset($_GET['kod_elem'])) {
     if (isset($_POST['kod_elem']))
         $E->kod_elem = $_POST['kod_elem'];
     else
-        die ('Необходимо перейти в Элемент');
+        die ('Необходимо указать Код Элемента');
 
-//----------------------------------------------------------------------------------------------------------------------
-// Удаление эелента и замен на Комплектующие=1001
-if(isset($_GET['setCompl']))
-{
-    $E->DeleteReplace($E->kod_elem);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Удаление документов
-if (isset($_POST['DelDocum'])) {
-    $docum = new Docum();
-    $docum->Delete($_POST['DelDocum']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Сохранить
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'SaveElem' and isset($_POST['obozn']) and isset($_POST['name'])) {
-            $E->Save($_POST['obozn'], $_POST['name'], $_POST['shablon'], $_POST['shifr']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
+$E->Events();
 
 
 ?>
@@ -65,11 +41,9 @@ if (isset($_POST['Flag']))
         <body>
             <?php
             include("header.php");
-
+            $Del = 0;
             if (in_array($_SESSION['MM_UserGroup'], $UserG))
                 $Del = 1;
-            else
-                $Del = 0;
 
             $Form = '';
             if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -77,7 +51,7 @@ if (isset($_POST['Flag']))
 
             if (isset($_POST['Flag']))
                 if ($_POST['Flag'] == 'formAddEdit') {
-                    $Form = $E->Form();
+                    $Form = $E->formAddEdit(1);
                 }
 
             ?>
@@ -89,14 +63,14 @@ if (isset($_POST['Flag']))
                     <tr valign="top">
                         <td align="left" bgcolor="#ECEEFD">
                             <?php
-                            echo $E->getPhoto() . '<br>';
+                            echo $E->formPhoto() . '<br>';
 
                             echo '<h1>' . $E->Name('name',0). '</h1><br>'. $E->Data['shifr'] .'<br>'. $Form . '<br>';
                             ?>
                             <div id="CollapsiblePanel1" class="CollapsiblePanel">
                                 <div class="CollapsiblePanelTab">Прикрепленные Файлы</div>
                                 <div class="CollapsiblePanelContent">
-                                    <?php echo '<br>' . $E->Docum($Del);?>
+                                    <?php echo '<br>' . $E->formDocum($Del);?>
                                 </div>
                             </div>
                         </td>
@@ -104,7 +78,7 @@ if (isset($_POST['Flag']))
                             <?php
                             echo ' <div id="CollapsiblePanel2" class="CollapsiblePanel">
                                         <div class="CollapsiblePanelTab" tabindex="0">Потребители</div>
-                                        <div class="CollapsiblePanelContent">' . $E->OrgByElem() . '</div>
+                                        <div class="CollapsiblePanelContent">' . $E->formOrgByElem() . '</div>
                                   </div>';
                             ?>
                         </td>
@@ -114,7 +88,7 @@ if (isset($_POST['Flag']))
                     <div class="CollapsiblePanelTab">Договоры</div>
                     <div class="CollapsiblePanelContent">
                         <?php
-                        echo $E->getDocs();
+                        echo $E->formDocs();
                         ?>
                     </div>
                 </div>

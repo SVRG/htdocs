@@ -51,7 +51,7 @@ if (isset($_POST['AddDocForm'])) {
 
         $c = new Kontakt();
 
-        echo $c->All();
+        echo $c->formAllKontats();
         ?>
     </div>
 </div>

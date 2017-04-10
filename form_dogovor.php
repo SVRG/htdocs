@@ -120,11 +120,11 @@ else
 
                     // Вывод контактов
                     $D->formDocKontakts(1);
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddCont');
+                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddKontakt');
 
                     // Добаление Контакта в Договор
                     if (isset($_POST['Flag']))
-                        if ($_POST['Flag'] == 'AddCont') {
+                        if ($_POST['Flag'] == 'AddKontakt') {
                             echo $K->formAddEdit();
                             $_POST['Flag'] = null;
                         }
@@ -149,10 +149,10 @@ else
                     // Партии
                     if (isset($_POST['Flag'])) {
                         if ($_POST['Flag'] == 'AddNacl')
-                            $P->ShowPart(1); // Партия + Форма добавления накладной
+                            $P->formPart(1); // Партия + Форма добавления накладной
                     }
 
-                    echo $P->GetParts(1,1,"",0);
+                    echo $P->GetParts(1,"",0);
 
                     ?></p>
             </td>
@@ -223,44 +223,7 @@ else
 
                 if (isset($_POST['Flag'])) {
                     if ($_POST['Flag'] == 'AddInvoice') {
-                        echo '
-                            <form id="form1" name="form1" method="post" action="">
-                              <table width="434" border="0">
-                                <tr>
-                                  <td width="126">Номер Счета</td>
-                                  <td width="292"><span id="SNumR">
-                                  <input type="text" name="InvNum" id="InvNum" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
-                                  number of characters not met.</span></span></td>
-                                </tr>
-                                <tr>
-                                  <td>Дата</td>
-                                  <td><span id="SDateR">
-                                  <input type="text" name="InvDate" id="InvDate" value="' . date('d.m.Y') . '" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
-                                </tr>
-                                <tr>
-                                  <td>Сумма</td>
-                                  <td><span id="SSummR">
-                                  <input type="text" name="InvSumm" id="InvSumm" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
-                                  format.</span></span></td>
-                                </tr>
-                                <tr>
-                                  <td>Примечание</td>
-                                  <td><span id="STextNR">
-                                    <input type="text" name="InvPrim" id="InvPrim" />
-                                      <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
-                                  </span></td>
-                                </tr>
-                              </table>
-                              <p>
-                                <input type="submit" name="button" id="button" value="Добавить" />
-                                <input type="reset" name="button" id="button" value="Сброс" />
-                                <input type="hidden" name="AddInv" id="button" value="1" />
-                              </p>
-                            </form>';
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
+                        echo $D->formAddInvoice();
                         $_POST['Flag'] = null;
                     }
                 }
