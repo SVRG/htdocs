@@ -124,11 +124,11 @@ class Func
     }
 //----------------------------------------------------------------------------------------------------------------------
 // Создает Форму с одной кнопкой
-    public static function ActButton($Act = '', $ButtValue = 'OK', $Val = 'Act')
+    public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
         $res = "<form id='FID' name='FNAME' method='POST' action='$Act '>
                     <input type='submit' name='Button' id='ID' value='$ButtValue' />
-                    <input type='hidden' name='Flag' id='$Val' value='$Val' />
+                    <input type='hidden' name='Flag' id='$FlagVal' value='$FlagVal' />
                 </form>";
 
         return $res;
