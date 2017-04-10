@@ -20,12 +20,10 @@ include_once "security.php";
     <!--pagecell1-->
     <div id="pageName">
         <?php
-        //include("nav.php");
         $t = date('H:i:s');
         include("class_doc.php");
         $D = new Doc();
         echo $D->formAllPays();
-        //$D->ShowDocListByID();
         echo 'begin:' . $t . ' end:' . date('H:i:s');
         ?>
     </div>

@@ -27,14 +27,10 @@ include_once "security.php";
 
     $sgp = 0;
     if (isset($_GET['sgp'])) {
-        if ($_GET['sgp'] == 1)
-            $sgp = 1;
-        elseif ($_GET['sgp'] == 2)
-            $sgp = 2;
-        else $sgp = -1;
+        $sgp = $_GET['sgp'];
     }
 
-    if ($sgp == -1)
+    if ($sgp == 0)
         echo $D->formRPlan(0);
     elseif ($sgp == 1)
         echo $D->formRPlan(0);
@@ -42,18 +38,6 @@ include_once "security.php";
         echo $D->formRPlan(1);
     elseif (isset($_GET['sgphistory']))
         echo $D->formSGPHistory();
-
-    /*
-     *
-         elseif (isset($_GET['RP'])) // Оплачено
-            echo Doc::formRPlan_by_Elem(' WHERE zakryt=0 AND summa_plat>1  AND kod_ispolnit=683 ');
-        elseif (isset($_GET['RP_VN'])) // todo - план реализации внешний?
-            echo Doc::formRPlan_by_Elem(" WHERE zakryt=0 AND kod_ispolnit<>683 ");
-        elseif (isset($_GET['RPN'])) // Нет оплаты
-            echo Doc::formRPlan_by_Elem(" WHERE zakryt=0 AND summa_plat=0  AND kod_ispolnit=683 ");
-        else // Закрытые договоры НВС
-            echo Doc::formRPlan_by_Elem(" WHERE zakryt=1 AND kod_ispolnit=683 ");
-    */
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
     ?>
