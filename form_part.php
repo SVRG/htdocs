@@ -132,9 +132,9 @@ include_once("header.php");
             if (isset($_POST['Flag'])) {
 
                 if ($_POST['Flag'] == 'AddNacl')
-                    $P->ShowPart(1); // Партия + Форма добавления накладной
+                    $P->formPart(1); // Партия + Форма добавления накладной
                 else {
-                    $P->ShowPart(0);
+                    $P->formPart(0);
                 } // Партия
 
                 // Форма Редактирования партии
@@ -142,10 +142,10 @@ include_once("header.php");
                     $P->formAddEdit();
 
             } else
-                $P->ShowPart(0); // Партия
+                $P->formPart(0); // Партия
 
             // График платежей
-            $P->PayGraph(true);
+            $P->formPayGraph(true);
 
             // Кнопки по расчетам
             //echo '<br>'.Func::ActButton($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'],'Добавить Расчет','AddRS');
@@ -189,10 +189,10 @@ include_once("header.php");
                 }
 
             }
-            $D->formParts(1, 1);
+            $D->formParts(1);
             echo '<br>';
         } else {
-            $P->PayGraph(false);
+            $P->formPayGraph(false);
             if (isset($Err)) echo $Err;
         }
         ?>
