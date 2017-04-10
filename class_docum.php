@@ -12,7 +12,7 @@ class Docum
      * @param int $Del - кнопка удаления
      * @return string
      */
-    public static function ShowDocum($Type = 'Doc', $ID = '1', $Del = 0)
+    public static function formDocum($Type = 'Doc', $ID = '1', $Del = 0)
     {
 
         $sql = '';
