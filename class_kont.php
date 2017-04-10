@@ -220,7 +220,8 @@ class Kontakt
         $db = new Db();
         $this->kod_kontakta = $kod_kontakta;
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=" . $this->kod_kontakta);
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta");
 
         $row = $rows[0];
 
@@ -315,7 +316,7 @@ class Kontakt
         $db->query("UPDATE kontakty SET dolg = '$Dolg', famil = '$FName', name = '$Name', otch = '$SName' WHERE kod_kontakta =$this->kod_kontakta");
     }
     //------------------------------------------------------------------------
-    // Save Form
+    // Save formAddEdit
     public function formAddEdit($Edit=0)
     {
 
@@ -374,7 +375,7 @@ class Kontakt
      * Список всех Контактов с телефонами / организацией
      * @return string
      */
-    public function All()
+    public function formAllKontats()
     {
         $db = new Db();
 
