@@ -26,7 +26,7 @@ class Part
      * @param int $AddNacl
      * @return string
      */
-    public function getParts($sgp = 0, $SQL = "", $AddNacl = 0)
+    public function formParts($sgp = 0, $SQL = "", $AddNacl = 0)
     {
         // Шапка
         $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
@@ -127,11 +127,9 @@ class Part
             $Val = '';
 
             // Процент оплаты
-            $PRC = 0; // Строка вывода процента
-
-            if ((int)$row['val'] != 1) { // Доработать. Пока только USD, добавить EUR
+            $PRC = 0; // Строка вывода процента // todo - $PRC = ???  Доработать. Не вычисляется если партия не в рублях. Нужно вводить данные о курсе и пересчитывать.
+            if ((int)$row['val'] != 1) { // todo - Доработать. Пока только USD, добавить EUR?
                 $Val = "$";
-                //$PRC = ???  Доработать. Не вычисляется если партия не в рублях. Нужно вводить данные о курсе и пересчитывать.
             }
             elseif ($dogovor_proc_pay > 0){
                 $prc = $this->getProcPayByPart($row);
@@ -191,11 +189,11 @@ class Part
                 $res .= '<br><img src="/img/out.gif" height="14" />' . $naklad;
 
                 // Форма отметки о получении накладной
-                $Nacl = $row['kod_oborota']; // Код оборота - ID накладной
+                $kod_oborota = $row['kod_oborota']; // Код оборота - код накладной
 
                 if ((int)$row['poluch'] <> 1)
                     $res .= '<form id="form1" name="form1" method="post" action="">
-                    <input type="hidden" name="PostNacl" value=' . $Nacl . ' />
+                    <input type="hidden" name="kod_oborota" value=' . $kod_oborota . ' />
                     <input type="submit" name="button" id="button" value="Получено" />
                     </form>';
 
@@ -210,7 +208,7 @@ class Part
     }
     //-------------------------------------------------------------------------
     /**
-     * Вывод одной партии по коду PartID с формой добавления накладной, если $AddNacl=1
+     * Вывод партии с формой добавления накладной, если $AddNacl=1
      * @param int $AddNacl
      */
     public function formPart($AddNacl = 0)
@@ -218,7 +216,7 @@ class Part
         // Шапка
         $res = '<br>Информация по Партии<br><table border=1 cellspacing=0 cellpadding=0 width="100%">';
 
-        $res .= $this->getParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
+        $res .= $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
 
         echo $res;
     }
@@ -263,15 +261,15 @@ class Part
             $ostatok_plat = Func::Rub($ostatok_plat);
 
             // Форма для ввода ПП в расчет
-            $Body =    "<input type='hidden' name='RsID' value='$kod_rascheta' />
-                        <input type='text' name='RsSumm' value='$ostatok_plat' />";
+            $Body =    "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
+                        <input type='text' name='summa' value='$ostatok_plat' />";
 
             echo '<tr>
                     <td width="80">' . $data . '</td>
                     <td width="100">' . $summa . '</td>
                     <td width="20">' . $type_rascheta . '</td>
                     <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body);
-                    echo Func::ActForm('', "<input type='hidden' name='RsID' value='$kod_rascheta' />", 'Удалить Расчет', 'DelRasch') .
+                    echo Func::ActForm('', "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />", 'Удалить Расчет', 'DelRasch') .
                     "</td>
                     </tr>";
         }
@@ -280,10 +278,10 @@ class Part
     }
 //--------------------------------------------------------------
 // Платежи по Расчету
-    public function formPPRascheta($RasID, $Edit = false, $Body = '')
+    public function formPPRascheta($kod_rascheta, $Edit = false, $Body = '')
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_raschety_plat WHERE kod_rascheta=$RasID");
+        $rows = $db->rows("SELECT * FROM view_raschety_plat WHERE kod_rascheta=$kod_rascheta");
         $cnt = $db->cnt;
 
         $res = "";
@@ -343,48 +341,45 @@ class Part
 //--------------------------------------------------------------
 // Добавить расчет
     /**
-     * @param $Summ
-     * @param $Date
-     * @param $Type
+     * @param $summa
+     * @param $data
+     * @param $type_rascheta
      */
-    public function AddRasch($Summ, $Date, $Type)
+    public function AddRasch($summa, $data, $type_rascheta)
     {
         $db = new Db();
-        $PartID = $this->kod_part;
-        $Date = func::Date_to_MySQL($Date);
-        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($PartID,$Summ,'$Date',$Type)");
+        $data = func::Date_to_MySQL($data);
+        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$summa,'$data',$type_rascheta)");
     }
 //------------------------------------------------------------------------
 // Удалить расчет
     /**
-     * @param $ID
+     * @param $kod_rascheta
      */
-    public function DelRasch($ID)
+    public function DelRasch($kod_rascheta)
     {
         $db = new Db();
 
-        $db->query("DELETE FROM raschety_plat WHERE kod_rascheta=" . $ID);
-        //echo "DELETE FROM raschety_plat WHERE kod_rascheta=" . $ID;
+        $db->query("DELETE FROM raschety_plat WHERE kod_rascheta=$kod_rascheta");
 
-        $db->query("DELETE FROM raschet WHERE kod_rascheta=" . $ID);
-        //echo "DELETE FROM raschet WHERE kod_rascheta=" . $ID;
+        $db->query("DELETE FROM raschet WHERE kod_rascheta=$kod_rascheta");
     }
 //------------------------------------------------------------------------
 // Добавить расчет 100% во все партии договора
     public function AddRasch100()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_dogovory_parts WHERE kod_dogovora=$this->kod_dogovora");
+        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora");
         $cnt = $db->cnt;
 
         for($i=0;$i<$cnt;$i++) {
             $row = $rows[$i];
-            $PartID = $row['kod_part'];
-            $Summ = $row['part_summa'];
-            $Date = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
-            $Type = 2; //ОК- расчет
+            $kod_part = $row['kod_part'];
+            $part_summa = $row['part_summa'];
+            $data = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
+            $type = 2; //ОК- расчет
 
-            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($PartID,$Summ,'$Date',$Type)");
+            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($kod_part,$part_summa,'$data',$type)");
         }
 
         return;
@@ -392,19 +387,17 @@ class Part
 //-----------------------------------------------------------------------
 // Добавляет Платеж в Расчет
     /**
-     * @param $Summ
-     * @param $RsID
-     * @param $PayID
+     * @param $summa
+     * @param $kod_rascheta
+     * @param $kod_plat
      */
-    public function AddPayToRas($Summ, $RsID, $PayID)
+    public function AddPayToRas($summa, $kod_rascheta, $kod_plat)
     {
         $db = new Db();
-        $Summ = str_replace(' ', '', $Summ);
-        $Summ = doubleval($Summ);
+        $summa = str_replace(' ', '', $summa);
+        $summa = doubleval($summa);
 
-        $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat) VALUES($Summ,$RsID,$PayID)");
-
-        return;
+        $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat) VALUES($summa,$kod_rascheta,$kod_plat)");
     }
 //--------------------------------------------------------------
 //
@@ -447,10 +440,10 @@ class Part
     public function AddNacl($numb, $naklad, $data, $kod_oper, $operator)
     {
         $db = new Db();
-        $PartID = $this->kod_part;
+        $kod_part = $this->kod_part;
         $data = func::Date_to_MySQL($data);
 
-        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($PartID,$numb,'$naklad','$data',$kod_oper,'$operator')");
+        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$operator')");
 
         return;
     }
@@ -623,26 +616,13 @@ class Part
 //-------------------------------------------------------------------------
     // Отметка о Получении Накладной
     /**
-     * @param $Nacl
+     * @param $kod_oborota
      */
-    public function PostNacl($Nacl)
+    public function PostNacl($kod_oborota)
     {
         $db = new Db();
         $Date = Func::NowE();
-        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$Nacl");
-    }
-
-//-------------------------------------------------------------------------
-    /**
-     *
-     */
-    public function setParts()
-    {
-        $db = new Db();
-        $this->Parts = array();
-        // Партии договора
-        $this->Parts = $db->rows("SELECT * FROM parts WHERE kod_dogovora=" . $this->kod_dogovora);
-
+        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota");
     }
 //-------------------------------------------------------------------------
 //
@@ -762,24 +742,71 @@ class Part
     }
 //-------------------------------------------------------------------------
 
+    /**
+     *
+     */
     public function Events()
     {
         $event = false;
 
-        if (isset($_POST['AddPart'])) {
-            $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+        if (isset($_POST['AddPart']))
+            if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
+            {
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+                $event = true;
+            }
+
+        if (isset($_POST['EditPart']))
+            if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
+            {
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+                $event = true;
+            }
+
+        if (isset($_POST['kod_oborota'])) {
+            $this->PostNacl($_POST['kod_oborota']);
             $event = true;
         }
 
-        if (isset($_POST['PostNacl'])) {
-            $this->PostNacl($_POST['PostNacl']);
-            $event = true;
-        }
-
-        if(isset($_POST['AddEditNacl']))
+        if (isset($_POST['AddEditNacl']))
             if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'],$_POST['kod_oper'])) {
                 $this->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
                 $event = true;
+        }
+
+        if (isset($_POST['summa']) and isset($_POST['data']) and isset($_POST['type_rascheta'])) {
+            $this->AddRasch($_POST['summa'], $_POST['data'], $_POST['type_rascheta']);
+            $event = true;
+        }
+
+        if (isset($_POST['Flag'])){
+            if ($_POST['Flag'] == 'AddRasch100')
+            {
+                $this->AddRasch100();
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta']))
+            {
+                $this->DelRasch($_POST['kod_rascheta']);
+                $event = true;
+            }
+        }
+
+        if (isset($_POST['summa']) and isset($_POST['kod_rascheta']) and isset($_POST['kod_plat'])) {
+            $this->AddPayToRas($_POST['summa'], $_POST['kod_rascheta'], $_POST['kod_plat']);
+            $event = true;
+        }
+
+        if (isset($_POST['AVPr'],$_POST['data']))
+        {
+            $pr = (double)$_POST['AVPr'];
+            $pr = round($pr / 100, 2);
+
+            if ($pr > 0 and $pr <= 1) {
+                $this->SetPayGraph($pr, $_POST['data']);
+                $event = true;
+            }
+
         }
 
         if($event)

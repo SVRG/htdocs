@@ -34,10 +34,11 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows(" SELECT * 
-                                  FROM view_rplan 
-                                  WHERE kod_elem=$kod_elem
-                                  ORDER BY kod_dogovora DESC"); // Код договора по убыванию
+        $rows = $db->rows(" SELECT
+                                      *
+                                    FROM view_rplan
+                                    WHERE kod_elem=$kod_elem
+                                    ORDER BY kod_dogovora DESC"); // Код договора по убыванию
 
         return Doc::formRPlan_by_Doc($rows);
     }
@@ -63,7 +64,7 @@ class Doc
         $dogovor_vnesh_zakryt = ""; // Таблица закрытых внешних договоров
 
 
-        $res = "<table border='1' cellspacing='0'>"; // Результирующий набор строк с объединением
+        $res = "<table border='1' cellspacing='0' width='100%'>"; // Результирующий набор строк с объединением
 
 
         $header = "<tr bgcolor='#5f9ea0'>
@@ -177,7 +178,7 @@ class Doc
      * @param $rplan_rows array Строки rplan
      * @return string
      */
-    static public function getRPlan_Row($rplan_rows)
+    public static function getRPlan_Row($rplan_rows)
     {
         $cnt = count($rplan_rows);
 
@@ -214,10 +215,9 @@ class Doc
             $kod_part = (int)$row['kod_part']; // Код партии
             $kod_elem = (int)$row['kod_elem']; // Код элемента
             $obozn = $row['obozn']; // Обозначение
-            //$name = $row['name']; // Название
             $mod = $row['modif']; // Модификация
             $numb = (int)$row['numb']; // Количество
-            //$ostatok = (int)$row['numb_otgruz']; // ??? Уточнить
+            $numb_ostat = (int)$row['numb_ostat'];
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
             $price = round((double)$row['price'], 2); // Цена
             $val = ""; // Валюта
@@ -237,10 +237,10 @@ class Doc
                 $ind_row = " bgcolor='#85e085'";
 
             // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
-            //$ostatok_str = $numb;
-            //if ($ostatok > 0 and $ostatok != $numb)
-            //    $ostatok_str = $numb . ' (' . $ostatok . ')';
-            $ostatok_str = ""; // todo - доделать вывод остатка к отгрузке
+            $ostatok_str = "";
+            if($numb_ostat>0 and $numb_ostat!=$numb){
+                    $ostatok_str = ' (' . $numb_ostat . ')';
+            }
 
             // Если договор внешний то надо Код организации указать как Код исполнителя
             if ($kod_ispolnit != 683) {
@@ -255,8 +255,8 @@ class Doc
             // Формируем строку
             if ($i == 0 and $cnt > 1) { // Когда требуется объединение строк
                 $res .= "<tr $ind_row>
-                                <td $rowspan><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
-                                <td $rowspan width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
+                                <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
+                                <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
             } elseif ($cnt == 1) { // Когда объединение строк не требуется
                 $res .= "<tr $ind_row>
                                     <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
@@ -267,7 +267,7 @@ class Doc
 
             $res .= "<td  width='365'><a href='form_part.php?kod_part=" . $kod_part . "&kod_dogovora=" . $kod_dogovora . "'><img src='/img/edit.gif' height='14' border='0' /></a>
                                        <a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $mod . "</a></td>
-                      <td width='40'>" .$numb .$ostatok_str . "</td>
+                      <td width='40'>" .$numb . $ostatok_str . "</td>
                       <td width='80' " . $ind_data . ">" . $data . "</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
                       <td width='120' align='right'>" . Func::Rub($part_summa) . $val . $nds . "</td>
@@ -429,7 +429,7 @@ class Doc
     {
         $nomer = "";
         $data_sost = Func::NowE();
-        $kod_org = -1;
+        $kod_org = $this->kod_org;
         $kod_ispolnit = 683;
         $FormName = "formAdd";
 
@@ -439,7 +439,7 @@ class Doc
             $data_sost = Func::Date_from_MySQL($this->Data['data_sost']);
             $kod_org = $this->Data['kod_org'];
             $kod_ispolnit = $this->Data['kod_ispolnit'];
-            $FormName = "formAddEdit";
+            $FormName = "formEdit";
         }
 
         $res = /** @lang HTML */
@@ -514,11 +514,14 @@ class Doc
 //--------------------------------------------------------------------
 //
 
+    /**
+     * @param int $sgp
+     */
     public function formParts($sgp = 0)
     {
         $p = new Part();
         $p->kod_dogovora = $this->kod_dogovora;
-        echo $p->GetParts($sgp);
+        echo $p->formParts($sgp);
     }
 //--------------------------------------------------------------
 //
@@ -602,12 +605,9 @@ class Doc
             $row = $rplan_rows[$i];
 
             // Партия
-            $kod_part = (int)$row['kod_part']; // Код партии
-            $numb_otgruz = Part::getNumbOtgruz($kod_part);
-            $numb = (int)$row['numb'];
-            if ($numb_otgruz != $numb)
-                $ostat = $numb - $numb_otgruz;
-            else
+            $numb_ostat = $row['numb_ostat'];
+
+            if ($numb_ostat == 0)
                 continue; // Если нет остатка то переходим к след. шагу
 
             // Договор
@@ -624,15 +624,25 @@ class Doc
 
             $kod_elem = (int)$row['kod_elem']; // Код элемента
             $obozn = $row['obozn']; // Обозначение
-            //$name = $row['name']; // Название
             $modif = $row['modif']; // Модификация
-            //$price = round((double)$row['price'], 2); // Цена
+            $numb = $row['numb'];
             $val = (int)$row['val']; // Валюта
             $price_nds = round($row['price'] * (1 + (double)$row['nds']), 2); // Цена с НДС
-            $part_summa = (double)$price_nds*$ostat; // Сумма партии
+            $part_summa = $row['part_summa']; // Сумма остатка партии
+            $part_summa_ostat = $price_nds*$numb_ostat; // Сумма остатка партии
             $data_postav = $row['data_postav'];
             $nds = round((double)$row['nds'], 2);
-            //$summa_plat = round((double)$row['summa_plat'], 2); // Сумма платежей по партии / Договору
+
+            $part_summa_ostat_str = "";
+            if($part_summa_ostat!=$part_summa)
+            {
+                $part_summa_ostat = func::Rub($part_summa_ostat);
+                $part_summa_ostat_str = "<br><abbr title=\"Сумма неотгруженного остатка\">($part_summa_ostat)</abbr>";
+            }
+
+            $numb_ostat_str = "";
+            if($numb_ostat>0 and $numb_ostat!=$numb)
+                $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
             // Строки
             $Dt = Func::Date_from_MySQL($data_postav); // Дата поставки
@@ -670,12 +680,12 @@ class Doc
             // Формируем строку плана
             $row_str = "<tr bgcolor='$zebra'>
                                 <td><a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $Mod . "</a></td>
-                                <td align='right'>" . (int)$ostat . "</td>
+                                <td align='right'>" . $numb . $numb_ostat_str. "</td>
                                 <td align='right'>" . $proc . "</td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right'>" . Func::Date_from_MySQL($data_postav) . "</td>
-                                <td align='right'>" . $part_summa_str . $Val . $NDS . "</td>
+                                <td align='right'>" . $part_summa_str . $Val . $NDS .$part_summa_ostat_str. "</td>
                          </tr>";
 
             $rowm = 0;
@@ -818,15 +828,20 @@ class Doc
                 FROM 
                     view_rplan 
                 WHERE 
-                    kod_org=" . $this->kod_org . "
-                    OR kod_ispolnit=" . $this->kod_org . "
+                    kod_org=$this->kod_org
+                    OR kod_ispolnit=$this->kod_org
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
 
         $rows = $db->rows($sql);
 
-        return $this->formRPlan_by_Doc($rows);
+
+        if(count($rows)>0)
+            return $this->formRPlan_by_Doc($rows);
+
+        return "Договоры без партий:<br>".$this->formDocList(/** @lang SQL */
+            "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org");
     }
 
 //-----------------------------------------------------------------------
@@ -970,22 +985,25 @@ class Doc
 
     /**
      * Список Всех договоров и вложенных счетов
+     * @param string $sql - запрос
      * @return string
      */
-    public function formDocList()
+    public function formDocList($sql="")
     {
         $db = new Db();
+        if($sql=="")
+            $sql = "SELECT * FROM view_scheta_dogovory_all";
 
-        $rows = $db->rows("SELECT * FROM view_scheta_dogovory_all");
+        $rows = $db->rows($sql);
 
         $cnt = $db->cnt;
 
         if ($cnt == 0)
             return "";
 
-        $res = 'Количество Записей: ' . $cnt . '<br>';
+        //$res = 'Количество Записей: ' . $cnt . '<br>';
 
-        $res.= '<table border=0 cellspacing=0 cellpadding=0 width="50%">';
+        $res= '<table border=0 cellspacing=0 cellpadding=0 width="50%">';
         $res.= '<tr bgcolor="#CCCCCC">
                     <td>Номер Договора</td>
                     <td>Организация</td>
@@ -1150,7 +1168,7 @@ class Doc
                 <table>
                     <tr>
                         <td>Платежи</td>
-                        <td><select name='SelPPID' id='SelPPID'>";
+                        <td><select name='kod_plat' id='kod_plat'>";
 
         $sell_list_empty = true;
 
@@ -1248,42 +1266,48 @@ class Doc
      * @param $nomer
      * @param $data_sost
      * @param $kod_org - Код организации Заказчика
-     * @param int $VN - Внешний, Заказчик - НВС, Исполнитель - Код организации
+     * @param int $kod_ispolnit
+     * @internal param int $VN - Внешний, Заказчик - НВС, Исполнитель - Код организации
      * @internal param $Num - номер
      * @internal param $DataCR - Дата создания договора
      * @internal param $Priem - Приемка, не актуально
      */
-    public function Add($nomer, $data_sost, $kod_org, $VN = 0)
+    public function Add($nomer, $data_sost, $kod_org, $kod_ispolnit = 683)
     {
         $db = new Db();
 
         $data_sost = func::Date_to_MySQL($data_sost);
 
-        if ((int)$VN == 0)
-            $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,683)";
-        else
-            $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',683,$kod_org)";
+            $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit)";
 
         $db->query($sql);
     }
 //--------------------------------------------------------------
 
+    /**
+     * Обработчик событий
+     *
+     */
     public function Events()
     {
         $event = false;
 
-        if (isset($_POST['AddDocForm'])) {
-            if(isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['VN']))
-                $this->Add($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['VN']);
-            $event = true;
+        if (isset($_POST['formAdd'])) {
+            if(isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']))
+            {
+                $this->Add($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']);
+                $event = true;
+            }
+            elseif(isset($_POST['famil'], $_POST['name']))
+            {
+                $this->AddCont($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+                $event = true;
+            }
         }
 
-
-        if (isset($_POST['AddPP']))
-            if (isset($_POST['PPNum']) and isset($_POST['PPSumm']) and isset($_POST['PPDate'])) {
-                if (!isset($_POST['PPPrim']))
-                    $_POST['PPPrim'] = '';
-                $this->AddPay($_POST['PPNum'], $_POST['PPSumm'], Func::Date_to_MySQL($_POST['PPDate']), $_POST['PPPrim']);
+        if (isset($_POST['formAddPP']))
+            if (isset($_POST['nomer'], $_POST['summa'], $_POST['data'])) {
+                $this->AddPay($_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 $event = true;
             }
 
@@ -1293,25 +1317,20 @@ class Doc
                 $event = true;
             }
 
-        if (isset($_POST['formAddEdit'])) {
-            $this->AddCont($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
-            $event = true;
-
-        }
-
         if (isset($_POST['AddPrim']))
             if (isset($_POST['Prim'])) {
                 $this->AddPrim($_POST['Prim'],$_SESSION['MM_Username']);
                 $event = true;
             }
 
-        if (isset($_POST['formAddEdit']))
+        if (isset($_POST['formEdit']))
             if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit'])) {
                 $this->Edit($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']);
                 $event = true;
             }
 
-        if (isset($_POST['Flag'])){
+        if (isset($_POST['Flag']))
+        {
             if ($_POST['Flag'] == 'DelInv') {
                 $this->DelInvoice($_POST['InvID']);
                 $event = true;
@@ -1330,23 +1349,23 @@ class Doc
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 
-//--------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Строка плана rplan
 
     /**
      * Добавление платежа в договор
-     * @param $Numb - номер
-     * @param $Summ - сумма
-     * @param $Date - дата
-     * @param $Prim - примечание
+     * @param $nomer - номер
+     * @param $summa - сумма
+     * @param $data - дата
+     * @param $prim - примечание
      */
-    public function AddPay($Numb, $Summ, $Date, $Prim)
+    public function AddPay($nomer, $summa, $data, $prim)
     {
         $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
-        $Date = func::Date_to_MySQL($Date);
+        $data = func::Date_to_MySQL($data);
 
-        $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$Numb,$Summ,'$Date','$Prim')");
+        $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim')");
     }
 //----------------------------------------------------------------------------------------------------------------------
 // Читает подряд все строки rplan с одним кодом договора. Используется при выводе договоров
@@ -1386,7 +1405,7 @@ class Doc
         $c = new Kontakt();
         $c->kod_dogovora = $this->kod_dogovora;
         $c->kod_org = $this->kod_org;
-        $c->AddContToDoc($Dolg, $SName, $Name, $PName);
+        $c->AddKontakt($Dolg, $SName, $Name, $PName);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1459,7 +1478,7 @@ class Doc
     public function formAddInvoice()
     {
        $res = /** @lang HTML */
-           '           <form id="form1" name="form1" method="post" action="">
+                            '<form id="form1" name="form1" method="post" action="">
                               <table width="434" border="0">
                                 <tr>
                                   <td width="126">Номер Счета</td>
@@ -1498,5 +1517,51 @@ class Doc
        $res.= func::Cansel();
        return $res;
     }
+//----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * @return string
+     */
+    public function formAddPP()
+    {
+        $date = date('d.m.Y');
+        $res = /** @lang HTML */
+            "               <form id=\"form1\" name=\"form1\" method=\"post\" action=\"\">
+                                  <table width=\"434\" border=\"0\">
+                                    <tr>
+                                      <td width=\"126\">Номер ПП</td>
+                                      <td width=\"292\"><span id=\"SNumR\">
+                                      <input type=\"text\" name=\"nomer\" id=\"nomer\" />
+                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldMinCharsMsg\">Minimum
+                                      number of characters not met.</span></span></td>
+                                    </tr>
+                                    <tr>
+                                      <td>Дата</td>
+                                      <td><span id=\"SDateR\">
+                                      <input type=\"text\" name=\"data\" id=\"data\" value=\"$date\"/>
+                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldInvalidFormatMsg\">Invalid
+                                      format.</span></span></td>
+                                    </tr>
+                                    <tr>
+                                      <td>Сумма</td>
+                                      <td><span id=\"SSummR\">
+                                      <input type=\"text\" name=\"summa\" id=\"summa\" />
+                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldInvalidFormatMsg\">Invalid
+                                      format.</span></span></td>
+                                    </tr>
+                                    <tr>
+                                      <td>Примечание</td>
+                                      <td><span id=\"STextNR\">
+                                        <input type=\"text\" name=\"prim\" id=\"prim\" />
+                                      </span></td>
+                                    </tr>
+                                  </table>
+                                  <p>
+                                    <input type=\"submit\" name=\"button\" id=\"button\" value=\"Добавить\" />
+                                    <input type=\"hidden\" name=\"formAddPP\" value=\"formAddPP\" />
+                                  </p>
+                                </form>";
+        $res.= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
+        return $res;
+    }
 }// END CLASS

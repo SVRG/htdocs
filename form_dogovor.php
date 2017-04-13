@@ -16,23 +16,23 @@ include_once("class_doc.php");
 
 if(!isset($_GET['kod_dogovora']) and !isset($_POST['kod_dogovora']))
     exit("Не задан Договор");
-$D = new Doc();
+$Dogovor = new Doc();
 if(isset($_GET['kod_dogovora']))
-    $D->kod_dogovora = $_GET['kod_dogovora'];
+    $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
 else
-    $D->kod_dogovora = $_POST['kod_dogovora'];
-$D->getData();
-$D->Events();
+    $Dogovor->kod_dogovora = $_POST['kod_dogovora'];
+$Dogovor->getData();
+$Dogovor->Events();
 
-$P = new Part();
-$P->kod_dogovora = $D->kod_dogovora;
+$Part = new Part();
+$Part->kod_dogovora = $Dogovor->kod_dogovora;
 if(isset($_POST['kod_part'])) // Если был передан код партии
-    $P->kod_part = $_POST['kod_part'];
-$P->Events();
+    $Part->kod_part = $_POST['kod_part'];
+$Part->Events();
 
-$K = new Kontakt();
-$K->kod_dogovora = $D->kod_dogovora;
-$K->Events();
+$Kontakt = new Kontakt();
+$Kontakt->kod_dogovora = $Dogovor->kod_dogovora;
+$Kontakt->Events();
 
 //---------------------------------------------------------------------------
 // Удаление документов
@@ -51,24 +51,8 @@ if (isset($_POST['DelDocum'])) {
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
-    <title><?php echo $D->Data['nomer'] ?></title>
+    <title><?php echo $Dogovor->Data['nomer'] ?></title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        <!--
-        function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-            if (init == true) with (navigator) {
-                if ((appName == "Netscape") && (parseInt(appVersion) == 4)) {
-                    document.MM_pgW = innerWidth;
-                    document.MM_pgH = innerHeight;
-                    onresize = MM_reloadPage;
-                }
-            }
-            else if (innerWidth != document.MM_pgW || innerHeight != document.MM_pgH) location.reload();
-        }
-        MM_reloadPage(true);
-        //-->
-    </script>
-
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
 
 </head>
@@ -90,9 +74,9 @@ else
                 <?php
 
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    $D->formDogovor(0, 1);
+                    $Dogovor->formDogovor(0, 1);
                 else
-                    $D->formDogovor();
+                    $Dogovor->formDogovor();
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'DocClose') {
@@ -103,11 +87,11 @@ else
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'DocEditForm')
-                        echo $D->formAddEdit(1);
+                        echo $Dogovor->formAddEdit(1);
 
                 echo Func::ActButton('', 'Редактировать Договор', 'DocEditForm');
 
-                echo $D->formDocum($Del); // Документы договора
+                echo $Dogovor->formDocum($Del); // Документы договора
 
                 ?>
             </td>
@@ -119,18 +103,18 @@ else
                 if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
 
                     // Вывод контактов
-                    $D->formDocKontakts(1);
+                    $Dogovor->formDocKontakts(1);
                     echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddKontakt');
 
                     // Добаление Контакта в Договор
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddKontakt') {
-                            echo $K->formAddEdit();
+                            echo $Kontakt->formAddEdit();
                             $_POST['Flag'] = null;
                         }
                 } elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-                    $D->formDocKontakts(1);
-                } else $D->formDocKontakts(0);
+                    $Dogovor->formDocKontakts(1);
+                } else $Dogovor->formDocKontakts(0);
 
                 ?></td>
         </tr>
@@ -139,7 +123,7 @@ else
                     <?php
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddPartForm') {
-                            $P->formAddEdit(0);
+                            $Part->formAddEdit(0);
                         }
 
                     // Кнопка Добавить Партию
@@ -149,10 +133,10 @@ else
                     // Партии
                     if (isset($_POST['Flag'])) {
                         if ($_POST['Flag'] == 'AddNacl')
-                            $P->formPart(1); // Партия + Форма добавления накладной
+                            $Part->formPart(1); // Партия + Форма добавления накладной
                     }
 
-                    echo $P->GetParts(1,"",0);
+                    echo $Part->formParts(1,"",0);
 
                     ?></p>
             </td>
@@ -162,7 +146,7 @@ else
                 <?php
 
                 // Платежи - ------------------
-                echo $D->formPP();
+                echo $Dogovor->formPP();
 
                 // Ввод платежей
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -170,52 +154,14 @@ else
 
                 if (isset($_POST['Flag'])) {
                     if ($_POST['Flag'] == 'AddPP') {
-                        echo '
-                                <form id="form1" name="form1" method="post" action="">
-                                  <table width="434" border="0">
-                                    <tr>
-                                      <td width="126">Номер ПП</td>
-                                      <td width="292"><span id="SNumR">
-                                      <input type="text" name="PPNum" id="PPNum" />
-                                      <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
-                                      number of characters not met.</span></span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Дата</td>
-                                      <td><span id="SDateR">
-                                      <input type="text" name="PPDate" id="PPDate" value="' . date('d.m.Y') . '"/>
-                                      <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
-                                      format.</span></span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Сумма</td>
-                                      <td><span id="SSummR">
-                                      <input type="text" name="PPSumm" id="PPSumm" />
-                                      <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
-                                      format.</span></span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Примечание</td>
-                                      <td><span id="STextNR">
-                                        <input type="text" name="PPPrim" id="PPPrim" />
-                                      </span></td>
-                                    </tr>
-                                  </table>
-                                  <p>
-                                    <input type="submit" name="button" id="button" value="Добавить" />
-                                    <input type="reset" name="button" id="button" value="Сброс" />
-                                    <input type="hidden" name="AddPP" value="1" />
-                                  </p>
-                                </form>';
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
-                        $_POST['Flag'] = null;
+                        echo $Dogovor->formAddPP();
                     }
                 }
                 ?>  </td>
             <td width="50%" align="left" valign="top">
                 <?php
                 // Счета ------------------------------------
-                $D->formScheta();
+                $Dogovor->formScheta();
 
                 // Добавить Счет
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -223,7 +169,7 @@ else
 
                 if (isset($_POST['Flag'])) {
                     if ($_POST['Flag'] == 'AddInvoice') {
-                        echo $D->formAddInvoice();
+                        echo $Dogovor->formAddInvoice();
                         $_POST['Flag'] = null;
                     }
                 }
@@ -244,7 +190,7 @@ else
                         if ($_POST['Flag'] == 'AddPrim')
                             $add_prim = 1;
 
-                    echo $D->formPrim($add_prim);
+                    echo $Dogovor->formPrim($add_prim);
                 }
                 ?></td>
         </tr>

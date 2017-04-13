@@ -23,9 +23,9 @@ class Kontakt
         $db = new Db();
 
         if ($Doc_Org == "Doc")
-            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=" . $this->kod_dogovora);
+            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora");
         else
-            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=" . $this->kod_org);
+            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org");
 
         return $db->cnt;
     }
@@ -138,59 +138,36 @@ class Kontakt
     //
     /**
      * Добавить контакт в Договор и Организацию
-     * @param $Dolg
-     * @param $SName
-     * @param $Name
-     * @param $PName
+     * @param $dolg
+     * @param $famil
+     * @param $name
+     * @param $otch
      * @return void
      */
-    public function AddContToDoc($Dolg, $SName, $Name, $PName)
+    public function AddKontakt($dolg, $famil, $name, $otch)
     {
+
+        $kod_dogovora = $this->kod_dogovora;
+        $kod_org = $this->kod_org;
+
+        if (!isset($FName) and !isset($name)) return;
+
+        $dolg = Func::Mstr($dolg);
+        $famil = Func::Mstr($famil);
+        $name = Func::Mstr($name);
+        $otch = Func::Mstr($otch);
+
         $db = new Db();
+        $db->query(/** @lang SQL */
+            "INSERT INTO 
+                      kontakty (kod_org,dolg,famil,name,otch)
+                    VALUES ($kod_org,'$dolg','$famil','$name','$otch')");
 
-        $DocID = $this->kod_dogovora;
-        $OrgID = $this->kod_org;
-
-        if (!isset($FName) and !isset($Name)) return;
-
-        $Dolg = Func::Mstr($Dolg);
-        $SName = Func::Mstr($SName);
-        $Name = Func::Mstr($Name);
-        $PName = Func::Mstr($PName);
-
-        $db->query("INSERT INTO kontakty (kod_org,dolg,famil,name,otch)
-        VALUES ($OrgID,'$Dolg','$SName','$Name','$PName')");
-        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora)
-        VALUES(LAST_INSERT_ID(),$DocID)");
-
-    }
-    //-----------------------------------------------------------------
-    //
-    /**
-     * Добавить контакт в Организацию
-     * @param $Dolg
-     * @param $SName
-     * @param $Name
-     * @param $PName
-     * @return void
-     * @internal param string $Prim
-     */
-    public function AddContToOrg($Dolg, $SName, $Name, $PName)
-    {
-        $db = new Db();
-
-        $OrgID = $this->kod_org;
-
-        if (!isset($FName) and !isset($Name)) return;
-
-        $Dolg = Func::Mstr($Dolg);
-        $SName = Func::Mstr($SName);
-        $Name = Func::Mstr($Name);
-        $PName = Func::Mstr($PName);
-
-        $db->query("INSERT INTO kontakty (kod_org,dolg,famil,name,otch)
-        VALUES ($OrgID,'$Dolg','$SName','$Name','$PName')");
-
+        if ($kod_dogovora > 0)
+            $db->query(/** @lang SQL */
+                "INSERT INTO 
+                          kontakty_dogovora (kod_kontakta,kod_dogovora)
+                        VALUES(LAST_INSERT_ID(),$kod_dogovora)");
     }
     //-----------------------------------------------------------------
     //
@@ -292,12 +269,12 @@ class Kontakt
     //
     /**
      * Добавление контакта в договор (из Sel List)
-     * @param $DocID
+     * @param $kod_dogovora
      */
-    public function AddKontaktToDoc($DocID)
+    public function AddKontaktToDoc($kod_dogovora)
     {
         $db = new Db();
-        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora) VALUES($this->kod_kontakta,$DocID)");
+        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora) VALUES($this->kod_kontakta,$kod_dogovora)");
     }
 
     //------------------------------------------------------------------------
@@ -324,6 +301,7 @@ class Kontakt
         $famil = "";
         $name = "";
         $otch = "";
+        $form_name = "formAdd";
 
         if($Edit==1) {
             $db = new Db();
@@ -335,6 +313,7 @@ class Kontakt
             $famil = $row['famil'];
             $name = $row['name'];
             $otch = $row['otch'];
+            $form_name = "formEdit";
         }
 
         $res = '<form id="form1" name="form1" method="post" action=""><table width="290" border="1">
@@ -362,7 +341,7 @@ class Kontakt
           <p>
             <label>
               <input type="submit" name="Save" id="Save" value="Сохранить" />
-              <input type="hidden" name="formAddEdit" id="formAddEdit" />
+              <input type="hidden" name="'.$form_name.'" id="'.$form_name.'" value="'.$form_name.'" />
             </label>
           </p>
         </form>';
@@ -425,7 +404,6 @@ class Kontakt
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
-
     /**
      * Перехватчик событий
      * Добавление телефона в контакт
@@ -450,10 +428,19 @@ class Kontakt
                 $event = true;
         }
 
-        if (isset($_POST['formAddEdit'])) {
+        if (isset($_POST['formEdit']))
+            if(isset($_POST['famil'], $_POST['name']))
+            {
             $this->Save($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
             $event = true;
-        }
+            }
+
+        if (isset($_POST['formAdd']))
+            if(isset($_POST['famil'], $_POST['name']))
+            {
+            $this->AddKontakt($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+            $event = true;
+            }
 
         if($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);

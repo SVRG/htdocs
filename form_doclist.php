@@ -6,8 +6,8 @@ include "security.php";
 
 $UserG = array('admin', 'oper');
 include_once("class_doc.php");
-$d = new Doc();
-$d->Events();
+$Dogovor = new Doc();
+$Dogovor->Events();
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -29,7 +29,7 @@ $d->Events();
         $add = false;
         if (isset($_POST['Flag']))
             if ($_POST['Flag'] == 'AddDoc'){
-                echo $d->formAddEdit();
+                echo $Dogovor->formAddEdit();
                 echo func::Cansel();
                 $add=true;
         }
@@ -39,7 +39,7 @@ $d->Events();
             if(in_array($_SESSION['MM_UserGroup'], $UserG))
                 echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Договор', 'AddDoc');
 
-            echo $d->formDocList();
+            echo $Dogovor->formDocList();
         }
         ?>
     </div>

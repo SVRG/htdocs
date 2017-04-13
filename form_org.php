@@ -16,60 +16,17 @@ include_once('class_org.php');
 $Org = new Org();
 $Org->kod_org = $kod_org;
 $Org->getData();
+$Org->Events();
 
-$c = new Kontakt();
-$c->kod_org = $kod_org;
 
-//---------------------------------------------------------------------------
-// Добавление Реквизитов
-if (isset($_POST['AddRecvForm'])) {
-    $Org->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
-// Добавление Контактов
-if (isset($_POST['AddContact']) and (isset($_POST['FName']) or isset($_POST['Name']))) {
-    $Org->AddKontakt($_POST['getDolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
-// Вставка Телефон в Контакт
-if (isset($_POST['AddPhone']))
-    if (isset($_POST['kod_kontakta']) and isset($_POST['phone'])) {
-        $c = new Kontakt();
-        $c->kod_kontakta = $_POST['kod_kontakta'];
-        $c->AddPhone($_POST['phone']);
+$Kontakt = new Kontakt();
+$Kontakt->kod_org = $kod_org;
+$Kontakt->Events();
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-//---------------------------------------------------------------------------
-// Добавление Телефона в Организацию
-if (isset($_POST['AddOrgPhone']) and (isset($_POST['phone']))) {
-    $Org->AddPhone($_POST['phone'], $_POST['prim']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
-// Добавление Адреса в организацию
-if (isset($_POST['AddOrgAdr']) and (isset($_POST['adres']))) {
-    $Org->AddAdr($_POST['adres'], $_POST['type']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
-// Добавить Телефон в Контакт
-if (isset($_POST['AddPhone']) and isset($_POST['Numb']) and isset($_POST['ContID'])) {
-    $Org->AddKontakt($_POST['getDolg'], $_POST['FName'], $_POST['Name'], $_POST['PName']);
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-//---------------------------------------------------------------------------
-// Сохранить
-if(isset($_POST['FormName']))
-    if($_POST['FormName']=="FormAddEdit")
-        if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
-            if ($_POST['poisk'] != '' and $_POST['nazv_krat'] != '' and $_POST['nazv_poln'] != '') {
-                $Org->Save($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
-            }
-            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
+$Doc = new Doc();
+$Doc->kod_org = $Org->kod_org;
+$Doc->Events();
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -178,9 +135,9 @@ if(isset($_POST['FormName']))
                     <div class="CollapsiblePanelContent">
                         <?php
                         if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                            echo $c->formKontakts(1, "Org");
+                            echo $Kontakt->formKontakts(1, "Org");
                         else
-                            echo $c->formKontakts(0, "Org");
+                            echo $Kontakt->formKontakts(0, "Org");
                         ?>
                     </div>
                 </div>
@@ -190,44 +147,7 @@ if(isset($_POST['FormName']))
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'AddKontakt') {
-                        echo '<form id="form1" name="form1" method="post" action="">
-                                  <table width="436" border="0">
-                                    <tr>
-                                      <td width="133">Должность</td>
-                                      <td width="287">
-                                        <input type="text" name="getDolg" id="getDolg" />
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td>Фамилия</td>
-                                      <td><span id="sprytextfield2">
-                                        <input type="text" name="FName" id="FName" />
-                                      </span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Имя</td>
-                                      <td><span id="sprytextfield3">
-                                        <input type="text" name="Name" id="Name" />
-                                      </span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Отчество</td>
-                                      <td><span id="sprytextfield4">
-                                        <input type="text" name="PName" id="PName" />
-                                      </span></td>
-                                    </tr>
-                                    <tr>
-                                      <td>Примечание</td>
-                                      <td><span id="sprytextfield5">
-                                        <input type="text" name="Prim" id="Prim" />
-                                      </span></td>
-                                    </tr>
-                                  </table>
-                                  <p>
-                                    <input type="submit" name="button" id="button" value="Добавить" />
-                                    <input type="hidden" name="AddContact" id="button" value="1" />
-                                  </p>
-                                </form>';
+                        echo $Kontakt->formAddEdit();
                         Func::Cansel();
                     }
                 ?>
@@ -243,7 +163,17 @@ if(isset($_POST['FormName']))
             <td colspan="2">
                 <div id="CollapsiblePanel4" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Договоры</div>
-                    <div class="CollapsiblePanelContent"><?php echo $Org->formDocs(); ?></div>
+                    <div class="CollapsiblePanelContent">
+                        <?php
+
+                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Договор', 'AddDogovor');
+
+                        if(isset($_POST['Flag']))
+                                if($_POST['Flag']=="AddDogovor")
+                                    echo $Doc->formAddEdit();
+                            echo $Org->formDocs();
+                        ?>
+                    </div>
                 </div>
             </td>
         </tr>

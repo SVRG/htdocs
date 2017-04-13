@@ -5,7 +5,7 @@ include_once "class_elem.php";
 
 class Org
 {
-    public $kod_org=0; // Идентификатор
+    public $kod_org = 0; // Идентификатор
     public $Data;
 
 //-----------------------------------------------------------
@@ -64,6 +64,7 @@ class Org
         $this->getData();
 
         $row = $this->Data;
+        $www = func::Link($row['www']);
 
         if ($Edit == 0) {
             echo '<table border=1 cellspacing=0 cellpadding=0>';
@@ -89,7 +90,7 @@ class Org
 			        <td bgcolor="#CCCCCC"></td><td></td>
 			    </tr>
 			    <tr>
-			        <td bgcolor="#CCCCCC">WWW</td><td><a href="' . $row['www'] . '" target="_blank">' . $row['www'] . '</a></td>
+			        <td bgcolor="#CCCCCC">WWW</td><td>'. $www .'</td>
 			        <td bgcolor="#CCCCCC">E-mail</td><td>' . $row['e_mail'] . '</td>
 			    </tr>
 			  </table>';
@@ -156,7 +157,7 @@ class Org
 
         $res = "";
         if ($Add == 1) {
-            $res.= '<form id="form1" name="form1" method="post" action="">
+            $res .= '<form id="form1" name="form1" method="post" action="">
                       <table border="0">
                         <tr>
                           <td width="10%">Адрес</td>
@@ -185,7 +186,7 @@ class Org
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
         $res .= '<table border="0" cellspacing=0 cellpadding=0 width="100%">';
@@ -200,12 +201,12 @@ class Org
             elseif ($row['type'] == 3)
                 $type = "Почтовый: ";
 
-            $res.= '<tr>
+            $res .= '<tr>
                            <td>' . $type . $row['adres'] . '</td>
                      </tr>';
         }
 
-        $res.= '</table>';
+        $res .= '</table>';
 
         return $res;
     }
@@ -226,9 +227,10 @@ class Org
 //
     /**
      * Вывод списка организаций
-     * @return void|string
+     * @param bool $echo
+     * @return string
      */
-    public function formOrgList($echo=false)
+    public function formOrgList($echo = false)
     {
         $db = new DB();
 
@@ -236,20 +238,21 @@ class Org
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "Список организаций пуст";
 
-        $res = '<table border=1 cellspacing=0 width="70%" rules="rows" frame="void">
-	                    <tr bgcolor="#CCCCCC">
-	                            <td width="20">№</td>
-	                            <td width="100">Поиск</td>
-	                            <td width="200">Наименование краткое</td>
-	                            <td width="200">Наименование полное</td>
-	                            <td width="100">WWW</td>
-	                            <td width="500"></td>
-	                    </tr>';
+        $res = /** @lang HTML */
+            "<table border=1 cellspacing=0 width=\"70%\" rules=\"rows\" frame=\"void\">
+	                    <tr bgcolor=\"#CCCCCC\">
+	                            <td width=\"20\">№</td>
+	                            <td width=\"100\">Поиск</td>
+	                            <td width=\"200\">Наименование краткое</td>
+	                            <td width=\"200\">Наименование полное</td>
+	                            <td width=\"100\">WWW</td>
+	                            <td width=\"500\"></td>
+	                    </tr>";
 
-        if($echo)
+        if ($echo)
             echo $res;
 
 
@@ -260,33 +263,35 @@ class Org
             $nazv_krat = $row['nazv_krat'];
             $nazv_poln = $row['nazv_poln'];
             $poisk = $row['poisk'];
-            $www = $row['www'];
+            $www = func::Link($row['www']);
 
             $FN = '';
             if ($nazv_krat != $nazv_poln)
                 $FN = $nazv_poln;
 
-            $tab_row= '<tr>
+            $tab_row = /** @lang HTML */
+                "<tr>
                       <td></td>
-                      <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $poisk . '</a></td>
-                      <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $nazv_krat . '</a></td>
-                      <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $FN . '</a></td>
-                      <td>' . Func::Link($www) . '</td>
-		            </tr>';
-            if($echo)
+                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $poisk </a></td>
+                      <td><a href=\"form_org.php?kod_org= $kod_org \">$nazv_krat</a></td>
+                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $FN </a></td>
+                      <td> $www </td>
+		            </tr>";
+            if ($echo)
                 echo $tab_row;
             else
-                $res.=$tab_row;
+                $res .= $tab_row;
 
         }
         $tab_row = '</table>';
 
-        if($echo)
+        if ($echo)
             echo $tab_row;
         else {
             $res .= $tab_row;
             return $res;
         }
+        return "";
     }
 //-----------------------------------------------------------------
 //
@@ -318,11 +323,11 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM phones WHERE kod_org=".$this->kod_org);
+        $rows = $db->rows("SELECT * FROM phones WHERE kod_org=" . $this->kod_org);
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
 
@@ -337,12 +342,12 @@ class Org
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
-            $res.= '<tr>
+            $res .= '<tr>
                         <td>' . $row['phone'] . '</td>
                         <td>' . $row['prim'] . '</td>
 		            </tr>';
         }
-        $res.= '</table>';
+        $res .= '</table>';
 
         return $res;
     }
@@ -398,7 +403,7 @@ class Org
                         </tr>
                       </table>
                     </form>';
-            $res .= Func::Cansel(0);
+        $res .= Func::Cansel(0);
 
         return $res;
     }
@@ -496,7 +501,7 @@ class Org
     {
         $c = new Kontakt();
         $c->kod_org = $this->kod_org;
-        $c->AddContToOrg($dolg, $famil, $name, $otch);
+        $c->AddKontakt($dolg, $famil, $name, $otch);
     }
 //----------------------------------------------------------------------
 //
@@ -510,7 +515,7 @@ class Org
         $rows = $db->rows(/** @lang SQL */
             "SELECT * FROM view_org_nomen WHERE kod_org = $this->kod_org");
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return "";
 
         $res = '<table border=0 cellspacing=0 cellpadding=0 width="100%">';
@@ -530,7 +535,7 @@ class Org
         $res .= '</table>';
         return $res;
     }
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //
     /**
      * Документы Организации
@@ -542,7 +547,7 @@ class Org
         $d = new Docum();
         return $d->formDocum('Org', $this->kod_org, $Del);
     }
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //
     /**
      * Задолженность по действующим договорам
@@ -564,7 +569,7 @@ class Org
                     dogovory.kod_org
                 ";
         $rows = $db->rows($sql);
-        if(count($rows)>=1)
+        if (count($rows) >= 1)
             $row = $rows[0];
         else
             return "0"; // По текущим договорам - 0
@@ -585,17 +590,16 @@ class Org
                 ";
 
         $rows = $db->rows($sql);
-        if(count($rows)>=1){
+        if (count($rows) >= 1) {
             $row = $rows[0];
             $summa_plat = (double)$row['summa_plat']; // Сумма платежей по действующим договорам
-        }
-        else
+        } else
             return Func::Rub($summa_dogovorov);
 
-        return $res=Func::Rub($summa_dogovorov-$summa_plat);
+        return $res = Func::Rub($summa_dogovorov - $summa_plat);
     }
 
-//------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //
     /**
      * Должники
@@ -641,21 +645,63 @@ class Org
         return $res;
     }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //
     /**
      * Ссылка на форму Огранизации
      * @return string
      */
     public function getFormLink()
-{
-    if(!isset($this->Data))
-    $this->getData();
+    {
+        if (!isset($this->Data))
+            $this->getData();
 
-    $kod_org = $this->kod_org;
-    $nazv_krat = $this->Data['nazv_krat'];
+        $kod_org = $this->kod_org;
+        $nazv_krat = $this->Data['nazv_krat'];
 
-    return "<a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a>";
-}
+        return "<a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a>";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * События форм
+     *
+     */
+    public function Events()
+    {
+        $event = false;
+        if (isset($_POST['AddOrgPhone']) and (isset($_POST['phone']))) {
+            $this->AddPhone($_POST['phone'], $_POST['prim']);
+            $event = true;
+        }
+
+        if (isset($_POST['AddOrgAdr']) and (isset($_POST['adres']))) {
+            $this->AddAdr($_POST['adres'], $_POST['type']);
+            $event = true;
+        }
+
+        if(isset($_POST['FormName']))
+            if($_POST['FormName']=="FormAddEdit")
+                if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln']))
+                    if ($_POST['poisk'] != '' and $_POST['nazv_krat'] != '' and $_POST['nazv_poln'] != '') {
+                        $this->Save($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
+                        $event = true;
+                    }
+
+
+        if (isset($_POST['AddRecvForm'])) {
+            $this->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);
+            $event = true;
+        }
+
+        if (isset($_POST['AddContact']) and (isset($_POST['famil']) or isset($_POST['name']))) {
+            $this->AddKontakt($_POST['golg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+            $event = true;
+        }
+
+        if($event)
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+
+    }
 
 }

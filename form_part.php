@@ -10,95 +10,13 @@ include_once("class_doc.php");
 if (!isset($_GET['kod_part']))
     exit("Не задан Код партии");
 
-$D = new Doc();
-$D->kod_dogovora = $_GET['kod_dogovora'];
+$Dogovor = new Doc();
+$Dogovor->kod_dogovora = $_GET['kod_dogovora'];
 
-$P = new Part();
-$P->kod_part = $_GET['kod_part'];
-$P->kod_dogovora = $_GET['kod_dogovora'];
-
-//---------------------------------------------------------------------------
-// Edit Партии
-if (isset($_POST['EditPart'])) {
-
-    $P->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Добавление Расчета
-if (isset($_POST['Summ']) and isset($_POST['Date']) and isset($_POST['Type'])) {
-    $P->AddRasch($_POST['Summ'], $_POST['Date'], $_POST['Type']);
-    $_POST['Summ'] = 0;
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Добавление Расчета 100% во все партии
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'AddRasch100') {
-        $P->AddRasch100();
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Удаляем Расчет
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'DelRasch' and isset($_POST['RsID'])) {
-        $P->DelRasch($_POST['RsID']);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Удаляем Партию
-if (isset($_GET['Delete'])) {
-    $P->Delete();
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-
-//---------------------------------------------------------------------------
-// Добавление Платежа в Расчет
-if (isset($_POST['RsSumm']) and isset($_POST['RsID']) and isset($_POST['SelPPID'])) {
-    $P->AddPayToRas($_POST['RsSumm'], $_POST['RsID'], $_POST['SelPPID']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Добавление Накладной
-if(isset($_POST['AddEditNacl']))
-    if (isset($_POST['numb']) and isset($_POST['naklad']) and isset($_POST['data']) and isset($_POST['kod_oper'])) {
-        $P->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
-
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    }
-
-//---------------------------------------------------------------------------
-// Отметка о Получении накладной
-if (isset($_POST['PostNacl'])) {
-    $P->kod_dogovora = $D->kod_dogovora;
-
-    $P->PostNacl($_POST['PostNacl']);
-
-    header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
-
-//---------------------------------------------------------------------------
-// Формирование Расчетов по схеме АВ-ОК
-if (isset($_POST['AVPr']) and isset($_POST['Date'])) {
-    $pr = (double)$_POST['AVPr'];
-    $pr = round($pr / 100, 2);
-    if ($pr > 0 and $pr <= 1) {
-        $P->SetPayGraph($pr, $_POST['Date']);
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-    } else
-        $Err = "Процент Аванса должен быть от 1 до 100.";
-}
-
+$Part = new Part();
+$Part->kod_part = $_GET['kod_part'];
+$Part->kod_dogovora = $_GET['kod_dogovora'];
+$Part->Events();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -122,7 +40,7 @@ include_once("header.php");
 <div class="style1" id="pagecell1">
     <!--pagecell1-->
     <?php
-        $D->formDogovor();
+        $Dogovor->formDogovor();
 
 
         $UserG = array('admin', 'oper', 'manager');
@@ -132,23 +50,22 @@ include_once("header.php");
             if (isset($_POST['Flag'])) {
 
                 if ($_POST['Flag'] == 'AddNacl')
-                    $P->formPart(1); // Партия + Форма добавления накладной
+                    $Part->formPart(1); // Партия + Форма добавления накладной
                 else {
-                    $P->formPart(0);
+                    $Part->formPart(0);
                 } // Партия
 
                 // Форма Редактирования партии
                 if ($_POST['Flag'] == 'EditPartForm')
-                    $P->formAddEdit();
+                    $Part->formAddEdit();
 
             } else
-                $P->formPart(0); // Партия
+                $Part->formPart(0); // Партия
 
             // График платежей
-            $P->formPayGraph(true);
+            $Part->formPayGraph(true);
 
             // Кнопки по расчетам
-            //echo '<br>'.Func::ActButton($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'],'Добавить Расчет','AddRS');
             echo '<br>';
             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Авто-Расчет', 'AddAVOK');
             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Авто-Расчет 100%', 'AddRasch100');
@@ -189,10 +106,10 @@ include_once("header.php");
                 }
 
             }
-            $D->formParts(1);
+            $Dogovor->formParts(1);
             echo '<br>';
         } else {
-            $P->formPayGraph(false);
+            $Part->formPayGraph(false);
             if (isset($Err)) echo $Err;
         }
         ?>
