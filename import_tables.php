@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!-- DW6 -->
 <head>
-    <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>ODBC-MySQL</title>
 </head>
@@ -26,22 +25,24 @@ include_once "classodbc.php";
     // sql to create table
     $sql = "DROP TABLE IF EXISTS `users`;
             CREATE TABLE `users` (
-              `userid` int(11) NOT NULL AUTO_INCREMENT,
+              kod_user int(11) NOT NULL AUTO_INCREMENT,
               `Name` varchar(20) NOT NULL DEFAULT '',
               `Pass` varchar(10) DEFAULT NULL,
               `FName` varchar(40) DEFAULT NULL,
               `rt` varchar(40) DEFAULT NULL,
-              PRIMARY KEY (`userid`)
+              PRIMARY KEY (`kod_user`)
             ) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=cp1251;
     ";
     $db->query($sql);
 
-    $sql = "INSERT INTO `users` VALUES (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin');
-    INSERT INTO `users` VALUES (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper');
-    INSERT INTO `users` VALUES (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper');
-    INSERT INTO `users` VALUES (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper');
-    INSERT INTO `users` VALUES (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper');
-    INSERT INTO `users` VALUES (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper');";
+    $sql = /** @lang SQL */
+        "
+            INSERT INTO `users` VALUES (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin');
+            INSERT INTO `users` VALUES (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper');
+            INSERT INTO `users` VALUES (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper');
+            INSERT INTO `users` VALUES (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper');
+            INSERT INTO `users` VALUES (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper');
+            INSERT INTO `users` VALUES (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper');";
     $db->query($sql);
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1448,13 +1449,35 @@ $db->query($sql);
 //----------------------------------------------------------------------------------------------------------------------
 //
 //drop view
-$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_dogovory_parts";
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_sklad_summ_otgruz";
 $db->query($sql);
 // sql to create view
 $sql = /** @lang SQL */
     "CREATE 
-        VIEW view_dogovory_parts AS 
+        VIEW view_sklad_summ_otgruz AS 
         SELECT
+            view_sklad_otgruzka.kod_part,
+            Sum(view_sklad_otgruzka.numb) AS summ_otgruz
+        FROM
+            view_sklad_otgruzka
+        WHERE
+            sklad.kod_oper = 1
+        GROUP BY
+	        view_sklad_otgruzka.kod_part 
+                ";
+$db->query($sql);
+//
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_rplan";
+$db->query($sql);
+// sql to create view
+$sql = /** @lang SQL */
+            "
+            CREATE 
+            VIEW view_rplan AS
+            SELECT
             dogovory.kod_dogovora,
             dogovory.nomer,
             org.kod_org,
@@ -1465,7 +1488,7 @@ $sql = /** @lang SQL */
             ROUND(parts.nds, 2) AS nds,
             ROUND(
                 IFNULL(
-                    parts.numb * price * (1 + parts.nds),
+                    parts.numb * parts.price * (1 + parts.nds),
                     0
                 ),
                 2
@@ -1478,16 +1501,27 @@ $sql = /** @lang SQL */
             dogovory.zakryt,
             dogovory.kod_ispolnit,
             elem.`name`,
-            ispolnit.nazv_krat AS ispolnit_nazv_krat
-        FROM
-            dogovory
-        INNER JOIN parts ON dogovory.kod_dogovora = parts.kod_dogovora
-        INNER JOIN org ON org.kod_org = dogovory.kod_org
-        INNER JOIN elem ON elem.kod_elem = parts.kod_elem
-        INNER JOIN org AS ispolnit ON ispolnit.kod_org = dogovory.kod_ispolnit
-        ORDER BY
-            dogovory.kod_dogovora DESC 
-        ";
+            ispolnit.nazv_krat AS ispolnit_nazv_krat,
+            IFNULL(
+                view_sklad_summ_otgruz.summ_otgruz,
+                0
+            ) AS numb_otgruz,
+            (
+                parts.numb - IFNULL(
+                    view_sklad_summ_otgruz.summ_otgruz,
+                    0
+                )
+            ) AS numb_ostat
+            FROM
+                dogovory
+            INNER JOIN parts ON dogovory.kod_dogovora = parts.kod_dogovora
+            INNER JOIN org ON org.kod_org = dogovory.kod_org
+            INNER JOIN elem ON elem.kod_elem = parts.kod_elem
+            INNER JOIN org AS ispolnit ON ispolnit.kod_org = dogovory.kod_ispolnit
+            LEFT JOIN view_sklad_summ_otgruz ON parts.kod_part = view_sklad_summ_otgruz.kod_part
+            ORDER BY
+                dogovory.kod_dogovora DESC  
+            ";
 $db->query($sql);
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1708,39 +1742,6 @@ $sql = /** @lang SQL */
         LEFT JOIN raschety_plat ON raschety_plat.kod_rascheta = raschet.kod_rascheta
         GROUP BY
             raschet.kod_rascheta 
-        ";
-$db->query($sql);
-//
-//----------------------------------------------------------------------------------------------------------------------
-//
-//drop view
-$sql =  /** @lang SQL */ "DROP VIEW IF EXISTS view_rplan";
-$db->query($sql);
-// sql to create view
-$sql = /** @lang SQL */
-    "CREATE 
-        VIEW view_rplan AS 
-        SELECT
-            view_dogovory_parts.kod_dogovora,
-            view_dogovory_parts.nomer,
-            view_dogovory_parts.kod_org,
-            view_dogovory_parts.nazv_krat,
-            view_dogovory_parts.modif,
-            view_dogovory_parts.numb,
-            view_dogovory_parts.data_postav,
-            ROUND(nds, 2) AS nds,
-            ROUND(IFNULL(part_summa, 0), 2) AS part_summa,
-            view_dogovory_parts.val,
-            view_dogovory_parts.price,
-            view_dogovory_parts.kod_elem,
-            view_dogovory_parts.obozn,
-            view_dogovory_parts.kod_part,
-            view_dogovory_parts.zakryt,
-            view_dogovory_parts.kod_ispolnit,
-            view_dogovory_parts.`name`,
-            view_dogovory_parts.ispolnit_nazv_krat
-        FROM
-            view_dogovory_parts 
         ";
 $db->query($sql);
 //
