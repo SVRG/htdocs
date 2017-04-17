@@ -1559,17 +1559,17 @@ $sql = /** @lang SQL */
     "CREATE 
         VIEW view_elem_org AS 
         SELECT
-            view_dogovory_parts.kod_org,
-            view_dogovory_parts.kod_elem,
-            view_dogovory_parts.nazv_krat,
-            Sum(view_dogovory_parts.numb) AS numb
+            view_rplan.kod_org,
+            view_rplan.kod_elem,
+            view_rplan.nazv_krat,
+            Sum(view_rplan.numb) AS numb
         FROM
             view_dogovor_summa_plat
-        INNER JOIN view_dogovory_parts ON view_dogovor_summa_plat.kod_dogovora = view_dogovory_parts.kod_dogovora
+        INNER JOIN view_rplan ON view_dogovor_summa_plat.kod_dogovora = view_rplan.kod_dogovora
         GROUP BY
-            view_dogovory_parts.kod_org,
-            view_dogovory_parts.kod_elem,
-            view_dogovory_parts.nazv_krat
+            view_rplan.kod_org,
+            view_rplan.kod_elem,
+            view_rplan.nazv_krat
         ORDER BY
             numb DESC
         ";
@@ -1610,16 +1610,16 @@ $sql = /** @lang SQL */
        "CREATE 
         VIEW view_org_nomen AS 
         SELECT
-            view_dogovory_parts.kod_org,
-            view_dogovory_parts.kod_elem,
-            Sum(view_dogovory_parts.numb) AS numb,
-            view_dogovory_parts.`name`
+            view_rplan.kod_org,
+            view_rplan.kod_elem,
+            Sum(view_rplan.numb) AS numb,
+            view_rplan.`name`
         FROM
-            view_dogovory_parts
+            view_rplan
         GROUP BY
-            view_dogovory_parts.kod_org,
-            view_dogovory_parts.kod_elem,
-            view_dogovory_parts.`name`
+            view_rplan.kod_org,
+            view_rplan.kod_elem,
+            view_rplan.`name`
         ORDER BY
         numb DESC 
         ";
