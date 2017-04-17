@@ -64,9 +64,9 @@ class Part
                 $modif = ' (' . $row['modif'] . ')'; // Модификация
 
             $numb = (int)$row['numb']; // Количество товара в партии
-            $numb_otgruz = self::getNumbOtgruz($row['kod_part']); // Количество отгруженного товара по партии
+            $numb_otgruz = $row['numb_otgruz']; // Количество отгруженного товара по партии
             $part_summa = (double)$row['part_summa'];
-            $ost = $numb - $numb_otgruz; // Осталось отгрузить
+            $ost = $row['numb_ostat']; // Осталось отгрузить
             $ostatok = ""; // Строка для вывода остатка по отгрузке
 
             // Вывод накладных о поступлении и Отгрузке с СГП---------------------------------------
@@ -96,11 +96,10 @@ class Part
             if ($ost == 0)
                 $res .= '<tr bgcolor="#ADFAC2">';// Зеленый
             else {
-
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
-                if ($ost != (int)$row['numb'] and $ost > 0)
-                    $ostatok = '(' . $ost . ')<br><img src="/img/out.gif" height="14" />' . $numb_otgruz;
+                if ($ost != $numb and $ost > 0)
+                    $ostatok = "<abbr title=\"Осталось отгрузить $ost\">( $ost )</abbr><br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" /> $numb_otgruz </abbr>";
                 else
                     $ostatok = "";
 

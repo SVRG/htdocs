@@ -204,7 +204,7 @@ class Doc
         $dogovor_summa = self::getSummaDogovora($kod_dogovora); // todo - медленные запросы, надо подумать как их ускорить.
         $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
         if ((double)$dogovor_summa > 0 and (double)$summa_plat > 0)
-            $oplacheno = (int)((double)$summa_plat / (double)$dogovor_summa * 100) . "%"; // Процент оплаты
+            $oplacheno = (int)((double)$summa_plat / (double)$dogovor_summa * 100) . "%"; // Процент оплаты по договору
 
 
         for ($i = 0; $i < $cnt; $i++) {
@@ -229,17 +229,27 @@ class Doc
             if ((int)((double)$row['nds'] * 100) != 18)
                 $nds = "<br>НДС ".(int)((double)$row['nds'] * 100)."%";
 
-            $ind_data = ""; // "bgcolor='#cc0000'"; // Индикатор окраски даты
-
-            // Цвет строки. Если договор закрыт - зеленый. Нет - без цвета
-            $ind_row = ""; // Индкатор строки
+            $ind_row = ""; // Индкатор строки Если договор закрыт - зеленый. Нет - без цвета
             if ((int)$row['zakryt'] == 1)
                 $ind_row = " bgcolor='#85e085'";
 
-            // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
-            $ostatok_str = "";
-            if($numb_ostat>0 and $numb_ostat!=$numb){
+            $ostatok_str = ""; // Остаток отгрузки
+            $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
+            if($numb_ostat>0){
+                if($numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
                     $ostatok_str = ' (' . $numb_ostat . ')';
+
+                if(func::DaysRem($row['data_postav'])<14)
+                    $ind_data = /** @lang HTML */
+                        " bgcolor='#f4df42'";
+            }
+
+
+            $ind_part = ''; // Окрашиваем ячейку Кол-во в зеленый если все отгружено
+            if($numb_ostat==0)
+            {
+                $ind_part = /** @lang HTML */
+                    " bgcolor='#85e085'";
             }
 
             // Если договор внешний то надо Код организации указать как Код исполнителя
@@ -254,24 +264,29 @@ class Doc
 
             // Формируем строку
             if ($i == 0 and $cnt > 1) { // Когда требуется объединение строк
-                $res .= "<tr $ind_row>
+                $res .= /** @lang HTML */
+                    "<tr $ind_row>
                                 <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
                                 <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
-            } elseif ($cnt == 1) { // Когда объединение строк не требуется
-                $res .= "<tr $ind_row>
+            }
+            elseif ($cnt == 1) // Когда объединение строк не требуется
+            {
+                $res .= /** @lang HTML */
+                    "<tr $ind_row>
                                     <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
                                     <td width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
-            } else {
-                $res .= "<tr $ind_row>";
-            }
+            } else
+                $res .= /** @lang HTML */
+                    "<tr $ind_row>";
 
-            $res .= "<td  width='365'><a href='form_part.php?kod_part=" . $kod_part . "&kod_dogovora=" . $kod_dogovora . "'><img src='/img/edit.gif' height='14' border='0' /></a>
-                                       <a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $mod . "</a></td>
-                      <td width='40'>" .$numb . $ostatok_str . "</td>
-                      <td width='80' " . $ind_data . ">" . $data . "</td>
+            $res .= /** @lang HTML */
+                "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
+                                       <a href='form_elem.php?kod_elem=$kod_elem'>$obozn $mod</a></td>
+                      <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
+                      <td width='80' align='center' $ind_data >$data</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
                       <td width='120' align='right'>" . Func::Rub($part_summa) . $val . $nds . "</td>
-                      <td width='90'>" . $oplacheno . "</td>
+                      <td width='90'>$oplacheno</td>
                   </tr>";
         }
 
