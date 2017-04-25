@@ -410,8 +410,6 @@ $f2_odbc="Должность";           $f2 = "dolg";                   $f2_type = "VARC
 $f3_odbc="Фамилия";             $f3 = "famil";                  $f3_type = "VARCHAR(255)";
 $f4_odbc="Имя";                 $f4 = "name";                   $f4_type = "VARCHAR(255)";
 $f5_odbc="Отчество";            $f5 = "otch";                   $f5_type = "VARCHAR(255)";
-$f6_odbc="Date_CP";             $f6 = "time_stamp";             $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
 $sql = "DROP TABLE IF EXISTS $table";
 $db->query($sql);
@@ -423,8 +421,7 @@ $sql = "CREATE TABLE $table (
     $f2 $f2_type,
     $f3 $f3_type,
     $f4 $f4_type,
-    $f5 $f5_type,
-    $f6 $f6_type
+    $f5 $f5_type
     )";
 $db->query($sql);
 
@@ -443,13 +440,12 @@ for ($i=1; $i <= $odbc->cnt; $i++)
     $field3 = $row[$f3_odbc];
     $field4 = $row[$f4_odbc];
     $field5 = $row[$f5_odbc];
-    $field6 = $row[$f6_odbc];
 
     if($field1=="") // Если не задан тип номенклатуры
         $field1=0;
 
     // Записываем строку
-    $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) VALUES($field_id,$field1,'$field2','$field3','$field4','$field5','$field6')";
+    $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5) VALUES($field_id,$field1,'$field2','$field3','$field4','$field5')";
     $db->query($sql);
 
     // Проверяем записалась ли строка
