@@ -395,7 +395,7 @@ class Elem
         if(isset($_GET['setCompl'], $_GET['kod_elem']))
         {
             $this->DeleteReplace($_GET['kod_elem']);
-            $event = true;
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_nomen.php");
         }
 
         if (isset($_POST['DelDocum'])) {
