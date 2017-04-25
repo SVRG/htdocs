@@ -642,14 +642,14 @@ class Doc
             $modif = $row['modif']; // Модификация
             $numb = $row['numb'];
             $val = (int)$row['val']; // Валюта
-            $price_nds = round($row['price'] * (1 + (double)$row['nds']), 2); // Цена с НДС
+            $nds = round((double)$row['nds'], 2);
+            $price_nds = round($row['price'] * (1 + $nds), 2); // Цена с НДС
             $part_summa = $row['part_summa']; // Сумма остатка партии
             $part_summa_ostat = $price_nds*$numb_ostat; // Сумма остатка партии
             $data_postav = $row['data_postav'];
-            $nds = round((double)$row['nds'], 2);
 
             $part_summa_ostat_str = "";
-            if($part_summa_ostat!=$part_summa)
+            if($part_summa_ostat!=$part_summa and $numb_ostat!=$numb)
             {
                 $part_summa_ostat = func::Rub($part_summa_ostat);
                 $part_summa_ostat_str = "<br><abbr title=\"Сумма неотгруженного остатка\">($part_summa_ostat)</abbr>";
@@ -659,7 +659,6 @@ class Doc
             if($numb_ostat>0 and $numb_ostat!=$numb)
                 $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
-            // Строки
             $Dt = Func::Date_from_MySQL($data_postav); // Дата поставки
 
             $Mod = '';            // Модификация
@@ -669,7 +668,8 @@ class Doc
             // НДС
             $NDS = '';
             if ($nds != 0.18)
-                $NDS = '<br>НДС ' . $nds * 100 . '%';
+                $NDS = /** @lang HTML */
+                    '<br>НДС ' . $nds * 100 . '%';
 
             // Валюта
             $Val = '';
@@ -695,8 +695,8 @@ class Doc
             // Формируем строку плана
             $row_str = "<tr bgcolor='$zebra'>
                                 <td><a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $Mod . "</a></td>
-                                <td align='right'>" . $numb . $numb_ostat_str. "</td>
-                                <td align='right'>" . $proc . "</td>
+                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $numb . $numb_ostat_str. "</a></td>
+                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $proc .  "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right'>" . Func::Date_from_MySQL($data_postav) . "</td>
