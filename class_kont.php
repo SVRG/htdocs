@@ -66,7 +66,8 @@ class Kontakt
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
                 // Добавляем должность, фамилию, имя и отчество
-                $res .= "<tr><td><a href='form_cont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
+                $res .= /** @lang HTML */
+                    "<tr><td><a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
 
                 // Если флаг - Добавить телефон
                 $res .= $this->formPhones($row['kod_kontakta'], $AddPh); // Форма добавления телефона
@@ -78,8 +79,7 @@ class Kontakt
         $res .= '</table>';
         return $res;
     }
-    //-----------------------------------------------------------------
-    // Телефоны контакта
+//-----------------------------------------------------------------
     /**
      * формирование списка телефонов контакта
      * @param int $kod_kontakta
@@ -138,10 +138,10 @@ class Kontakt
     //
     /**
      * Добавить контакт в Договор и Организацию
-     * @param $dolg
-     * @param $famil
-     * @param $name
-     * @param $otch
+     * @param string $dolg
+     * @param string $famil
+     * @param string $name
+     * @param string $otch
      * @return void
      */
     public function AddKontakt($dolg, $famil, $name, $otch)
@@ -173,7 +173,7 @@ class Kontakt
     //
     /**
      * Добавить телефон
-     * @param $phone
+     * @param string $phone
      * @return void
      */
     public function AddPhone($phone)
@@ -190,7 +190,7 @@ class Kontakt
     //
     /**
      * Загрузка данных. Проверить необходимость!
-     * @param $kod_kontakta
+     * @param int $kod_kontakta
      */
     public function Set($kod_kontakta)
     {
@@ -202,7 +202,7 @@ class Kontakt
 
         $row = $rows[0];
 
-        $this->Name = "<a href='form_cont.php?kod_kontakta=" . $row['kod_kontakta'] . " '>" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
+        $this->Name = "<a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . " '>" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
         $this->Data = $row;
 
         if (isset($row['kod_org'])) {
@@ -230,7 +230,8 @@ class Kontakt
         if ($cnt == 0) return ''; // если нет записей
 
         // Формируем компонет - список
-        $res = "<form id='form1' name='form1' method='post' action='' >
+        $res = /** @lang HTML */
+            "<form id='form1' name='form1' method='post' action='' >
                 <select name='kod_kontakta' id='kod_kontakta'>";
 
         $exc = array();
@@ -243,7 +244,8 @@ class Kontakt
             if (!in_array($row['famil'] . $row['name'] . $row['otch'], $exc)) {
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
-                $res .= '<option value="' . $row['kod_kontakta'] . '">' .
+                $res .= /** @lang HTML */
+                    '<option value="' . $row['kod_kontakta'] . '">' .
                     Func::Mstr($row['dolg']) . ' ' . Func::Mstr($row['famil']) . ' ' .
                     Func::Mstr($row['name']) . ' ' .
                     Func::Mstr($row['otch']) . ' '
@@ -251,7 +253,8 @@ class Kontakt
             }
         }
 
-        $res .= "</select>
+        $res .= /** @lang HTML */
+            "</select>
                     <select name='Status' id='Status'>
                     <option value='2' selected='selected'>По Договору</option>
                     <option value='4'>По Отгрузке</option>
@@ -259,8 +262,9 @@ class Kontakt
                     <option value='3'>По Финансированию</option>
                  </select>";
 
-        $res.= "<input type='hidden' name='formSelList' id='formSelList' />
-                <input type='submit' name='button' id='button' value='Добавить из списка' />
+        $res.= /** @lang HTML */
+                    "<input type='hidden' name='formSelList' id='formSelList' />
+                    <input type='submit' name='button' id='button' value='Добавить из списка' />
                 </form>";
 
         return $res;
@@ -269,7 +273,7 @@ class Kontakt
     //
     /**
      * Добавление контакта в договор (из Sel List)
-     * @param $kod_dogovora
+     * @param int $kod_dogovora
      */
     public function AddKontaktToDoc($kod_dogovora)
     {
@@ -281,19 +285,24 @@ class Kontakt
     // Save
     /**
      * Обновление данных контакта
-     * @param $Dolg
-     * @param $FName
-     * @param $Name
-     * @param $SName
+     * @param string $dolg
+     * @param string $famil
+     * @param string $name
+     * @param string $otch
      */
-    public function Save($Dolg, $FName, $Name, $SName)
+    public function Save($dolg, $famil, $name, $otch)
     {
         $db = new Db();
         // Не обновляется код организации
-        $db->query("UPDATE kontakty SET dolg = '$Dolg', famil = '$FName', name = '$Name', otch = '$SName' WHERE kod_kontakta =$this->kod_kontakta");
+        $db->query("UPDATE kontakty SET dolg = '$dolg', famil = '$famil', name = '$name', otch = '$otch' WHERE kod_kontakta =$this->kod_kontakta");
     }
     //------------------------------------------------------------------------
-    // Save formAddEdit
+    //
+    /**
+     * Форма - добавления и редактирования
+     * @param int $Edit
+     * @return string
+     */
     public function formAddEdit($Edit=0)
     {
 
@@ -316,35 +325,36 @@ class Kontakt
             $form_name = "formEdit";
         }
 
-        $res = '<form id="form1" name="form1" method="post" action=""><table width="290" border="1">
-          <tr>
-            <td width="78">Должность</td>
-            <td width="256">
-              <label>
-                <input name="dolg" type="text" id="dolg" size="35" value="' . $dolg . '" />
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td>Фамилия</td>
-            <td><input name="famil" type="text" id="famil" size="35" value="' . $famil . '" /></td>
-          </tr>
-          <tr>
-            <td>Имя</td>
-            <td><input name="name" type="text" id="name" size="35" value="' . $name . '" /></td>
-          </tr>
-          <tr>
-            <td>Отчество</td>
-            <td><input name="otch" type="text" id="otch" size="35" value="' . $otch . '" /></td>
-          </tr>
-        </table>
-          <p>
-            <label>
-              <input type="submit" name="Save" id="Save" value="Сохранить" />
-              <input type="hidden" name="'.$form_name.'" id="'.$form_name.'" value="'.$form_name.'" />
-            </label>
-          </p>
-        </form>';
+        $res = /** @lang HTML */
+            "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"\"><table width=\"290\" border=\"1\">
+              <tr>
+                <td width=\"78\">Должность</td>
+                <td width=\"256\">
+                  <label>
+                    <input name=\"dolg\" type=\"text\" id=\"dolg\" size=\"35\" value=\"$dolg\" />
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td>Фамилия</td>
+                <td><input name=\"famil\" type=\"text\" id=\"famil\" size=\"35\" value=\"$famil\" /></td>
+              </tr>
+              <tr>
+                <td>Имя</td>
+                <td><input name=\"name\" type=\"text\" id=\"name\" size=\"35\" value=\"$name\" /></td>
+              </tr>
+              <tr>
+                <td>Отчество</td>
+                <td><input name=\"otch\" type=\"text\" id=\"otch\" size=\"35\" value=\"$otch\" /></td>
+              </tr>
+            </table>
+              <p>
+                <label>
+                  <input type=\"submit\" name=\"Save\" id=\"Save\" value=\"Сохранить\" />
+                  <input type=\"hidden\" name=\"$form_name\" id=\"$form_name\" value=\"$form_name\" />
+                </label>
+              </p>
+            </form>";
 
         return $res;
     }
@@ -377,7 +387,8 @@ class Kontakt
         if ($cnt == 0)
             return "";
 
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res = /** @lang HTML */
+            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
                         <td width="200">Фамилия Имя Отчество</td>
                         <td width="200">Организация</td>
@@ -389,8 +400,9 @@ class Kontakt
             $row = $rows[$i];
 
 
-            $res.= '<tr>
-                            <td><a href="form_cont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
+            $res.= /** @lang HTML */
+                '<tr>
+                            <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
                 ' ' . Func::Mstr($row['name']) .
                 ' ' . Func::Mstr($row['otch']) . '</a></td>
                             <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>

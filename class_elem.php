@@ -21,6 +21,7 @@ class Elem
     {
         if($name=='' or $kod_elem==-1)
         {
+            $kod_elem = $this->kod_elem;
             $this->getData($this->kod_elem);
             $name=$this->Data['name'];
         }
@@ -30,13 +31,13 @@ class Elem
 //----------------------------------------------------------------------
 // Запрос данных
     /**
-     * @param int $ID
-     * @return mixed
+     * @param int $kod_elem
+     * @return array
      */
-    public function getData($ID = 0)
+    public function getData($kod_elem = 0)
     {
-        if ($ID != 0)
-            $this->kod_elem = $ID;
+        if ($kod_elem != 0)
+            $this->kod_elem = $kod_elem;
 
         $db = new Db();
         $rows = $db->rows("SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
@@ -51,7 +52,6 @@ class Elem
      * @param string $field
      * @param int $Link
      * @return string
-     * @internal param string $t
      */
     public function Name($field = 'name', $Link = 1) //
     {
@@ -77,8 +77,9 @@ class Elem
     }
 
 //----------------------------------------------------------------------
-// Вывод списка элементов, которые можно поставлять
+//
     /**
+     * Вывод списка элементов, которые можно поставлять
      *
      */
     public function formNomen()
@@ -158,8 +159,9 @@ class Elem
         return $res;
     }
 //------------------------------------------------------------------------
-// Документы Элемента
+//
     /**
+     * Документы Элемента
      * @param int $Del
      * @return string
      */
@@ -168,8 +170,9 @@ class Elem
         return Docum::formDocum('Elem', $this->kod_elem, $Del);
     }
 //------------------------------------------------------------------------
-// Фото Элемента
+//
     /**
+     * Фото Элемента
      * @return string
      */
     public function formPhoto()
@@ -200,10 +203,12 @@ class Elem
 //------------------------------------------------------------------------
 //
     /**
-     * @param $obozn
-     * @param $name
-     * @param $shifr
+     * Добавление элемента
+     * @param string $obozn
+     * @param string $name
+     * @param string $shifr
      * @param int $nomen
+     * @param string $shablon
      */
     public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon='')
     {
@@ -216,8 +221,9 @@ class Elem
 
     }
 //------------------------------------------------------------------------
-// Сохранить изменения
+//
     /**
+     * Сохранить изменения
      * @param string $obozn
      * @param string $name
      * @param string $shablon
@@ -280,8 +286,9 @@ class Elem
     }
 
 //-----------------------------------------------------------------------------
-// Форма внесения изменений
+//
     /**
+     * Форма добавления / внесения изменений
      * @param int $Edit
      * @return string
      */
@@ -347,9 +354,11 @@ class Elem
         return $res . Func::Cansel(0);
     }
 //------------------------------------------------------------------
-// Удаление элемента с заменой
-// Заменяем указанный элемент в партиях на код Комплектующие=1001, в модификации добавляем наименование
+//
+
     /**
+     * Удаление элемента с заменой
+     * Заменяем указанный элемент в партиях на код Комплектующие=1001, в модификации добавляем наименование
      * @param int $kod_elem - код удаляемого элемента
      * @param int $kod_dest - код элекмента на который надо заменить
      */
@@ -389,6 +398,10 @@ class Elem
 
     }
 //----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Обработка событий
+     */
     public function Events()
     {
         $event = false;

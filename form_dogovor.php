@@ -161,7 +161,7 @@ else
             <td width="50%" align="left" valign="top">
                 <?php
                 // Счета ------------------------------------
-                $Dogovor->formScheta();
+                echo $Dogovor->formScheta();
 
                 // Добавить Счет
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))

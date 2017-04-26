@@ -6,13 +6,13 @@ class Docum
 //---------------------------------------------------------------------
 //
     /**
-     * Документы договора
+     * Документы договора/елемента/организации
      * @param string $Type
-     * @param string $ID
+     * @param int $ID
      * @param int $Del - кнопка удаления
      * @return string
      */
-    public static function formDocum($Type = 'Doc', $ID = '1', $Del = 0)
+    public static function formDocum($Type = 'Doc', $ID =1, $Del = 0)
     {
 
         $sql = '';
@@ -94,9 +94,10 @@ class Docum
     }
 
 //-----------------------------------------------------------------------
-// Удаление файла
+//
     /**
-     * @param $kod_docum
+     * Удаление файла и записи (документа)
+     * @param int $kod_docum
      * @return void
      */
     public function Delete($kod_docum)
@@ -123,11 +124,12 @@ class Docum
         unlink($path);
     }
 //-----------------------------------------------------------------------
-// Добавление файла
+//
     /**
-     * @param $name
-     * @param $path
-     * @param $ID
+     * Добавление документв
+     * @param string $name
+     * @param string $path
+     * @param int $ID
      * @param string $Dest
      */
     function Add($name, $path, $ID, $Dest='Doc')
@@ -152,9 +154,10 @@ class Docum
     }
 
     //-----------------------------------------------------------------------
-// Удаление файлов по коду Элемента
+//
     /**
-     * @param $kod_elem
+     * Удаление файлов по коду Элемента
+     * @param int $kod_elem
      * @return int|void
      * @internal param $kod_docum
      */
@@ -185,7 +188,7 @@ class Docum
 
             if (!file_exists($path))
                 continue;
-            unlink("C:/xampp/htdocs/" . $row['path']);
+            unlink("C:/xampp/htdocs/" . $row['path']); // todo - нужно задавать путь!
         }
 
         $db->query("DELETE FROM docum_elem WHERE kod_elem= $kod_elem");

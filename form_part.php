@@ -106,7 +106,7 @@ include_once("header.php");
                 }
 
             }
-            $Dogovor->formParts(1);
+            echo $Dogovor->formParts(1);
             echo '<br>';
         } else {
             $Part->formPayGraph(false);

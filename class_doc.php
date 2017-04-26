@@ -14,9 +14,13 @@ class Doc
     public $kod_dogovora = '';  // код_договора
     public $nomer = '';         // номер договора
     public $kod_org = '';       // код_организации
-    public $nazv_krat = '';     // Из расшиернного запроса
+    public $nazv_krat = '';     // краткое название организации из расшиернного запроса
 
 //--------------------------------------------------------------
+    /**
+     * Doc constructor.
+     * @param int $kod_dogovora
+     */
     public function __construct($kod_dogovora=-1)
     {
         //$this->getData($kod_dogovora);
@@ -27,7 +31,7 @@ class Doc
 
     /**
      * Показать Партии по Элементу - только партии, для просмотра договора надо в него перейти
-     * @param $kod_elem
+     * @param  int $kod_elem
      * @return string
      */
     static public function formDocByElem($kod_elem)
@@ -48,7 +52,7 @@ class Doc
      * Договоры - основной формат вывода
      * Группировка строк rplan по договорам
      * На вход должен подаватья rplan отсотированный по коду договора!
-     * @param $rplan_rows
+     * @param array $rplan_rows
      * @return string
      */
     static public function formRPlan_by_Doc($rplan_rows)
@@ -139,10 +143,11 @@ class Doc
         return $res;
     }
 //--------------------------------------------------------------
-// вывод партий Договора
+//
 
     /**
-     * @param $rplan_rows
+     * Собирает буфер по одному коду договора для формирования строки
+     * @param array $rplan_rows
      * @param $i - внешний счетчик
      * @return array
      */
@@ -175,7 +180,7 @@ class Doc
     /**
      * Формирует объединенную строку Договор + Партии из строк/строки rplan отобранных по одному коду договора
      * На вход подается массив с одним кодом договора
-     * @param $rplan_rows array Строки rplan
+     * @param array $rplan_rows - Строки rplan
      * @return string
      */
     public static function getRPlan_Row($rplan_rows)
@@ -297,8 +302,8 @@ class Doc
 
     /**
      * Сумма договора
-     * @param $kod_dogovora
-     * @return float|int
+     * @param int $kod_dogovora
+     * @return float
      */
     public static function getSummaDogovora($kod_dogovora)
     {
@@ -309,14 +314,14 @@ class Doc
         if ($db->cnt > 0)
             return (double)$rows[0]['dogovor_summa'];
         else
-            return 0;
+            return 0.;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
      * Сумма платежей по договору
-     * @param $kod_dogovora
-     * @return float|int
+     * @param int $kod_dogovora
+     * @return float
      */
     public static function getSummaPlat($kod_dogovora)
     {
@@ -334,7 +339,7 @@ class Doc
 
     /**
      * Договоры по Контакту
-     * @param $kod_kontakta
+     * @param int $kod_kontakta
      * @return string
      */
     public static function formDocsByKontakt($kod_kontakta)
@@ -502,6 +507,7 @@ class Doc
 //
 
     /**
+     * Запрос данных по договору
      * @param int $kod_dogovora
      * @return array
      */
@@ -530,13 +536,15 @@ class Doc
 //
 
     /**
+     * Форма - Партии договора
      * @param int $sgp
+     * @return string
      */
     public function formParts($sgp = 0)
     {
         $p = new Part();
         $p->kod_dogovora = $this->kod_dogovora;
-        echo $p->formParts($sgp);
+        return $p->formParts($sgp);
     }
 //--------------------------------------------------------------
 //
@@ -581,18 +589,20 @@ class Doc
 //
 
     /**
-     * График поставок в тек. и след. месяцах по Изделиям. (План Реализации)
-     * @param $rplan_rows
+     * График поставок по изделиям в тек. и след. месяцах (План Реализации)
+     * todo - добавить итоговые значения по количествам к отгрузке и всего
+     * @param array $rplan_rows
      * @return string
      */
     static public function formRPlan_by_Elem($rplan_rows)
     {
         $cnt = count($rplan_rows); // Количество записей
 
-        if ($cnt == 0) return "Список договоров пуст";// "RPlan with current SQL = $sql is empty"; // Если данных нет то выходим
+        if ($cnt == 0) return "Список договоров пуст"; // Если данных нет то выходим
 
         // Формируем заголовок таблицы
-        $header = "<tr bgcolor=\"#CCCCCC\">
+        $header = /** @lang HTML */
+            "<tr bgcolor=\"#CCCCCC\">
                     <td width=\"200\">Наименование</td>
                     <td>Кол-во</td>
                     <td>Оплата</td>
@@ -659,22 +669,22 @@ class Doc
             if($numb_ostat>0 and $numb_ostat!=$numb)
                 $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
-            $Dt = Func::Date_from_MySQL($data_postav); // Дата поставки
+            $data_postav_str = Func::Date_from_MySQL($data_postav); // Дата поставки
 
-            $Mod = '';            // Модификация
+            $modif_str = '';            // Модификация
             if ($modif != '')
-                $Mod = " ($modif)";
+                $modif_str = " ($modif)";
 
             // НДС
-            $NDS = '';
+            $nds_str = '';
             if ($nds != 0.18)
-                $NDS = /** @lang HTML */
+                $nds_str = /** @lang HTML */
                     '<br>НДС ' . $nds * 100 . '%';
 
             // Валюта
-            $Val = '';
+            $val_str = '';
             if ($val != 1)
-                $Val = ' ' . $val;
+                $val_str = ' ' . $val;
 
             $proc = self::getProcPay($kod_dogovora); // todo - Сравнить производительность - Ввести в запрос rplan или отдельно много запросов
             if($proc==0)
@@ -693,21 +703,22 @@ class Doc
                 $zebra = "#FFFFFF";
 
             // Формируем строку плана
-            $row_str = "<tr bgcolor='$zebra'>
-                                <td><a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $Mod . "</a></td>
+            $row_str = /** @lang HTML */
+                "<tr bgcolor='$zebra'>
+                                <td><a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $modif_str . "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $numb . $numb_ostat_str. "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $proc .  "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right'>" . Func::Date_from_MySQL($data_postav) . "</td>
-                                <td align='right'>" . $part_summa_str . $Val . $NDS .$part_summa_ostat_str. "</td>
+                                <td align='right'>" . $part_summa_str . $val_str . $nds_str .$part_summa_ostat_str. "</td>
                          </tr>";
 
             $rowm = 0;
             $rowy = 0;
             // Разбираем дату на месяц и год
-            if ($Dt != '-') {
-                $m = explode('.', $Dt);
+            if ($data_postav_str != '-') {
+                $m = explode('.', $data_postav_str);
 
                 if(count($m)>2)
                 {
@@ -744,7 +755,8 @@ class Doc
         }
 
         // Формируем заголовок для плана на след. месяцы
-        $res .= "<tr bgcolor=\"#21ba42\">
+        $res .= /** @lang HTML */
+            "<tr bgcolor=\"#21ba42\">
                     <td>Поставка в следующих месяцах</td>
                     <td width=\"100\"></td>
                     <td></td>
@@ -766,8 +778,8 @@ class Doc
 
     /**
      * Процент оплаты = Сумма платежей / Сумма договора
-     * @param $kod_dogovora - код договора
-     * @return float|int
+     * @param int $kod_dogovora - код договора
+     * @return string
      */
     public static function getProcPay($kod_dogovora)
     {
@@ -775,13 +787,13 @@ class Doc
         $summa_plat = self::getSummaPlat($kod_dogovora);
 
         if ($summa_plat==0)
-            return 0;
+            return "0";
 
         // Сумма договора
         $dogovor_summa = self::getSummaDogovora($kod_dogovora);
 
         if ($dogovor_summa==0)
-            return 0;
+            return "0";
 
         $p = 0.;
         if ($dogovor_summa > 0)
@@ -863,7 +875,9 @@ class Doc
 //
 
     /**
-     * Показать счета по Договору - Проверить Удаление
+     * Показать счета по Договору
+     * todo - Проверить Удаление
+     * @return string
      */
     public function formScheta()
     {
@@ -874,34 +888,37 @@ class Doc
         $cnt = $db->cnt;
 
         if ($cnt == 0)
-            return;
+            return "";
 
-        echo '<br>Счета<br>';
-        echo '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-        echo '<tr bgcolor="#CCCCCC" >
-                <td width="60">Номер</td>
-                <td width="100">Сумма</td>
-                <td width="80">Дата</td>
-                <td>Примечание</td>
+        $res = /** @lang HTML */
+            '<br>Счета<br>
+                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+                <tr bgcolor="#CCCCCC" >
+                    <td width="60">Номер</td>
+                    <td width="100">Сумма</td>
+                    <td width="80">Дата</td>
+                    <td>Примечание</td>
                 </tr>';
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
-            echo '<tr>
+            $res.= '<tr>
                         <td>' . $row['nomer']             . '</td>
                         <td>' . Func::Rub($row['summa']) . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
-                        <td>' . $row['prim'] . '<br>' . Func::ActForm('', '<input type="hidden" name="InvID" id="InvID" value="' . $row['kod_scheta'] . '" />', 'Удалить Счет', 'DelInv') . '</td>
+                        <td>' . $row['prim'] . '<br>' . Func::ActForm('', /** @lang HTML */
+                    '<input type="hidden" name="kod_scheta" id="kod_scheta" value="' . $row['kod_scheta'] . '" />', 'Удалить Счет', 'DelInv') . '</td>
                     </tr>';
         }
+        $res.= '</table>';
 
-        echo '</table>';
+        return $res;
     }
 //-----------------------------------------------------------------------
 //
 
     /**
-     * Примечание договора
+     * Форма - Примечание договора
      * @param int $AddForm
      * @return string
      */
@@ -951,7 +968,8 @@ class Doc
             if($row['user']!="")
                 $user = "<br>".$row['user'];
 
-            $res.=  '<tr>
+            $res.= /** @lang HTML */
+                    '<tr>
                         <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . '</td>
                         <td>' . $row['text'] . '</td>
                      </tr>';
@@ -961,8 +979,6 @@ class Doc
         return $res;
     }
 //-----------------------------------------------------------------------
-// Удаление счета и данных связных таблиц. Переделать с каскадным удалением!
-
     /**
      * Контакты по договору. Проверить
      * @param int $AddPh - вывод формы добавления телефона
@@ -982,9 +998,6 @@ class Doc
         echo $c->formKontakts($AddPh, "Doc");
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Вывод списка договоров по заданному запросу
-// Сортировка по Элементам
-
     /**
      * Документы по Договору. Проверить
      * @param $DelButton - кнопка удаления
@@ -992,12 +1005,9 @@ class Doc
      */
     public function formDocum($DelButton)
     {
-        $d = new Docum();
-        return $d->formDocum('Doc', $this->kod_dogovora, $DelButton);
+        return Docum::formDocum('Doc', $this->kod_dogovora, $DelButton);
     }
 //-----------------------------------------------------------------------
-// История по Складу
-
     /**
      * Список Всех договоров и вложенных счетов
      * @param string $sql - запрос
@@ -1146,7 +1156,7 @@ class Doc
             $res .= '<tr><td>' . $row['nomer'] . '</td>
                           <td  align="right">' . Func::Rub($row['summa']) . '</td>
                           <td  align="center">' . $d . '</td>
-                          <td ' . $col . '>' . $prs . '%</td>
+                          <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
                           <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
                           <td>' . $row['nazv_krat'] . '</td>
                           <td>' . $row['prim'] . '</td>
@@ -1200,7 +1210,8 @@ class Doc
 
             if (($ostat) > 0)
             {
-                $res .= "<option value=$kod_plat>ПП №  $nomer  от  $data - $ostat  р.</option>";
+                $ostat_str = func::Rub($ostat)." р"; // todo - сделать универсально для всех валют
+                $res .= "<option value=$kod_plat>ПП №$nomer от $data - $ostat_str </option>";
                 $sell_list_empty = false;
             }
         }
@@ -1218,6 +1229,10 @@ class Doc
 //--------------------------------------------------------------
 //
 
+    /**
+     * Форма - История по складу
+     * @return string
+     */
     public function formSGPHistory()
     {
         $db = new Db();
@@ -1229,7 +1244,8 @@ class Doc
         if ($cnt == 0)
             return '';
 
-        $res = '<table width="100%" border="0">
+        $res = /** @lang HTML */
+            '<table width="100%" border="0">
                     <tr bgcolor="#CCCCCC">
                     <td width="40%">Наименование</td>
                     <td width="10%">Номер Договора</td>
@@ -1280,7 +1296,7 @@ class Doc
      * Добавить Договор
      * @param $nomer
      * @param $data_sost
-     * @param $kod_org - Код организации Заказчика
+     * @param int $kod_org - Код организации Заказчика
      * @param int $kod_ispolnit
      * @internal param int $VN - Внешний, Заказчик - НВС, Исполнитель - Код организации
      * @internal param $Num - номер
@@ -1293,7 +1309,7 @@ class Doc
 
         $data_sost = func::Date_to_MySQL($data_sost);
 
-            $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit)";
+        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit)";
 
         $db->query($sql);
     }
@@ -1315,7 +1331,7 @@ class Doc
             }
             elseif(isset($_POST['famil'], $_POST['name']))
             {
-                $this->AddCont($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+                $this->AddKontakt($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
                 $event = true;
             }
         }
@@ -1365,7 +1381,6 @@ class Doc
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Строка плана rplan
 
     /**
      * Добавление платежа в договор
@@ -1383,59 +1398,58 @@ class Doc
         $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim')");
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Читает подряд все строки rplan с одним кодом договора. Используется при выводе договоров
-// На вход подается rplan отсортированный по коду договора
 
     /**
      * Добавление счета в договор
-     * @param $Numb
-     * @param $Summ
-     * @param $Date
-     * @param string $Prim
+     * @param $nomer
+     * @param $summa
+     * @param $data
+     * @param string $prim
      * @internal param string $PayDate
      */
-    public function AddInvoice($Numb, $Summ, $Date, $Prim = '-')
+    public function AddInvoice($nomer, $summa, $data, $prim = '-')
     {
         $kod_dogovora = $this->kod_dogovora;
 
-        if (!isset($Prim)) $Prim = '-';
+        if (!isset($prim)) $prim = '-';
 
         $db = new Db();
-        $Date = func::Date_to_MySQL($Date);
+        $data = func::Date_to_MySQL($data);
 
-        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,'$Numb',$Summ,'$Date','$Prim')");
+        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim')");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
      * Добавление контакта в договор
-     * @param $Dolg
-     * @param $SName
-     * @param $Name
-     * @param $PName
+     * @param $dolg
+     * @param $famil
+     * @param $name
+     * @param $otch
      */
-    public function AddCont($Dolg, $SName, $Name, $PName)
+    public function AddKontakt($dolg, $famil, $name, $otch)
     {
-        $c = new Kontakt();
-        $c->kod_dogovora = $this->kod_dogovora;
-        $c->kod_org = $this->kod_org;
-        $c->AddKontakt($Dolg, $SName, $Name, $PName);
+        $kontakt = new Kontakt();
+        $kontakt->kod_dogovora = $this->kod_dogovora;
+        $kontakt->kod_org = $this->kod_org;
+        $kontakt->AddKontakt($dolg, $famil, $name, $otch);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param $Prim
+     * Добавить примечание
+     * @param $text
      * @param string $user
      */
-    public function AddPrim($Prim, $user="")
+    public function AddPrim($text, $user="")
     {
-        if (strlen($Prim) < 4) {
+        if (strlen($text) < 4) {
             echo "Err: Слишком короткое примечание. Должно быть не менее 4-х символов.";
             return;
         }
 
-        $P = nl2br($Prim); // Вставлем <br> вместо перевода строки
+        $P = nl2br($text); // Вставлем <br> вместо перевода строки
 
         $db = new Db();
         $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user) VALUES($this->kod_dogovora,'$P','$user')");
@@ -1444,22 +1458,40 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Сохранить Изменения Договора
-     * @param $Numb - номер
-     * @param $Date - дата
-     * @param $kod_org - код заказчика
-     * @param $IspID - код исполнителя
+     * Удаление примечания
+     * @param int $kod_prim
+     * @internal param $kod_scheta
      */
-    public function Edit($Numb, $Date, $kod_org, $IspID)
+    public function DelPrim($kod_prim)
     {
-        $DateR = func::Date_to_MySQL($Date);
         $db = new Db();
-        $db->query("UPDATE dogovory SET nomer = '$Numb', data_sost='$DateR', kod_org=$kod_org, kod_ispolnit=$IspID WHERE kod_dogovora=$this->kod_dogovora");
+
+        if (isset($kod_prim)) {
+            $db->query("DELETE FROM dogovor_prim WHERE kod_prim=$kod_prim");
+
+        } else
+            echo "Ошибка: Не задан ID примечания";
     }
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param $kod_scheta
+     * Сохранить Изменения Договора
+     * @param $nomer - номер
+     * @param $data_sost - дата
+     * @param int $kod_org - код заказчика
+     * @param $kod_ispolnit - код исполнителя
+     */
+    public function Edit($nomer, $data_sost, $kod_org, $kod_ispolnit=683)
+    {
+        $DateR = func::Date_to_MySQL($data_sost);
+        $db = new Db();
+        $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$DateR', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit WHERE kod_dogovora=$this->kod_dogovora");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление счета
+     * @param int $kod_scheta
      */
     public function DelInvoice($kod_scheta)
     {
@@ -1487,7 +1519,7 @@ class Doc
 
 //----------------------------------------------------------------------------------------------------------------------
     /**
-     * Форма вставки счета
+     * Форма вставки подчиненного счета
      * @return string
      */
     public function formAddInvoice()
@@ -1535,6 +1567,7 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Форма - добавление платежного поручения
      * @return string
      */
     public function formAddPP()
