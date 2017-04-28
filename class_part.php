@@ -99,7 +99,7 @@ class Part
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
                 if ($ost != $numb and $ost > 0)
-                    $ostatok = "<abbr title=\"Осталось отгрузить $ost\">( $ost )</abbr><br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" /> $numb_otgruz </abbr>";
+                    $ostatok = " (<abbr title=\"Осталось отгрузить $ost\">$ost</abbr>)<br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" />$numb_otgruz</abbr>";
                 else
                     $ostatok = "";
 
@@ -147,8 +147,8 @@ class Part
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
                                   <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . $sn . '</a>'.$btn.'</td>
-                      <td width="40">' . (int)$row['numb'] . $ostatok . '</td>
-                      <td width="80" ' . $ind . '>' . $data_postav . '</td>
+                      <td width="70" align="right">' . (int)$row['numb'] . $ostatok . '</td>
+                      <td width="80" align="center" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
                       <td width="120" >' . Func::Rub($price) . $Val . '</td>
                       <td width="120" >' . Func::Rub($price * (1 + (double)$row['nds'])) . $Val .  '</td>
@@ -409,9 +409,21 @@ class Part
      */
     public function AddPayToRas($summa, $kod_rascheta, $kod_plat)
     {
-        $db = new Db();
         $summa = str_replace(' ', '', $summa);
         $summa = doubleval($summa);
+
+        $db = new Db();
+
+        $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat =$kod_plat");
+        if($db->cnt==1)
+        {
+            $row = $rows[0];
+            $ostat = ((double)$row['summa']-(double)$row['summa_raspred']);
+            if($summa > $ostat)
+            {
+                $summa = $ostat;
+            }
+        }
 
         $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat) VALUES($summa,$kod_rascheta,$kod_plat)");
     }
@@ -663,13 +675,13 @@ class Part
 //
     /**
      * Сумма платежей по расчету
-     * @param $kod_rasch
+     * @param $kod_rascheta
      * @return float
      */
-    public static function SummPlatByRasch($kod_rasch)
+    public static function SummPlatByRasch($kod_rascheta)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschety_plat WHERE kod_rascheta=$kod_rasch");
+        $rows = $db->rows("SELECT * FROM raschety_plat WHERE kod_rascheta=$kod_rascheta");
 
         $cnt = $db->cnt;
         if($cnt==0)
@@ -677,7 +689,7 @@ class Part
 
         $res = 0.;
 
-        for ($i = 1; $i < $cnt; $i++) {
+        for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
             // Данные
