@@ -14,6 +14,7 @@ class Db
 
     public $res; // Data
     public $last_id = 0; // Last inserted ID
+    public $last_query = "empty";
 
     public $cnt = 0; // Количество записей
 
@@ -59,6 +60,7 @@ class Db
 
         // Query the database
         $result = $connection->query($query);
+        $this->last_query = $query;
 
         // Обновляем последний добавленный номер
         $this->last_id = $connection->insert_id;
