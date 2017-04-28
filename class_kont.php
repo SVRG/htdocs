@@ -9,10 +9,17 @@ class Kontakt
     public $Data;
     public $Name;
     public $OrgName;
-    public $KontArray; // Массив контактов по Договору
+    public $KontArray;// Массив контактов по Договору
+
+    /**
+     * Kontakt constructor.
+     */
+    public function __construct()
+    {
+        
+    }
 
     //------------------------------------------------------------------------
-    // Контакты Договора
     /**
      * Формирует массив контактов договора или организации
      * @param string $Doc_Org -
