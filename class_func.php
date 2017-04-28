@@ -13,7 +13,7 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Сколько дней осталось до указанной даты
-     * @param $Date
+     * @param string $Date
      * @return int
      */
     public static function DaysRem($Date)
@@ -37,6 +37,12 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Формат денег
+     * @param double $R
+     * @return string
+     */
     public static function Rub($R)
     {
         $R = round((double)$R, 2);
@@ -44,8 +50,9 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Преобразуем дату в формат yyyymmdd для MySQL
+//
     /**
+     * Преобразуем дату в формат yyyymmdd для MySQL
      * @param string $Date
      * @return string
      */
@@ -62,8 +69,9 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Дата в формате MySQL yy-mm-dd в формат dd.mm.yyyy
+//
     /**
+     * Преобразует дату из MySQL yy-mm-dd в формат dd.mm.yyyy
      * @param string $MySQL_Date
      * @return string
      */
@@ -112,6 +120,12 @@ class Func
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
+    /**
+     * Если строка пустая то возвращает тире
+     * @param $Str
+     * @param string $Delim
+     * @return string
+     */
     public static function Mstr($Str, $Delim = '-')
     {
         if (isset($Str)) {
@@ -123,7 +137,14 @@ class Func
         return $Delim;
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Создает Форму с одной кнопкой
+//
+    /**
+     * Создает Форму с одной кнопкой
+     * @param string $Act
+     * @param string $ButtValue
+     * @param string $FlagVal
+     * @return string
+     */
     public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
         $res = "<form id='FID' name='FNAME' method='POST' action='$Act '>
@@ -134,7 +155,15 @@ class Func
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Построение Формы
+//
+    /**
+     * Построение Формы
+     * @param string $Act
+     * @param string $Body
+     * @param string $ButtValue
+     * @param string $FlagVal
+     * @return string
+     */
     public static function ActForm($Act = '', $Body = '', $ButtValue = 'OK', $FlagVal = 'OK')
     {
         $res = "<form id='FID' name='FNAME' method='POST' action=' $Act '>
@@ -146,19 +175,34 @@ class Func
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Текущее число
+//
+    /**
+     * Текущее число
+     * @param string $Delim
+     * @return string
+     */
     public static function NowE($Delim = '.')
     {
         return date('d') . $Delim . date('m') . $Delim . date('Y');
     }
 //----------------------------------------------------------------------------------------------------------------------
-// Текущее число
+//
+    /**
+     * Текущее число для названия файла
+     * @param string $Delim
+     * @return string
+     */
     public static function NowDoc($Delim = '_')
     {
         return date('Y') . $Delim . date('m') . $Delim . date('d');
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
+    /**
+     * Кнопка - отменв
+     * @param int $Echo
+     * @return string
+     */
     public static function Cansel($Echo = 1)
     {
         $res = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
@@ -172,7 +216,13 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Ссылка
+//
+    /**
+     * Ссылка
+     * @param string $Link
+     * @param string $Text
+     * @return string
+     */
     static public function Link($Link = '', $Text = '')
     {
         if ($Link == '') return '';
