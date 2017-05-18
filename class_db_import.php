@@ -7,7 +7,7 @@
  * @license MIT License
  * @see http://www.binpress.com/tutorial/using-php-with-mysql-the-right-way/17
  */
-class Db
+class Db_import
 {
     // The database connection
     protected static $connection;
