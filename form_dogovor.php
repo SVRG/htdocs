@@ -7,17 +7,15 @@ $MM_donotCheckaccess = "true";
 
 $UserG = array('admin', 'oper');
 $UserG1 = array('admin', 'oper', 'manager');
-$Edit = false;
-$ADMIN = array('admin');
 
 include_once "security.php";
 
 include_once("class_doc.php");
 
-if(!isset($_GET['kod_dogovora']) and !isset($_POST['kod_dogovora']))
+if (!isset($_GET['kod_dogovora']) and !isset($_POST['kod_dogovora']))
     exit("Не задан Договор");
 $Dogovor = new Doc();
-if(isset($_GET['kod_dogovora']))
+if (isset($_GET['kod_dogovora']))
     $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
 else
     $Dogovor->kod_dogovora = $_POST['kod_dogovora'];
@@ -26,7 +24,7 @@ $Dogovor->Events();
 
 $Part = new Part();
 $Part->kod_dogovora = $Dogovor->kod_dogovora;
-if(isset($_POST['kod_part'])) // Если был передан код партии
+if (isset($_POST['kod_part'])) // Если был передан код партии
     $Part->kod_part = $_POST['kod_part'];
 $Part->Events();
 
@@ -73,23 +71,31 @@ else
 
                 <?php
 
-                if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    $Dogovor->formDogovor(0, 1);
-                else
-                    $Dogovor->formDogovor();
+                $edit = false;
+                if (isset($_POST['Flag']))
+                    if ($_POST['Flag'] == 'DocEditForm') {
+                        echo $Dogovor->formAddEdit(1);
+                        echo func::Cansel();
+                        $edit = true;
+                    }
+
+                if(!$edit)
+                {
+                    if (in_array($_SESSION['MM_UserGroup'], $UserG))
+                    {
+                        $Dogovor->formDogovor(0, 1);
+                        echo Func::ActButton('', 'Редактировать Договор', 'DocEditForm');
+                    }
+                    else
+                        $Dogovor->formDogovor();
+                }
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'DocClose') {
                         echo Func::ActButton('', 'Подтвердить Закрытие', 'DocCloseConf');
-                        Func::Cansel();
+                        echo Func::Cansel();
                     }
 
-
-                if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'DocEditForm')
-                        echo $Dogovor->formAddEdit(1);
-
-                echo Func::ActButton('', 'Редактировать Договор', 'DocEditForm');
 
                 echo $Dogovor->formDocum($Del); // Документы договора
 
@@ -102,19 +108,27 @@ else
                 // Добавление Контакта
                 if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
 
-                    // Вывод контактов
-                    $Dogovor->formDocKontakts(1);
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddKontakt');
-
+                    $add_kont = false;
                     // Добаление Контакта в Договор
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddKontakt') {
                             echo $Kontakt->formAddEdit();
+                            echo func::Cansel();
                             $_POST['Flag'] = null;
+                            $add_kont = true;
                         }
-                } elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+
+                        if(!$add_kont)
+                        {
+                            // Вывод контактов
+                            $Dogovor->formDocKontakts(1);
+                            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Контакт', 'AddKontakt');
+                        }
+                }
+                elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                     $Dogovor->formDocKontakts(1);
-                } else $Dogovor->formDocKontakts(0);
+                } else
+                    $Dogovor->formDocKontakts(0);
 
                 ?></td>
         </tr>
@@ -136,7 +150,7 @@ else
                             $Part->formPart(1); // Партия + Форма добавления накладной
                     }
 
-                    echo $Part->formParts(1,"",0);
+                    echo $Part->formParts(1, "", 0);
 
                     ?></p>
             </td>
@@ -205,7 +219,10 @@ else
     var sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
     var sprytextfield4 = new Spry.Widget.ValidationTextField("SSummR", "currency");
-    var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {format: "dd.mm.yyyy",isRequired: false});
+    var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {
+        format: "dd.mm.yyyy",
+        isRequired: false
+    });
     var sprytextfield6 = new Spry.Widget.ValidationTextField("STextNR", "none", {isRequired: true});
     var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
     var sprytextfield7 = new Spry.Widget.ValidationTextField("sprytextfield7");

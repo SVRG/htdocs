@@ -16,7 +16,7 @@ class Kontakt
      */
     public function __construct()
     {
-        
+
     }
 
     //------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class Kontakt
     //------------------------------------------------------------------------
     /**
      * Форма со списком контактов по Договору или Организации
-     * @param int $AddPh
+     * @param int $AddPh - 0 не добавлять телефон
      * @param string $Doc_Org - поиск по Организации или Договору
      * @return string
      */
@@ -59,7 +59,10 @@ class Kontakt
         }
 
         if($cnt==0)
+        {
+            // todo: Информировать, что контакт не выбран
             return $this->formSelList();
+        }
 
         $exc = array();
 
@@ -271,7 +274,7 @@ class Kontakt
 
         $res.= /** @lang HTML */
                     "<input type='hidden' name='formSelList' id='formSelList' />
-                    <input type='submit' name='button' id='button' value='Добавить из списка' />
+                    <br><input type='submit' name='button' id='button' value='Добавить из списка' />
                 </form>";
 
         return $res;
@@ -333,7 +336,8 @@ class Kontakt
         }
 
         $res = /** @lang HTML */
-            "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"\"><table width=\"290\" border=\"1\">
+            "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"\">
+             <table width=\"290\" border=\"0\">
               <tr>
                 <td width=\"78\">Должность</td>
                 <td width=\"256\">
@@ -355,39 +359,41 @@ class Kontakt
                 <td><input name=\"otch\" type=\"text\" id=\"otch\" size=\"35\" value=\"$otch\" /></td>
               </tr>
             </table>
-              <p>
                 <label>
                   <input type=\"submit\" name=\"Save\" id=\"Save\" value=\"Сохранить\" />
                   <input type=\"hidden\" name=\"$form_name\" id=\"$form_name\" value=\"$form_name\" />
                 </label>
-              </p>
             </form>";
 
         return $res;
     }
 
 //------------------------------------------------------------------------
+
     /**
      * Список всех Контактов с телефонами / организацией
+     * @param string $query - Запрос на выборку строк из БД с контатами, должен содержать (kod_kontakta,kod_org,dolg,famil,name,otch,nazv_krat)
      * @return string
      */
-    public function formAllKontats()
+    public function formAllKontats($query="")
     {
         $db = new Db();
+        if($query=="")
+            $query =           "SELECT
+                                    kontakty.kod_kontakta,
+                                    kontakty.kod_org,
+                                    kontakty.dolg,
+                                    kontakty.famil,
+                                    kontakty.`name`,
+                                    kontakty.otch,
+                                    org.nazv_krat
+                                FROM
+                                    kontakty
+                                INNER JOIN org ON kontakty.kod_org = org.kod_org
+                                ORDER BY
+                                    kontakty.famil ASC";
 
-        $rows = $db->rows("SELECT
-                                kontakty.kod_kontakta,
-                                kontakty.kod_org,
-                                kontakty.dolg,
-                                kontakty.famil,
-                                kontakty.`name`,
-                                kontakty.otch,
-                                org.nazv_krat
-                            FROM
-                                kontakty
-                            INNER JOIN org ON kontakty.kod_org = org.kod_org
-                            ORDER BY
-                                kontakty.famil ASC");
+        $rows = $db->rows($query);
 
         $cnt = $db->cnt;
 

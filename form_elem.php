@@ -78,7 +78,9 @@ $E->Events();
                             <?php
                             echo ' <div id="CollapsiblePanel2" class="CollapsiblePanel">
                                         <div class="CollapsiblePanelTab" tabindex="0">Потребители</div>
-                                        <div class="CollapsiblePanelContent">' . $E->formOrgByElem() . '</div>
+                                        <div class="CollapsiblePanelContent">
+                                            <a href="form_kontlist.php?kod_elem='.$E->kod_elem.'">Контакты</a>' . $E->formOrgByElem() . '
+                                        </div>
                                   </div>';
                             ?>
                         </td>

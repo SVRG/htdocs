@@ -9,7 +9,7 @@
 
 <?php
 include_once "class_db_import.php";
-include_once "classodbc.php";
+include_once "class_odbc.php";
 /**
  * Created by PhpStorm.
  * User: svrg
@@ -18,7 +18,7 @@ include_once "classodbc.php";
  * Важно! - При вставке проверять поля INT! Если они пустые то строка не вставится
  */
 
-$db = new Db();
+$db = new Db_import();
 $odbc = new ODBC();
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 

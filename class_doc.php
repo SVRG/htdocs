@@ -374,8 +374,9 @@ class Doc
 
         if ($Edit == 1) {
             echo $this->formAddEdit(1);
-        } else {
-
+        }
+        else
+        {
             $this->getData();
             $row = $this->Data;
             $clr = '';
@@ -403,7 +404,7 @@ class Doc
                             </tr>';
             }
 
-            echo // Проверить правильность. Округление! Валюта - пока только руб.
+            echo // todo - Проверить правильность. Округление! Валюта - пока только руб.
                 '<table width="600" border="0">
                         <th width="202" scope="row">Номер</th>
                         <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></td>
@@ -450,15 +451,24 @@ class Doc
         $nomer = "";
         $data_sost = Func::NowE();
         $kod_org = $this->kod_org;
-        $kod_ispolnit = 683;
         $FormName = "formAdd";
+
+        $posav_checked = "checked";
+        $zakup_checked = "";
 
         if($Edit==1)
         {
             $nomer = $this->Data['nomer'];
             $data_sost = Func::Date_from_MySQL($this->Data['data_sost']);
             $kod_org = $this->Data['kod_org'];
-            $kod_ispolnit = $this->Data['kod_ispolnit'];
+
+            if($kod_org==683)
+            {
+                $zakup_checked = "checked";
+                $posav_checked = "";
+                $kod_org = $this->Data['kod_ispolnit'];
+            }
+
             $FormName = "formEdit";
         }
 
@@ -474,7 +484,7 @@ class Doc
                         <th width="202" scope="row">Номер</th>
                         <td width="374"><span id="SNumR">
                                   <input type="text" name="nomer" id="nomer" value="' . $nomer . '"/>
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
+                                  <span class="textfieldRequiredMsg">Нужно ввести значение.</span><span class="textfieldMinCharsMsg">Minimum
                                   number of characters not met.</span></span>
                          </td>
                       </tr>
@@ -482,25 +492,26 @@ class Doc
                         <th scope="row">Дата Составления </th>
                         <td><span id="SDateR">
                                   <input type="text" name="data_sost" id="data_sost" value="' . $data_sost . '" />
-                             <span class="textfieldRequiredMsg">A value is required.</span>
+                             <span class="textfieldRequiredMsg">Нужно ввести значение.</span>
                              <span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span>
                              </span>
                         </td>
                       </tr>
                       <tr>
-                        <th scope="row">Заказчик</th>
+                        <th scope="row">Контрагент</th>
                         <td>' . Org::formSelList($kod_org, '', 'kod_org') . '</td>
                       </tr>
                       <tr>
-                        <th scope="row">Поставщик</th>
-                        <td>' . Org::formSelList($kod_ispolnit, '', 'kod_ispolnit') . '</td>
+                        <th scope="row">Тип Догвора</th>
+                            <td>     
+                                    <p><input name="doc_type" id="doc_type" type="radio" value="postav" '.$posav_checked.'>Поставка</p>
+                                    <p><input name="doc_type" id="doc_type" type="radio" value="zakup" '.$zakup_checked.'>Закупка</p>
+                            </td>
                       </tr>
                     </table>
-        
                     <input id="'.$FormName.'" type="hidden" value="'.$FormName.'" name="'.$FormName.'"/>
                     <input type="submit" value="Сохранить" />
                 </form>';
-
         return $res;
     }
 //--------------------------------------------------------------------
@@ -981,7 +992,7 @@ class Doc
 //-----------------------------------------------------------------------
     /**
      * Контакты по договору. Проверить
-     * @param int $AddPh - вывод формы добавления телефона
+     * @param int $AddPh - вывод формы добавления телефона 0-не выводить, 1-выводить
      */
     public function formDocKontakts($AddPh = 0)
     {
@@ -1324,9 +1335,18 @@ class Doc
         $event = false;
 
         if (isset($_POST['formAdd'])) {
-            if(isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']))
+            if(isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['doc_type']))
             {
-                $this->Add($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']);
+                $kod_ispolnit = 683; // НВС - Поставщик
+                $kod_org = $_POST['kod_org']; // Заказчик
+
+                if($_POST['doc_type']=="zakup")
+                {
+                    $kod_ispolnit = $_POST['kod_org']; // Поставщик
+                    $kod_org = 683; // НВС - Заказчик
+                }
+
+                $this->Add($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
                 $event = true;
             }
             elseif(isset($_POST['famil'], $_POST['name']))
@@ -1355,8 +1375,18 @@ class Doc
             }
 
         if (isset($_POST['formEdit']))
-            if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit'])) {
-                $this->Edit($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['kod_ispolnit']);
+            if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['doc_type'])) {
+
+                $kod_ispolnit = 683; // НВС - Поставщик
+                $kod_org = $_POST['kod_org']; // Заказчик
+
+                if($_POST['doc_type']=="zakup")
+                {
+                    $kod_ispolnit = $_POST['kod_org']; // Поставщик
+                    $kod_org = 683; // НВС - Заказчик
+                }
+
+                $this->Edit($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
                 $event = true;
             }
 
@@ -1432,7 +1462,16 @@ class Doc
     {
         $kontakt = new Kontakt();
         $kontakt->kod_dogovora = $this->kod_dogovora;
-        $kontakt->kod_org = $this->kod_org;
+
+        $kod_org = $this->kod_org;
+
+        if($kod_org == 683)
+        {
+            $this->getData();
+            $kod_org = $this->Data['kod_ispolnit'];
+        }
+
+        $kontakt->kod_org = $kod_org;
         $kontakt->AddKontakt($dolg, $famil, $name, $otch);
     }
 //----------------------------------------------------------------------------------------------------------------------
