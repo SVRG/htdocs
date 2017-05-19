@@ -212,8 +212,19 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 .idea/inspectionProfiles/
+.idea/*
 docs/
 
 menu/Thumbs.db
 
 *.db
+
+.idea/workspace.xml
+
+.htaccess
+
+.htpasswd
+
+.idea/workspace.xml
+
+.idea/workspace.xml

@@ -70,7 +70,7 @@ $E->Events();
                             <div id="CollapsiblePanel1" class="CollapsiblePanel">
                                 <div class="CollapsiblePanelTab">Прикрепленные Файлы</div>
                                 <div class="CollapsiblePanelContent">
-                                    <?php echo '<br>' . $E->formDocum($Del);?>
+                                    <?php echo $E->formDocum($Del);?>
                                 </div>
                             </div>
                         </td>
