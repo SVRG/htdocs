@@ -2,6 +2,9 @@
 $MM_authorizedUsers = "";
 $MM_donotCheckaccess = "true";
 
+$UserG = array('admin', 'oper', 'manager');
+$UserG1 = array('admin', 'oper');
+
 include_once "security.php";
 
 include_once("class_part.php");
@@ -42,9 +45,6 @@ include_once("header.php");
     <?php
         $Dogovor->formDogovor();
 
-
-        $UserG = array('admin', 'oper', 'manager');
-
         if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
 
             if (isset($_POST['Flag'])) {
@@ -55,9 +55,11 @@ include_once("header.php");
                     $Part->formPart(0);
                 } // Партия
 
-                // Форма Редактирования партии
-                if ($_POST['Flag'] == 'EditPartForm')
-                    $Part->formAddEdit();
+                if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
+                    // Форма Редактирования партии
+                    if ($_POST['Flag'] == 'EditPartForm')
+                        $Part->formAddEdit();
+                }
 
             } else
                 $Part->formPart(0); // Партия
