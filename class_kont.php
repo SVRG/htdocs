@@ -148,10 +148,10 @@ class Kontakt
     //
     /**
      * Добавить контакт в Договор и Организацию
-     * @param string $dolg
-     * @param string $famil
-     * @param string $name
-     * @param string $otch
+     * @param string $dolg - Должность
+     * @param string $famil - Фамилия
+     * @param string $name - Имя
+     * @param string $otch - Отчество
      * @return void
      */
     public function AddKontakt($dolg, $famil, $name, $otch)
@@ -418,9 +418,9 @@ class Kontakt
                             <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
                 ' ' . Func::Mstr($row['name']) .
                 ' ' . Func::Mstr($row['otch']) . '</a></td>
+                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
                             <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                             <td>' . Func::Mstr($row['dolg']) . '</td>
-                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
                  </tr>';
         }
 

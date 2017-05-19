@@ -148,10 +148,9 @@ class Func
     public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
         $res = "<form id='FID' name='FNAME' method='POST' action='$Act '>
-                    <input type='submit' name='Button' id='ID' value='$ButtValue' />
                     <input type='hidden' name='Flag' id='$FlagVal' value='$FlagVal' />
+                    <input type='submit' name='Button' id='ID' value='$ButtValue' />
                 </form>";
-
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
