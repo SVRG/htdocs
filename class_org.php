@@ -513,7 +513,18 @@ class Org
     {
         $db = new Db();
         $rows = $db->rows(/** @lang SQL */
-            "SELECT * FROM view_org_nomen WHERE kod_org = $this->kod_org");
+                "SELECT view_rplan.kod_elem, 
+                            view_rplan.name, 
+                            sum(view_rplan.numb) AS summ_numb, 
+                            view_rplan.kod_org, 
+                            view_dogovor_summa_plat.summa_plat
+                        FROM view_rplan INNER JOIN view_dogovor_summa_plat ON view_rplan.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
+                        WHERE view_rplan.kod_org=$this->kod_org
+                        AND
+                        view_dogovor_summa_plat.summa_plat>0
+                        GROUP BY view_rplan.kod_elem
+                        ORDER BY summ_numb DESC
+                      ");
 
         if ($db->cnt == 0)
             return "";
@@ -528,7 +539,7 @@ class Org
 
             $res .= '<tr>
                         <td width="100%">' . $form_link . ' </td>
-                        <td align="right">' . (int)$row['numb'] . '</td>
+                        <td align="right">' . (int)$row['summ_numb'] . '</td>
                       </tr>';
 
         }
