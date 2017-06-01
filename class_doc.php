@@ -817,8 +817,10 @@ class Doc
 
     /**
      * Форма - Платежи по договору
+     * @param int $Del - 1 Кнопка удаления
+     * @return string
      */
-    public function formPP()
+    public function formPlat($Del=0)
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora");
@@ -838,10 +840,18 @@ class Doc
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
+            $kod_plat = $row['kod_plat'];
+
+            $del = "";
+            if($Del==1)
+            {
+                $del = func::ActForm("", /** @lang HTML */
+                    "<input type='hidden' id='kod_plat' name='kod_plat' value='$kod_plat'> </input>","Удалить","DelPlat");
+            }
 
             $res.= '<tr>
                         <td>' . Func::Rub($row['summa']) . '</td>
-                        <td>' . $row['nomer'] . '</td>
+                        <td>' . $row['nomer'] . $del . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
                     </tr>';
@@ -933,7 +943,7 @@ class Doc
      * @param int $AddForm
      * @return string
      */
-    public function formPrim($AddForm=0)
+    public function formPrim($AddForm=0, $Del=0)
     {
         $db = new Db();
 
@@ -979,9 +989,18 @@ class Doc
             if($row['user']!="")
                 $user = "<br>".$row['user'];
 
+            $kod_prim = $row['kod_prim'];
+
+            $del = "";
+            if($Del==1)
+            {
+                $del = func::ActForm("", /** @lang HTML */
+                    "<input type='hidden' id='kod_prim' name='kod_prim' value='$kod_prim'> </input>","Удалить","DelPrim");
+            }
+
             $res.= /** @lang HTML */
                     '<tr>
-                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . '</td>
+                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $del . '</td>
                         <td>' . $row['text'] . '</td>
                      </tr>';
         }
@@ -1405,6 +1424,16 @@ class Doc
 
                 $event = true;
             }
+            elseif($_POST['Flag'] == 'DelPlat') {
+                $this->DelPlat($_POST['kod_plat']);
+
+                $event = true;
+            }
+            elseif($_POST['Flag'] == 'DelPrim') {
+                $this->DelPrim($_POST['kod_prim']);
+
+                $event = true;
+            }
         }
             if($event)
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
@@ -1497,7 +1526,27 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Удаление платежа
+     * @param $kod_plat
+     * @internal param int $kod_prim
+     * @internal param $kod_scheta
+     */
+    public function DelPlat($kod_plat)
+    {
+        $db = new Db();
+
+        if (isset($kod_plat)) {
+            $db->query("DELETE FROM plat WHERE kod_plat=$kod_plat");
+
+            $db->query("DELETE FROM raschety_plat WHERE kod_plat=$kod_plat");
+
+        } else
+            echo "Ошибка: Не задан ID платежа";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
      * Удаление примечания
+     * todo - добавить в форму
      * @param int $kod_prim
      * @internal param $kod_scheta
      */
