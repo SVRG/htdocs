@@ -43,34 +43,50 @@ $org_links = 0;
 $docum_elem = 0;
 $docum_org = 0;
 $view = 0;
-//
+
+//----------------------------------------------------------------------------------------------------------------------
 if ($users == 1) {
     // sql to create table
     $sql = /** @lang SQL */
         "DROP TABLE IF EXISTS `users`;
             CREATE TABLE `users` (
               kod_user INT(11) NOT NULL AUTO_INCREMENT,
-              `Name` VARCHAR(20) NOT NULL DEFAULT '',
-              `Pass` VARCHAR(10) DEFAULT NULL,
-              `FName` VARCHAR(40) DEFAULT NULL,
+              `login` VARCHAR(20) NOT NULL DEFAULT '',
+              `password` VARCHAR(80) DEFAULT NULL,
+              `famil` VARCHAR(40) DEFAULT NULL,
               `rt` VARCHAR(40) DEFAULT NULL,
+              `salt` VARCHAR(40) DEFAULT NULL,
               PRIMARY KEY (`kod_user`)
-            ) ENGINE=MyISAM AUTO_INCREMENT=53
+            ) ENGINE=MyISAM AUTO_INCREMENT=53;
     ";
     //$db->query($sql);
 
     $sql = /** @lang SQL */
-        "
-            INSERT INTO `users` VALUES (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin'),
-                                       (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper'),
-                                        (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper'),
-                                        (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper'),
-                                        (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper'),
-                                        (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper');";
+        "INSERT INTO `users` VALUES     (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin',''),
+                                        (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper',''),
+                                        (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper',''),
+                                        (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper',''),
+                                        (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper',''),
+                                        (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper','');";
     $db->query($sql);
 }
 //----------------------------------------------------------------------------------------------------------------------
+
+    $sql = /** @lang SQL */
+        "DROP TABLE IF EXISTS `sessions`;
+         create table sessions (
+                            kod_ses int auto_increment
+                                primary key,
+                            login varchar(20) null,
+                            time_stamp timestamp null,
+                            ip varchar(20) null)";
+    $db->query($sql);
+//----------------------------------------------------------------------------------------------------------------------
 if ($adresa == 1) {
+    $table = "adresa";
+    $table_odbc = "Адреса";
+    $id = "kod_adresa";
+
     // sql drop table
     $sql = /** @lang SQL */
         "DROP TABLE IF EXISTS adresa";
@@ -88,7 +104,7 @@ if ($adresa == 1) {
     $db->query($sql);
 
     // Запросить данные из ODBC
-    $odbc->sql = "SELECT * FROM Адреса";
+    $odbc->sql = "SELECT * FROM $table_odbc";
     $odbc->ex();
 
     // Вставить данные в MySQL
@@ -99,10 +115,16 @@ if ($adresa == 1) {
         $adres = $row['Адрес'];
         $kod_org = $row['Код_Организации'];
         $type = $row['ТипАдреса'];
+        $field_id = $kod_adresa;
 
         $sql = "INSERT INTO adresa (kod_adresa,adres,kod_org,type) VALUES($kod_adresa,'$adres',$kod_org,$type)";
         $db->query($sql);
-        //echo $sql.'<br>';
+
+        // Проверяем записалась ли строка
+        $db->query("SELECT * FROM $table WHERE $id=$field_id");
+        if ($db->cnt != 1)
+            echo "!!!!!!!!! Err: " . $sql;
+
     }
 
     $sql = "ALTER TABLE adresa MODIFY kod_adresa INT AUTO_INCREMENT PRIMARY KEY";
@@ -1932,35 +1954,6 @@ if ($view == 1) {
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_kontakty_dogovora");
-    if($db->cnt==0)
-        echo $db->last_query;
-//
-//----------------------------------------------------------------------------------------------------------------------
-//
-//drop view
-    $sql = /** @lang SQL */
-        "DROP VIEW IF EXISTS view_org_nomen";
-    $db->query($sql);
-// sql to create view
-    $sql = /** @lang SQL */
-        "CREATE 
-        VIEW view_org_nomen AS 
-        SELECT
-            view_rplan.kod_org,
-            view_rplan.kod_elem,
-            Sum(view_rplan.numb) AS numb,
-            view_rplan.`name`
-        FROM
-            view_rplan
-        GROUP BY
-            view_rplan.kod_org,
-            view_rplan.kod_elem,
-            view_rplan.`name`
-        ORDER BY
-        numb DESC 
-        ";
-    $db->query($sql);
-    $db->query("SELECT * FROM view_org_nomen");
     if($db->cnt==0)
         echo $db->last_query;
 //

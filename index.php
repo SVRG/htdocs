@@ -10,18 +10,37 @@ if (isset($_GET['accesscheck'])) {
     $_SESSION['PrevUrl'] = $_GET['accesscheck'];
 }
 
-if (isset($_POST['Name'])) {
-    $loginUsername = $_POST['Name'];
-    $password = $_POST['Pass'];
+if (isset($_POST['login'],$_POST['password'])) {
+    $loginUsername = mysqli_real_escape_string($mysqli,$_POST['login']);
+    $password = mysqli_real_escape_string($mysqli,$_POST['password']);
     $MM_fldUserAuthorization = "";
     $MM_redirectLoginSuccess = "main.php";
     $MM_redirectLoginFailed = "index.php";
     $MM_redirecttoReferrer = false;
 
-    $LoginRS__query = sprintf("SELECT Name, Pass, FName, rt FROM users WHERE Name='%s' AND Pass='%s'",
-        get_magic_quotes_gpc() ? $loginUsername : addslashes($loginUsername), get_magic_quotes_gpc() ? $password : addslashes($password));
+    $saltQuery = "SELECT users.salt FROM users WHERE users.login='$loginUsername'";
+    $result = $mysqli->query($saltQuery);
+    $row = mysqli_fetch_assoc($result);
+    $salt = $row['salt'];
 
-    $res = $mysqli->query($LoginRS__query);
+    if($salt=='') // todo - при первом входе обновить пароли!
+    {
+        //generate a random salt to use for this account
+        $salt = bin2hex(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
+        $saltedPW =  $password . $salt;
+        $hashedPW = hash('sha256', $saltedPW);
+        $query = /** @lang SQL */
+            "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
+        $mysqli->query($query);
+    }
+
+    $saltedPW =  $password . $salt;
+    $hashedPW = hash('sha256', $saltedPW);
+    $query = /** @lang SQL */
+        "SELECT * FROM users WHERE users.login='$loginUsername' AND users.password='$hashedPW'";
+    $res = $mysqli->query($query);
+
+    //exit();
 
     if ($res->num_rows > 0) {
 
@@ -35,11 +54,8 @@ if (isset($_POST['Name'])) {
         $_SESSION['MM_UserGroup'] = $loginStrGroup;
 
         // Запись сесии
-
-        $SessionSQL = sprintf("INSERT INTO Sessions VALUES('','%s','%s','%s')", $loginUsername, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
-
+        $SessionSQL = sprintf("INSERT INTO sessions VALUES('','%s','%s','%s')", $loginUsername, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
         $mysqli->query($SessionSQL);
-
         $res->close();
         $mysqli->close();
 
@@ -62,35 +78,14 @@ if (isset($_POST['Name'])) {
     <style type="text/css">
         <!--
         .style1 {
-            font-family: "Arial", Arial, serif;
+            font-family: "Verdana", Verdana, sans-serif;
         }
 
         body {
-            background-image: url(img/bg_grad.jpg);
-            background-color: #336699;
+            background: #336699 url(img/bg_grad.jpg);
         }
-
-        .style2 {
-            font-family: "Courier New", Courier, mono
-        }
-
         -->
     </style>
-    <script type="text/javascript">
-        <!--
-        function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-            if (init == true) with (navigator) {
-                if ((appName == "Netscape") && (parseInt(appVersion) == 4)) {
-                    document.MM_pgW = innerWidth;
-                    document.MM_pgH = innerHeight;
-                    onresize = MM_reloadPage;
-                }
-            }
-            else if (innerWidth != document.MM_pgW || innerHeight != document.MM_pgH) location.reload();
-        }
-        MM_reloadPage(true);
-        //-->
-    </script>
 </head>
 <?php
 require_once('class_func.php');
@@ -100,15 +95,15 @@ require_once('class_func.php');
 <form id="form1" name="form1" method="POST" action="<?php echo $loginFormAction; ?>">
     <table width="253" border="0">
         <tr>
-            <th width="92" scope="row"><span class="style2">Name</span></th>
+            <th width="92" scope="row"><span class="style1">Name</span></th>
             <td width="162"><label>
-                    <input name="Name" type="text" class="style1" id="Name"/>
+                    <input name="login" type="text" class="style1" id="login"/>
                 </label></td>
         </tr>
         <tr>
-            <th scope="row"><span class="style2">Pass</span></th>
+            <th scope="row"><span class="style1">Pass</span></th>
             <td><label>
-                    <input name="Pass" type="password" class="style1" id="Pass"/>
+                    <input name="password" type="password" class="style1" id="password"/>
                 </label></td>
         </tr>
         <tr>
