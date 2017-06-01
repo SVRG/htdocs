@@ -31,22 +31,6 @@ $Kontakt->Events();
     <title>Контакт</title>
     <script src="/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        <!--
-        function MM_reloadPage(init) {  //reloads the window if Nav4 resized
-            if (init == true) with (navigator) {
-                if ((appName == "Netscape") && (parseInt(appVersion) == 4)) {
-                    document.MM_pgW = innerWidth;
-                    document.MM_pgH = innerHeight;
-                    onresize = MM_reloadPage;
-                }
-            }
-            else if (innerWidth != document.MM_pgW || innerHeight != document.MM_pgH) location.reload();
-        }
-        MM_reloadPage(true);
-        //-->
-    </script>
-
     <link href="/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <link href="SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -56,8 +40,6 @@ include_once("header.php");
 include_once("class_org.php");
 include_once("class_doc.php");
 
-
-$Doc = new Doc();
 $Org = new Org();
 $Org->kod_org = $Kontakt->kod_org;
 $Org->getData();
@@ -66,7 +48,11 @@ $Org->getData();
 <div class="style1" id="pagecell1">
     <table width="100%" border="0" cellspacing="10">
         <tr>
-            <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php echo $Kontakt->Name; ?></h1>
+            <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php
+                    echo $Kontakt->Name;
+                    echo func::ActForm("", /** @lang HTML */
+                            "<input type='hidden' id='kod_kontakta' name='kod_kontakta' value='".$Kontakt->kod_kontakta."'> </input>","Удалить","DelKontakt");
+                    ?></h1>
                 <p><?php
 
 
