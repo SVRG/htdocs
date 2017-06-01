@@ -467,10 +467,35 @@ class Kontakt
             $event = true;
             }
 
+        if(isset($_POST['Flag']))
+        if($_POST['Flag']=="DelKontakt" and isset($_POST['kod_kontakta']))
+        {
+            $this->DelKonakt($_POST['kod_kontakta']); // todo - придумать защиту от случайного удаления
+            header('Location: /form_org.php?kod_org='.$this->kod_org);
+        }
+
         if($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление Контакта
+     * @param int $kod_kontakta
+     */
+    public function DelKonakt($kod_kontakta=-1)
+    {
+        $db = new Db();
+
+        if ($kod_kontakta<0)
+            $kod_kontakta = $this->kod_kontakta;
+
+        $db->query("DELETE FROM kontakty WHERE kod_kontakta=$kod_kontakta");
+        $db->query("DELETE FROM kontakty_data WHERE kod_kontakta=$kod_kontakta");
+        $db->query("DELETE FROM kontakty_dogovora WHERE kod_kontakta=$kod_kontakta");
+
+    }
 //----------------------------------------------------------------------------------------------------------------------
 
 
