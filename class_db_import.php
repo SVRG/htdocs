@@ -14,6 +14,7 @@ class Db_import
 
     public $res; // Data
     public $last_id = 0; // Last inserted ID
+    public $last_query = "";
 
     public $cnt = 0; // Количество записей
 
@@ -69,6 +70,7 @@ class Db_import
 
         if($echo==1)
             echo $query;
+        $this->last_query = $query;
 
         return $result;
     }
