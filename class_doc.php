@@ -222,7 +222,7 @@ class Doc
             $obozn = $row['obozn']; // Обозначение
             $mod = $row['modif']; // Модификация
             $numb = (int)$row['numb']; // Количество
-            $numb_ostat = (int)$row['numb_ostat'];
+            $numb_ostat = (int)$row['numb_ostat']; // Осталось отгрузить
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
             $price = round((double)$row['price'], 2); // Цена
             $val = ""; // Валюта
@@ -241,8 +241,8 @@ class Doc
             $ostatok_str = ""; // Остаток отгрузки
             $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
             if($numb_ostat>0){
-                if($numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
-                    $ostatok_str = ' (' . $numb_ostat . ')';
+                if($numb_ostat>0 and $numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
+                    $ostatok_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
                 if(func::DaysRem($row['data_postav'])<14)
                     $ind_data = /** @lang HTML */
@@ -891,6 +891,36 @@ class Doc
         return "Договоры без партий:<br>".$this->formDocList(/** @lang SQL */
             "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org");
     }
+//-----------------------------------------------------------------------
+//
+
+    /**
+     * Договоры по Организации - Внешние и Поставка
+     * @return string
+     */
+    public function formDocsOpen()
+    {
+        $db = new Db();
+
+        $sql = "SELECT 
+                * 
+                FROM 
+                    view_rplan 
+                WHERE 
+                    view_rplan.zakryt = 0 AND kod_ispolnit=683
+                ORDER BY 
+                kod_dogovora DESC,
+                view_rplan.name ASC";
+
+        $rows = $db->rows($sql);
+
+
+        if(count($rows)>0)
+            return $this->formRPlan_by_Doc($rows);
+
+        return "Список пуст.";
+    }
+
 
 //-----------------------------------------------------------------------
 //
