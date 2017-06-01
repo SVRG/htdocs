@@ -160,7 +160,7 @@ else
                 <?php
 
                 // Платежи - ------------------
-                echo $Dogovor->formPP();
+                echo $Dogovor->formPlat(1);
 
                 // Ввод платежей
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
@@ -204,7 +204,7 @@ else
                         if ($_POST['Flag'] == 'AddPrim')
                             $add_prim = 1;
 
-                    echo $Dogovor->formPrim($add_prim);
+                    echo $Dogovor->formPrim($add_prim,1);
                 }
                 ?></td>
         </tr>

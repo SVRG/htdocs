@@ -10,8 +10,8 @@ body {
     font-family: Arial, sans-serif;
     color: #333333;
     line-height: 1.166;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     background: #cccccc url(bg_grad.jpg) fixed;
 }
 
@@ -31,29 +31,29 @@ a:hover {
 h1 {
     font: bold 115% Arial, sans-serif;
     color: #334d55;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 h2 {
     font: bold 114% Arial, sans-serif;
     color: #006699;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 h3 {
     font: bold 100% Arial, sans-serif;
     color: #334d55;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 h4 {
     font: 100% Arial, sans-serif;
     color: #333333;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 h5 {

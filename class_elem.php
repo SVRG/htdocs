@@ -233,11 +233,11 @@ class Elem
     {
         $db = new Db();
 
-        $ID = $this->kod_elem;
+        $kod_elem = $this->kod_elem;
 
         if ($obozn == '' or $name == '') return;
 
-        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr' WHERE kod_elem = $ID");
+        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr' WHERE kod_elem = $kod_elem");
 
     }
 //------------------------------------------------------------------------
