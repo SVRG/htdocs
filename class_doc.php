@@ -203,6 +203,7 @@ class Doc
         $nazv_krat = $rplan_rows[0]['nazv_krat']; // Название Заказчика
         $kod_ispolnit = $rplan_rows[0]['kod_ispolnit']; // Код исполнителя
         $ispolnit_nazv_krat = $rplan_rows[0]['ispolnit_nazv_krat']; // Название исполнителя
+        $zakryt = $rplan_rows[0]['zakryt'];
 
         // Процент оплаты по договору
         $oplacheno = "";
@@ -234,9 +235,14 @@ class Doc
             if ((int)((double)$row['nds'] * 100) != 18)
                 $nds = "<br>НДС ".(int)((double)$row['nds'] * 100)."%";
 
-            $ind_row = ""; // Индкатор строки Если договор закрыт - зеленый. Нет - без цвета
-            if ((int)$row['zakryt'] == 1)
-                $ind_row = " bgcolor='#85e085'";
+            $ind_row = ""; // Индикатор строки Если договор закрыт - зеленый. Нет - без цвета
+            if ((int)$zakryt == 1)
+            {
+                if($summa_plat>0)
+                    $ind_row = " bgcolor='#85e085'";
+                else
+                    $ind_row = " bgcolor='#ffaaa0'";
+            }
 
             $ostatok_str = ""; // Остаток отгрузки
             $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
@@ -244,9 +250,10 @@ class Doc
                 if($numb_ostat>0 and $numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
                     $ostatok_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
-                if(func::DaysRem($row['data_postav'])<14)
-                    $ind_data = /** @lang HTML */
-                        " bgcolor='#f4df42'";
+                if($summa_plat>0)
+                    if(func::DaysRem($row['data_postav'])<14)
+                        $ind_data = /** @lang HTML */
+                            " bgcolor='#f4df42'";
             }
 
 
@@ -602,7 +609,7 @@ class Doc
     /**
      * График поставок по изделиям в тек. и след. месяцах (План Реализации)
      * todo - добавить итоговые значения по количествам к отгрузке и всего
-     * @param array $rplan_rows
+     * @param array $rplan_rows - массив rplan отсортированный по элементам
      * @return string
      */
     static public function formRPlan_by_Elem($rplan_rows)
@@ -627,13 +634,12 @@ class Doc
         $res = '<table width="100%">' . $header;
 
         // Переменные
-        $cm = (int)date('m');// Текущий месяц
-        $cy = (int)date('Y'); // Текущий год
         $zebra = "#FFFFFF"; // Цвет зебры
         $itog_summ = 0; // Итоговая Сумма по всем партиям
-        $fut = ''; // Будущий план
         $kod_elem_pred = -1; // Код предыдущего элемента
-        $kod_elem_pred_fut = -1; // Код предыдущего элемента
+        $summ_numb_ostat = 0; // Сумма остатка отгрузки по элементу
+        $summ_cnt = 0; // Счетчик - сколько раз считали сумму. Используется в условии
+
 
         // Вывод плана
         for ($i = 0; $i < $cnt; $i++) {
@@ -643,6 +649,9 @@ class Doc
             // Партия
             $numb_ostat = $row['numb_ostat'];
 
+            if($summ_cnt>1 and $i==$cnt-1) // Вывод итогов если последняя запись
+                $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat</b></td><th colspan='5'></th></tr>";
+
             if ($numb_ostat == 0)
                 continue; // Если нет остатка то переходим к след. шагу
 
@@ -651,6 +660,7 @@ class Doc
             $nomer = $row['nomer']; // номер договора
             $kod_org = (int)$row['kod_org']; // Код организации (Заказчик)
             $nazv_krat = $row['nazv_krat']; // Название Заказчика
+            $kod_part = $row['kod_part'];
 
             // Если заказчик НВС - то выводим исполнителя
             if($kod_org==683) {
@@ -669,18 +679,12 @@ class Doc
             $part_summa_ostat = $price_nds*$numb_ostat; // Сумма остатка партии
             $data_postav = $row['data_postav'];
 
-            $part_summa_ostat_str = "";
+            $part_summa_ostat_str = ""; // Сумма неотгруженного остатка
             if($part_summa_ostat!=$part_summa and $numb_ostat!=$numb)
             {
                 $part_summa_ostat = func::Rub($part_summa_ostat);
                 $part_summa_ostat_str = "<br><abbr title=\"Сумма неотгруженного остатка\">($part_summa_ostat)</abbr>";
             }
-
-            $numb_ostat_str = "";
-            if($numb_ostat>0 and $numb_ostat!=$numb)
-                $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
-
-            $data_postav_str = Func::Date_from_MySQL($data_postav); // Дата поставки
 
             $modif_str = '';            // Модификация
             if ($modif != '')
@@ -698,87 +702,57 @@ class Doc
                 $val_str = ' ' . $val;
 
             $proc = self::getProcPay($kod_dogovora); // todo - Сравнить производительность - Ввести в запрос rplan или отдельно много запросов
-            if($proc==0)
-                $proc = "";
-            else
-                $proc.="%";
+            $proc_str = "";
+            if($proc>0)
+                $proc_str ="$proc%";
+
+            $ind_data = ""; // Индикатор даты
+
+            if(func::DaysRem(func::Date_from_MySQL($data_postav))<14 and $proc>0)
+                $ind_data = " bgcolor='#f4df42'";
+
+            $numb_ostat_str = ""; // Количество которое осталось отгрузить
+            if($numb_ostat!=$numb)
+                    $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
             $itog_summ += $part_summa;// Итоговая Сумма по всем партиям
 
-            // Сумма партии
-            $part_summa_str = Func::Rub($part_summa);
+            $part_summa_str = Func::Rub($part_summa);// Сумма партии
 
             if ($zebra == "#FFFFFF")
                 $zebra = "#E6E6E6";
             else
                 $zebra = "#FFFFFF";
 
+            // Если предыдущий элемент другой то создаем заголовок
+            if ($kod_elem != $kod_elem_pred)
+            {
+                if($summ_cnt>1)
+                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat</b></td><th colspan='5'></th></tr>";
+                $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$obozn</a></th></tr>";
+                $summ_numb_ostat = 0;
+                $summ_cnt = 0;
+            }
+            $kod_elem_pred = $kod_elem;
+            $summ_numb_ostat +=$numb_ostat;
+            $summ_cnt++;
+
             // Формируем строку плана
             $row_str = /** @lang HTML */
                 "<tr bgcolor='$zebra'>
-                                <td><a href='form_elem.php?kod_elem=" . $kod_elem . "'>" . $obozn . $modif_str . "</a></td>
+                                <td><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'>" . $obozn . $modif_str . "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $numb . $numb_ostat_str. "</a></td>
-                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $proc .  "</a></td>
+                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $proc_str .  "</a></td>
                                 <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
-                                <td align='right'>" . Func::Date_from_MySQL($data_postav) . "</td>
+                                <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
                                 <td align='right'>" . $part_summa_str . $val_str . $nds_str .$part_summa_ostat_str. "</td>
                          </tr>";
 
-            $rowm = 0;
-            $rowy = 0;
-            // Разбираем дату на месяц и год
-            if ($data_postav_str != '-') {
-                $m = explode('.', $data_postav_str);
-
-                if(count($m)>2)
-                {
-                    $rowm = (int)$m[1];
-                    $rowy = (int)$m[2];
-                }
-
-
-                // Если месяц и год обрабатываемой сторки меньше текущего месяца и года то...
-                // Записываем в график поставок на текущий месяц
-                // в противном случае на будующие месяцы
-                if (($rowy == $cy and $rowm <= $cm) or ($rowy < $cy)) {
-
-                    // Если предыдущий элемент другой то создаем заголовок
-                    if ($kod_elem != $kod_elem_pred)
-                        $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'>" . $obozn . "</th></tr>";
-                    // Записываем строку в план
-                    $res .= $row_str;
-
-                    $kod_elem_pred = $kod_elem;
-
-                    continue; // строка уже записана, переходим на след шаг
-                }
-            }
-
-            // Если предыдущий элемент другой то формируем заголовок
-            if ($kod_elem != $kod_elem_pred_fut)
-                $fut .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'>" . $obozn . "</th></tr>";
-
-            // Если строка не записана в текущий план, то записываем в план на будущее
-            $fut .= $row_str;
-
-            $kod_elem_pred_fut = $kod_elem;
+            $res.= $row_str;
         }
 
-        // Формируем заголовок для плана на след. месяцы
-        $res .= /** @lang HTML */
-            "<tr bgcolor=\"#21ba42\">
-                    <td>Поставка в следующих месяцах</td>
-                    <td width=\"100\"></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>"
-            . $header
-            . $fut .
-            '</table>';
+        $res .='</table>';
 
         // Выводим сумму по всем партиям
         $res .= "<br>Итого: " . Func::Rub($itog_summ) . "<br>";
@@ -971,6 +945,7 @@ class Doc
     /**
      * Форма - Примечание договора
      * @param int $AddForm
+     * @param int $Del
      * @return string
      */
     public function formPrim($AddForm=0, $Del=0)
@@ -1226,6 +1201,81 @@ class Doc
         }
 
         $res .= '</table>';
+
+        return $res;
+    }
+    //-----------------------------------------------------------------------
+
+    /**
+     * Список платежей в выбранном месяце.
+     * @param int $Month - месяц текущего года
+     * @return string - таблица платежей
+     */
+    public function formCurrentMonthPays($Month=0)
+    {
+
+        $start_data = date('Y-m-01');
+
+        if($Month>0)
+            $start_data = date("Y-$Month-01");
+
+        $db = new Db();
+
+        $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' ORDER BY view_plat.data DESC");
+
+        $cnt = $db->cnt;
+
+        if ($cnt == 0)
+            return '';
+
+
+        $summ = 0; // Сумма по месяцу
+
+        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
+        $res .= '<tr bgcolor="#CCCCCC" >
+                    <td width="60">Номер ПП</td>
+                    <td width="100">Сумма</td>
+                    <td width="80">Дата</td>
+                    <td width="100">Распределено</td>
+                    <td width="130">Договор</td>
+                    <td  width="220">Организация</td>
+                    <td>Примечание</td>
+                </tr>';
+
+        for ($i = 0; $i < $cnt; $i++) {
+
+            $row = $rows[$i];
+
+            $d = Func::Date_from_MySQL($row['data']); // Дата
+
+            // Процент распределения платежа
+            $prs = 0;
+            if ($row['summa'] != 0)
+                $prs = Func::Proc($row['summa_raspred'] / $row['summa']);
+
+            // Если процент не равен 100 то красим ячейку
+            if ($prs != 100)
+                $col = 'bgcolor="#FFFF99"';
+            else
+                $col = '';
+
+            $res .= '<tr><td>' . $row['nomer'] . '</td>
+                          <td  align="right">' . Func::Rub($row['summa']) . '</td>
+                          <td  align="center">' . $d . '</td>
+                          <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
+                          <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
+                          <td>' . $row['nazv_krat'] . '</td>
+                          <td>' . $row['prim'] . '</td>
+                        </tr>';
+
+            $summ += $row['summa'];
+        }
+
+        $res .= '</table>';
+
+        $month = date("m.Y");
+
+        $res = "<h1>$month<br>Сумма: ".func::Rub($summ) . "</h1>" . $res;
 
         return $res;
     }

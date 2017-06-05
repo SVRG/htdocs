@@ -23,6 +23,7 @@ $odbc = new ODBC();
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 
 $users = 0;
+$sessions = 0;
 $adresa = 0;
 $docum = 0;
 $docum_dogovory = 0;
@@ -71,16 +72,17 @@ if ($users == 1) {
     $db->query($sql);
 }
 //----------------------------------------------------------------------------------------------------------------------
-
+if ($sessions == 1) {
     $sql = /** @lang SQL */
         "DROP TABLE IF EXISTS `sessions`;
-         create table sessions (
-                            kod_ses int auto_increment
-                                primary key,
-                            login varchar(20) null,
-                            time_stamp timestamp null,
-                            ip varchar(20) null)";
+         CREATE TABLE sessions (
+                            kod_ses INT AUTO_INCREMENT
+                                PRIMARY KEY,
+                            login VARCHAR(20) NULL,
+                            time_stamp TIMESTAMP NULL,
+                            ip VARCHAR(20) NULL)";
     $db->query($sql);
+}
 //----------------------------------------------------------------------------------------------------------------------
 if ($adresa == 1) {
     $table = "adresa";
@@ -341,7 +343,7 @@ if ($dogovory == 1) {
     $f2_type = "DATE";
     $f3_odbc = "Закрыт";
     $f3 = "zakryt";
-    $f3_type = "INT";
+    $f3_type = "INT DEFAULT 0";
     $f4_odbc = "Дата_закрытия";
     $f4 = "data_zakrytiya";
     $f4_type = "DATE";
@@ -1840,7 +1842,7 @@ if ($view == 1) {
             elem.kod_elem,
             elem.obozn,
             parts.kod_part,
-            dogovory.zakryt,
+            IFNULL(dogovory.zakryt,0) AS zakryt,
             dogovory.kod_ispolnit,
             elem.`name`,
             ispolnit.nazv_krat AS ispolnit_nazv_krat,
