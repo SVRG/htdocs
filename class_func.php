@@ -148,8 +148,28 @@ class Func
     public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
         $res = "<form id='FID' name='FNAME' method='POST' action='$Act '>
-                    <input type='hidden' name='Flag' id='$FlagVal' value='$FlagVal' />
-                    <input type='submit' name='Button' id='ID' value='$ButtValue' />
+                    <input type='hidden' name='Flag' value='$FlagVal' />
+                    <input type='submit' name='Button' value='$ButtValue' />
+                </form>";
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Создает Форму с одной кнопкой
+     * @param string $Act
+     * @param string $ButtValue
+     * @param string $FlagVal
+     * @param string $hidden_name
+     * @param string $hidden_val
+     * @return string
+     */
+    public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val="1")
+    {
+        $res = "<form name='FNAME' method='POST' action='$Act '>
+                    <input type='hidden' name='Flag' value='$FlagVal' />
+                    <input type='hidden' name='$hidden_name' value='$hidden_val' />
+                    <input type='submit' name='Button' value='$ButtValue' />
                 </form>";
         return $res;
     }
@@ -167,8 +187,8 @@ class Func
     {
         $res = "<form id='FID' name='FNAME' method='POST' action=' $Act '>
                     $Body
-                    <input type='submit' name='Button' id='ID' value=' $ButtValue ' />
-                    <input type='hidden' name='Flag' id='Flag' value='$FlagVal' />
+                    <input type='submit' name='Button' value=' $ButtValue ' />
+                    <input type='hidden' name='Flag' value='$FlagVal' />
                </form>";
 
         return $res;
@@ -249,7 +269,7 @@ class Func
         else $string = strtr($string, $upper, $lower);
 
     }
-
+//----------------------------------------------------------------------------------------------------------------------
 // Функция обратимой перекодировки кириллицы в транслит.
     static public function rus2lat($s)
     {

@@ -157,7 +157,7 @@ class Org
 
         $res = "";
         if ($Add == 1) {
-            $res .= '<form id="form1" name="form1" method="post" action="">
+            return '<form id="form1" name="form1" method="post" action="">
                       <table border="0">
                         <tr>
                           <td width="10%">Адрес</td>
@@ -176,8 +176,7 @@ class Org
                       <p>
                         <input type="submit" name="button" id="button" value="Добавить" />
                         <input type="hidden" name="AddOrgAdr" id="AddOrgAdr" value="1" />
-                    </form>';
-            Func::Cansel();
+                    </form>'. Func::Cansel();
         }
 
         $db = new DB();
@@ -193,7 +192,7 @@ class Org
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
-
+            $kod_adresa = $row['kod_adresa'];
             $type = "Юридический: ";
 
             if ($row['type'] == 1)
@@ -201,8 +200,10 @@ class Org
             elseif ($row['type'] == 3)
                 $type = "Почтовый: ";
 
+            $del = Func::ActForm('', "<input type='hidden' name='kod_adresa_del' value='$kod_adresa' />", 'Удалить', 'DelAddr');
+
             $res .= '<tr>
-                           <td>' . $type . $row['adres'] . '</td>
+                           <td>' . $type . $row['adres'] . $del . '</td>
                      </tr>';
         }
 
@@ -460,8 +461,26 @@ class Org
                     bik = '$bik', okpo = '$okpo', okonh = '$okonh', www = '$www', e_mail = '$e_mail' WHERE kod_org =$kod_org");
 
     }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление адреса
+     * @param $kod_adresa
+     */
+    public function DelAddr($kod_adresa)
+    {
+        $db = new Db();
+
+        if (isset($kod_adresa)) {
+            $db->query("DELETE FROM adresa WHERE kod_adresa=$kod_adresa");
+
+        } else
+            echo "Ошибка: Не задан ID адреса";
+    }
+
 //----------------------------------------------------------------------
 //
+
     /**
      * Добавить Адрес
      * @param string $adres
@@ -699,6 +718,10 @@ class Org
                         $event = true;
                     }
 
+        if (isset($_POST['kod_adresa_del'])) { // Удаление накладной
+            $this->DelAddr($_POST['kod_adresa_del']);
+            $event = true;
+        }
 
         if (isset($_POST['AddRecvForm'])) {
             $this->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);

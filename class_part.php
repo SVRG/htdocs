@@ -83,7 +83,7 @@ class Part
             }
             elseif($ost>0) // Выводим кнопку Добавить только когда есть отстаток
                 $nacl.= Func::ActForm($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],
-                                        "<input type='hidden' name='kod_part' id='kod_part' value='$this->kod_part'  />", 'Добавить', 'AddNacl');
+                                        "<input type='hidden' name='kod_part' id='kod_part' value='$this->kod_part'  />", 'Добавить', 'AddNaklad');
 
             // Цена --------------------------------------------------------------------------------------
             $price = (double)$row['price'];
@@ -162,7 +162,7 @@ class Part
     }
 //-------------------------------------------------------------------------
     /**
-     * Все накладные по дате
+     * Все накладные отсортированные по дате
      * @return string
      */
     public function formSGPAll()
@@ -189,12 +189,13 @@ class Part
 
                 // Форма отметки о получении накладной
                 $kod_oborota = $row['kod_oborota']; // Код оборота - код накладной
-
                 if ((int)$row['poluch'] <> 1)
-                    $res .= '<form id="form1" name="form1" method="post" action="">
-                    <input type="hidden" name="kod_oborota" value=' . $kod_oborota . ' />
-                    <input type="submit" name="button" id="button" value="Получено" />
-                    </form>';
+                    $res .= '<form name="form" method="post" action="">
+                                <input type="hidden" name="kod_oborota_poluch" value="' . $kod_oborota . '" />
+                                <input type="submit" name="button" id="button" value="Получено" />
+                             </form>';
+
+                $res .= Func::ActForm('', "<input type='hidden' name='kod_oborota_del' value='$kod_oborota' />", 'Удалить', 'DelNaklad');
 
             } else if ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
@@ -207,7 +208,7 @@ class Part
     }
     //-------------------------------------------------------------------------
     /**
-     * Вывод партии с формой добавления накладной, если $AddNacl=1
+     * Вывод партии с формой добавления накладной, если $AddNaklad=1
      * @param int $AddNacl
      */
     public function formPart($AddNacl = 0)
@@ -466,7 +467,7 @@ class Part
      * @param $kod_oper
      * @param $operator
      */
-    public function AddNacl($numb, $naklad, $data, $kod_oper, $operator)
+    public function AddNaklad($numb, $naklad, $data, $kod_oper, $operator)
     {
         $db = new Db();
         $kod_part = $this->kod_part;
@@ -475,6 +476,22 @@ class Part
         $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$operator')");
 
         return;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление накладной
+     * @param $kod_oborota
+     */
+    public function DelNaklad($kod_oborota)
+    {
+        $db = new Db();
+
+        if (isset($kod_oborota)) {
+            $db->query("DELETE FROM sklad WHERE kod_oborota=$kod_oborota");
+
+        } else
+            echo "Ошибка: Не задан ID накладной";
     }
 //-----------------------------------------------------------------------
     /**
@@ -797,14 +814,18 @@ class Part
                 $event = true;
             }
 
-        if (isset($_POST['kod_oborota'])) {
-            $this->PostNacl($_POST['kod_oborota']);
+        if (isset($_POST['kod_oborota_poluch'])) { // Получение накладной
+            $this->PostNacl($_POST['kod_oborota_poluch']);
+            $event = true;
+        }
+        elseif (isset($_POST['kod_oborota_del'])) { // Удаление накладной
+            $this->DelNaklad($_POST['kod_oborota_del']);
             $event = true;
         }
 
         if (isset($_POST['AddEditNacl']))
             if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'],$_POST['kod_oper'])) {
-                $this->AddNacl($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
+                $this->AddNaklad($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
                 $event = true;
         }
 
@@ -813,7 +834,8 @@ class Part
             $event = true;
         }
 
-        if (isset($_POST['Flag'])){
+        if (isset($_POST['Flag']))
+        {
             if ($_POST['Flag'] == 'AddRasch100')
             {
                 $this->AddRasch100();
@@ -840,7 +862,6 @@ class Part
                 $this->SetPayGraph($pr, $_POST['data']);
                 $event = true;
             }
-
         }
 
         if($event)

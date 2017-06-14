@@ -146,7 +146,7 @@ else
 
                     // Партии
                     if (isset($_POST['Flag'])) {
-                        if ($_POST['Flag'] == 'AddNacl')
+                        if ($_POST['Flag'] == 'AddNaklad')
                             $Part->formPart(1); // Партия + Форма добавления накладной
                     }
 
