@@ -867,4 +867,19 @@ class Part
         if($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
+//-------------------------------------------------------------------------
+
+    /**
+     * Возвращает код первой партии в договоре
+     * @param $kod_dogovora
+     * @return mixed
+     */
+    public static function getFirstPartKod($kod_dogovora)
+    {
+        $db = new Db();
+
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT kod_part FROM parts WHERE kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
+        return $rows[0]['kod_part'];
+    }
 }
