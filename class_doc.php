@@ -1501,17 +1501,14 @@ class Doc
                 }
             elseif($_POST['Flag'] == 'DocCloseConf') {
                 $this->Close();
-
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DelPlat') {
                 $this->DelPlat($_POST['kod_plat']);
-
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DelPrim') {
                 $this->DelPrim($_POST['kod_prim']);
-
                 $event = true;
             }
         }
@@ -1626,9 +1623,8 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Удаление примечания
-     * todo - добавить в форму
+     * todo - добавить в форму + Events
      * @param int $kod_prim
-     * @internal param $kod_scheta
      */
     public function DelPrim($kod_prim)
     {

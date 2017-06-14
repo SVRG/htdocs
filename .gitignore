@@ -228,3 +228,5 @@ menu/Thumbs.db
 .idea/workspace.xml
 
 .idea/workspace.xml
+
+PHPMailer-master/examples/gmail.php
