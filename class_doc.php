@@ -608,7 +608,7 @@ class Doc
 
     /**
      * График поставок по изделиям в тек. и след. месяцах (План Реализации)
-     * todo - добавить итоговые значения по количествам к отгрузке и всего
+     * todo - добавить итоговые значения оплаченных шт
      * @param array $rplan_rows - массив rplan отсортированный по элементам
      * @return string
      */
@@ -901,10 +901,9 @@ class Doc
 
     /**
      * Показать счета по Договору
-     * todo - Проверить Удаление
      * @return string
      */
-    public function formScheta()
+    public function formInvoice()
     {
 
         $db = new Db();
@@ -1412,6 +1411,7 @@ class Doc
      * @internal param $Num - номер
      * @internal param $DataCR - Дата создания договора
      * @internal param $Priem - Приемка, не актуально
+     * @return int
      */
     public function Add($nomer, $data_sost, $kod_org, $kod_ispolnit = 683)
     {
@@ -1422,6 +1422,8 @@ class Doc
         $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit)";
 
         $db->query($sql);
+
+        return $db->last_id;
     }
 //--------------------------------------------------------------
 
@@ -1444,9 +1446,10 @@ class Doc
                     $kod_ispolnit = $_POST['kod_org']; // Поставщик
                     $kod_org = 683; // НВС - Заказчик
                 }
-
-                $this->Add($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
-                $event = true;
+                $kod_dogovora = $this->Add($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
+                // переходим в форму договору
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora='.$kod_dogovora);
+                return;
             }
             elseif(isset($_POST['famil'], $_POST['name']))
             {
@@ -1492,7 +1495,7 @@ class Doc
         if (isset($_POST['Flag']))
         {
             if ($_POST['Flag'] == 'DelInv') {
-                $this->DelInvoice($_POST['InvID']);
+                $this->DelInvoice($_POST['kod_scheta']);
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DocOpen') {
@@ -1623,7 +1626,6 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Удаление примечания
-     * todo - добавить в форму + Events
      * @param int $kod_prim
      */
     public function DelPrim($kod_prim)
