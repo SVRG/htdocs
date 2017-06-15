@@ -27,22 +27,6 @@ class ODBC
     }
 
 //--------------------------------------------------------------
-    public function xodbc_fetch_array($result, $rownumber = -1)
-    {
-        $rs_assoc = array();
-
-        if ($rownumber < 0) {
-            odbc_fetch_into($result, $rs);
-        } else {
-            odbc_fetch_into($result, $rs, $rownumber);
-        }
-        foreach ($rs as $key => $value) {
-            $rs_assoc[odbc_field_name($result, $key + 1)] = $value;
-        }
-        return $rs_assoc;
-    }
-
-//--------------------------------------------------------------
     public function ex($Type = 's') // i-INSERT, s-SELECT
     {
         $this->sql = stripslashes($this->sql);
@@ -71,31 +55,6 @@ class ODBC
     {
         $row = odbc_fetch_array($this->res, $i);
         return $row;
-    }
-
-//--------------------------------------------------------------
-    public function Close()
-    {
-        odbc_close($this->x);
-    }
-//--------------------------------------------------------------
-//
-    public function exINS()
-    {
-        try {
-            $dbh = new PDO('odbc:trin, UID=Admin, PWD=master',
-                array(PDO::ATTR_PERSISTENT => true));
-            echo "Connected\n";
-            //$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $dbh->beginTransaction();
-            $dbh->exec($this->sql);
-            $dbh->commit();
-
-        } catch (Exception $e) {
-            $dbh->rollBack();
-            echo "Failed: " . $e->getMessage();
-        }
     }
 
 }

@@ -214,6 +214,7 @@ pip-log.txt
 .idea/inspectionProfiles/
 .idea/*
 docs/
+.idea
 
 menu/Thumbs.db
 
