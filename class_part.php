@@ -188,14 +188,11 @@ class Part
                 $res .= '<br><img src="/img/out.gif" height="14" />' . $naklad;
 
                 // Форма отметки о получении накладной
-                $kod_oborota = $row['kod_oborota']; // Код оборота - код накладной
+                $kod_oborota = $row['kod_oborota']; // Код оборота = код накладной
                 if ((int)$row['poluch'] <> 1)
-                    $res .= '<form name="form" method="post" action="">
-                                <input type="hidden" name="kod_oborota_poluch" value="' . $kod_oborota . '" />
-                                <input type="submit" name="button" id="button" value="Получено" />
-                             </form>';
+                    $res.= Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch',$kod_oborota);
 
-                $res .= Func::ActForm('', "<input type='hidden' name='kod_oborota_del' value='$kod_oborota' />", 'Удалить', 'DelNaklad');
+                $res .= Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
 
             } else if ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
