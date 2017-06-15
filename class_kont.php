@@ -129,6 +129,7 @@ class Kontakt
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>
+                    <td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>
                     </tr>';
         }
 
@@ -467,10 +468,16 @@ class Kontakt
             $event = true;
             }
 
+        if(isset($_POST['kod_dat_del']))
+        {
+            $this->DelData($_POST['kod_dat_del']);
+            $event = true;
+        }
+
         if(isset($_POST['Flag']))
         if($_POST['Flag']=="DelKontakt" and isset($_POST['kod_kontakta']))
         {
-            $this->DelKonakt($_POST['kod_kontakta']); // todo - придумать защиту от случайного удаления
+            $this->DelKonakt($_POST['kod_kontakta']);
             header('Location: /form_org.php?kod_org='.$this->kod_org);
         }
 
@@ -482,6 +489,7 @@ class Kontakt
 
     /**
      * Удаление Контакта
+     * // todo - придумать защиту от случайного удаления
      * @param int $kod_kontakta
      */
     public function DelKonakt($kod_kontakta=-1)
@@ -495,6 +503,19 @@ class Kontakt
         $db->query("DELETE FROM kontakty_data WHERE kod_kontakta=$kod_kontakta");
         $db->query("DELETE FROM kontakty_dogovora WHERE kod_kontakta=$kod_kontakta");
 
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление Данных
+     * // todo - придумать защиту от случайного удаления
+     * @param int $kod_dat
+     */
+    public function DelData($kod_dat)
+    {
+        $db = new Db();
+
+        $db->query("DELETE FROM kontakty_data WHERE kod_dat=$kod_dat");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
