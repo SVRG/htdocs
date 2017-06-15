@@ -157,6 +157,8 @@ class Func
 //
     /**
      * Создает Форму с одной кнопкой
+     * + скрытое поле Flag со значением
+     * + скрытое поле с именем $hidden_name и значением $hidden_val
      * @param string $Act
      * @param string $ButtValue
      * @param string $FlagVal
@@ -176,7 +178,8 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Построение Формы
+     * Построение Формы с одной кнопкой
+     * + скрытое поле Flag со значением
      * @param string $Act
      * @param string $Body
      * @param string $ButtValue

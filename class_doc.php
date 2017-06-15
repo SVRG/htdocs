@@ -449,8 +449,7 @@ class Doc
 
     /**
      * Форма редактирования Договора
-     * todo - упростить ввод внешних/внутренних договоров - например <input name="vnesh" type="radio" />
-     * @param int $Edit
+     * @param int $Edit - 1 форма редактирования
      * @return string
      */
     public function formAddEdit($Edit=0)
