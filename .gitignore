@@ -219,8 +219,6 @@ menu/Thumbs.db
 
 *.db
 
-.idea/workspace.xml
-
 .htaccess
 
 .htpasswd
@@ -230,3 +228,7 @@ menu/Thumbs.db
 .idea/workspace.xml
 
 PHPMailer-master/examples/gmail.php
+
+.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
+
+.idea/encodings.xml

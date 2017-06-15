@@ -149,9 +149,10 @@ else
                         if ($_POST['Flag'] == 'AddNaklad')
                             $Part->formPart(1); // Партия + Форма добавления накладной
                     }
-
+                    // Партии
                     echo $Part->formParts(1, "", 0);
-
+                    // Кнопка добавить 100% расчет в каждую партию
+                    echo Func::ActButton("form_part.php?kod_dogovora=$Dogovor->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100');
                     ?></p>
             </td>
         </tr>
@@ -175,7 +176,7 @@ else
             <td width="50%" align="left" valign="top">
                 <?php
                 // Счета ------------------------------------
-                echo $Dogovor->formScheta();
+                echo $Dogovor->formInvoice();
 
                 // Добавить Счет
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))

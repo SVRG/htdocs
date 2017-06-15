@@ -10,14 +10,25 @@ include_once "security.php";
 include_once("class_part.php");
 include_once("class_doc.php");
 
+$kod_part = 0;
 if (!isset($_GET['kod_part']))
-    exit("Не задан Код партии");
+{
+    if(!isset($_GET['kod_dogovora']))
+        exit("Не задан Код партии и договора");
+    else
+    {
+        $kod_part=Part::getFirstPartKod($_GET['kod_dogovora']);
+    }
+}
+else
+    $kod_part=$_GET['kod_part'];
+
 
 $Dogovor = new Doc();
 $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
 
 $Part = new Part();
-$Part->kod_part = $_GET['kod_part'];
+$Part->kod_part = $kod_part;
 $Part->kod_dogovora = $_GET['kod_dogovora'];
 $Part->Events();
 ?>
