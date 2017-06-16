@@ -22,6 +22,7 @@ $db = new Db_import();
 $odbc = new ODBC();
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 
+$drop=false; // Удаление таблиц
 $users = 0;
 $sessions = 0;
 $adresa = 0;
@@ -48,40 +49,47 @@ $view = 0;
 //----------------------------------------------------------------------------------------------------------------------
 if ($users == 1) {
     // sql to create table
-    $sql = /** @lang SQL */
-        "DROP TABLE IF EXISTS `users`;
+    if($drop)
+    {
+        $sql = /** @lang SQL */
+            "DROP TABLE IF EXISTS `users`;
             CREATE TABLE `users` (
-              kod_user INT(11) NOT NULL AUTO_INCREMENT,
-              `login` VARCHAR(20) NOT NULL DEFAULT '',
-              `password` VARCHAR(80) DEFAULT NULL,
-              `famil` VARCHAR(40) DEFAULT NULL,
-              `rt` VARCHAR(40) DEFAULT NULL,
-              `salt` VARCHAR(40) DEFAULT NULL,
-              PRIMARY KEY (`kod_user`)
-            ) ENGINE=MyISAM AUTO_INCREMENT=53;
-    ";
-    //$db->query($sql);
+                                      kod_user INT(11) NOT NULL AUTO_INCREMENT,
+                                      `login` VARCHAR(20) NOT NULL DEFAULT '',
+                                      `password` VARCHAR(80) DEFAULT NULL,
+                                      `famil` VARCHAR(40) DEFAULT NULL,
+                                      `rt` VARCHAR(40) DEFAULT NULL,
+                                      `salt` VARCHAR(40) DEFAULT NULL,
+                                      PRIMARY KEY (`kod_user`)
+                                    ) ENGINE=MyISAM AUTO_INCREMENT=53;
+            ";
+        $db->query($sql);
 
-    $sql = /** @lang SQL */
-        "INSERT INTO `users` VALUES     (1, 'Tikhomirov', 'master123', 'Тихомиров Сергей', 'admin',''),
-                                        (51, 'Charykova', 'nvs12345', 'Чарыкова Татьяна', 'oper',''),
-                                        (46, 'Mityushin', 'nvs12345', 'Митюшин Максим', 'oper',''),
-                                        (50, 'Ukhova', 'nvs12345', 'Ухова Евгения', 'oper',''),
-                                        (49, 'Vasin', 'nvs12345', 'Васин Андрей', 'oper',''),
-                                        (45, 'Morgunova', 'nvs12345', 'Моргунова Елена', 'oper','');";
-    $db->query($sql);
+        $sql = /** @lang SQL */
+            "INSERT INTO `users` VALUES     (1, 'Tikhomirov', '', 'Тихомиров Сергей', 'admin',''),
+                                        (51, 'Charykova', '', 'Чарыкова Татьяна', 'oper',''),
+                                        (46, 'Mityushin', '', 'Митюшин Максим', 'oper',''),
+                                        (50, 'Ukhova', '', 'Ухова Евгения', 'oper',''),
+                                        (49, 'Vasin', '', 'Васин Андрей', 'oper',''),
+                                        (45, 'Morgunova', '', 'Моргунова Елена', 'oper','');";
+        $db->query($sql);
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------
 if ($sessions == 1) {
-    $sql = /** @lang SQL */
-        "DROP TABLE IF EXISTS `sessions`;
+    if($drop)
+    {
+        $sql = /** @lang SQL */
+            "DROP TABLE IF EXISTS `sessions`;
          CREATE TABLE sessions (
                             kod_ses INT AUTO_INCREMENT
                                 PRIMARY KEY,
                             login VARCHAR(20) NULL,
                             time_stamp TIMESTAMP NULL,
                             ip VARCHAR(20) NULL)";
-    $db->query($sql);
+        $db->query($sql);
+    }
+
 }
 //----------------------------------------------------------------------------------------------------------------------
 if ($adresa == 1) {
@@ -90,23 +98,26 @@ if ($adresa == 1) {
     $id = "kod_adresa";
 
     // sql drop table
-    $sql = /** @lang SQL */
-        "DROP TABLE IF EXISTS adresa";
-    $db->query($sql);
+    if($drop)
+    {
+        $sql = /** @lang SQL */
+            "DROP TABLE IF EXISTS adresa";
+        $db->query($sql);
 
-    // sql to create table
-    $sql = "CREATE TABLE adresa (
-    kod_adresa INT(6),
-    adres TEXT,
-    kod_org INT,
-    type INT,
-    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
+        // sql to create table
+        $sql = "CREATE TABLE adresa (
+                                    kod_adresa INT(6),
+                                    adres TEXT,
+                                    kod_org INT,
+                                    type INT,
+                                    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                    )";
 
-    $db->query($sql);
+        $db->query($sql);
+    }
 
     // Запросить данные из ODBC
-    $odbc->sql = "SELECT * FROM $table_odbc";
+    $odbc->sql = "SELECT * FROM $table_odbc ORDER BY Код_Адреса DESC";
     $odbc->ex();
 
     // Вставить данные в MySQL
@@ -114,19 +125,31 @@ if ($adresa == 1) {
         $row = $odbc->Row($i);
 
         $kod_adresa = $row['Код_Адреса'];
+        $field_id = $kod_adresa;
         $adres = $row['Адрес'];
         $kod_org = $row['Код_Организации'];
         $type = $row['ТипАдреса'];
-        $field_id = $kod_adresa;
 
         $sql = "INSERT INTO adresa (kod_adresa,adres,kod_org,type) VALUES($kod_adresa,'$adres',$kod_org,$type)";
-        $db->query($sql);
+
+        if($drop)
+        {
+            $db->query($sql);
+        }
+        else
+        {
+            $db->query("SELECT * FROM $table WHERE $id=$field_id");
+
+            if ($db->cnt != 1) // Проверям наличие записи в таблице MySQL, если нет то записываем
+                $db->query($sql);
+            else
+                break; // Если запись есть то выходим из цикла
+        }
 
         // Проверяем записалась ли строка
         $db->query("SELECT * FROM $table WHERE $id=$field_id");
         if ($db->cnt != 1)
-            echo "!!!!!!!!! Err: " . $sql;
-
+            echo "<br>$table Err: $sql";
     }
 
     $sql = "ALTER TABLE adresa MODIFY kod_adresa INT AUTO_INCREMENT PRIMARY KEY";
@@ -142,40 +165,46 @@ if ($docum == 1) {
     $table = "docum";
     $table_odbc = "Документы";
 
-// Sourse Names                | Dest Names                 | Dest Type
     $id_odbc = "Код_Документа";
     $id = "kod_docum";
     $id_type = "INT";
+
     $f1_odbc = "Наименование";
     $f1 = "name";
     $f1_type = "VARCHAR(255)";
+
     $f2_odbc = "Путь";
     $f2 = "path";
     $f2_type = "VARCHAR(255)";
+
     $f3_odbc = "Date_CP";
     $f3 = "time_stamp";
     $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
-    $sql = "DROP TABLE IF EXISTS $table";
-    $db->query($sql);
+    if($drop)
+    {
+        $sql = "DROP TABLE IF EXISTS $table";
+        $db->query($sql);
 
-// sql to create table
-    $sql = "CREATE TABLE $table (
-    $id $id_type,
-    $f1 $f1_type,
-    $f2 $f2_type,
-    $f3 $f3_type
-    )";
-    $db->query($sql);
+        // sql to create table
+        $sql = "CREATE TABLE $table (
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $f3 $f3_type
+                                    )";
+        $db->query($sql);
+    }
 
 // Запросить данные из ODBC
-    $odbc->sql = "SELECT * FROM $table_odbc";
-    $odbc->ex();
+    $odbc->sql = "SELECT * FROM $table_odbc ORDER BY $id_odbc DESC";
+    $rows = $odbc->ex();
+    $cnt = $odbc->cnt;
 
 // Вставить данные в MySQL
-    for ($i = 1; $i <= $odbc->cnt; $i++) {
-        $row = $odbc->Row($i);
+    for ($i = 0; $i < $cnt; $i++) {
+        $row = $rows[$i];
 
         $field_id = $row[$id_odbc];
         $field1 = $row[$f1_odbc];
@@ -183,13 +212,25 @@ if ($docum == 1) {
         $field3 = $row[$f3_odbc];
 
         $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,'$field1','$field2','$field3')";
-        $db->query($sql);
+
+        if($drop)
+        {
+            $db->query($sql);
+        }
+        else
+        {
+            $db->query("SELECT * FROM $table WHERE $id=$field_id");
+
+            if ($db->cnt != 1) // Проверям наличие записи в таблице MySQL, если нет то записываем
+                $db->query($sql);
+            else
+                break; // Если запись есть то выходим из цикла
+        }
 
         // Проверяем записалась ли строка
         $db->query("SELECT * FROM $table WHERE $id=$field_id");
         if ($db->cnt != 1)
-            echo "!!!!!!!!! Err: " . $sql;
-
+            echo "<br>$table Err: $sql";
     }
 
     $sql = "ALTER TABLE $table MODIFY $id INT AUTO_INCREMENT PRIMARY KEY";

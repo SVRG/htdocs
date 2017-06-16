@@ -7,6 +7,7 @@ class ODBC
     public $sql = '';
     public $cnt = 0;
     public $res;
+    public $rows;
 
 //--------------------------------------------------------------
     public function __construct()
@@ -31,23 +32,20 @@ class ODBC
     {
         $this->sql = stripslashes($this->sql);
 
-        //$this->sql = str_replace('"','»',$this->sql);
-
-
         if ($Type == 's') {
-            //$xn = odbc_prepare($this->x, $this->sql);
             $this->res = odbc_exec($this->x, $this->sql);
-            $this->cnt = $this->xodbc_num_rows($this->res);
-            //odbc_close($this->x);
+            //$this->cnt = $this->xodbc_num_rows($this->res);
         } elseif ($Type == 'i') {
             odbc_exec($this->x, $this->sql);
             //odbc_close($this->x);
         } elseif ($Type == 'p') {
             $this->res = odbc_execute($this->x, $this->sql);
-            $this->cnt = $this->xodbc_num_rows($this->res);
+            //$this->cnt = $this->xodbc_num_rows($this->res);
         }
 
-//return $this->res;
+        $this->rows = odbc_fetch_array($this->res);
+        $this->cnt = count($this->rows);
+        return  $this->rows;
     }
 
 //--------------------------------------------------------------
