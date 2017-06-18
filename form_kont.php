@@ -50,8 +50,8 @@ $Org->getData();
         <tr>
             <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php
                     echo $Kontakt->Name;
-                    echo func::ActForm("", /** @lang HTML */
-                            "<input type='hidden' id='kod_kontakta' name='kod_kontakta' value='".$Kontakt->kod_kontakta."'> </input>","Удалить","DelKontakt");
+                    echo func::ActButton2("", /** @lang HTML */
+                            "Удалить","DelKontakt","kod_kontakta_del",$Kontakt->kod_kontakta);
                     ?></h1>
                 <p><?php
 

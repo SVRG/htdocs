@@ -817,10 +817,7 @@ class Doc
 
             $del = "";
             if($Del==1)
-            {
-                $del = func::ActForm("", /** @lang HTML */
-                    "<input type='hidden' id='kod_plat' name='kod_plat' value='$kod_plat'> </input>","Удалить","DelPlat");
-            }
+                $del = func::ActButton2("","Удалить","DelPlat","kod_plat_del",$kod_plat);
 
             $res.= '<tr>
                         <td>' . Func::Rub($row['summa']) . '</td>
@@ -929,8 +926,7 @@ class Doc
                         <td>' . $row['nomer']             . '</td>
                         <td>' . Func::Rub($row['summa']) . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
-                        <td>' . $row['prim'] . '<br>' . Func::ActForm('', /** @lang HTML */
-                    '<input type="hidden" name="kod_scheta" id="kod_scheta" value="' . $row['kod_scheta'] . '" />', 'Удалить Счет', 'DelInv') . '</td>
+                        <td>' . $row['prim'] . '<br>' . Func::ActButton2('', 'Удалить', 'DelInv',"kod_scheta_del",$row['kod_scheta']) . '</td>
                     </tr>';
         }
         $res.= '</table>';
@@ -1493,8 +1489,8 @@ class Doc
 
         if (isset($_POST['Flag']))
         {
-            if ($_POST['Flag'] == 'DelInv') {
-                $this->DelInvoice($_POST['kod_scheta']);
+            if ($_POST['Flag'] == 'DelInv' and isset($_POST['kod_scheta_del'])) {
+                $this->DelInvoice($_POST['kod_scheta_del']);
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DocOpen') {
@@ -1505,8 +1501,8 @@ class Doc
                 $this->Close();
                 $event = true;
             }
-            elseif($_POST['Flag'] == 'DelPlat') {
-                $this->DelPlat($_POST['kod_plat']);
+            elseif($_POST['Flag'] == 'DelPlat' and isset($_POST['kod_plat_del'])) {
+                $this->DelPlat($_POST['kod_plat_del']);
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DelPrim') {

@@ -222,6 +222,7 @@ class Part
     /**
      * График Расчетов
      * @param bool $Edit
+     * @return string
      */
     public function formPayGraph($Edit = false)
     {
@@ -231,9 +232,9 @@ class Part
         $cnt = $db->cnt;
 
         if($cnt==0)
-            return;
+            return "";
 
-        echo '<br>График Расчетов<br>
+        $res = '<br>График Расчетов<br>
                 <table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC">
                         <td>Дата</td>
@@ -265,17 +266,18 @@ class Part
             $Body =    "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
                         <input type='text' name='summa' value='$ostatok_plat' />";
 
-            echo '<tr>
+            $res.= '<tr>
                     <td width="80">' . $data . '</td>
                     <td width="100">' . $summa . '</td>
                     <td width="20">' . $type_rascheta . '</td>
                     <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body);
-                    echo Func::ActForm('', "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />", 'Удалить Расчет', 'DelRasch') .
+                    $res.= Func::ActButton2('','Удалить', 'DelRasch',"kod_rascheta_del",$kod_rascheta) .
                     "</td>
                     </tr>";
         }
 
-        echo '</table>';
+        $res.= '</table>';
+        return $res;
     }
 //--------------------------------------------------------------
 //
@@ -681,6 +683,8 @@ class Part
 
         $db->query("DELETE FROM raschet WHERE kod_part=" . $this->kod_part);
 
+        //$db->query("DELETE FROM raschety_plat WHERE kod_rascheta=" . $); // todo - удалить свзяные записи
+
         $db->query("DELETE FROM sklad WHERE kod_part=" . $this->kod_part);
 
     }
@@ -838,9 +842,9 @@ class Part
                 $this->AddRasch100();
                 $event = true;
             }
-            elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta']))
+            elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta_del']))
             {
-                $this->DelRasch($_POST['kod_rascheta']);
+                $this->DelRasch($_POST['kod_rascheta_del']);
                 $event = true;
             }
         }

@@ -76,7 +76,7 @@ include_once("header.php");
                 $Part->formPart(0); // Партия
 
             // График платежей
-            $Part->formPayGraph(true);
+            echo $Part->formPayGraph(true);
 
             // Кнопки по расчетам
             echo '<br>';
@@ -122,7 +122,7 @@ include_once("header.php");
             echo $Dogovor->formParts(1);
             echo '<br>';
         } else {
-            $Part->formPayGraph(false);
+            echo $Part->formPayGraph(false);
             if (isset($Err)) echo $Err;
         }
         ?>

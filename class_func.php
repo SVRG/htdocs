@@ -159,6 +159,7 @@ class Func
      * Создает Форму с одной кнопкой
      * + скрытое поле Flag со значением
      * + скрытое поле с именем $hidden_name и значением $hidden_val
+     * + если название кнопки "Удалить" то добавляется подтверждение
      * @param string $Act
      * @param string $ButtValue
      * @param string $FlagVal
@@ -168,7 +169,14 @@ class Func
      */
     public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val="1")
     {
-        $res = "<form name='FNAME' method='POST' action='$Act '>
+        if($ButtValue=="Удалить")
+            $res = "<form name='FNAME' method='POST' action='$Act' onsubmit='return confirm(\"Вы уверены, что хотите удалить запись?\");' >
+                    <input type='hidden' name='Flag' value='$FlagVal' />
+                    <input type='hidden' name='$hidden_name' value='$hidden_val' />
+                    <input type='submit' name='Button' value='$ButtValue' />
+                </form>";
+        else
+        $res = "<form name='FNAME' method='POST' action='$Act'>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
                     <input type='submit' name='Button' value='$ButtValue' />

@@ -475,9 +475,9 @@ class Kontakt
         }
 
         if(isset($_POST['Flag']))
-        if($_POST['Flag']=="DelKontakt" and isset($_POST['kod_kontakta']))
+        if($_POST['Flag']=="DelKontakt" and isset($_POST['kod_kontakta_del']))
         {
-            $this->DelKonakt($_POST['kod_kontakta']);
+            $this->DelKonakt($_POST['kod_kontakta_del']);
             header('Location: /form_org.php?kod_org='.$this->kod_org);
         }
 
