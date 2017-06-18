@@ -56,23 +56,77 @@ class Db_import
         $connection = $this->connect();
 
         // Для обеспечения совместимости кодировок
-        $connection->query("SET NAMES 'cp1251'"); // cp1251 - для Win
+        $connection->query("SET NAMES 'utf8'"); // cp1251 - для Win
+
+        $query = preg_replace('/\s\s+/', ' ', $query); // В запросе удаляем лишние пробелы
+        // todo - Подумать как в INSERT / UPDATE запросах удалять пробелы в значениях '_VALUE_'
 
         // Query the database
         $result = $connection->query($query);
+        $this->last_query = $query;
 
         // Обновляем последний добавленный номер
         $this->last_id = $connection->insert_id;
-        if(isset($result->num_rows))
-            $this->cnt = $result->num_rows;
-        else
-            $this->cnt = 1;
+
+        $this->cnt = 0;
+        if(isset($result->field_count))
+            $this->cnt = (int)$result->field_count;
 
         if($echo==1)
             echo $query;
-        $this->last_query = $query;
 
         return $result;
     }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Fetch rows from the database (SELECT query)
+     *
+     * @param string|$query The query string
+     * @param int $echo
+     * @return array
+     */
+    public function rows($query="",$echo=0)
+    {
+        if($echo==1)
+            echo $query;
 
+        $rows = array();
+        $this->res = $this->query($query);
+        if ($this->res === false) {
+            $this->cnt = 0;
+            return $rows;
+        }
+        while ($row = $this->res->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        $this->cnt = $this->res->num_rows;
+
+        return $rows;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Fetch rows from the database (SELECT query)
+     *
+     * @param string|$query The query string
+     * @param int $echo
+     * @return int
+     */
+    public function cnt($query="",$echo=0)
+    {
+        if($echo==1)
+            echo $query;
+
+        $rows = array();
+        $this->res = $this->query($query);
+        if ($this->res === false) {
+            $this->cnt = 0;
+            return 0;
+        }
+        while ($row = $this->res->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        $this->cnt = $this->res->num_rows;
+
+        return $this->cnt;
+    }
 }

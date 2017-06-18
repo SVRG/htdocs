@@ -67,10 +67,10 @@ class Db
 
         // Обновляем последний добавленный номер
         $this->last_id = $connection->insert_id;
-        if(isset($result->num_rows))
-            $this->cnt = $result->num_rows;
-        else
-            $this->cnt = 1;
+
+        $this->cnt = 0;
+        if(isset($result->field_count))
+            $this->cnt = $result->field_count;
 
         if($echo==1)
             echo $query;
