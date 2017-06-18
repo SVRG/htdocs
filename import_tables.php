@@ -22,29 +22,29 @@ $db = new Db_import();
 $odbc = new ODBC();
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 
-$drop=true; // Удаление таблиц
-$users          = 1;
-$sessions       = 0;
-$adresa         = 0;
-$docum          = 0;
-$docum_dogovory = 0;
-$dogovor_prim   = 0;
-$dogovory       = 0;
-$elem           = 0;
-$kontakty       = 0;
-$kontakty_dogovora = 0;
-$org            = 0;
-$parts          = 0;
-$kontakty_data  = 0;
-$plat           = 0;
-$raschet        = 0;
-$raschety_plat  = 0;
-$scheta         = 0;
-$sklad          = 0;
-$org_links      = 0;
-$docum_elem     = 0;
-$docum_org      = 0;
-$view           = 0;
+$drop               =true; // Удаление таблиц
+$users              = 0;
+$sessions           = 0;
+$adresa             = 0;
+$docum              = 0;
+$docum_dogovory     = 0;
+$dogovor_prim       = 0;
+$dogovory           = 0;
+$elem               = 0;
+$kontakty           = 0;
+$kontakty_dogovora  = 0;
+$org                = 0;
+$parts              = 0;
+$kontakty_data      = 0;
+$plat               = 0;
+$raschet            = 0;
+$raschety_plat      = 0;
+$scheta             = 0;
+$sklad              = 0;
+$org_links          = 0;
+$docum_elem         = 0;
+$docum_org          = 0;
+$view               = 0;
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -973,17 +973,20 @@ if ($kontakty_data == 1) {
         if ($field1 != "") {
             $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,'$field2','$field3')";
             $db->query($sql);
+
             // Проверяем записалась ли строка
-            $db->query("SELECT * FROM $table WHERE $id=$field_id");
-            if ($db->cnt != 1)
-                echo "<br>$table Err: " . $sql;
-        } elseif ($field4 != "") {
+            if ($db->cnt("SELECT * FROM $table WHERE $id=$field_id") == 0)
+                echo "<br>$table Err: $sql";
+
+        }
+        elseif ($field4 != "")
+        {
             $sql = "INSERT INTO $table2 ($id,$f4,$f2,$f3) VALUES($field_id,$field4,'$field2','$field3')";
             $db->query($sql);
+
             // Проверяем записалась ли строка
-            $db->query("SELECT * FROM $table2 WHERE $id=$field_id");
-            if ($db->cnt != 1)
-                echo "<br>$table2 Err: " . $sql;
+            if ($db->cnt("SELECT * FROM $table2 WHERE $id=$field_id") == 0)
+                echo "<br>$table2 Err: $sql";
         }
     }
 

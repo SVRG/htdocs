@@ -56,7 +56,7 @@ class Db_import
         $connection = $this->connect();
 
         // Для обеспечения совместимости кодировок
-        $connection->query("SET NAMES 'utf8'"); // cp1251 - для Win
+        $connection->query("SET NAMES 'cp1251'"); // cp1251 - для Win
 
         $query = preg_replace('/\s\s+/', ' ', $query); // В запросе удаляем лишние пробелы
         // todo - Подумать как в INSERT / UPDATE запросах удалять пробелы в значениях '_VALUE_'
