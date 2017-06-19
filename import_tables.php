@@ -22,29 +22,35 @@ $db = new Db_import();
 $odbc = new ODBC();
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 
+$time_stamp = "time_stamp"; // Поле для хранения времени создания
+$time_stamp_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+$time_stamp_str = "$time_stamp $time_stamp_type";
+
+$footer_fields = "$time_stamp_str, del INT DEFAULT 0, user INT, edit INT DEFAULT 0";
+
 $drop               =true; // Удаление таблиц
-$users              = 0;
-$sessions           = 0;
-$adresa             = 0;
-$docum              = 0;
-$docum_dogovory     = 0;
-$dogovor_prim       = 0;
-$dogovory           = 0;
-$elem               = 0;
-$kontakty           = 0;
-$kontakty_dogovora  = 0;
-$org                = 0;
-$parts              = 0;
-$kontakty_data      = 0;
-$plat               = 0;
-$raschet            = 0;
-$raschety_plat      = 0;
-$scheta             = 0;
-$sklad              = 0;
-$org_links          = 0;
-$docum_elem         = 0;
-$docum_org          = 0;
-$view               = 0;
+$users              = 1;
+$sessions           = 1;
+$adresa             = 1;
+$docum              = 1;
+$docum_dogovory     = 1;
+$dogovor_prim       = 1;
+$dogovory           = 1;
+$elem               = 1;
+$kontakty           = 1;
+$kontakty_dogovora  = 1;
+$org                = 1;
+$parts              = 1;
+$kontakty_data      = 1;
+$plat               = 1;
+$raschet            = 1;
+$raschety_plat      = 1;
+$scheta             = 1;
+$sklad              = 1;
+$org_links          = 1;
+$docum_elem         = 1;
+$docum_org          = 1;
+$view               = 1;
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -149,16 +155,18 @@ if ($users == 1) {
 }
 //----------------------------------------------------------------------------------------------------------------------
 if ($sessions == 1) {
+
+    $table = "sessions";
+    $id = "kod_ses";
+
     if($drop)
     {
-        $sql = /** @lang SQL */
-            "DROP TABLE IF EXISTS `sessions`;
-             CREATE TABLE sessions (
-        kod_ses INT AUTO_INCREMENT
-                                    PRIMARY KEY,
+        $sql = "DROP TABLE IF EXISTS $table;
+                CREATE TABLE sessions (
+                                $id INT AUTO_INCREMENT PRIMARY KEY,
                                 login VARCHAR(20) NULL,
-                                time_stamp TIMESTAMP NULL,
-                                ip VARCHAR(20) NULL)";
+                                $time_stamp_str,
+                                ip VARCHAR(20) NULL);";
         $db->query($sql);
     }
 }
@@ -176,12 +184,12 @@ if ($adresa == 1) {
         drop();
         // sql to create table
         $sql = "CREATE TABLE adresa (
-                                    kod_adresa INT(6),
+                                    kod_adresa INT,
                                     adres TEXT,
                                     kod_org INT,
                                     type INT,
-                                    time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                                    )";
+                                    $footer_fields
+                                    );";
 
         $db->query($sql);
     }
@@ -226,9 +234,6 @@ if ($docum == 1) {
     $f2_type = "VARCHAR(255)";
 
     $f3_odbc = "Date_CP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
     if($drop)
     {
@@ -239,8 +244,8 @@ if ($docum == 1) {
                                     $id $id_type,
                                     $f1 $f1_type,
                                     $f2 $f2_type,
-                                    $f3 $f3_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -256,7 +261,7 @@ if ($docum == 1) {
         $field2 = $row[$f2_odbc];
         $field3 = $row[$f3_odbc];
 
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,'$field1','$field2','$field3')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,'$field1','$field2','$field3')";
 
         if(insert())
             break;
@@ -283,8 +288,6 @@ if ($docum_dogovory == 1) {
     $f2_type = "INT";
 
     $f3_odbc = "DateCP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if ($drop) {
         drop();
@@ -293,7 +296,7 @@ if ($docum_dogovory == 1) {
                                     $id $id_type,
                                     $f1 $f1_type,
                                     $f2 $f2_type,
-                                    $f3 $f3_type
+                                    $footer_fields
                                     )";
         $db->query($sql);
     }
@@ -311,7 +314,7 @@ if ($docum_dogovory == 1) {
         $field2 = $row[$f2_odbc];
         $field3 = $row[$f3_odbc];
 
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,$field1,$field2,'$field3')";
 
         if(insert())
             break;
@@ -325,22 +328,23 @@ if ($dogovor_prim == 1) {
     $table = "dogovor_prim";
     $table_odbc = "ПримечаниеДоговора";
 
-// Sourse Names                | Dest Names                 | Dest Type
     $id_odbc = "Код_Примечания";
     $id = "kod_prim";
     $id_type = "INT";
+
     $f1_odbc = "Текст";
     $f1 = "text";
     $f1_type = "TEXT";
+
     $f2_odbc = "Код_Договора";
     $f2 = "kod_dogovora";
     $f2_type = "INT";
+
     $f3_odbc = "user";
     $f3 = "user";
     $f3_type = "VARCHAR(20)";
+
     $f4_odbc = "Дата";
-    $f4 = "time_stamp";
-    $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
@@ -351,8 +355,8 @@ if ($dogovor_prim == 1) {
                                     $f1 $f1_type,
                                     $f2 $f2_type,
                                     $f3 $f3_type,
-                                    $f4 $f4_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -369,7 +373,7 @@ if ($dogovor_prim == 1) {
         $field3 = $row[$f3_odbc];
         $field4 = $row[$f4_odbc];
 
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) VALUES($field_id,'$field1',$field2,'$field3','$field4')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$time_stamp) VALUES($field_id,'$field1',$field2,'$field3','$field4');";
 
         if(insert())
             break;
@@ -416,8 +420,6 @@ if ($dogovory == 1) {
     $f7_type = "INT";
 
     $f8_odbc = "DateCP";
-    $f8 = "time_stamp";
-    $f8_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
 
     if($drop)
@@ -426,16 +428,16 @@ if ($dogovory == 1) {
 
         // sql to create table
         $sql = "CREATE TABLE $table (
-        $id $id_type,
-        $f1 $f1_type,
-        $f2 $f2_type,
-        $f3 $f3_type,
-        $f4 $f4_type,
-        $f5 $f5_type,
-        $f6 $f6_type,
-        $f7 $f7_type,
-        $f8 $f8_type
-        )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $f3 $f3_type,
+                                    $f4 $f4_type,
+                                    $f5 $f5_type,
+                                    $f6 $f6_type,
+                                    $f7 $f7_type,
+                                    $footer_fields
+                                    );";
             $db->query($sql);
     }
 
@@ -460,7 +462,7 @@ if ($dogovory == 1) {
             $field7 = $field5;
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8) VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,$field6,$field7,'$field8')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$time_stamp) VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,$field6,$field7,'$field8');";
 
         if(insert())
             break;
@@ -499,22 +501,21 @@ if ($elem == 1) {
     $f5_type = "VARCHAR(255)";
 
     $f6_odbc = "Date_CP";
-    $f6 = "time_stamp";
-    $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
         drop();
         // sql to create table
         $sql = "CREATE TABLE $table (
-        $id $id_type,
-        $f1 $f1_type,
-        $f2 $f2_type,
-        $f3 $f3_type,
-        $f4 $f4_type,
-        $f5 $f5_type,
-        $f6 $f6_type
-        )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $f3 $f3_type,
+                                    $f4 $f4_type,
+                                    $f5 $f5_type,
+                                    $footer_fields
+
+                                    );";
             $db->query($sql);
     }
 
@@ -540,7 +541,7 @@ if ($elem == 1) {
             $field5 = $field1;
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) VALUES($field_id,'$field1','$field2','$field3',$field4,'$field5','$field6')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$time_stamp) VALUES($field_id,'$field1','$field2','$field3',$field4,'$field5','$field6');";
 
         if(insert())
             break;
@@ -583,13 +584,14 @@ if ($kontakty==1) {
         drop();
         // sql to create table
         $sql = "CREATE TABLE $table (
-                            $id $id_type,
-                            $f1 $f1_type,
-                            $f2 $f2_type,
-                            $f3 $f3_type,
-                            $f4 $f4_type,
-                            $f5 $f5_type
-                                )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $f3 $f3_type,
+                                    $f4 $f4_type,
+                                    $f5 $f5_type,
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -608,7 +610,7 @@ if ($kontakty==1) {
         $field5 = $row[$f5_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5) VALUES($field_id,$field1,'$field2','$field3','$field4','$field5')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5) VALUES($field_id,$field1,'$field2','$field3','$field4','$field5');";
         if(insert())
             break;
     }
@@ -635,9 +637,6 @@ if ($kontakty_dogovora == 1) {
     $f2_type = "INT";
 
     $f3_odbc = "DateCP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
     if($drop)
     {
@@ -647,8 +646,8 @@ if ($kontakty_dogovora == 1) {
                                     $id $id_type,
                                     $f1 $f1_type,
                                     $f2 $f2_type,
-                                    $f3 $f3_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -665,7 +664,7 @@ if ($kontakty_dogovora == 1) {
         $field3 = $row[$f3_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,$field1,$field2,'$field3');";
         if(insert())
             break;
     }
@@ -740,9 +739,6 @@ if ($org == 1) {
     $f14_type = "VARCHAR(255)";
 
     $f15_odbc = "Date_CP";
-    $f15 = "time_stamp";
-    $f15_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
     if($drop)
     {
@@ -764,8 +760,8 @@ if ($org == 1) {
                                     $f12 $f12_type,
                                     $f13 $f13_type,
                                     $f14 $f14_type,
-                                    $f15 $f15_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -799,9 +795,9 @@ if ($org == 1) {
             $field7 = $field5;
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$f10,$f11,$f12,$f13,$f14,$f15) 
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$f10,$f11,$f12,$f13,$f14,$time_stamp) 
             VALUES($field_id,'$field1','$field2','$field3','$field4','$field5','$field6','$field7',
-            '$field8','$field9','$field10','$field11','$field12','$field13','$field14','$field15')";
+            '$field8','$field9','$field10','$field11','$field12','$field13','$field14','$field15');";
         if(insert())
             break;
     }
@@ -852,25 +848,22 @@ if ($parts == 1) {
     $f8_type = "DOUBLE";
 
     $f9_odbc = "DateCP";
-    $f9 = "time_stamp";
-    $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
     if($drop)
     {
         drop();
         $sql = "CREATE TABLE $table (
-        $id $id_type,
-        $f1 $f1_type,
-        $f2 $f2_type,
-        $f3 $f3_type,
-        $f4 $f4_type,
-        $f5 $f5_type,
-        $f6 $f6_type,
-        $f7 $f7_type,
-        $f8 $f8_type,
-        $f9 $f9_type
-        )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $f3 $f3_type,
+                                    $f4 $f4_type,
+                                    $f5 $f5_type,
+                                    $f6 $f6_type,
+                                    $f7 $f7_type,
+                                    $f8 $f8_type,
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -894,7 +887,7 @@ if ($parts == 1) {
         $field9 = $row[$f9_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9) 
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$time_stamp) 
             VALUES($field_id,$field1,'$field2',$field3,'$field4',$field5,$field6,$field7,$field8,'$field9')";
         if(insert())
             break;
@@ -922,13 +915,11 @@ if ($kontakty_data == 1) {
     $f2 = "data";
     $f2_type = "VARCHAR(255)";
 
-    $f3_odbc = "Date_CP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
     $f4_odbc = "Код_Организации";
     $f4 = "kod_org";
     $f4_type = "INT";
+
+    $f3_odbc = "Date_CP";
 
     if($drop)
     {
@@ -939,20 +930,20 @@ if ($kontakty_data == 1) {
 
         // sql to create table
         $sql = "CREATE TABLE $table (
-        $id $id_type,
-        $f1 $f1_type,
-        $f2 $f2_type,
-        $f3 $f3_type
-        )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $footer_fields     
+                                    );";
         $db->query($sql);
 
         // sql to create table2
         $sql = "CREATE TABLE $table2 (
-        $id $id_type,
-        $f4 $f4_type,
-        $f2 $f2_type,
-        $f3 $f3_type
-        )";
+                                    $id $id_type,
+                                    $f4 $f4_type,
+                                    $f2 $f2_type,
+                                    $footer_fields
+                                    );";
         $db->query($sql);
 
     }
@@ -971,7 +962,7 @@ if ($kontakty_data == 1) {
         $field4 = $row[$f4_odbc];
 
         if ($field1 != "") {
-            $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,'$field2','$field3')";
+            $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,$field1,'$field2','$field3')";
             $db->query($sql);
 
             // Проверяем записалась ли строка
@@ -981,7 +972,7 @@ if ($kontakty_data == 1) {
         }
         elseif ($field4 != "")
         {
-            $sql = "INSERT INTO $table2 ($id,$f4,$f2,$f3) VALUES($field_id,$field4,'$field2','$field3')";
+            $sql = "INSERT INTO $table2 ($id,$f4,$f2,$time_stamp) VALUES($field_id,$field4,'$field2','$field3')";
             $db->query($sql);
 
             // Проверяем записалась ли строка
@@ -989,9 +980,6 @@ if ($kontakty_data == 1) {
                 echo "<br>$table2 Err: $sql";
         }
     }
-
-    $sql = "ALTER TABLE $table MODIFY $id INT AUTO_INCREMENT PRIMARY KEY";
-    $db->query($sql);
 
     $sql = "ALTER TABLE $table2 MODIFY $id INT AUTO_INCREMENT PRIMARY KEY";
     $db->query($sql);
@@ -1029,14 +1017,10 @@ if ($plat == 1) {
     $f5 = "kod_dogovora";
     $f5_type = "INT";
 
-    $f6_odbc = "Date_CP";
-    $f6 = "time_stamp";
-    $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+    $f6 = "user";
+    $f6_type = "VARCHAR(255)";
 
-    $f7_odbc = "";
-    $f7 = "user";
-    $f7_type = "VARCHAR(255)";
-
+    $f7_odbc = "Date_CP";
 
     if($drop)
     {
@@ -1050,8 +1034,8 @@ if ($plat == 1) {
                                     $f4 $f4_type,
                                     $f5 $f5_type,
                                     $f6 $f6_type,
-                                    $f7 $f7_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1068,11 +1052,11 @@ if ($plat == 1) {
         $field3 = $row[$f3_odbc];
         $field4 = $row[$f4_odbc];
         $field5 = $row[$f5_odbc];
-        $field6 = $row[$f6_odbc];
+        $field6 = $row[$f7_odbc];
 
         // Записываем строку
         $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) 
-            VALUES($field_id,'$field1',$field2,'$field3','$field4',$field5,'$field6')";
+            VALUES($field_id,'$field1',$field2,'$field3','$field4',$field5,'$field6');";
 
         if(insert())
             break;
@@ -1106,14 +1090,6 @@ if ($raschet == 1) {
     $f4 = "type_rascheta";
     $f4_type = "INT";
 
-    $f5_odbc = "";
-    $f5 = "time_stamp";
-    $f5_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
-    $f6_odbc = "";
-    $f6 = "user";
-    $f6_type = "VARCHAR(255)";
-
     if($drop)
     {
         drop();
@@ -1124,9 +1100,8 @@ if ($raschet == 1) {
                                     $f2 $f2_type,
                                     $f3 $f3_type,
                                     $f4 $f4_type,
-                                    $f5 $f5_type,
-                                    $f6 $f6_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1145,7 +1120,7 @@ if ($raschet == 1) {
 
         // Записываем строку
         $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) 
-                             VALUES($field_id,$field1,$field2,'$field3',$field4)";
+                             VALUES($field_id,$field1,$field2,'$field3',$field4);";
 
         if(insert())
             break;
@@ -1176,15 +1151,6 @@ if ($raschety_plat == 1) {
     $f3 = "kod_plat";
     $f3_type = "INT";
 
-    $f4_odbc = "";
-    $f4 = "time_stamp";
-    $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
-    $f5_odbc = "";
-    $f5 = "user";
-    $f5_type = "VARCHAR(255)";
-
-
     if($drop)
     {
         drop();
@@ -1194,9 +1160,8 @@ if ($raschety_plat == 1) {
                                     $f1 $f1_type,
                                     $f2 $f2_type,
                                     $f3 $f3_type,
-                                    $f4 $f4_type,
-                                    $f5 $f5_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1215,7 +1180,7 @@ if ($raschety_plat == 1) {
 
         // Записываем строку
         $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) 
-            VALUES($field_id,$field1,$field2,$field3)";
+            VALUES($field_id,$field1,$field2,$field3);";
 
         if(insert())
             break;
@@ -1229,7 +1194,6 @@ if ($scheta == 1) {
     $table = "scheta";
     $table_odbc = "Счета";
 
-// Sourse Names                | Dest Names                   | Dest Type
     $id_odbc = "Код_Счета";
     $id = "kod_scheta";
     $id_type = "INT";
@@ -1255,8 +1219,6 @@ if ($scheta == 1) {
     $f5_type = "INT";
 
     $f6_odbc = "Date_CP";
-    $f6 = "time_stamp";
-    $f6_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
@@ -1270,8 +1232,8 @@ if ($scheta == 1) {
                                     $f3 $f3_type,
                                     $f4 $f4_type,
                                     $f5 $f5_type,
-                                    $f6 $f6_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1292,8 +1254,8 @@ if ($scheta == 1) {
         $field6 = $row[$f6_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6) 
-            VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,'$field6')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$time_stamp) 
+            VALUES($field_id,'$field1','$field2',$field3,'$field4',$field5,'$field6');";
         if(insert())
             break;
     }
@@ -1343,8 +1305,6 @@ if ($sklad == 1) {
     $f8_type = "DATE";
 
     $f9_odbc = "DateCP";
-    $f9 = "time_stamp";
-    $f9_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
@@ -1360,8 +1320,8 @@ if ($sklad == 1) {
                                     $f6 $f6_type,
                                     $f7 $f7_type,
                                     $f8 $f8_type,
-                                    $f9 $f9_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1384,8 +1344,8 @@ if ($sklad == 1) {
         $field9 = $row[$f9_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9) 
-            VALUES($field_id,$field1,$field2,$field3,'$field4','$field5','$field6',$field7,'$field8','$field9')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$time_stamp) 
+            VALUES($field_id,$field1,$field2,$field3,'$field4','$field5','$field6',$field7,'$field8','$field9');";
         if(insert())
             break;
     }
@@ -1415,9 +1375,6 @@ if ($org_links == 1) {
     $f3_type = "VARCHAR(255)";
 
     $f4_odbc = "Date_CP";
-    $f4 = "time_stamp";
-    $f4_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
 
     if($drop)
     {
@@ -1428,8 +1385,8 @@ if ($org_links == 1) {
                                     $f1 $f1_type,
                                     $f2 $f2_type,
                                     $f3 $f3_type,
-                                    $f4 $f4_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1447,8 +1404,8 @@ if ($org_links == 1) {
         $field4 = $row[$f4_odbc];
 
         // Записываем строку
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$f4) 
-            VALUES($field_id,$field1,$field2,'$field3','$field4')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3,$time_stamp) 
+            VALUES($field_id,$field1,$field2,'$field3','$field4');";
         if(insert())
             break;
     }
@@ -1474,8 +1431,6 @@ if ($docum_elem == 1) {
     $f2_type = "INT";
 
     $f3_odbc = "DateCP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
@@ -1485,8 +1440,8 @@ if ($docum_elem == 1) {
                                     $id $id_type,
                                     $f1 $f1_type,
                                     $f2 $f2_type,
-                                    $f3 $f3_type
-                                    )";
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1502,7 +1457,7 @@ if ($docum_elem == 1) {
         $field2 = $row[$f2_odbc];
         $field3 = $row[$f3_odbc];
 
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,$field1,$field2,'$field3');";
         if(insert())
             break;
     }
@@ -1519,15 +1474,16 @@ if ($docum_org == 1) {
     $id_odbc = "Код_Связи";
     $id = "kod_docum_org";
     $id_type = "INT";
+
     $f1_odbc = "Код_Документа";
     $f1 = "kod_docum";
     $f1_type = "INT";
+
     $f2_odbc = "Код_Организации";
     $f2 = "kod_org";
     $f2_type = "INT";
+
     $f3_odbc = "Date_CP";
-    $f3 = "time_stamp";
-    $f3_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     if($drop)
     {
@@ -1535,11 +1491,11 @@ if ($docum_org == 1) {
 
         // sql to create table
         $sql = "CREATE TABLE $table (
-        $id $id_type,
-        $f1 $f1_type,
-        $f2 $f2_type,
-        $f3 $f3_type
-        )";
+                                    $id $id_type,
+                                    $f1 $f1_type,
+                                    $f2 $f2_type,
+                                    $footer_fields
+                                    );";
         $db->query($sql);
     }
 
@@ -1556,7 +1512,7 @@ if ($docum_org == 1) {
         $field2 = $row[$f2_odbc];
         $field3 = $row[$f3_odbc];
 
-        $sql = "INSERT INTO $table ($id,$f1,$f2,$f3) VALUES($field_id,$field1,$field2,'$field3')";
+        $sql = "INSERT INTO $table ($id,$f1,$f2,$time_stamp) VALUES($field_id,$field1,$field2,'$field3')";
 
         if(insert())
             break;
@@ -1585,7 +1541,9 @@ if ($view == 1) {
             docum.kod_docum
         FROM
             docum
-        INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum 
+        INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum
+        WHERE docum_elem.del=0
+        ORDER BY docum_elem.kod_docum DESC
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_docum_elem");
