@@ -25,7 +25,7 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM org ORDER BY poisk");
+        $rows = $db->rows("SELECT * FROM org WHERE del=0 ORDER BY poisk");
 
         $cnt = $db->cnt;
 
@@ -140,7 +140,7 @@ class Org
     public function getData()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM org WHERE kod_org=$this->kod_org");
+        $rows = $db->rows("SELECT * FROM org WHERE del=0 AND kod_org=$this->kod_org");
         $this->Data = $rows[0];
         return;
     }
@@ -181,7 +181,7 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org");
+        $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0");
 
         $cnt = $db->cnt;
 
@@ -235,7 +235,7 @@ class Org
     {
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM org ORDER BY poisk");
+        $rows = $db->rows("SELECT * FROM org WHERE del=0 ORDER BY poisk");
 
         $cnt = $db->cnt;
 
@@ -324,7 +324,7 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM phones WHERE kod_org=" . $this->kod_org);
+        $rows = $db->rows("SELECT * FROM org_data WHERE del=0 AND kod_org=$this->kod_org");
 
         $cnt = $db->cnt;
 
@@ -344,8 +344,7 @@ class Org
             $row = $rows[$i];
 
             $res .= '<tr>
-                        <td>' . $row['phone'] . '</td>
-                        <td>' . $row['prim'] . '</td>
+                        <td>' . $row['data'] . '</td>
 		            </tr>';
         }
         $res .= '</table>';
@@ -472,7 +471,7 @@ class Org
         $db = new Db();
 
         if (isset($kod_adresa)) {
-            $db->query("DELETE FROM adresa WHERE kod_adresa=$kod_adresa");
+            $db->query("UPDATE adresa SET del=1 WHERE kod_adresa=$kod_adresa");
 
         } else
             echo "Ошибка: Не задан ID адреса";
@@ -592,9 +591,7 @@ class Org
                 FROM
                     view_dogovor_summa
                 INNER JOIN dogovory ON view_dogovor_summa.kod_dogovora = dogovory.kod_dogovora
-                WHERE dogovory.kod_org=$this->kod_org
-                AND
-                      dogovory.zakryt = 0
+                WHERE dogovory.kod_org=$this->kod_org AND dogovory.zakryt = 0
                 GROUP BY
                     dogovory.kod_org
                 ";

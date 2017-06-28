@@ -40,7 +40,7 @@ class Elem
             $this->kod_elem = $kod_elem;
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
+        $rows = $db->rows("SELECT * FROM elem WHERE kod_elem=$this->kod_elem AND del=0");
         $this->Data = $rows[0];
 
         return $this->Data;
@@ -57,7 +57,7 @@ class Elem
     {
         $db = new Db();
         $rows = $db->rows(/** @lang SQL */
-            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
+            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem AND del=0");
 
         if ($db->cnt == 0)
             return "";
@@ -184,6 +184,7 @@ class Elem
                         docum_elem.kod_elem
                     FROM
                         docum_elem
+                    WHERE del=0
                     INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum WHERE docum.`name`='Фото' AND docum_elem.kod_elem=$this->kod_elem";
         $link = 'form_elem.php?kod_elem=' . $this->kod_elem;
 
@@ -366,7 +367,7 @@ class Elem
     {
         $db = new Db();
 
-        $elem_name = $db->rows("SELECT * FROM elem WHERE kod_elem = $kod_elem"); // Получаем название удаляемого элемента
+        $elem_name = $db->rows("SELECT * FROM elem WHERE kod_elem = $kod_elem AND del=0"); // Получаем название удаляемого элемента
 
         $name = $elem_name[0]['name'];
         $obozn = $elem_name[0]['obozn'];
@@ -375,10 +376,10 @@ class Elem
         if(substr_count($name,$obozn)==0)
             $new_name = $name.' '.$obozn;
 
-        $db->query("DELETE FROM elem WHERE kod_elem=$kod_elem"); // Удаляем элемент
+        $db->query("UPDATE elem SET del=1 WHERE kod_elem=$kod_elem"); // Удаляем элемент
         Docum::DeleteElemFiles($kod_elem); // Удаляем связные документы
 
-        $rows = $db->rows("SELECT * FROM parts WHERE kod_elem = $kod_elem"); // Получаем списое партий, где участвовал удаленный элемент
+        $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем списое партий, где участвовал удаленный элемент
         if($db->cnt==0)
             return;
 

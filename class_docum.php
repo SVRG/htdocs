@@ -3,6 +3,7 @@ include_once('class_db.php');
 
 class Docum
 {
+    public $path = "C:/xampp/htdocs/";
 //---------------------------------------------------------------------
 //
     /**
@@ -25,7 +26,7 @@ class Docum
                               FROM
                                 docum_elem
                               INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum
-                              WHERE kod_elem=" . $ID;
+                              WHERE kod_elem=$ID AND docum.del=0";
 
         elseif ($Type == 'Doc')
             $sql =      "SELECT
@@ -36,7 +37,7 @@ class Docum
                           FROM
                             docum
                           INNER JOIN docum_dogovory ON docum_dogovory.kod_docum = docum.kod_docum
-                          WHERE docum_dogovory.kod_dogovora=" . $ID;
+                          WHERE docum_dogovory.kod_dogovora=$ID AND docum.del=0";
 
         elseif ($Type == 'Org')
             $sql =   "SELECT
@@ -47,7 +48,7 @@ class Docum
                       FROM
                         docum_org
                       INNER JOIN docum ON docum_org.kod_docum = docum.kod_docum
-                      WHERE kod_org=" . $ID;
+                      WHERE kod_org=$ID AND docum.del=0";
 
         if($sql=='')
             return "";
@@ -104,17 +105,17 @@ class Docum
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM docum WHERE kod_docum=$kod_docum");
+        $rows = $db->rows("SELECT * FROM docum WHERE kod_docum=$kod_docum AND docum.del=0");
 
         if($db->cnt!=1)
             return;
 
         $row = $rows[0];
 
-        $db->query("DELETE FROM docum WHERE kod_docum= $kod_docum");
-        $db->query("DELETE FROM docum_dogovory WHERE kod_docum= $kod_docum");
-        $db->query("DELETE FROM docum_elem WHERE kod_docum= $kod_docum");
-        $db->query("DELETE FROM docum_org WHERE kod_docum= $kod_docum");
+        $db->query("UPDATE docum SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query("UPDATE docum_dogovory SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query("UPDATE docum_elem SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query("UPDATE docum_org SET del=1 WHERE kod_docum= $kod_docum");
 
         if (!file_exists($row['path']))
             return;
@@ -172,7 +173,8 @@ class Docum
                                     FROM
                                         docum_elem
                                     INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum
-                                    WHERE kod_elem=$kod_elem");
+                                    WHERE kod_elem=$kod_elem AND docum_elem.del=0
+                                    ");
 
         if($db->cnt!=1)
             return;
@@ -184,14 +186,14 @@ class Docum
 
             $path = $row['path'];
 
-            $db->query("DELETE FROM docum WHERE kod_docum= $kod_docum");
+            $db->query("UPDATE docum SET del=1 WHERE kod_docum=$kod_docum");
 
             if (!file_exists($path))
                 continue;
             unlink("C:/xampp/htdocs/" . $row['path']); // todo - нужно задавать путь!
         }
 
-        $db->query("DELETE FROM docum_elem WHERE kod_elem= $kod_elem");
+        $db->query("UPDATE docum_elem SET del=1 WHERE kod_elem=$kod_elem");
     }
 //-----------------------------------------------------------------------
 }

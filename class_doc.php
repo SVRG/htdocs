@@ -220,7 +220,7 @@ class Doc
             // Партия
             $kod_part = (int)$row['kod_part']; // Код партии
             $kod_elem = (int)$row['kod_elem']; // Код элемента
-            $obozn = $row['obozn']; // Обозначение
+            $shifr = $row['shifr']; // Обозначение
             $mod = $row['modif']; // Модификация
             $numb = (int)$row['numb']; // Количество
             $numb_ostat = (int)$row['numb_ostat']; // Осталось отгрузить
@@ -293,7 +293,7 @@ class Doc
 
             $res .= /** @lang HTML */
                 "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
-                                       <a href='form_elem.php?kod_elem=$kod_elem'>$obozn $mod</a></td>
+                                       <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
@@ -582,7 +582,7 @@ class Doc
                     WHERE 
                       kod_ispolnit=683 AND zakryt<>1 
                     ORDER BY 
-                      obozn ASC,
+                      shifr ASC,
                       numb DESC";
 
         else // Если договор внешний
@@ -594,7 +594,7 @@ class Doc
                     WHERE 
                       kod_org=683 AND zakryt<>1 
                     ORDER BY 
-                      obozn ASC, 
+                      shifr ASC, 
                       numb DESC";
 
         $db = new Db();
@@ -606,7 +606,7 @@ class Doc
 //
 
     /**
-     * График поставок по изделиям в тек. и след. месяцах (План Реализации)
+     * График поставок по изделиям (План Реализации)
      * todo - добавить итоговые значения оплаченных шт
      * @param array $rplan_rows - массив rplan отсортированный по элементам
      * @return string
@@ -668,7 +668,7 @@ class Doc
             }
 
             $kod_elem = (int)$row['kod_elem']; // Код элемента
-            $obozn = $row['obozn']; // Обозначение
+            $shifr = $row['shifr']; // Обозначение
             $modif = $row['modif']; // Модификация
             $numb = $row['numb'];
             $val = (int)$row['val']; // Валюта
@@ -706,8 +706,8 @@ class Doc
                 $proc_str ="$proc%";
 
             $ind_data = ""; // Индикатор даты
-
-            if(func::DaysRem(func::Date_from_MySQL($data_postav))<14 and $proc>0)
+            if($proc>0)
+            if(func::DaysRem(func::Date_from_MySQL($data_postav))<14)
                 $ind_data = " bgcolor='#f4df42'";
 
             $numb_ostat_str = ""; // Количество которое осталось отгрузить
@@ -728,7 +728,7 @@ class Doc
             {
                 if($summ_cnt>1)
                     $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat</b></td><th colspan='5'></th></tr>";
-                $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$obozn</a></th></tr>";
+                $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
                 $summ_numb_ostat = 0;
                 $summ_cnt = 0;
             }
@@ -736,13 +736,16 @@ class Doc
             $summ_numb_ostat +=$numb_ostat;
             $summ_cnt++;
 
+            $form_part_link = "form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora";
+            $form_dogovor_link = "form_dogovor.php?kod_dogovora=$kod_dogovora";
+
             // Формируем строку плана
             $row_str = /** @lang HTML */
                 "<tr bgcolor='$zebra'>
-                                <td><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'>" . $obozn . $modif_str . "</a></td>
-                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $numb . $numb_ostat_str. "</a></td>
-                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $proc_str .  "</a></td>
-                                <td align='right'><a href='form_dogovor.php?kod_dogovora=" . $kod_dogovora . "'>" . $nomer . "</a></td>
+                                <td><a href='$form_part_link'>" . $shifr . $modif_str . "</a></td>
+                                <td align='right'><a href='$form_part_link'>" . $numb . $numb_ostat_str. "</a></td>
+                                <td align='right'><a href='$form_part_link'>" . $proc_str .  "</a></td>
+                                <td align='right'><a href='$form_dogovor_link'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
                                 <td align='right'>" . $part_summa_str . $val_str . $nds_str .$part_summa_ostat_str. "</td>
@@ -796,7 +799,7 @@ class Doc
     public function formPlat($Del=0)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora");
+        $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora AND plat.del=0");
 
         $cnt = $db->cnt;
 
@@ -904,7 +907,7 @@ class Doc
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora");
+        $rows = $db->rows("SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora AND scheta.del=0");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
@@ -946,7 +949,11 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM dogovor_prim WHERE kod_dogovora=$this->kod_dogovora ORDER BY dogovor_prim.time_stamp DESC");
+        $rows = $db->rows("SELECT * 
+                                  FROM dogovor_prim 
+                                  WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 
+                                  ORDER BY dogovor_prim.time_stamp DESC
+                                  ");
 
         $cnt = $db->cnt;
         $res = "";
@@ -1611,9 +1618,9 @@ class Doc
         $db = new Db();
 
         if (isset($kod_plat)) {
-            $db->query("DELETE FROM plat WHERE kod_plat=$kod_plat");
+            $db->query("UPDATE plat SET del=1 WHERE kod_plat=$kod_plat");
 
-            $db->query("DELETE FROM raschety_plat WHERE kod_plat=$kod_plat");
+            $db->query("UPDATE raschety_plat SET del=1 WHERE kod_plat=$kod_plat");
 
         } else
             echo "Ошибка: Не задан ID платежа";
@@ -1628,7 +1635,7 @@ class Doc
         $db = new Db();
 
         if (isset($kod_prim)) {
-            $db->query("DELETE FROM dogovor_prim WHERE kod_prim=$kod_prim");
+            $db->query("UPDATE dogovor_prim SET del=1 WHERE kod_prim=$kod_prim");
 
         } else
             echo "Ошибка: Не задан ID примечания";

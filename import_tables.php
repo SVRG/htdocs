@@ -16,40 +16,60 @@ include_once "class_odbc.php";
  * Date: 21.09.16
  * Time: 19:57
  * Важно! - При вставке проверять поля INT! Если они пустые то строка не вставится
+ * Кодировка MySQL должна быть utf8
+ * Кодировка данного файла - windows-1251
+ *
+ *
+    Old Server
+
+    Stop mysql server
+    Copy contents of datadir to another location on disk (~/mysqldata/*)
+    Start mysql server again
+    compress the data (tar -czvf mysqldata.tar.gz ~/mysqldata)
+    copy the compressed file to new server
+
+    New Server
+
+    install mysql (don't start)
+    unzip compressed file (tar -xzvf mysqldata.tar.gz)
+    move contents of mysqldata to the datadir
+    Make sure your innodb_log_file_size is same on new server, or if it's not, don't copy the old log files (mysql will generate these)
+    Start mysql
+
  */
 
 $db = new Db_import();
-$odbc = new ODBC();
+//$odbc = new ODBC(); // Только на машине с ODBC, в противном случае будет выдавать ошибку соединения
 ini_set('max_execution_time', 1000); // Установка времени тайм-аута во избежания ошибки
 
 $time_stamp = "time_stamp"; // Поле для хранения времени создания
 $time_stamp_type = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 $time_stamp_str = "$time_stamp $time_stamp_type";
 
-$footer_fields = "$time_stamp_str, del INT DEFAULT 0, user INT, edit INT DEFAULT 0";
+$footer_fields = "$time_stamp_str, del INT(2) DEFAULT 0, kod_user INT, edit INT DEFAULT 0";
 
-$drop               =true; // Удаление таблиц
-$users              = 1;
-$sessions           = 1;
-$adresa             = 1;
-$docum              = 1;
-$docum_dogovory     = 1;
-$dogovor_prim       = 1;
-$dogovory           = 1;
-$elem               = 1;
-$kontakty           = 1;
-$kontakty_dogovora  = 1;
-$org                = 1;
-$parts              = 1;
-$kontakty_data      = 1;
-$plat               = 1;
-$raschet            = 1;
-$raschety_plat      = 1;
-$scheta             = 1;
-$sklad              = 1;
-$org_links          = 1;
-$docum_elem         = 1;
-$docum_org          = 1;
+$drop               = false; // Удаление таблиц
+$users              = 0;
+$sessions           = 0;
+$adresa             = 0;
+$docum              = 0;
+$docum_dogovory     = 0;
+$dogovor_prim       = 0;
+$dogovory           = 0;
+$elem               = 0;
+$kontakty           = 0;
+$kontakty_dogovora  = 0;
+$org                = 0;
+$parts              = 0;
+$kontakty_data      = 0;
+$plat               = 0;
+$raschet            = 0;
+$raschety_plat      = 0;
+$scheta             = 0;
+$sklad              = 0;
+$org_links          = 0;
+$docum_elem         = 0;
+$docum_org          = 0;
 $view               = 1;
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -124,36 +144,43 @@ function drop()
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
-
+//
 if ($users == 1) {
     // sql to create table
     if($drop)
     {
         $sql = /** @lang SQL */
-            "DROP TABLE IF EXISTS `users`;
-            CREATE TABLE `users` (
+            "DROP TABLE IF EXISTS trin.users;";
+        $db->query($sql);
+
+        $sql=     "CREATE TABLE users (
                                       kod_user INT(11) NOT NULL AUTO_INCREMENT,
-                                      `login` VARCHAR(20) NOT NULL DEFAULT '',
-                                      `password` VARCHAR(80) DEFAULT NULL,
-                                      `famil` VARCHAR(40) DEFAULT NULL,
-                                      `rt` VARCHAR(40) DEFAULT NULL,
-                                      `salt` VARCHAR(40) DEFAULT NULL,
-                                      PRIMARY KEY (`kod_user`)
-                                    ) ENGINE=MyISAM AUTO_INCREMENT=53;
+                                      login VARCHAR(20) NOT NULL,
+                                      password VARCHAR(80) DEFAULT '',
+                                      famil VARCHAR(40) DEFAULT '',
+                                      rt VARCHAR(40) DEFAULT 'oper',
+                                      salt VARCHAR(40) DEFAULT '',
+                                      PRIMARY KEY (kod_user)
+                                 );
             ";
         $db->query($sql);
 
         $sql = /** @lang SQL */
-            "INSERT INTO `users` VALUES     (1, 'Tikhomirov', '', 'Тихомиров Сергей', 'admin',''),
-                                            (51, 'Charykova', '', 'Чарыкова Татьяна', 'oper',''),
-                                            (46, 'Mityushin', '', 'Митюшин Максим', 'oper',''),
-                                            (50, 'Ukhova', '', 'Ухова Евгения', 'oper',''),
-                                            (49, 'Vasin', '', 'Васин Андрей', 'oper',''),
-                                            (45, 'Morgunova', '', 'Моргунова Елена', 'oper','');";
+            "INSERT INTO users VALUES(1, 'Tikhomirov', '', 'Тихомиров Сергей', 'admin',''),
+                                     (2, 'Charykova', '', 'Чарыкова Татьяна', 'oper',''),
+                                     (3, 'Mityushin', '', 'Митюшин Максим', 'oper',''),
+                                     (4, 'Ukhova', '', 'Ухова Евгения', 'oper',''),
+                                     (5, 'Vasin', '', 'Васин Андрей', 'oper',''),
+                                     (6, 'Morgunova', '', 'Моргунова Елена', 'oper','');";
         $db->query($sql);
+
+        $db->query("SELECT * FROM users");
+        if($db->cnt==0)
+            echo $db->last_query;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
+//
 if ($sessions == 1) {
 
     $table = "sessions";
@@ -161,12 +188,15 @@ if ($sessions == 1) {
 
     if($drop)
     {
-        $sql = "DROP TABLE IF EXISTS $table;
-                CREATE TABLE sessions (
+        $sql = "DROP TABLE IF EXISTS trin.sessions;";
+        $db->query($sql);
+
+        $sql = "CREATE TABLE $table (
                                 $id INT AUTO_INCREMENT PRIMARY KEY,
-                                login VARCHAR(20) NULL,
+                                login VARCHAR(20) DEFAULT '',
                                 $time_stamp_str,
-                                ip VARCHAR(20) NULL);";
+                                ip VARCHAR(20) NULL
+                                );";
         $db->query($sql);
     }
 }
@@ -1572,6 +1602,7 @@ if ($view == 1) {
             dogovory
         INNER JOIN org ON dogovory.kod_org = org.kod_org
         INNER JOIN org AS org_ispolnit ON dogovory.kod_ispolnit = org_ispolnit.kod_org
+        WHERE dogovory.del=0
         ORDER BY
             dogovory.data_sost DESC
         ";
@@ -1596,6 +1627,7 @@ if ($view == 1) {
             Sum(parts.price*parts.numb*(1+parts.nds)) AS dogovor_summa
         FROM
             parts
+        WHERE parts.del=0
         GROUP BY
             parts.kod_dogovora
         ORDER BY
@@ -1622,6 +1654,7 @@ if ($view == 1) {
             plat.kod_dogovora
         FROM
             plat
+        WHERE plat.del=0
         GROUP BY
             plat.kod_dogovora
         ORDER BY
@@ -1658,7 +1691,7 @@ if ($view == 1) {
         FROM
             view_dogovory_nvs
         LEFT JOIN view_dogovor_summa ON view_dogovor_summa.kod_dogovora = view_dogovory_nvs.kod_dogovora
-        LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora = view_dogovory_nvs.kod_dogovora 
+        LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_dogovor_data");
@@ -1688,7 +1721,7 @@ if ($view == 1) {
             parts.kod_elem
         FROM
             parts
-        INNER JOIN view_dogovory_nvs ON view_dogovory_nvs.kod_dogovora = parts.kod_dogovora 
+        INNER JOIN view_dogovory_nvs ON view_dogovory_nvs.kod_dogovora = parts.kod_dogovora
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_dogovory_elem");
@@ -1713,7 +1746,7 @@ if ($view == 1) {
         FROM
             sklad
         WHERE
-            sklad.kod_oper = 2 
+            sklad.kod_oper = 2 AND sklad.del=0
                 ";
     $db->query($sql);
     $db->query("SELECT * FROM view_sklad_otgruzka");
@@ -1755,7 +1788,7 @@ if ($view == 1) {
         FROM
             sklad
         WHERE
-            sklad.kod_oper = 1
+            sklad.kod_oper = 1 AND sklad.del=0
                 ";
     $db->query($sql);
     $db->query("SELECT * FROM view_sklad_postuplenie");
@@ -1792,6 +1825,7 @@ if ($view == 1) {
             parts.price,
             elem.kod_elem,
             elem.obozn,
+            elem.shifr,
             parts.kod_part,
             IFNULL(dogovory.zakryt,0) AS zakryt,
             dogovory.kod_ispolnit,
@@ -1814,8 +1848,7 @@ if ($view == 1) {
             INNER JOIN elem ON elem.kod_elem = parts.kod_elem
             INNER JOIN org AS ispolnit ON ispolnit.kod_org = dogovory.kod_ispolnit
             LEFT JOIN view_sklad_summ_otgruz ON parts.kod_part = view_sklad_summ_otgruz.kod_part
-            ORDER BY
-                dogovory.kod_dogovora DESC  
+            WHERE parts.del=0
             ";
     $db->query($sql);
     $db->query("SELECT * FROM view_rplan");
@@ -1842,6 +1875,7 @@ if ($view == 1) {
             elem.time_stamp
         FROM
             elem
+        WHERE elem.del=0
         ORDER BY
             elem.obozn ASC,
             elem.nomen DESC 
@@ -1903,7 +1937,8 @@ if ($view == 1) {
         FROM
             kontakty
         INNER JOIN kontakty_dogovora ON kontakty.kod_kontakta = kontakty_dogovora.kod_kontakta
-        INNER JOIN org ON kontakty.kod_org = org.kod_org 
+        INNER JOIN org ON kontakty.kod_org = org.kod_org
+        WHERE kontakty.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_kontakty_dogovora");
@@ -1930,6 +1965,7 @@ if ($view == 1) {
         FROM
             kontakty
         INNER JOIN kontakty_data ON kontakty.kod_kontakta = kontakty_data.kod_kontakta
+        WHERE kontakty.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_phones_kontakts");
@@ -1951,16 +1987,17 @@ if ($view == 1) {
             plat.summa,
             plat.`data`,
             plat.prim,
+            plat.kod_plat,
             view_dogovory_nvs.kod_dogovora,
             view_dogovory_nvs.nomer AS nomer_dogovora,
             view_dogovory_nvs.kod_org,
             view_dogovory_nvs.nazv_krat,
-            view_plat_raspred.summa_raspred,
-            plat.kod_plat
+            view_plat_raspred.summa_raspred
         FROM
             plat
         INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
-        LEFT JOIN view_plat_raspred ON plat.kod_plat = view_plat_raspred.kod_plat 
+        LEFT JOIN view_plat_raspred ON plat.kod_plat = view_plat_raspred.kod_plat
+        WHERE plat.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_plat");
@@ -1983,6 +2020,7 @@ if ($view == 1) {
         FROM
             raschety_plat
         INNER JOIN plat ON plat.kod_plat = raschety_plat.kod_plat
+        WHERE plat.del=0 AND raschety_plat.del=0
         GROUP BY
             plat.kod_plat 
         ";
@@ -2000,23 +2038,24 @@ if ($view == 1) {
 // sql to create view
     $sql = /** @lang SQL */
         "CREATE 
-        VIEW view_raschety_plat AS 
-        SELECT
-            raschet.kod_rascheta,
-            raschet.kod_part,
-            raschet.summa AS raschet_summa,
-            raschet.`data` AS data_rascheta,
-            raschet.type_rascheta,
-            raschety_plat.kod_plat,
-            raschety_plat.summa AS summa_raspred,
-            plat.nomer,
-            plat.`data` AS data_plat,
-            plat.prim,
-            plat.kod_dogovora
-        FROM
-            raschet
-        INNER JOIN raschety_plat ON raschet.kod_rascheta = raschety_plat.kod_rascheta
-        INNER JOIN plat ON raschety_plat.kod_plat = plat.kod_plat
+            VIEW view_raschety_plat AS 
+            SELECT
+                raschet.kod_rascheta,
+                raschet.kod_part,
+                raschet.summa AS raschet_summa,
+                raschet.`data` AS data_rascheta,
+                raschet.type_rascheta,
+                raschety_plat.kod_plat,
+                raschety_plat.summa AS summa_raspred,
+                plat.nomer,
+                plat.`data` AS data_plat,
+                plat.prim,
+                plat.kod_dogovora
+            FROM
+                raschet
+            INNER JOIN raschety_plat ON raschet.kod_rascheta = raschety_plat.kod_rascheta
+            INNER JOIN plat ON raschety_plat.kod_plat = plat.kod_plat
+            WHERE raschet.del=0 AND plat.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_raschety_plat");
@@ -2041,6 +2080,7 @@ if ($view == 1) {
         FROM
             raschet
         LEFT JOIN raschety_plat ON raschety_plat.kod_rascheta = raschet.kod_rascheta
+        WHERE raschet.del=0
         GROUP BY
             raschet.kod_rascheta 
         ";
@@ -2070,8 +2110,9 @@ if ($view == 1) {
             view_dogovory_nvs.nazv_krat
         FROM
           view_dogovory_nvs
-        INNER JOIN scheta ON view_dogovory_nvs.kod_dogovora = scheta.kod_dogovora 
-                ";
+        INNER JOIN scheta ON view_dogovory_nvs.kod_dogovora = scheta.kod_dogovora
+        WHERE scheta.del=0
+        ";
     $db->query($sql);
     $db->query("SELECT * FROM view_scheta_dogovora");
     if($db->cnt==0)
@@ -2153,7 +2194,7 @@ if ($view == 1) {
         AND dogovory.kod_dogovora = view_dogovor_summa.kod_dogovora
         LEFT JOIN view_dogovor_summa_plat ON dogovory.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
         WHERE
-            sklad.kod_oper = 2
+            sklad.kod_oper = 2 AND sklad.del=0
         ORDER BY
             sklad.`data` DESC
                 ";

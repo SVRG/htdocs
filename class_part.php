@@ -169,7 +169,7 @@ class Part
     {
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM sklad WHERE kod_part=$this->kod_part");
+        $rows = $db->rows("SELECT * FROM sklad WHERE del=0 AND kod_part=$this->kod_part");
         $cnt = $db->cnt;
 
         $res = '';
@@ -227,7 +227,7 @@ class Part
     public function formPayGraph($Edit = false)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschet WHERE kod_part=$this->kod_part ORDER BY data ASC"); //
+        $rows = $db->rows("SELECT * FROM raschet WHERE del=0 AND kod_part=$this->kod_part ORDER BY data ASC"); //
 
         $cnt = $db->cnt;
 
@@ -372,9 +372,9 @@ class Part
     {
         $db = new Db();
 
-        $db->query("DELETE FROM raschety_plat WHERE kod_rascheta=$kod_rascheta");
+        $db->query("UPDATE raschety_plat SET del=1 WHERE kod_rascheta=$kod_rascheta");
 
-        $db->query("DELETE FROM raschet WHERE kod_rascheta=$kod_rascheta");
+        $db->query("UPDATE raschet SET del=1 WHERE kod_rascheta=$kod_rascheta");
     }
 //------------------------------------------------------------------------
 //
@@ -487,7 +487,7 @@ class Part
         $db = new Db();
 
         if (isset($kod_oborota)) {
-            $db->query("DELETE FROM sklad WHERE kod_oborota=$kod_oborota");
+            $db->query("UPDATE sklad SET del=1 WHERE kod_oborota=$kod_oborota");
 
         } else
             echo "Ошибка: Не задан ID накладной";
@@ -583,7 +583,7 @@ class Part
         if($Edit==1) {
 
             $db = new Db();
-            $rows = $db->rows("SELECT * FROM parts WHERE kod_part=$this->kod_part");
+            $rows = $db->rows("SELECT * FROM parts WHERE del=0 AND kod_part=$this->kod_part");
 
             $row = $rows[0];//Данные
             $form_name = "EditPart";
@@ -679,13 +679,13 @@ class Part
     public function Delete()
     {
         $db = new Db();
-        $db->query("DELETE FROM parts WHERE kod_part=" . $this->kod_part);
+        $db->query("UPDATE parts SET del=1 WHERE kod_part=$this->kod_part");
 
-        $db->query("DELETE FROM raschet WHERE kod_part=" . $this->kod_part);
+        $db->query("UPDATE raschet SET del=1 WHERE kod_part=$this->kod_part");
 
-        //$db->query("DELETE FROM raschety_plat WHERE kod_rascheta=" . $); // todo - удалить свзяные записи
+        //$db->query("UPDATE raschety_plat SET del=1 WHERE kod_rascheta=" . $); // todo - удалить свзяные записи
 
-        $db->query("DELETE FROM sklad WHERE kod_part=" . $this->kod_part);
+        $db->query("UPDATE sklad SET del=1 WHERE kod_part=$this->kod_part");
 
     }
 
@@ -699,7 +699,7 @@ class Part
     public static function SummPlatByRasch($kod_rascheta)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschety_plat WHERE kod_rascheta=$kod_rascheta");
+        $rows = $db->rows("SELECT * FROM raschety_plat WHERE del=0 AND kod_rascheta=$kod_rascheta");
 
         $cnt = $db->cnt;
         if($cnt==0)
@@ -733,7 +733,7 @@ class Part
                                 raschet
                             LEFT JOIN raschety_plat ON raschety_plat.kod_rascheta = raschet.kod_rascheta
                             WHERE
-                                kod_part=$this->kod_part
+                                kod_part=$this->kod_part AND raschet.del=0
                             GROUP BY
                                 raschet.kod_part");
 
@@ -880,7 +880,7 @@ class Part
         $db = new Db();
 
         $rows = $db->rows(/** @lang SQL */
-            "SELECT kod_part FROM parts WHERE kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
+            "SELECT kod_part FROM parts WHERE del=0 AND kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
         return $rows[0]['kod_part'];
     }
 }

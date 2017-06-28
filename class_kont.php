@@ -32,7 +32,7 @@ class Kontakt
         if ($Doc_Org == "Doc")
             $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora");
         else
-            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org");
+            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org AND del=0");
 
         return $db->cnt;
     }
@@ -103,12 +103,12 @@ class Kontakt
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=" . $kod_kontakta);
+        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$kod_kontakta AND del=0");
         if(count($rows)==0)
             return "";
         $kontakt_data = $rows[0];
 
-        $rows = $db->rows("SELECT * FROM kontakty_data WHERE kod_kontakta=" . $kod_kontakta);
+        $rows = $db->rows("SELECT * FROM kontakty_data WHERE kod_kontakta=$kod_kontakta AND del=0");
 
         // Формируем таблицу телефонов/адресов/...
         $res = '<table border=0 cellspacing=0 cellpadding=0>';
@@ -209,7 +209,7 @@ class Kontakt
         $this->kod_kontakta = $kod_kontakta;
 
         $rows = $db->rows(/** @lang SQL */
-            "SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta");
+            "SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta  AND del=0");
 
         $row = $rows[0];
 
@@ -234,7 +234,7 @@ class Kontakt
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_org=" . $this->kod_org);
+        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org  AND del=0");
 
         $cnt = $db->cnt; // количество записей
 
@@ -325,7 +325,7 @@ class Kontakt
 
         if($Edit==1) {
             $db = new Db();
-            $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta");
+            $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta AND del=0");
 
             $row = $rows[0];
 
@@ -391,6 +391,7 @@ class Kontakt
                                 FROM
                                     kontakty
                                 INNER JOIN org ON kontakty.kod_org = org.kod_org
+                                WHERE kontakty.del=0
                                 ORDER BY
                                     kontakty.famil ASC";
 
@@ -499,9 +500,9 @@ class Kontakt
         if ($kod_kontakta<0)
             $kod_kontakta = $this->kod_kontakta;
 
-        $db->query("DELETE FROM kontakty WHERE kod_kontakta=$kod_kontakta");
-        $db->query("DELETE FROM kontakty_data WHERE kod_kontakta=$kod_kontakta");
-        $db->query("DELETE FROM kontakty_dogovora WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty SET del=1 WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty_data SET del=1 WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty_dogovora SET del=1 WHERE kod_kontakta=$kod_kontakta");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -515,7 +516,7 @@ class Kontakt
     {
         $db = new Db();
 
-        $db->query("DELETE FROM kontakty_data WHERE kod_dat=$kod_dat");
+        $db->query("UPDATE kontakty_data SET del=1 WHERE kod_dat=$kod_dat");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
