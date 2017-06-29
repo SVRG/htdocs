@@ -121,11 +121,14 @@ class Kontakt
             // Если это e-mail
             if (strpos($row['data'], '@')) {
                 $res .= '<tr>
-                    <td>
-                    <form action="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!" method="post" enctype="text/plain">'
-                    . $row['data'] .
-                    ' <input type="submit" value="E-MAIL" />
-                    </form></td></tr>';
+                            <td>
+                                <form action="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!" method="post" enctype="text/plain">'
+                                . $row['data'] .
+                                ' <input type="submit" value="E-MAIL" />
+                                </form>
+                            </td>
+                            <td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>
+                        </tr>';
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>
@@ -490,7 +493,6 @@ class Kontakt
 
     /**
      * Удаление Контакта
-     * // todo - придумать защиту от случайного удаления
      * @param int $kod_kontakta
      */
     public function DelKonakt($kod_kontakta=-1)
@@ -509,7 +511,6 @@ class Kontakt
 
     /**
      * Удаление Данных
-     * // todo - придумать защиту от случайного удаления
      * @param int $kod_dat
      */
     public function DelData($kod_dat)
