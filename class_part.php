@@ -556,7 +556,7 @@ class Part
         if($this->kod_part==0)
             $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val)");
         else
-            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val WHERE kod_part=$this->kod_part");
+            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1 WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
@@ -775,16 +775,16 @@ class Part
     {
         $db = new Db();
 
-        $rows = $db->rows("
-                            SELECT
-                              view_sklad_otgruzka.kod_part,
-                              Sum(view_sklad_otgruzka.numb) AS summ_numb
-                            FROM
-                              view_sklad_otgruzka
-                            WHERE
-                              view_sklad_otgruzka.kod_part = $kod_part
-                            GROUP BY
-                              view_sklad_otgruzka.kod_part");
+        $rows = $db->rows("SELECT
+                                      view_sklad_otgruzka.kod_part,
+                                      Sum(view_sklad_otgruzka.numb) AS summ_numb
+                                    FROM
+                                      view_sklad_otgruzka
+                                    WHERE
+                                      view_sklad_otgruzka.kod_part = $kod_part
+                                    GROUP BY
+                                      view_sklad_otgruzka.kod_part"
+                            );
         if($db->cnt==0)
             return 0;
 

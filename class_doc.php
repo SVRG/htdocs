@@ -38,7 +38,7 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows(" SELECT
+        $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
                                     WHERE kod_elem=$kod_elem
@@ -1682,7 +1682,7 @@ class Doc
 
         $now = date('y.m.d');
 
-        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now' WHERE kod_dogovora=$this->kod_dogovora");
+        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now', edit=1 WHERE kod_dogovora=$this->kod_dogovora");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
