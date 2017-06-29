@@ -75,6 +75,18 @@ class Db
         if($echo==1)
             echo $query;
 
+        // Если обновление или добавление то записываем в Лог
+        if ((strpos($query, 'UPDATE') !== false) or (strpos($query, 'INSERT') !== false)) {
+
+            $user = "Test";
+            if(isset($_SESSION['MM_Username']))
+                $user = $_SESSION['MM_Username'];
+
+            $safe_str = addslashes($query);
+            $connection->query(/** @lang SQL */
+                "INSERT INTO log(log,user) VALUES ('$safe_str','$user');");
+        }
+
         return $result;
     }
 

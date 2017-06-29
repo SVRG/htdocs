@@ -48,9 +48,10 @@ $time_stamp_str = "$time_stamp $time_stamp_type";
 
 $footer_fields = "$time_stamp_str, del INT(2) DEFAULT 0, kod_user INT, edit INT DEFAULT 0";
 
-$drop               = false; // Удаление таблиц
+$drop               = true; // Удаление таблиц
 $users              = 0;
 $sessions           = 0;
+$log                = 1;
 $adresa             = 0;
 $docum              = 0;
 $docum_dogovory     = 0;
@@ -70,7 +71,7 @@ $sklad              = 0;
 $org_links          = 0;
 $docum_elem         = 0;
 $docum_org          = 0;
-$view               = 1;
+$view               = 0;
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -195,9 +196,30 @@ if ($sessions == 1) {
                                 $id INT AUTO_INCREMENT PRIMARY KEY,
                                 login VARCHAR(20) DEFAULT '',
                                 $time_stamp_str,
-                                ip VARCHAR(20) NULL
+                                ip VARCHAR(20)
                                 );";
         $db->query($sql);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+//
+if ($log == 1) {
+
+    $table = "log";
+    $id = "kod_log";
+
+    if($drop)
+    {
+        $sql = "DROP TABLE IF EXISTS trin.$table;";
+        $db->query($sql);
+
+        $sql = "CREATE TABLE $table (
+                                $id INT AUTO_INCREMENT PRIMARY KEY,
+                                log TEXT DEFAULT '',
+                                $time_stamp_str,
+                                user VARCHAR(20)
+                                );";
+        $db->query($sql,1);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
