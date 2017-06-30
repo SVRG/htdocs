@@ -23,7 +23,7 @@ class Doc
      */
     public function __construct($kod_dogovora=-1)
     {
-        //$this->getData($kod_dogovora);
+
     }
 
 //--------------------------------------------------------------
@@ -359,9 +359,9 @@ class Doc
                                         *
                                     FROM
                                         view_rplan
-                                    INNER JOIN kontakty_dogovora ON view_rplan.kod_dogovora = kontakty_dogovora.kod_dogovora
+                                    INNER JOIN view_kontakty_dogovora ON view_rplan.kod_dogovora = view_kontakty_dogovora.kod_dogovora
                                     WHERE
-                                        kontakty_dogovora.kod_kontakta = $kod_kontakta
+                                        view_kontakty_dogovora.kod_kontakta = $kod_kontakta
                                     ORDER BY
                                         view_rplan.kod_dogovora DESC,
                                         view_rplan.name ASC");
@@ -997,16 +997,15 @@ class Doc
 
             $kod_prim = $row['kod_prim'];
 
-            $del = "";
+            $btn_del = "";
             if($Del==1)
             {
-                $del = func::ActForm("", /** @lang HTML */
-                    "<input type='hidden' id='kod_prim' name='kod_prim' value='$kod_prim'> </input>","Удалить","DelPrim");
+                $btn_del = func::ActButton2("","Удалить","DelPrim","kod_prim_del",$kod_prim);
             }
 
             $res.= /** @lang HTML */
                     '<tr>
-                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $del . '</td>
+                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $btn_del . '</td>
                         <td>' . $row['text'] . '</td>
                      </tr>';
         }
@@ -1513,7 +1512,7 @@ class Doc
                 $event = true;
             }
             elseif($_POST['Flag'] == 'DelPrim') {
-                $this->DelPrim($_POST['kod_prim']);
+                $this->DelPrim($_POST['kod_prim_del']);
                 $event = true;
             }
         }
