@@ -192,7 +192,6 @@ class Org
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
-            $kod_adresa = $row['kod_adresa'];
             $type = "Юридический: ";
 
             if ($row['type'] == 1)
@@ -200,10 +199,9 @@ class Org
             elseif ($row['type'] == 3)
                 $type = "Почтовый: ";
 
-            $del = Func::ActForm('', "<input type='hidden' name='kod_adresa_del' value='$kod_adresa' />", 'Удалить', 'DelAddr');
-
+            $btn_del = func::ActButton2('','Удалить',"DelAddr","kod_adresa_del",$row['kod_adresa']);
             $res .= '<tr>
-                           <td>' . $type . $row['adres'] . $del . '</td>
+                           <td>' . $type . $row['adres'] .'</td><td>'. $btn_del . '</td>
                      </tr>';
         }
 
@@ -310,10 +308,6 @@ class Org
                           <td width="133">Номер</td>
                           <td ><input type="text" name="phone" id="phone" /></td>
                         </tr>
-                        <tr>
-                          <td width="133">Примечание</td>
-                          <td ><input type="text" name="prim" id="prim" /></td>
-                        </tr>
                       </table>
                   <p>
                     <input type="submit" name="button" id="button" value="Добавить" />
@@ -333,25 +327,35 @@ class Org
 
 
         $res = '<br>Телефоны<br>
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
-		            <tr bgcolor="#CCCCCC">
-		                <td>Номер</td>
-		                <td>Примечание</td>
-		            </tr>';
+                <table border=0 cellspacing=0 cellpadding=0 width="100%">';
 
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
+            $btn_del = func::ActButton2('','Удалить',"DelOrgData","kod_dat_del",$row['kod_dat']);
+
             $res .= '<tr>
                         <td>' . $row['data'] . '</td>
+                        <td>'.$btn_del.'</td>
 		            </tr>';
         }
         $res .= '</table>';
 
         return $res;
     }
+//----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Удаление Данных
+     * @param int $kod_dat
+     */
+    public function DelData($kod_dat)
+    {
+        $db = new Db();
+
+        $db->query("UPDATE org_data SET del=1 WHERE kod_dat=$kod_dat");
+    }
 //---------------------------------------------------------------------
 //
     /**
@@ -497,14 +501,13 @@ class Org
     /**
      * Добавить Телефон
      * @param $phone
-     * @param $prim
      */
-    public function AddPhone($phone, $prim)
+    public function AddPhone($phone)
     {
         $db = new DB();
         $kod_org = $this->kod_org;
 
-        $db->query("INSERT INTO phones (phone,prim,kod_org) VALUES('$phone','$prim',$kod_org)");
+        $db->query("INSERT INTO org_data (data,kod_org) VALUES('$phone',$kod_org)");
     }
 //----------------------------------------------------------------------
 //
@@ -698,7 +701,7 @@ class Org
     {
         $event = false;
         if (isset($_POST['AddOrgPhone']) and (isset($_POST['phone']))) {
-            $this->AddPhone($_POST['phone'], $_POST['prim']);
+            $this->AddPhone($_POST['phone']);
             $event = true;
         }
 
@@ -728,6 +731,14 @@ class Org
         if (isset($_POST['AddContact']) and (isset($_POST['famil']) or isset($_POST['name']))) {
             $this->AddKontakt($_POST['golg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
             $event = true;
+        }
+
+        if(isset($_POST['Flag'])){
+            if($_POST['Flag']=='DelOrgData' and isset($_POST['kod_dat_del']))
+            {
+                $this->DelData($_POST['kod_dat_del']);
+                $event = true;
+            }
         }
 
         if($event)
