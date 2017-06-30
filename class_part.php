@@ -82,8 +82,7 @@ class Part
                     $nacl .= $this->formAddNacl($ost, 1); // Поступление
             }
             elseif($ost>0) // Выводим кнопку Добавить только когда есть отстаток
-                $nacl.= Func::ActForm($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],
-                                        "<input type='hidden' name='kod_part' id='kod_part' value='$this->kod_part'  />", 'Добавить', 'AddNaklad');
+                $nacl.= Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],"Добавить", 'AddNaklad',"kod_part",$row['kod_part']);
 
             // Цена --------------------------------------------------------------------------------------
             $price = (double)$row['price'];
@@ -146,7 +145,7 @@ class Part
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['obozn'] . "</b> " /*. $row['name']*/ . $modif . $sn . '</a>'.$btn.'</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn.'</td>
                       <td width="70" align="right">' . (int)$row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
