@@ -51,7 +51,7 @@ $footer_fields = "$time_stamp_str, del INT(2) DEFAULT 0, kod_user INT, edit INT 
 $drop               = true; // Удаление таблиц
 $users              = 0;
 $sessions           = 0;
-$log                = 1;
+$log                = 0;
 $adresa             = 0;
 $docum              = 0;
 $docum_dogovory     = 0;
@@ -71,7 +71,7 @@ $sklad              = 0;
 $org_links          = 0;
 $docum_elem         = 0;
 $docum_org          = 0;
-$view               = 0;
+$view               = 1;
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -219,7 +219,7 @@ if ($log == 1) {
                                 $time_stamp_str,
                                 user VARCHAR(20)
                                 );";
-        $db->query($sql,1);
+        $db->query($sql);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -1594,7 +1594,7 @@ if ($view == 1) {
         FROM
             docum
         INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum
-        WHERE docum_elem.del=0
+        WHERE docum_elem.del=0 AND docum.del=0
         ORDER BY docum_elem.kod_docum DESC
         ";
     $db->query($sql);
@@ -1646,7 +1646,7 @@ if ($view == 1) {
         VIEW view_dogovor_summa AS 
         SELECT
             parts.kod_dogovora,
-            Sum(parts.price*parts.numb*(1+parts.nds)) AS dogovor_summa
+            Sum(round(parts.price*parts.numb*(1+parts.nds),2)) AS dogovor_summa
         FROM
             parts
         WHERE parts.del=0
@@ -1744,6 +1744,7 @@ if ($view == 1) {
         FROM
             parts
         INNER JOIN view_dogovory_nvs ON view_dogovory_nvs.kod_dogovora = parts.kod_dogovora
+        WHERE parts.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_dogovory_elem");
@@ -1955,12 +1956,13 @@ if ($view == 1) {
             kontakty.`name`,
             kontakty.otch,
             kontakty_dogovora.kod_dogovora,
+            kontakty_dogovora.kod_kont_dog,
             org.nazv_krat
         FROM
             kontakty
         INNER JOIN kontakty_dogovora ON kontakty.kod_kontakta = kontakty_dogovora.kod_kontakta
         INNER JOIN org ON kontakty.kod_org = org.kod_org
-        WHERE kontakty.del=0
+        WHERE kontakty.del=0 AND kontakty_dogovora.del=0
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_kontakty_dogovora");
