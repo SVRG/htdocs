@@ -58,7 +58,7 @@ class Kontakt
             $res .= '</td></tr>';
         }
 
-        if($cnt==0)
+        if($cnt==0) // если нет контактов то возвращаем список
         {
             // todo: Информировать, что контакт не выбран
             return $this->formSelList();
@@ -75,9 +75,15 @@ class Kontakt
 
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
+                $del_btn = '';
+                if($Doc_Org=='Doc')
+                    $del_btn = func::ActButton2('','Удалить',"DelKonaktDog","kod_kont_dog_del",$row['kod_kont_dog']);
+
                 // Добавляем должность, фамилию, имя и отчество
                 $res .= /** @lang HTML */
-                    "<tr><td><a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>";
+                    "<tr>
+                        <td>
+                            <a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>".$del_btn;
 
                 // Если флаг - Добавить телефон
                 $res .= $this->formPhones($row['kod_kontakta'], $AddPh); // Форма добавления телефона
@@ -96,7 +102,7 @@ class Kontakt
      * @param int $Add
      * @return string
      */
-    public function formPhones($kod_kontakta=-1, $Add = 0)
+    public function formPhones($kod_kontakta=-1, $Add = 0, $Del=0)
     {
         if($kod_kontakta==-1)
             $kod_kontakta=$this->kod_kontakta;
@@ -126,14 +132,15 @@ class Kontakt
                                 . $row['data'] .
                                 ' <input type="submit" value="E-MAIL" />
                                 </form>
-                            </td>
-                            <td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>
-                        </tr>';
+                            </td>';
             } else
                 $res .= '<tr>
-                    <td>' . $row['data'] . '</td>
-                    <td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>
-                    </tr>';
+                    <td>' . $row['data'] . '</td>';
+
+            if($Del==1)
+                $res.='<td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>';
+
+            $res.='</tr>';
         }
 
         $res .= '</table>';
@@ -176,12 +183,13 @@ class Kontakt
             "INSERT INTO 
                       kontakty (kod_org,dolg,famil,name,otch)
                     VALUES ($kod_org,'$dolg','$famil','$name','$otch')");
+        $last_id = $db->last_id;
 
         if ($kod_dogovora > 0)
             $db->query(/** @lang SQL */
                 "INSERT INTO 
                           kontakty_dogovora (kod_kontakta,kod_dogovora)
-                        VALUES(LAST_INSERT_ID(),$kod_dogovora)");
+                        VALUES($last_id,$kod_dogovora)");
     }
     //-----------------------------------------------------------------
     //
@@ -478,11 +486,17 @@ class Kontakt
             $event = true;
         }
 
-        if(isset($_POST['Flag']))
-        if($_POST['Flag']=="DelKontakt" and isset($_POST['kod_kontakta_del']))
-        {
-            $this->DelKonakt($_POST['kod_kontakta_del']);
-            header('Location: /form_org.php?kod_org='.$this->kod_org);
+        if(isset($_POST['Flag'])) {
+            if ($_POST['Flag'] == "DelKontakt" and isset($_POST['kod_kontakta_del'])) {
+                $this->DelKonakt($_POST['kod_kontakta_del']);
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_org.php?kod_org=' . $this->kod_org); // todo - поправить переадресацию, если не корень то не работает
+            }
+
+            if ($_POST['Flag']=='DelKonaktDog' and isset($_POST['kod_kont_dog_del']))
+            {
+                $this->DelKonaktDog($_POST['kod_kont_dog_del']);
+                $event=true;
+            }
         }
 
         if($event)
@@ -506,6 +520,18 @@ class Kontakt
         $db->query("UPDATE kontakty_data SET del=1 WHERE kod_kontakta=$kod_kontakta");
         $db->query("UPDATE kontakty_dogovora SET del=1 WHERE kod_kontakta=$kod_kontakta");
 
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление Контакта из договора
+     * @param int $kod_kont_dog
+     */
+    public function DelKonaktDog($kod_kont_dog)
+    {
+        $db = new Db();
+
+        $db->query("UPDATE kontakty_dogovora SET del=1 WHERE kod_kont_dog=$kod_kont_dog");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
