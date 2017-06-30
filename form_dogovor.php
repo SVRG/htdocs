@@ -145,12 +145,15 @@ else
                         echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
 
                     // Партии
-                    if (isset($_POST['Flag'])) {
-                        if ($_POST['Flag'] == 'AddNaklad')
-                            $Part->formPart(1); // Партия + Форма добавления накладной
+                    if (isset($_POST['Flag'])) { // Партия + Форма добавления накладной
+                        if ($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part']))
+                        {
+                            $Part->kod_part = $_POST['kod_part'];
+                            $Part->formPart(1);
+                        }
                     }
                     // Партии
-                    echo $Part->formParts(1, "", 0);
+                    echo "<br>".$Part->formParts(1, "", 0);
                     // Кнопка добавить 100% расчет в каждую партию
                     echo Func::ActButton("form_part.php?kod_dogovora=$Dogovor->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100');
                     ?></p>

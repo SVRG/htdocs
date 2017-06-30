@@ -23,6 +23,10 @@ if (!isset($_GET['kod_part']))
 else
     $kod_part=$_GET['kod_part'];
 
+// Если код передан в форме
+if(isset($_POST['kod_part']))
+    $kod_part = $_POST['kod_part'];
+
 
 $Dogovor = new Doc();
 $Dogovor->kod_dogovora = $_GET['kod_dogovora'];

@@ -48,26 +48,37 @@ $Org->getData();
 <div class="style1" id="pagecell1">
     <table width="100%" border="0" cellspacing="10">
         <tr>
-            <td width="50%" valign="top" bgcolor="#ECEEFD"><h1><?php
+            <td width="50%" valign="top" bgcolor="#ECEEFD">
+                <h1>
+                    <?php
                     echo $Kontakt->Name;
-                    echo func::ActButton2("", /** @lang HTML */
-                            "Удалить","DelKontakt","kod_kontakta_del",$Kontakt->kod_kontakta);
-                    ?></h1>
-                <p><?php
-
-
-                    if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                        echo Func::ActButton('', 'Изменить', 'EditCont');
-
+                    ?>
+                </h1>
+                <table>
+                    <tr>
+                        <td>
+                            <?php
+                            if (in_array($_SESSION['MM_UserGroup'], $UserG))
+                                echo Func::ActButton('', 'Изменить', 'EditCont');
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            echo func::ActButton2("", /** @lang HTML */
+                                "Удалить","DelKontakt","kod_kontakta_del",$Kontakt->kod_kontakta);
+                            ?>
+                        </td>
+                    </tr>
+                </table>
+                <?php
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'EditCont') {
                             echo $Kontakt->formAddEdit(1);
                             Func::Cansel();
                         }
-
-                    ?>
+                ?>
                     <br>
-                    Контактная информация<?php echo $Kontakt->formPhones(-1,1); ?>
+                    <?php echo $Kontakt->formPhones(-1,1,1); ?>
             </td>
             <td width="50%" valign="top"><?php echo '<h1>' . $Org->getFormLink() . '</h1>'; ?>
                     <div id="CollapsiblePanel1" class="CollapsiblePanel">
