@@ -28,19 +28,6 @@ class Part
      */
     public function formParts($sgp = 0, $SQL = "", $AddNacl = 0)
     {
-        // Шапка
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
-                    <tr bgcolor="#CCCCCC">
-                        <td width="365">Наименование</td>
-                        <td width="40">Кол-во</td>
-                        <td width="80">Дата Поставки</td>
-                        <td width="80">Склад</td>
-                        <td width="120">Цена без НДС</td>
-                        <td width="120">Цена c НДС</td>
-                        <td width="120">Сумма</td>
-                        <td width="90">Оплата</td>
-                    </tr>';
-
         $db = new Db();
 
         // Если запрос не был передан в параметрах
@@ -51,7 +38,49 @@ class Part
         $cnt = $db->cnt;
 
         if($cnt==0)
-            return $res.'</table>';
+            return Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
+
+        $btn_auto_ras = '';
+        $btn_add_part = '';
+        $btn_add_100 = '';
+
+        // Если вызов списка партий - выводим кнопки Добавить партию и Авто-Расчет 100%
+        // Если вызов из формы Партия - выводим только Авторасчет
+        if($this->kod_part!=0)
+            $btn_auto_ras = Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=".$this->kod_part, 'Авто-Расчет', 'AddAVOK');
+        else
+        {
+            $btn_add_part = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
+            $btn_add_100 = Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100');
+        }
+
+        // Шапка
+        // Кнопки Добавить Партию / Добавить расчет во все партии / Добавить расчет в партию
+        $res = "<table>
+                    <tr>
+                        <td>
+                            $btn_add_part
+                        </td>
+                        <td>
+                            $btn_add_100
+                        </td>
+                        <td>
+                            $btn_auto_ras
+                        </td>
+                    </tr>
+                </table>";
+
+        $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC">
+                        <td width="365">Наименование</td>
+                        <td width="40">Кол-во</td>
+                        <td width="80">Дата Поставки</td>
+                        <td width="80">Склад</td>
+                        <td width="120">Цена без НДС</td>
+                        <td width="120">Цена c НДС</td>
+                        <td width="120">Сумма</td>
+                        <td width="90">Оплата</td>
+                    </tr>';
 
         $dogovor_proc_pay = Doc::getProcPay($this->kod_dogovora); // Процент платежей по договору. Строка вида "70%"
 
@@ -138,10 +167,10 @@ class Part
                     $PRC = $prc;
             }
 
-            $sn = ' s/n '. $row['kod_part']; // Идентификатор партии
+            //$sn = ' s/n '. $row['kod_part']; // Идентификатор партии
 
             // Кнопка редактирования партии
-            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Редактор', 'EditPartForm');
+            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
@@ -203,9 +232,11 @@ class Part
         return $res;
     }
     //-------------------------------------------------------------------------
+
     /**
      * Вывод партии с формой добавления накладной, если $AddNaklad=1
      * @param int $AddNacl
+     * @return string
      */
     public function formPart($AddNacl = 0)
     {
@@ -214,7 +245,7 @@ class Part
 
         $res .= $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
 
-        echo $res;
+        return $res;
     }
 //--------------------------------------------------------------
     //
@@ -261,6 +292,8 @@ class Part
             $ostatok_plat = $raschet_summa - $summa_pays;
             $ostatok_plat = Func::Rub($ostatok_plat);
 
+            $btn_del = Func::ActButton2('','Удалить', 'DelRasch',"kod_rascheta_del",$kod_rascheta);
+
             // Форма для ввода ПП в расчет
             $Body =    "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
                         <input type='text' name='summa' value='$ostatok_plat' />";
@@ -268,10 +301,8 @@ class Part
             $res.= '<tr>
                     <td width="80">' . $data . '</td>
                     <td width="100">' . $summa . '</td>
-                    <td width="20">' . $type_rascheta . '</td>
-                    <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body);
-                    $res.= Func::ActButton2('','Удалить', 'DelRasch',"kod_rascheta_del",$kod_rascheta) .
-                    "</td>
+                    <td width="20" align="center">' . $type_rascheta ."<br>". $btn_del. '</td>
+                    <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body)."</td>
                     </tr>";
         }
 
@@ -538,6 +569,7 @@ class Part
     }
 
 //-----------------------------------------------------------------------
+
     /**
      * Добавление или редактирование
      * @param $kod_elem
@@ -547,12 +579,13 @@ class Part
      * @param string $modif
      * @param int $nds
      * @param int $val
+     * @param int $Add
      */
-    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0, $modif = '', $nds = 18, $val = 1)
+    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0, $modif = '', $nds = 18, $val = 1,$Add=1)
     {
         $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
-        if($this->kod_part==0)
+        if($Add==1)
             $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val)");
         else
             $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1 WHERE kod_part=$this->kod_part");
@@ -562,6 +595,7 @@ class Part
     /**
      * Форма - Добавление или Редактирование партии
      * @param int $Edit
+     * @return string
      */
     public function formAddEdit($Edit=1)
     {
@@ -610,7 +644,8 @@ class Part
 
             $E->kod_elem = $kod_elem;
         }
-        echo
+
+        $res =
             '<form id="form1" name="form1" method="post" action="">
                 <table border="0">
                   <tr>
@@ -656,7 +691,8 @@ class Part
             <br>
             </form>';
 
-        echo Func::Cansel(1);
+        $res.= Func::Cansel(0);
+        return $res;
     }
 //-------------------------------------------------------------------------
     //
@@ -682,7 +718,14 @@ class Part
 
         $db->query("UPDATE raschet SET del=1 WHERE kod_part=$this->kod_part");
 
-        //$db->query("UPDATE raschety_plat SET del=1 WHERE kod_rascheta=" . $); // todo - удалить свзяные записи
+        //todo - проверить
+        /*$db->query("UPDATE
+                          raschety_plat
+                          JOIN raschet ON raschety_plat.kod_rascheta=raschet.kod_rascheta 
+                          SET raschety_plat.del=1
+                          WHERE raschet.kod_part=$this->kod_part
+                          ");
+        */
 
         $db->query("UPDATE sklad SET del=1 WHERE kod_part=$this->kod_part");
 
@@ -810,7 +853,7 @@ class Part
         if (isset($_POST['EditPart']))
             if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
             {
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'],0);
                 $event = true;
             }
 
