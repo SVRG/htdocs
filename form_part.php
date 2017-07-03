@@ -10,6 +10,7 @@ include_once "security.php";
 include_once("class_part.php");
 include_once("class_doc.php");
 
+// todo - переделаль в нормальный вид
 $kod_part = 0;
 if (!isset($_GET['kod_part']))
 {
@@ -24,9 +25,10 @@ else
     $kod_part=$_GET['kod_part'];
 
 // Если код передан в форме
-if(isset($_POST['kod_part']))
-    $kod_part = $_POST['kod_part'];
-
+if(isset($_POST['kod_part'])) {
+    if($_POST['kod_part']!=0)
+        $kod_part = $_POST['kod_part'];
+}
 
 $Dogovor = new Doc();
 $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
@@ -65,28 +67,25 @@ include_once("header.php");
             if (isset($_POST['Flag'])) {
 
                 if ($_POST['Flag'] == 'AddNaklad')
-                    $Part->formPart(1); // Партия + Форма добавления накладной
+                    echo $Part->formPart(1); // Партия + Форма добавления накладной
                 else {
-                    $Part->formPart(0);
+                    echo $Part->formPart(0);
                 } // Партия
 
                 if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
                     // Форма Редактирования партии
                     if ($_POST['Flag'] == 'EditPartForm')
-                        $Part->formAddEdit();
+                    {
+                        echo $Part->formAddEdit(1);
+                    }
+                    elseif ($_POST['Flag'] == 'AddPartForm')
+                        echo $Part->formAddEdit(0);
                 }
-
             } else
-                $Part->formPart(0); // Партия
+                echo $Part->formPart(0); // Партия
 
             // График платежей
             echo $Part->formPayGraph(true);
-
-            // Кнопки по расчетам
-            echo '<br>';
-            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Авто-Расчет', 'AddAVOK');
-            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Авто-Расчет 100%', 'AddRasch100');
-            echo '<br>';
 
             if (isset($_POST['Flag'])) {
                 // Форма для добавления Расчета
