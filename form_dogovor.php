@@ -133,30 +133,20 @@ else
                 ?></td>
         </tr>
         <tr valign="top">
-            <td colspan="2" align="left"><p>Партии:
+            <td colspan="2" align="left">Партии:
                     <?php
-                    if (isset($_POST['Flag']))
-                        if ($_POST['Flag'] == 'AddPartForm') {
-                            $Part->formAddEdit(0);
-                        }
-
-                    // Кнопка Добавить Партию
-                    if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
-
-                    // Партии
-                    if (isset($_POST['Flag'])) { // Партия + Форма добавления накладной
-                        if ($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part']))
+                    if (isset($_POST['Flag'])){
+                        if ($_POST['Flag'] == 'AddPartForm')
+                            echo $Part->formAddEdit(0);
+                        elseif($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part']))
                         {
                             $Part->kod_part = $_POST['kod_part'];
-                            $Part->formPart(1);
+                            echo $Part->formPart(1);
                         }
                     }
                     // Партии
-                    echo "<br>".$Part->formParts(1, "", 0);
-                    // Кнопка добавить 100% расчет в каждую партию
-                    echo Func::ActButton("form_part.php?kod_dogovora=$Dogovor->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100');
-                    ?></p>
+                    echo $Part->formParts(1, "", 0);
+                    ?>
             </td>
         </tr>
         <tr align="left" valign="top">
