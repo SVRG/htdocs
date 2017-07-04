@@ -179,7 +179,7 @@ class Elem
     {
         $sql = "SELECT
                         docum.`name`,
-                        docum.path,
+                        docum.path
                     FROM
                         docum
                     INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum 
@@ -196,8 +196,7 @@ class Elem
             $row = $rows[$i];
 
             if (file_exists($row['path']))
-                if ($row['name'] == 'Фото')
-                    $res .= ' <a href="' . $link . '"><img src="' . $row['path'] . '" width="100" border="0" /></a>';
+                $res .= ' <a href="' . $link . '"><img src="' . $row['path'] . '" width="100" border="0" /></a>';
         }
         return $res;
     }
