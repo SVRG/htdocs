@@ -313,7 +313,7 @@ class Org
                     <input type="submit" name="button" id="button" value="Добавить" />
                     <input type="hidden" name="AddOrgPhone" id="AddOrgPhone" value="1" />
                 </form>';
-            Func::Cansel();
+            Func::Cansel(1);
         }
 
         $db = new DB();

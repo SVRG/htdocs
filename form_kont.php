@@ -74,7 +74,7 @@ $Org->getData();
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'EditCont') {
                             echo $Kontakt->formAddEdit(1);
-                            Func::Cansel();
+                            Func::Cansel(1);
                         }
                 ?>
                     <br>

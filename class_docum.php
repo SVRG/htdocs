@@ -83,7 +83,7 @@ class Docum
                     $del .= Func::ActButton2('', "Удалить",'DelDocum',"kod_docum_del",$row['kod_docum']);
 
                 $res .= "<tr>
-                            <td> <a href='$path'> $name </a></td>
+                            <td> <a href='$path' target='_blank'> $name </a></td>
                             <td>$del</td>
                          </tr>";
             }

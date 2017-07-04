@@ -233,7 +233,7 @@ class Func
      * @param int $Echo
      * @return string
      */
-    public static function Cansel($Echo = 1)
+    public static function Cansel($Echo = 0)
     {
         $res = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
 

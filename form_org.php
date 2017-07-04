@@ -148,7 +148,7 @@ $Doc->Events();
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'AddKontakt') {
                         echo $Kontakt->formAddEdit();
-                        Func::Cansel();
+                        Func::Cansel(1);
                     }
                 ?>
                 <div id="CollapsiblePanel3" class="CollapsiblePanel">
