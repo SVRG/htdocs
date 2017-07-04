@@ -139,20 +139,22 @@ class Elem
 
         $db = new Db();
 
-        $sql = "SELECT * FROM view_elem WHERE nomen=1";
+        $sql = "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
 
         $rows = $db->rows($sql);
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-            $selected = "";
             $kod_elem = $row['kod_elem'];
-            $obozn = $row['obozn'];
+            //$obozn = $row['obozn'];
+            $shifr = $row['shifr'];
             $name = $row['name'];
 
+            $selected = "";
             if ($row['kod_elem'] == $this->kod_elem)
                 $selected = " selected='selected'";
-            $res .= "<option value=\"$kod_elem\" $selected > $obozn  \"$name\" </option>";
+
+            $res .= "<option value=\"$kod_elem\" $selected > $shifr  \"$name\" </option>";
         }
         $res .= '</select>';
 
