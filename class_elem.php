@@ -85,7 +85,7 @@ class Elem
     public function formNomen()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_elem WHERE nomen=1");
+        $rows = $db->rows("SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr ASC"); // todo - оптимизировать запрос, добавить docum (ссылку на фото)
 
         $cnt = $db->cnt;
 
@@ -94,8 +94,8 @@ class Elem
 
         $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
                  <tr bgcolor="#CCCCCC">
-                 <td width="10%">Фото</td>
-                 <td align="center">Наименование</td>
+                     <td width="10%">Фото</td>
+                     <td align="center">Наименование</td>
                  </tr>';
 
         for ($i = 0; $i < $db->cnt; $i++)
@@ -104,13 +104,13 @@ class Elem
             $this->kod_elem = $row['kod_elem'];
 
             $name = "";
-            if ($row['obozn'] != $row['name'])
+            if ($row['shifr'] != $row['name'])
                 $name = $row['name'];
 
             $res.=  '<tr>
-		  			<td align="left" valign="top">' . $this->formPhoto() . '</td>
-		  			<td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['obozn'] . '</h1>' . $name . '</td>
-		         </tr>';
+                        <td align="left" valign="top">' . $this->formPhoto() . '</td>
+                        <td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['shifr'] . '</h1>' . $name . '</td>
+		             </tr>';
 
         }
         $res.=  '</table>';
@@ -178,18 +178,18 @@ class Elem
     public function formPhoto()
     {
         $sql = "SELECT
-                        docum.kod_docum,
                         docum.`name`,
                         docum.path,
-                        docum_elem.kod_elem
                     FROM
-                        docum_elem
-                    WHERE del=0
-                    INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum WHERE docum.`name`='Фото' AND docum_elem.kod_elem=$this->kod_elem";
+                        docum
+                    INNER JOIN docum_elem ON docum_elem.kod_docum = docum.kod_docum 
+                    WHERE docum.`name`='Фото' AND docum_elem.kod_elem=$this->kod_elem AND docum.del=0";
         $link = 'form_elem.php?kod_elem=' . $this->kod_elem;
 
         $db = new Db();
         $rows = $db->rows($sql);
+        if($db->cnt==0)
+            return "";
 
         $res = '';
         for ($i = 0; $i < $db->cnt; $i++) {
