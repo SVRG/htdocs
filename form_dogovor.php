@@ -90,13 +90,6 @@ else
                         $Dogovor->formDogovor();
                 }
 
-                if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'DocClose') {
-                        echo Func::ActButton('', 'Подтвердить Закрытие', 'DocCloseConf');
-                        echo Func::Cansel();
-                    }
-
-
                 echo $Dogovor->formDocum($Del); // Документы договора
 
                 ?>

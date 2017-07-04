@@ -393,9 +393,20 @@ class Doc
                 $clr = '<tr>
                             <th scope="row"></th>
                             <td bgcolor="#F18585">Закрыт</td>
+                            <td>'. Func::ActButton2('',"Восстановить","DocOpen",'kod_dogovora_open',$row['kod_dogovora']) .'</td>
                         </tr>';
             else {
-                if ($Close == 1)
+                $close = true;
+                if (isset($_POST['Flag']))
+                    if ($_POST['Flag'] == 'DocClose') {
+                        $clr = "   <tr>
+                                        <td bgcolor=\"#F18585\">Закрыть?</td>
+                                        <td bgcolor='red'>".Func::ActButton('', 'Подтвердить Закрытие', 'DocCloseConf').Func::Cansel(0)."</td>
+                                    </tr>";
+                        $close = false;
+                    }
+
+                if($Close == 1 and $close)
                     $clr = '<tr>
                             <th scope="row"></th>
                             <td>' . Func::ActButton('', 'Закрыть', 'DocClose') . '</td>
