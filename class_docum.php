@@ -80,7 +80,7 @@ class Docum
                 $del='';
 
                 if ($Del == 1)
-                    $del .= Func::ActForm('', '<input type="hidden" name="DelDocum" id="ID" value="' . $row['kod_docum'] . '" />', 'Del', '1');
+                    $del .= Func::ActButton2('', "Удалить",'DelDocum',"kod_docum_del",$row['kod_docum']);
 
                 $res .= "<tr>
                             <td> <a href='$path'> $name </a></td>
@@ -139,18 +139,21 @@ class Docum
         if($Dest=='Doc')
         {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora) VALUES (LAST_INSERT_ID(),$ID)");
+            $last_id = $db->last_id;
+            $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora) VALUES ($last_id,$ID)");
         }
 
         elseif($Dest=='Org')
         {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $db->query("INSERT INTO docum_org (kod_docum,kod_org) VALUES (LAST_INSERT_ID(),$ID)");
+            $last_id = $db->last_id;
+            $db->query("INSERT INTO docum_org (kod_docum,kod_org) VALUES ($last_id,$ID)");
         }
         elseif($Dest=='Elem')
         {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $db->query("INSERT INTO docum_elem (kod_docum,kod_elem) VALUES (LAST_INSERT_ID(),$ID)");
+            $last_id = $db->last_id;
+            $db->query("INSERT INTO docum_elem (kod_docum,kod_elem) VALUES ($last_id,$ID)");
         }
     }
 
