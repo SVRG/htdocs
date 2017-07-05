@@ -395,7 +395,7 @@ class Elem
             $modif = $new_name.$modif;
             $kod_part = $row['kod_part'];
 
-            $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif' WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
+            $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1 WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
         }
 
     }
@@ -409,7 +409,10 @@ class Elem
         $event = false;
         if(isset($_GET['setCompl'], $_GET['kod_elem']))
         {
-            $this->DeleteReplace($_GET['kod_elem']);
+            if((int)$_GET['setCompl']>0)
+                $this->DeleteReplace($_GET['kod_elem'],(int)$_GET['setCompl']);
+            else
+                $this->DeleteReplace($_GET['kod_elem']);
             header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_nomen.php");
         }
 
