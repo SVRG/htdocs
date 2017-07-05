@@ -79,16 +79,18 @@ class Kontakt
                 if($Doc_Org=='Doc')
                     $del_btn = func::ActButton2('','Удалить',"DelKonaktDog","kod_kont_dog_del",$row['kod_kont_dog']);
 
+                $dolg = "";
+                if($row['dolg']!="")
+                   $dolg = $row['dolg'] . "<br>";
+
                 // Добавляем должность, фамилию, имя и отчество
                 $res .= /** @lang HTML */
                     "<tr>
                         <td>
-                            <a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $row['dolg'] . "<br>" . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>".$del_btn;
+                            <a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $dolg . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>".$del_btn;
 
                 // Если флаг - Добавить телефон
-                $res .= $this->formPhones($row['kod_kontakta'], $AddPh); // Форма добавления телефона
-
-                $res .= '</td></tr>';
+                $res .= $this->formPhones($row['kod_kontakta'], $AddPh).'</td></tr>';
             }
         }
 
@@ -96,10 +98,12 @@ class Kontakt
         return $res;
     }
 //-----------------------------------------------------------------
+
     /**
      * формирование списка телефонов контакта
      * @param int $kod_kontakta
      * @param int $Add
+     * @param int $Del
      * @return string
      */
     public function formPhones($kod_kontakta=-1, $Add = 0, $Del=0)
