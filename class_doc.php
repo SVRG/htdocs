@@ -1292,7 +1292,10 @@ class Doc
 
         $res .= '</table>';
 
-        $month = date("m.Y");
+        if($Month>0)
+            $month = date("$Month.Y");
+        else
+            $month = date("m.Y");
 
         $res = "<h1>$month<br>Сумма: ".func::Rub($summ) . "</h1>" . $res;
 

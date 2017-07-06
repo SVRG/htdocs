@@ -22,8 +22,16 @@ include_once "security.php";
         <?php
         $t = date('H:i:s');
         include("class_doc.php");
+
         $D = new Doc();
-        echo $D->formCurrentMonthPays();
+
+        if(isset($_GET['m'])){
+            if((int)$_GET['m']>0 and (int)$_GET['m']<12)
+                echo $D->formCurrentMonthPays((int)$_GET['m']);
+        }
+        else
+            echo $D->formCurrentMonthPays();
+
         echo 'begin:' . $t . ' end:' . date('H:i:s');
         ?>
     </div>
