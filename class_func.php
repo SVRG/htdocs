@@ -13,19 +13,16 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Сколько дней осталось до указанной даты
-     * @param string $Date
+     * @param string $Date - 17.07.2017
      * @return int
      */
     public static function DaysRem($Date)
     {
         if (!isset($Date)) return 0;
-
-        if ($Date == '-') return 0;
-
         $d = explode('.', $Date);
         $res = 0;
 
-        if (count($d) == 3)
+        if (count($d) >= 3)
             if ($d[0] > 0 and $d[1] > 0 and $d[2] > 0) {
                 $d1 = mktime(0, 0, 0, $d[1], $d[0], $d[2]);
                 $d2 = mktime(0, 0, 0, date('m'), date('d'), date('y'));

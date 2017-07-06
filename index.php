@@ -1,5 +1,5 @@
-<?php require_once('Connections/roo.php'); ?>
 <?php
+require_once('Connections/roo.php');
 // *** Validate request to login to this site.
 if (!isset($_SESSION)) {
     session_start();
@@ -40,15 +40,12 @@ if (isset($_POST['login'],$_POST['password'])) {
         "SELECT * FROM users WHERE users.login='$loginUsername' AND users.password='$hashedPW'";
     $res = $mysqli->query($query);
 
-    //exit();
-
     if ($res->num_rows > 0) {
 
         $row = $res->fetch_assoc();
 
         $loginStrGroup = $row['rt'];
 
-        //echo $loginStrGroup;
         //declare two session variables and assign them
         $_SESSION['MM_Username'] = $loginUsername;
         $_SESSION['MM_UserGroup'] = $loginStrGroup;
@@ -72,13 +69,13 @@ if (isset($_POST['login'],$_POST['password'])) {
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Login</title>
     <link href="/img/emx_nav_left.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
         <!--
         .style1 {
-            font-family: "Verdana", Verdana, sans-serif;
+            font-family: "Arial", Arial, sans-serif;
         }
 
         body {
