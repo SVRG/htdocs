@@ -95,8 +95,16 @@ class Part
             $numb = (int)$row['numb']; // Количество товара в партии
             $numb_otgruz = $row['numb_otgruz']; // Количество отгруженного товара по партии
             $part_summa = (double)$row['part_summa'];
+
             $ost = $row['numb_ostat']; // Осталось отгрузить
             $ostatok = ""; // Строка для вывода остатка по отгрузке
+            // Если договор входящий
+            $numb_poluch = 0;
+            if($row['kod_ispolnit']!=683)
+            {
+                $numb_poluch = $this->getNumbPoluch($row['kod_part']);
+                $ost = $numb - $numb_poluch;
+            }
 
             // Вывод накладных о поступлении и Отгрузке с СГП---------------------------------------
             $nacl = ''; // Строка вывода накладных
@@ -119,15 +127,19 @@ class Part
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
 
-            // Окраска отруженных партий в зелёный
+            // Окраска отруженных/полученных партий в зелёный
             $ind = '';// Индикатор окраски даты поставки
             if ($ost == 0)
                 $res .= '<tr bgcolor="#ADFAC2">';// Зеленый
             else {
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
-                if ($ost != $numb and $ost > 0)
-                    $ostatok = " (<abbr title=\"Осталось отгрузить $ost\">$ost</abbr>)<br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" />$numb_otgruz</abbr>";
+                if ($ost != $numb) {
+                    if($row['kod_ispolnit']==683)
+                        $ostatok = " (<abbr title=\"Осталось отгрузить $ost\">$ost</abbr>)<br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" />$numb_otgruz</abbr>";
+                    else
+                        $ostatok = " (<abbr title=\"Осталось получить $ost\">$ost</abbr>)<br><abbr title='Получено $numb_poluch'><img src=\"/img/in.gif\" height=\"14\" />$numb_poluch</abbr>";
+                }
                 else
                     $ostatok = "";
 
@@ -827,6 +839,35 @@ class Part
                                     GROUP BY
                                       view_sklad_otgruzka.kod_part"
                             );
+        if($db->cnt==0)
+            return 0;
+
+        $res = $rows[0]['summ_numb'];
+
+        return $res;
+    }
+    //
+//-------------------------------------------------------------------------
+    /**
+     * Количество полученное по партии
+     * @param $kod_part
+     * @return int
+     */
+    public static function getNumbPoluch($kod_part)
+    {
+        $db = new Db();
+
+        $rows = $db->rows("SELECT
+                                      view_sklad_postuplenie.kod_part,
+                                      Sum(view_sklad_postuplenie.numb) AS summ_numb
+                                    FROM
+                                      view_sklad_postuplenie
+                                    WHERE
+                                      view_sklad_postuplenie.kod_part = $kod_part
+                                    GROUP BY
+                                      view_sklad_postuplenie.kod_part"
+        );
+
         if($db->cnt==0)
             return 0;
 

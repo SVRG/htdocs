@@ -72,8 +72,8 @@ class Doc
 
 
         $header = "<tr bgcolor='#5f9ea0'>
-                    <th>Договор</th>
-                    <th>Организация</th>
+                    <th width='10%'>Договор</th>
+                    <th width='15%'>Организация</th>
                     <th>Наименование</th>
                     <th>Кол-во</th>
                     <th>Дата поставки</th>
@@ -246,7 +246,8 @@ class Doc
 
             $ostatok_str = ""; // Остаток отгрузки
             $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
-            if($numb_ostat>0){
+            // Для исходящих договоров
+            if($numb_ostat>0 and (int)$row['kod_ispolnit']==683){
                 if($numb_ostat>0 and $numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
                     $ostatok_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
 
@@ -256,6 +257,18 @@ class Doc
                             " bgcolor='#f4df42'";
             }
 
+            // Если договор входящий - выводим сколько осталось получить
+            if($row['kod_ispolnit']!=683)
+            {
+                $numb_ostat = $numb - Part::getNumbPoluch($kod_part);
+                if($numb_ostat>0 and $numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
+                    $ostatok_str = " <abbr title=\"Осталось получить $numb_ostat\">($numb_ostat)</abbr>";
+
+                if($summa_plat>0)
+                    if(func::DaysRem($row['data_postav'])<14)
+                        $ind_data = /** @lang HTML */
+                            " bgcolor='#f4df42'";
+            }
 
             $ind_part = ''; // Окрашиваем ячейку Кол-во в зеленый если все отгружено
             if($numb_ostat==0)
