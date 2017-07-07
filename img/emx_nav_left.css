@@ -59,8 +59,8 @@ h4 {
 h5 {
     font: 100% Arial, sans-serif;
     color: #334d55;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 /*************** list tag styles ***************/
@@ -104,16 +104,15 @@ input {
     width: 95%;
     background-color: #ffffff;
     font-size: 14px;
-    /*	font-family: Arial,sans-serif;*/
-    font-family: "Helvetica", sans-serif, serif;
+    font-family: Arial,sans-serif;
 }
 
 #tl {
     position: absolute;
     top: 40px;
     left: 13px;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     z-index: 100;
     background-image: url(/img/bg_nav.jpg);
 }
@@ -122,8 +121,8 @@ input {
     position: absolute;
     top: -1px;
     right: -1px;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     z-index: 100;
     font-family: "Helvetica", sans-serif, serif;
     font-size: 10px;
@@ -142,7 +141,7 @@ input {
 #pageNav {
     float: left;
     width: 178px;
-    padding: 0px;
+    padding: 0;
     background-color: #F5f7f7;
     border-right: 1px solid #cccccc;
     border-bottom: 1px solid #cccccc;
