@@ -1995,6 +1995,31 @@ if ($view == 1) {
     $db->query("SELECT * FROM view_phones_kontakts");
     if($db->cnt==0)
         echo $db->last_query;
+    //
+//----------------------------------------------------------------------------------------------------------------------
+//
+//drop view
+    $sql = /** @lang SQL */
+        "DROP VIEW IF EXISTS view_plat_raspred";
+    $db->query($sql);
+// sql to create view
+    $sql = /** @lang SQL */
+        "CREATE 
+        VIEW view_plat_raspred AS 
+        SELECT
+            plat.kod_plat,
+            SUM(raschety_plat.summa) AS summa_raspred
+        FROM
+            raschety_plat
+        INNER JOIN plat ON plat.kod_plat = raschety_plat.kod_plat
+        WHERE plat.del=0 AND raschety_plat.del=0
+        GROUP BY
+            plat.kod_plat 
+        ";
+    $db->query($sql);
+    $db->query("SELECT * FROM view_plat_raspred");
+    if($db->cnt==0)
+        echo $db->last_query;
 //
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2025,31 +2050,6 @@ if ($view == 1) {
         ";
     $db->query($sql);
     $db->query("SELECT * FROM view_plat");
-    if($db->cnt==0)
-        echo $db->last_query;
-//
-//----------------------------------------------------------------------------------------------------------------------
-//
-//drop view
-    $sql = /** @lang SQL */
-        "DROP VIEW IF EXISTS view_plat_raspred";
-    $db->query($sql);
-// sql to create view
-    $sql = /** @lang SQL */
-        "CREATE 
-        VIEW view_plat_raspred AS 
-        SELECT
-            plat.kod_plat,
-            SUM(raschety_plat.summa) AS summa_raspred
-        FROM
-            raschety_plat
-        INNER JOIN plat ON plat.kod_plat = raschety_plat.kod_plat
-        WHERE plat.del=0 AND raschety_plat.del=0
-        GROUP BY
-            plat.kod_plat 
-        ";
-    $db->query($sql);
-    $db->query("SELECT * FROM view_plat_raspred");
     if($db->cnt==0)
         echo $db->last_query;
 //
