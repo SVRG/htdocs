@@ -218,7 +218,7 @@ class Part
             $row = $rows[$i];
 
             $date = ' от ' . Func::Date_from_MySQL($row['data']); // Дата документа
-
+            $kod_oborota = $row['kod_oborota']; // Код оборота = код накладной
             $naklad = $row['numb'] . '(№' . $row['naklad'] . $date . ')'; // Номер документа и дата
 
             if ((int)$row['kod_oper'] == 1) // Поступление
@@ -228,17 +228,14 @@ class Part
                 $res .= '<br><img src="/img/out.gif" height="14" />' . $naklad;
 
                 // Форма отметки о получении накладной
-                $kod_oborota = $row['kod_oborota']; // Код оборота = код накладной
                 if ((int)$row['poluch'] <> 1)
                     $res.= Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch',$kod_oborota);
-
-                $res .= Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
-
             } else if ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
             else
                 if ($row['kod_oper'] == 4) // Возврат
                     $res .= '<br>Возврат:' . $naklad;
+            $res .= Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
         }
 
         return $res;
