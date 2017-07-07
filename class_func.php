@@ -311,6 +311,39 @@ class Func
         $s = rawurlencode($s); // Разрешённые символы URL - латинские буквы, точка, минус и подчёркивание
         return $s;
     }
+//----------------------------------------------------------------------------------------------------------------------
+    static public function rus2lat2($string) {
+
+        $rus    = array('ё', 'ж', 'ц', 'ч', 'ш', 'щ', 'ю', 'я', 'Ё', 'Ж', 'Ц', 'Ч', 'Ш', 'Щ', 'Ю', 'Я');
+        $lat    = array('yo', 'zh', 'tc', 'ch', 'sh', 'sh', 'yu', 'ya', 'YO', 'ZH', 'TC', 'CH', 'SH', 'SH', 'YU', 'YA');
+        $string = str_replace($rus, $lat, $string);
+        $string = func::mb_strtr($string,
+            "АБВГДЕЗИЙКЛМНОПРСТУФХЪЫЬЭабвгдезийклмнопрстуфхъыьэ",
+            "ABVGDEZIJKLMNOPRSTUFH_I_Eabvgdezijklmnoprstufh_i_e");
+
+        // удаляем лишние пробелы
+        $string = preg_replace('/\s\s+/', ' ', $string);
+        // удаляем пробелы
+        $string = str_replace(" ", "_", $string); // сохраняем пробел от перехода в %20
+        // удаляем мусор
+        //$string = preg_replace("/[^A-Za-z0-9_\-]/", '-', $string);
+        // приводим к нижнему регистру
+        $string = strtolower($string);
+        // убираем "-" дефисы, который больше двух
+        $string = preg_replace("/(-){2,}/","-",$string);
+        // убираем "-" дефисы в начале и конце строки
+        $string = preg_replace("/(^-)|(-$)/","",$string);
+
+        return ($string);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    static public function mb_strtr($str, $from, $to) {
+        return str_replace(func::mb_str_split($from), func::mb_str_split($to), $str);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    static public function mb_str_split($str) {
+        return preg_split('~~u', $str, null, PREG_SPLIT_NO_EMPTY);
+    }
 
 //----------------------------------------------------------------------------------------------------------------------
     static public function lat2rus($s)
