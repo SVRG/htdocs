@@ -38,9 +38,7 @@ $CopyOK = false;
 if (isset($_FILES["filename"])) {
     $dest = $_FILES["filename"]["tmp_name"];
 
-    echo $fname = Func::rus2lat2(Func::_strip($_FILES["filename"]["name"]));
-
-    exit();
+    $fname = Func::rus2lat2(Func::_strip($_FILES["filename"]["name"]));
 
     $date = Func::NowDoc();
     $rnd = rand();
