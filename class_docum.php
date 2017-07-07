@@ -13,12 +13,12 @@ class Docum
      * @param int $Del - кнопка удаления
      * @return string
      */
-    public static function formDocum($Type = 'Doc', $ID =1, $Del = 0)
+    public static function formDocum($Type = 'Doc', $ID = 1, $Del = 0)
     {
 
         $sql = '';
         if ($Type == 'Elem')
-            $sql =          "SELECT
+            $sql = "SELECT
                                 docum_elem.kod_docum,
                                 docum_elem.kod_elem,
                                 docum.`name`,
@@ -26,10 +26,11 @@ class Docum
                               FROM
                                 docum_elem
                               INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum
-                              WHERE kod_elem=$ID AND docum.del=0";
+                              WHERE kod_elem=$ID AND docum.del=0
+                              ORDER BY docum.time_stamp DESC";
 
         elseif ($Type == 'Doc')
-            $sql =      "SELECT
+            $sql = "SELECT
                             docum_dogovory.kod_docum,
                             docum_dogovory.kod_dogovora,
                             docum.`name`,
@@ -37,10 +38,11 @@ class Docum
                           FROM
                             docum
                           INNER JOIN docum_dogovory ON docum_dogovory.kod_docum = docum.kod_docum
-                          WHERE docum_dogovory.kod_dogovora=$ID AND docum.del=0";
+                          WHERE docum_dogovory.kod_dogovora=$ID AND docum.del=0
+                          ORDER BY docum.time_stamp DESC";
 
         elseif ($Type == 'Org')
-            $sql =   "SELECT
+            $sql = "SELECT
                         docum_org.kod_docum,
                         docum_org.kod_org,
                         docum.`name`,
@@ -49,9 +51,10 @@ class Docum
                       FROM
                         docum_org
                       INNER JOIN docum ON docum_org.kod_docum = docum.kod_docum
-                      WHERE kod_org=$ID AND docum.del=0";
+                      WHERE kod_org=$ID AND docum.del=0
+                      ORDER BY docum.time_stamp DESC";
 
-        if($sql=='')
+        if ($sql == '')
             return "";
 
         $db = new DB();
@@ -67,7 +70,7 @@ class Docum
         elseif ($Type == 'Cont')
             $res .= Func::ActButton('upload.php?Desc=IncludeToCont&kod_kontakta=' . $ID, 'Прикрепить Файл');
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return $res;
 
         $res .= '<table>';
@@ -79,9 +82,9 @@ class Docum
                 $name = $row['name'];
                 $path = $row['path'];
                 $date = func::Date_from_MySQL($row['time_stamp']);
-                $del='';
+                $del = '';
 
-                $del .= Func::ActButton2('', "Удалить",'DelDocum',"kod_docum_del",$row['kod_docum']);
+                $del .= Func::ActButton2('', "Удалить", 'DelDocum', "kod_docum_del", $row['kod_docum']);
 
                 $res .= "<tr>
                             <td> <a href='$path' target='_blank'> $date </a></td>
@@ -103,13 +106,13 @@ class Docum
      * @param int $kod_docum
      * @return void
      */
-    public function Delete($kod_docum)
+    static public function Delete($kod_docum)
     {
         $db = new Db();
 
         $rows = $db->rows("SELECT * FROM docum WHERE kod_docum=$kod_docum AND docum.del=0");
 
-        if($db->cnt!=1)
+        if ($db->cnt != 1)
             return;
 
         $row = $rows[0];
@@ -122,7 +125,7 @@ class Docum
         if (!file_exists($row['path']))
             return;
 
-        $path = realpath($_SERVER["DOCUMENT_ROOT"]).'/'.$row['path'];
+        $path = realpath($_SERVER["DOCUMENT_ROOT"]) . '/' . $row['path'];
 
         unlink($path);
     }
@@ -135,24 +138,18 @@ class Docum
      * @param int $ID
      * @param string $Dest
      */
-    function Add($name, $path, $ID, $Dest='Doc')
+    function Add($name, $path, $ID, $Dest = 'Doc')
     {
         $db = new Db();
-        if($Dest=='Doc')
-        {
+        if ($Dest == 'Doc') {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
             $last_id = $db->last_id;
             $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora) VALUES ($last_id,$ID)");
-        }
-
-        elseif($Dest=='Org')
-        {
+        } elseif ($Dest == 'Org') {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
             $last_id = $db->last_id;
             $db->query("INSERT INTO docum_org (kod_docum,kod_org) VALUES ($last_id,$ID)");
-        }
-        elseif($Dest=='Elem')
-        {
+        } elseif ($Dest == 'Elem') {
             $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
             $last_id = $db->last_id;
             $db->query("INSERT INTO docum_elem (kod_docum,kod_elem) VALUES ($last_id,$ID)");
@@ -181,7 +178,7 @@ class Docum
                                     WHERE kod_elem=$kod_elem AND docum_elem.del=0
                                     ");
 
-        if($db->cnt!=1)
+        if ($db->cnt != 1)
             return;
         $cnt = $db->cnt;
 
@@ -200,5 +197,22 @@ class Docum
 
         $db->query("UPDATE docum_elem SET del=1 WHERE kod_elem=$kod_elem");
     }
-//-----------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Обработка событий
+     */
+    public static function Events()
+    {
+        $event = false;
+
+        if (isset($_POST['Flag'])) {
+            if ($_POST['Flag'] == 'DelDocum' and isset($_POST['kod_docum_del'])) {
+                Docum::Delete($_POST['DelDocum']);
+                $event = true;
+            }
+        }
+        if ($event)
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+    }
 }
+//----------------------------------------------------------------------------------------------------------------------

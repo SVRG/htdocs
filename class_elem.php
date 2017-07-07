@@ -416,12 +416,6 @@ class Elem
             header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_nomen.php");
         }
 
-        if (isset($_POST['DelDocum'])) {
-            $docum = new Docum();
-            $docum->Delete($_POST['DelDocum']);
-            $event = true;
-        }
-
         if (isset($_POST['formEdit'], $_POST['obozn'], $_POST['name'])) {
             $this->Save($_POST['obozn'], $_POST['name'], $_POST['shablon'], $_POST['shifr']);
             $event = true;

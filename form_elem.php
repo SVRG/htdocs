@@ -25,6 +25,7 @@ if (isset($_GET['kod_elem'])) {
 
 $E->Events();
 
+Docum::Events();
 
 ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

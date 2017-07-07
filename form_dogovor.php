@@ -32,6 +32,8 @@ $Kontakt = new Kontakt();
 $Kontakt->kod_dogovora = $Dogovor->kod_dogovora;
 $Kontakt->Events();
 
+Docum::Events();
+
 //---------------------------------------------------------------------------
 // Удаление документов
 if (isset($_POST['DelDocum'])) {
