@@ -207,7 +207,7 @@ class Docum
 
         if (isset($_POST['Flag'])) {
             if ($_POST['Flag'] == 'DelDocum' and isset($_POST['kod_docum_del'])) {
-                Docum::Delete($_POST['DelDocum']);
+                Docum::Delete($_POST['kod_docum_del']);
                 $event = true;
             }
         }
