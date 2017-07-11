@@ -81,10 +81,11 @@ class Docum
             if (file_exists($row['path'])) {
                 $name = $row['name'];
                 $path = $row['path'];
-                $date = func::Date_from_MySQL($row['time_stamp']);
-                $del = '';
+                $date = "";
+                if(isset($row['time_stamp'])) // todo - разобраться, если time_stamp = NULL выдает ошибку Notice: Undefined index: time_stamp
+                    $date = func::Date_from_MySQL($row['time_stamp']);
 
-                $del .= Func::ActButton2('', "Удалить", 'DelDocum', "kod_docum_del", $row['kod_docum']);
+                $del = Func::ActButton2('', "Удалить", 'DelDocum', "kod_docum_del", $row['kod_docum']);
 
                 $res .= "<tr>
                             <td> <a href='$path' target='_blank'> $date </a></td>
