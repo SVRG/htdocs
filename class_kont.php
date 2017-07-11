@@ -30,9 +30,9 @@ class Kontakt
         $db = new Db();
 
         if ($Doc_Org == "Doc")
-            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora");
+            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora ORDER BY kod_kontakta DESC");
         else
-            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org AND del=0");
+            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org AND del=0  ORDER BY kod_kontakta DESC");
 
         return $db->cnt;
     }
@@ -132,10 +132,9 @@ class Kontakt
             if (strpos($row['data'], '@')) {
                 $res .= '<tr>
                             <td>
-                                <form action="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!" method="post" enctype="text/plain">'
+                                <a href="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
                                 . $row['data'] .
-                                ' <input type="submit" value="E-MAIL" />
-                                </form>
+                                '</a>
                             </td>';
             } else
                 $res .= '<tr>
@@ -249,7 +248,7 @@ class Kontakt
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org  AND del=0");
+        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org  AND del=0 ORDER BY kod_kontakta DESC");
 
         $cnt = $db->cnt; // количество записей
 
@@ -260,7 +259,7 @@ class Kontakt
             "<form id='form1' name='form1' method='post' action='' >
                 <select name='kod_kontakta' id='kod_kontakta'>";
 
-        $exc = array();
+        $exc = array(); // Массив ФИО, чтобы не было повторений
 
         // Формируем элементы списка
         for ($i = 0; $i < $cnt; $i++) {
@@ -272,9 +271,10 @@ class Kontakt
 
                 $res .= /** @lang HTML */
                     '<option value="' . $row['kod_kontakta'] . '">' .
-                    Func::Mstr($row['dolg']) . ' ' . Func::Mstr($row['famil']) . ' ' .
+                    Func::Mstr($row['famil']) . ' ' .
                     Func::Mstr($row['name']) . ' ' .
-                    Func::Mstr($row['otch']) . ' '
+                    Func::Mstr($row['otch']) . ' '.
+                    Func::Mstr($row['dolg'])
                     . '</option>';
             }
         }
