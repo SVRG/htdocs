@@ -10,10 +10,9 @@ class Docum
      * Документы договора/елемента/организации
      * @param string $Type
      * @param int $ID
-     * @param int $Del - кнопка удаления
      * @return string
      */
-    public static function formDocum($Type = 'Doc', $ID = 1, $Del = 0)
+    public static function formDocum($Type = 'Doc', $ID = 1)
     {
 
         $sql = '';
@@ -22,7 +21,8 @@ class Docum
                                 docum_elem.kod_docum,
                                 docum_elem.kod_elem,
                                 docum.`name`,
-                                docum.path
+                                docum.path,
+                                docum.time_stamp
                               FROM
                                 docum_elem
                               INNER JOIN docum ON docum_elem.kod_docum = docum.kod_docum
@@ -34,7 +34,8 @@ class Docum
                             docum_dogovory.kod_docum,
                             docum_dogovory.kod_dogovora,
                             docum.`name`,
-                            docum.path
+                            docum.path,
+                            docum.time_stamp
                           FROM
                             docum
                           INNER JOIN docum_dogovory ON docum_dogovory.kod_docum = docum.kod_docum
