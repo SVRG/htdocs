@@ -250,9 +250,9 @@ class Part
     public function formPart($AddNacl = 0)
     {
         // Шапка
-        $res = '<br>Информация по Партии<br><table border=1 cellspacing=0 cellpadding=0 width="100%">';
-
-        $res .= $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
+        $res = $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
+        if(isset($_GET['del']))
+            $res .= Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del',$this->kod_part);
 
         return $res;
     }
@@ -707,7 +707,7 @@ class Part
     //
     /**
      * Отметка о Получении Накладной
-     * @param $kod_oborota
+     * @param int $kod_oborota
      */
     public function PostNacl($kod_oborota)
     {
@@ -719,25 +719,27 @@ class Part
 //
     /**
      * Удаление партии и связей
+     * @param int $kod_part
      */
-    public function Delete()
+    public static function Delete($kod_part=0)
     {
-        $db = new Db();
-        $db->query("UPDATE parts SET del=1 WHERE kod_part=$this->kod_part");
+        if($kod_part==0)
+            return;
 
-        $db->query("UPDATE raschet SET del=1 WHERE kod_part=$this->kod_part");
+        $db = new Db();
+        $db->query("UPDATE parts SET del=1 WHERE kod_part=$kod_part");
+
+        $db->query("UPDATE raschet SET del=1 WHERE kod_part=$kod_part");
 
         //todo - проверить
-        /*$db->query("UPDATE
-                          raschety_plat
-                          JOIN raschet ON raschety_plat.kod_rascheta=raschet.kod_rascheta 
-                          SET raschety_plat.del=1
-                          WHERE raschet.kod_part=$this->kod_part
+        $db->query("UPDATE
+                            raschety_plat
+                           INNER JOIN raschet ON raschet.kod_rascheta = raschety_plat.kod_rascheta
+                           SET raschety_plat.del=1
+                           WHERE raschet.kod_part=$kod_part
                           ");
-        */
 
-        $db->query("UPDATE sklad SET del=1 WHERE kod_part=$this->kod_part");
-
+        $db->query("UPDATE sklad SET del=1 WHERE kod_part=$kod_part");
     }
 
 //-------------------------------------------------------------------------
@@ -925,6 +927,11 @@ class Part
             elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta_del']))
             {
                 $this->DelRasch($_POST['kod_rascheta_del']);
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'DelPart' and isset($_POST['kod_part_del']))
+            {
+                $this->Delete($_POST['kod_part_del']);
                 $event = true;
             }
         }
