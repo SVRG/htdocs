@@ -116,16 +116,25 @@ class Elem
         for ($i = 0; $i < $db->cnt; $i++)
         {
             $row = $rows[$i];
-            $this->kod_elem = $row['kod_elem'];
+            $kod_elem = $row['kod_elem'];
+            $shifr = $row['shifr'];
+            $img = "";
+            $link = "form_elem.php?kod_elem=$kod_elem";
+            if(isset($row['path']))
+            {
+                $path = $row['path'];
+                $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
+            }
+
 
             $name = "";
             if ($row['shifr'] != $row['elem_name'])
                 $name = $row['elem_name'];
 
-            $row_nomen = '<tr>
-                            <td align="left" valign="top">' . $row['path'] . '</td>
-                            <td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['shifr'] . '</h1>' . $name . '</td>
-                         </tr>';
+            $row_nomen = "<tr>
+                            <td align='left' valign='top'>$img</td>
+                            <td valign='top'><a href='$link'><h1> $shifr </h1> $name </td>
+                         </tr>";
 
             if($row['nomen']==1)
                 $res.= $row_nomen;
