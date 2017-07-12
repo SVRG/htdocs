@@ -79,18 +79,31 @@ class Elem
 //----------------------------------------------------------------------
 //
     /**
-     * Вывод списка элементов, которые можно поставлять
+     * Вывод списка элементов, которые можно поставлять + остальные
      *
      */
     public function formNomen()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr ASC"); // todo - оптимизировать запрос, добавить docum (ссылку на фото)
+        $rows = $db->rows("SELECT
+                                    view_elem.name AS elem_name,
+                                    view_elem.kod_elem,
+                                    view_elem.shifr,
+                                    view_elem.nomen,
+                                    photo.path
+                                  FROM view_elem 
+                                  LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото') AS photo ON view_elem.kod_elem=photo.kod_elem
+                                  GROUP BY view_elem.kod_elem
+                                  ORDER BY shifr ASC");
 
         $cnt = $db->cnt;
 
         if($cnt==0)
             return "";
+
+        $all=false;
+        if(isset($_GET['all']))
+            $all = true;
 
         $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
                  <tr bgcolor="#CCCCCC">
@@ -98,21 +111,34 @@ class Elem
                      <td align="center">Наименование</td>
                  </tr>';
 
+        $other = "";
+
         for ($i = 0; $i < $db->cnt; $i++)
         {
             $row = $rows[$i];
             $this->kod_elem = $row['kod_elem'];
 
             $name = "";
-            if ($row['shifr'] != $row['name'])
-                $name = $row['name'];
+            if ($row['shifr'] != $row['elem_name'])
+                $name = $row['elem_name'];
 
-            $res.=  '<tr>
-                        <td align="left" valign="top">' . $this->formPhoto() . '</td>
-                        <td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['shifr'] . '</h1>' . $name . '</td>
-		             </tr>';
+            $row_nomen = '<tr>
+                            <td align="left" valign="top">' . $row['path'] . '</td>
+                            <td valign="top"><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><h1>' . $row['shifr'] . '</h1>' . $name . '</td>
+                         </tr>';
 
+            if($row['nomen']==1)
+                $res.= $row_nomen;
+            elseif($row['nomen']==0 and $all)
+                $other.=$row_nomen;
         }
+
+        $res .= '<tr bgcolor="#CCCCCC">
+                     <td width="10%">Остальная номенклатура</td>
+                     <td align="center"></td>
+                 </tr>';
+        $res.=$other;
+
         $res.=  '</table>';
 
         return $res;
@@ -164,12 +190,11 @@ class Elem
 //
     /**
      * Документы Элемента
-     * @param int $Del
      * @return string
      */
-    public function formDocum($Del = 0)
+    public function formDocum()
     {
-        return Docum::formDocum('Elem', $this->kod_elem, $Del);
+        return Docum::formDocum('Elem', $this->kod_elem);
     }
 //------------------------------------------------------------------------
 //
@@ -302,6 +327,7 @@ class Elem
         $name = "";
         $shablon = "";
         $FormName = "formAdd";
+        $btn_nomen = "";
 
         if($Edit==1){
             $this->getData();
@@ -311,6 +337,11 @@ class Elem
             $name = $row['name'];
             $shablon = $row['shablon'];
             $FormName = "formEdit";
+
+            if($row['nomen']==1)
+                $btn_nomen = func::ActButton2('','Удалить из номенклатуры',"UnsetNomen","kod_elem_set",$row['kod_elem']);
+            elseif($row['nomen']==0)
+                $btn_nomen = func::ActButton2('','Добавить в номенклатуру',"SetNomen","kod_elem_set",$row['kod_elem']);
         }
 
         $res = '
@@ -352,7 +383,7 @@ class Elem
                   <input id="'.$FormName.'" type="hidden" value="'.$FormName.'" name="'.$FormName.'"/>
                   <input type="submit" value="Сохранить" />
                 </form>';
-
+        $res.=$btn_nomen;
         return $res . Func::Cansel(0);
     }
 //------------------------------------------------------------------
@@ -426,8 +457,34 @@ class Elem
             $event = true;
         }
 
+        if(isset($_POST['Flag']))
+        {
+            if($_POST['Flag']=='SetNomen' and isset($_POST['kod_elem_set']))
+            {
+                $this->setNomen($_POST['kod_elem_set'],1);
+            }
+            elseif($_POST['Flag']=='UnsetNomen' and isset($_POST['kod_elem_set']))
+            {
+                $this->setNomen($_POST['kod_elem_set'],0);
+            }
+        }
+
         if($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 //----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Установить признак номенклатуры
+     * @param $kod_elem
+     * @param int $nomen - 0-не в номенклатуре, 1-в номенклатуре(продаем)
+     */
+    public function setNomen($kod_elem,$nomen=0)
+    {
+        $db = new Db();
+
+        $db->query("UPDATE elem SET nomen = $nomen WHERE kod_elem = $kod_elem");
+
+    }
+//------------------------------------------------------------------------
 }
