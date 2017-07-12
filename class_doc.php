@@ -1054,12 +1054,11 @@ class Doc
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Документы по Договору. Проверить
-     * @param $DelButton - кнопка удаления
      * @return string
      */
-    public function formDocum($DelButton)
+    public function formDocum()
     {
-        return Docum::formDocum('Doc', $this->kod_dogovora, $DelButton);
+        return Docum::formDocum('Doc', $this->kod_dogovora);
     }
 //-----------------------------------------------------------------------
     /**

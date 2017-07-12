@@ -571,13 +571,12 @@ class Org
 //
     /**
      * Документы Организации
-     * @param int $Del
      * @return string
      */
-    public function Docum($Del = 0)
+    public function Docum()
     {
         $d = new Docum();
-        return $d->formDocum('Org', $this->kod_org, $Del);
+        return $d->formDocum('Org', $this->kod_org);
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
