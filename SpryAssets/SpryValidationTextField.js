@@ -719,7 +719,7 @@ Spry.Widget.ValidationTextField.prototype.init = function (element, options) {
     options.hint = Spry.Widget.Utils.firstValid(options.hint, '');
     options.isRequired = Spry.Widget.Utils.firstValid(options.isRequired, true);
 
-    //set widget validation parameters
+    //set widgets validation parameters
     //get values from validation type descriptor
     //use the user specified values, if defined
     options.characterMasking = Spry.Widget.Utils.firstValid(options.characterMasking, validationDescriptor.characterMasking);
@@ -879,7 +879,7 @@ Spry.Widget.ValidationTextField.prototype.attachBehaviors = function () {
                 }, false);
                 this.form.attachedResetHandler = true;
             }
-            // add the currrent widget to the "onSubmit" check queue;
+            // add the currrent widgets to the "onSubmit" check queue;
             Spry.Widget.Form.onSubmitWidgetQueue.push(this);
         }
     }
@@ -1052,7 +1052,7 @@ Spry.Widget.ValidationTextField.prototype.doValidations = function (testValue, r
         }
     }
 
-    //validation - testValue passes widget validation function
+    //validation - testValue passes widgets validation function
     if (!mustRevert && this.validation && continueValidations) {
         var value = this.validation(fixedValue, this.options);
         if (false === value) {

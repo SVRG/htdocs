@@ -142,11 +142,14 @@ class Elem
                 $other.=$row_nomen;
         }
 
-        $res .= '<tr bgcolor="#CCCCCC">
+        if($all)
+        {
+            $res .= '<tr bgcolor="#CCCCCC">
                      <td width="10%">Остальная номенклатура</td>
                      <td align="center"></td>
-                 </tr>';
-        $res.=$other;
+                    </tr>';
+            $res.=$other;
+        }
 
         $res.=  '</table>';
 

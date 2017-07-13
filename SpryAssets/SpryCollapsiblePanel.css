@@ -6,14 +6,14 @@
 
 /* This is the selector for the main CollapsiblePanel container. For our
  * default style, the CollapsiblePanel is responsible for drawing the borders
- * around the widget.
+ * around the widgets.
  *
- * If you want to constrain the width of the CollapsiblePanel widget, set a width on
+ * If you want to constrain the width of the CollapsiblePanel widgets, set a width on
  * the CollapsiblePanel container. By default, our CollapsiblePanel expands horizontally to fill
  * up available space.
  *
  * The name of the class ("CollapsiblePanel") used in this selector is not necessary
- * to make the widget function. You can use any class name you want to style the
+ * to make the widgets function. You can use any class name you want to style the
  * CollapsiblePanel container.
  */
 .CollapsiblePanel {

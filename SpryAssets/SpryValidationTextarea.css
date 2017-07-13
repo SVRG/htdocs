@@ -14,9 +14,9 @@
     display: none;
 }
 
-/* These selectors change the way messages look when the widget is in one of the error states.
+/* These selectors change the way messages look when the widgets is in one of the error states.
  * These classes set a default red border and color for the error text.
- * The state class (e.g. .textareaRequiredState) is applied on the top-level container for the widget,
+ * The state class (e.g. .textareaRequiredState) is applied on the top-level container for the widgets,
  * and this way only the specific error message can be shown by setting the display property to "inline".
  */
 .textareaRequiredState .textareaRequiredMsg,
@@ -27,10 +27,10 @@
     border: 1px solid #CC3333;
 }
 
-/* The next three group selectors control the way the core element (TEXTAREA) looks like when the widget is in one of the states: * focus, required / minChars / maxChars , valid 
- * There are two selectors for each state, to cover the two main usecases for the widget:
- * - the widget id is placed on the top level container for the TEXTAREA
- * - the widget id is placed on the TEXTAREA element itself (there are no error messages)
+/* The next three group selectors control the way the core element (TEXTAREA) looks like when the widgets is in one of the states: * focus, required / minChars / maxChars , valid
+ * There are two selectors for each state, to cover the two main usecases for the widgets:
+ * - the widgets id is placed on the top level container for the TEXTAREA
+ * - the widgets id is placed on the TEXTAREA element itself (there are no error messages)
  */
 
 /* When the widget is in the valid state the TEXTAREA has a green background applied on it. */
