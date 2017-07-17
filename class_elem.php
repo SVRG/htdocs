@@ -92,7 +92,7 @@ class Elem
                                     view_elem.nomen,
                                     photo.path
                                   FROM view_elem 
-                                  LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото') AS photo ON view_elem.kod_elem=photo.kod_elem
+                                  LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                   GROUP BY view_elem.kod_elem
                                   ORDER BY shifr ASC");
 
