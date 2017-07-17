@@ -19,16 +19,9 @@ class Func
     public static function DaysRem($Date)
     {
         if (!isset($Date)) return 0;
-        $d = explode('.', $Date);
-        $res = 0;
-
-        if (count($d) >= 3)
-            if ($d[0] > 0 and $d[1] > 0 and $d[2] > 0) {
-                $d1 = mktime(0, 0, 0, $d[1], $d[0], $d[2]);
-                $d2 = mktime(0, 0, 0, date('m'), date('d'), date('y'));
-                $res = intval(($d1 - $d2) / 86400);
-            } else
-                return 0;
+        $now = new DateTime("now");
+        $date = new DateTime($Date);
+        $res = $now->diff($date)->format("%R%a");
 
         return $res;
     }
@@ -49,62 +42,48 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Преобразуем дату в формат yyyymmdd для MySQL
+     * Преобразуем дату из dd.mm.yyyy в формат yyyy-mm-dd для MySQL
      * @param string $Date
      * @return string
      */
     public static function Date_to_MySQL($Date = "")
     {
+        if ($Date == "" or !self::validateDate($Date))
+            return date('Y-m-d');
 
-        if ($Date == "")
-            return date('y.m.d');
-
-        $date_corrected = explode('.', $Date);
-        $date_corrected = $date_corrected[2] . $date_corrected[1] . $date_corrected[0];
-
-        return $date_corrected;
+        $date = date_create_from_format("d.m.Y",$Date);
+        $date_to_MySQL = $date->format("Y-m-d");
+        return $date_to_MySQL;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Преобразует дату из MySQL yy-mm-dd в формат dd.mm.yyyy
+     * Преобразует дату из MySQL yyyy-mm-dd в формат dd.mm.yyyy
      * @param string $MySQL_Date
      * @return string
      */
     public static function Date_from_MySQL($MySQL_Date = "")
     {
-
-        $res = '';
-
-        if ($MySQL_Date == "")
-            return date('y.m.d');
-
-        $d = explode(' ', $MySQL_Date);
-
-        if (count($d) >= 1)
-            $de = explode('-', $d[0]);
-        else
-            return $MySQL_Date;
-
-        if (count($de) > 1) {
-            if ($de[2] > 0 and $de[1] > 0 and $de[0] > 0)
-                $res = $de[2] . '.' . $de[1] . '.' . $de[0];
-        } else {
-
-            $de = explode('.', $d[0]);
-
-            if (count($de) > 1) {
-                if ($de[2] > 0 and $de[1] > 0 and $de[0] > 0)
-                    $res = $de[0] . '.' . $de[1] . '.' . $de[2];
-            }
-        }
-
+        $date = strtotime($MySQL_Date);
+        $res = date('d.m.Y',$date);
         return $res;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Проверка корректности даты
+     * @param $date
+     * @param string $format
+     * @return bool
+     */
+    public static function validateDate($date, $format = 'd.m.Y')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) == $date;
+    }
+//----------------------------------------------------------------------------------------------------------------------
     /**
      * Процент
      * @param $R
