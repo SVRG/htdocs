@@ -245,7 +245,6 @@ class Doc
             }
 
             $ostatok_str = ""; // Остаток отгрузки
-            $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
             // Для исходящих договоров
             if($numb_ostat>0 and (int)$row['kod_ispolnit']==683){
                 if($numb_ostat>0 and $numb_ostat!=$numb) // Вывод остатка. Если он не нулевой и не равен количеству поставки то выводим
@@ -260,6 +259,7 @@ class Doc
                     $ostatok_str = " <abbr title=\"Осталось получить $numb_ostat\">($numb_ostat)</abbr>";
             }
 
+            $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
             if($summa_plat>0 and $numb_ostat>0)
                 if(func::DaysRem($row['data_postav'])<14)
                     $ind_data = /** @lang HTML */
@@ -657,7 +657,7 @@ class Doc
         $kod_elem_pred = -1; // Код предыдущего элемента
         $summ_numb_ostat = 0; // Сумма остатка отгрузки по элементу
         $summ_cnt = 0; // Счетчик - сколько раз считали сумму. Используется в условии
-
+        $summ_numb_payed = 0; // Сумма оплаченных товаров
 
         // Вывод плана
         for ($i = 0; $i < $cnt; $i++) {
@@ -726,7 +726,7 @@ class Doc
 
             $ind_data = ""; // Индикатор даты
             if($proc>0)
-            if(func::DaysRem(func::Date_from_MySQL($data_postav))<14)
+            if(func::DaysRem($data_postav)<14)
                 $ind_data = " bgcolor='#f4df42'";
 
             $numb_ostat_str = ""; // Количество которое осталось отгрузить
@@ -746,13 +746,17 @@ class Doc
             if ($kod_elem != $kod_elem_pred)
             {
                 if($summ_cnt>1)
-                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat</b></td><th colspan='5'></th></tr>";
+                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='5'></th></tr>";
                 $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
                 $summ_numb_ostat = 0;
+                $summ_numb_payed = 0;
                 $summ_cnt = 0;
             }
             $kod_elem_pred = $kod_elem;
             $summ_numb_ostat +=$numb_ostat;
+            if($proc>0)
+                $summ_numb_payed+=$numb_ostat;
+
             $summ_cnt++;
 
             $form_part_link = "form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora";
