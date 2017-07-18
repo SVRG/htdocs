@@ -261,9 +261,15 @@ class Doc
 
             $ind_data = ""; // Индикатор окраски даты - если менее 14 дней - то желтый
             if($summa_plat>0 and $numb_ostat>0)
-                if(func::DaysRem($row['data_postav'])<14)
+            {
+                $days_rem = func::DaysRem($row['data_postav']);
+                if($days_rem<=14)
+                    $ind_data = /** @lang HTML */
+                        " bgcolor='#F18585'";
+                elseif($days_rem<=30)
                     $ind_data = /** @lang HTML */
                         " bgcolor='#f4df42'";
+            }
 
             $ind_part = ''; // Окрашиваем ячейку Кол-во в зеленый если все отгружено
             if($numb_ostat==0)
@@ -726,8 +732,13 @@ class Doc
 
             $ind_data = ""; // Индикатор даты
             if($proc>0)
-            if(func::DaysRem($data_postav)<14)
-                $ind_data = " bgcolor='#f4df42'";
+            {
+                $days_rem = func::DaysRem($data_postav);
+                if($days_rem<=14)
+                    $ind_data = " bgcolor='#F18585'";
+                elseif ($days_rem<=30)
+                    $ind_data = " bgcolor='#f4df42'";
+            }
 
             $numb_ostat_str = ""; // Количество которое осталось отгрузить
             if($numb_ostat!=$numb)

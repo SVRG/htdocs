@@ -21,8 +21,7 @@ class Func
         if (!isset($Date)) return 0;
         $now = new DateTime("now");
         $date = new DateTime($Date);
-        $res = $now->diff($date)->format("%R%a");
-
+        $res = $now->diff($date)->format("%r%a");
         return $res;
     }
 
