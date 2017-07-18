@@ -711,8 +711,9 @@ class Part
     public function PostNacl($kod_oborota)
     {
         $db = new Db();
-        $Date = Func::NowE();
-        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota");
+        $Date = date("Y-m-d");
+        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota",1);
+        exit();
     }
 //-------------------------------------------------------------------------
 //
