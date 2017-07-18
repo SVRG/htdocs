@@ -712,8 +712,7 @@ class Part
     {
         $db = new Db();
         $Date = date("Y-m-d");
-        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota",1);
-        exit();
+        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota");
     }
 //-------------------------------------------------------------------------
 //
