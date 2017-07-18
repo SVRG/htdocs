@@ -16,7 +16,7 @@ class Org
      * @param string $ID
      * @return string
      */
-    public static function formSelList($kod_org_selected = -1, $Name = 'nazv_krat', $ID = 'kod_org')
+    public static function formSelList($kod_org_selected = 0, $Name = 'nazv_krat', $ID = 'kod_org')
     {
         if (!isset($kod_org_selected))
             $kod_org_selected = -1;
@@ -28,7 +28,6 @@ class Org
         $rows = $db->rows("SELECT * FROM org WHERE del=0 ORDER BY poisk");
 
         $cnt = $db->cnt;
-
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
@@ -181,7 +180,7 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0");
+        $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0 ORDER BY kod_adresa DESC");
 
         $cnt = $db->cnt;
 
@@ -264,16 +263,16 @@ class Org
             $poisk = $row['poisk'];
             $www = func::Link($row['www']);
 
-            $FN = '';
+            $nazv_poln_str = '';
             if ($nazv_krat != $nazv_poln)
-                $FN = $nazv_poln;
+                $nazv_poln_str = $nazv_poln;
 
             $tab_row = /** @lang HTML */
                 "<tr>
                       <td></td>
                       <td><a href=\"form_org.php?kod_org= $kod_org \"> $poisk </a></td>
                       <td><a href=\"form_org.php?kod_org= $kod_org \">$nazv_krat</a></td>
-                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $FN </a></td>
+                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $nazv_poln_str </a></td>
                       <td> $www </td>
 		            </tr>";
             if ($echo)
@@ -738,11 +737,131 @@ class Org
                 $this->DelData($_POST['kod_dat_del']);
                 $event = true;
             }
+            elseif($_POST['Flag']=='DelOrgLink' and isset($_POST['kod_link_del']))
+            {
+                $this->DelOrgLink($_POST['kod_link_del']);
+                $event = true;
+            }
+            elseif($_POST['Flag']=='AddOrgLink' and isset($_POST['kod_org_slave']))
+            {
+                $this->AddOrgLink($this->kod_org,$_POST['kod_org_slave'],$_POST['prim']);
+                $event = true;
+            }
         }
 
         if($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 
     }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Связи организации
+     * @param $kod_org
+     * @return string
+     */
+    public static function formOrgLinks($kod_org)
+    {
+        if(!isset($kod_org))
+            return "";
 
+        $db = new Db();
+        $rows = $db->rows(/** @lang SQL */
+            "SELECT
+                      org.nazv_krat,
+                      org.kod_org,
+                      org_slave.nazv_krat AS nazv_krat_slave,
+                      org_slave.kod_org AS kod_org_slave,
+                      org_links.prim,
+                      org_links.kod_link
+                    FROM
+                      org
+                      JOIN org_links
+                        ON org.kod_org = org_links.master
+                      JOIN org AS org_slave
+                        ON org_links.slave = org_slave.kod_org
+                    WHERE
+                      (org_links.master = $kod_org
+                      OR org_links.slave = $kod_org) AND org_links.del=0
+                      ");
+
+        if ($db->cnt == 0)
+            return '';
+
+        $res = '<table>
+                    <tr>
+                       <td>Название</td>
+                       <td>Примечание</td>
+                    </tr>';
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            $kod = $row['kod_org_slave'];
+            $nazv = $row['nazv_krat_slave'];
+            $prim = $row['prim'];
+            if($kod_org==$row['kod_org_slave'])
+            {
+                $kod = $row['kod_org'];
+                $nazv = $row['nazv_krat'];
+            }
+
+            $btn_del = func::ActButton2('','Удалить',"DelOrgLink","kod_link_del",$row['kod_link']);
+            $res .= "<tr>
+                            <td><a href='form_org.php?kod_org=$kod'>$nazv</a></td>
+                            <td align='right'>$prim</td>
+                            <td align='right'>$btn_del</td>
+                    </tr>";
+        }
+        $res .= '</table>';
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Удаление связи организации
+     * @param $kod_link
+     */
+    private function DelOrgLink($kod_link)
+    {
+        $db = new Db();
+
+        $db->query("UPDATE org_links SET del=1 WHERE kod_link=$kod_link");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Форма добавления связи
+     *
+     */
+    public function formAddOrgLink()
+    {
+        $sel = self::formSelList(0,'nazv_krat','kod_org_slave');
+        $body = "<table>
+                    <tr>
+                        <td>
+                          $sel
+                        </td>
+                        <td><input name='prim'></td>
+                    </tr>
+                </table>";
+        $res = func::ActForm("",$body,"Добавить","AddOrgLink");
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Удаление связи организации
+     * @param $kod_org_master
+     * @param $kod_org_slave
+     * @param string $prim
+     * @internal param $kod_link
+     */
+    private function AddOrgLink($kod_org_master,$kod_org_slave, $prim="")
+    {
+        $db = new Db();
+
+        $db->query(/** @lang SQL */
+            "INSERT INTO org_links (master, slave, prim) VALUE ($kod_org_master,$kod_org_slave,'$prim')");
+    }
 }

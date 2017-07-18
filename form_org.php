@@ -90,7 +90,14 @@ Docum::Events();
                         // Документы
                         echo '<br>' . $Org->Docum();
 
-                        $Edit = 0;
+                        // Связи
+                        if (isset($_POST['Flag']))
+                            if ($_POST['Flag'] == 'AddOrgLinkForm')
+                            {
+                                echo $Org->formAddOrgLink();
+                            }
+                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Связь', 'AddOrgLinkForm');
+                        echo Org::formOrgLinks($Org->kod_org);
 
                         // Реквизиты
                         $Edit = 0;
