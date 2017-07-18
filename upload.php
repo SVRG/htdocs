@@ -88,7 +88,6 @@ if (isset($_FILES["filename"])) {
 </head>
 <body>
 <?php  include("header.php");
-//include("nav.php");
 ?>
 
 <!-- end masthead -->
@@ -128,7 +127,6 @@ if (isset($_FILES["filename"])) {
         echo($_FILES["filename"]["size"]);
     } else
         echo("Ошибка загрузки файла");
-
     ?>
 </div>
 </body>

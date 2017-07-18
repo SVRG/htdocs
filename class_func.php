@@ -303,8 +303,9 @@ class Func
         $string = preg_replace('/\s\s+/', ' ', $string);
         // удаляем пробелы
         $string = str_replace(" ", "_", $string); // сохраняем пробел от перехода в %20
+        // $string = str_replace("№", "N", $string); // сохраняем пробел от перехода в %20
         // удаляем мусор
-        //$string = preg_replace("/[^A-Za-z0-9_\-]/", '-', $string);
+        $string = preg_replace("/[^A-Za-z0-9_\-]/", '-', $string);
         // приводим к нижнему регистру
         $string = strtolower($string);
         // убираем "-" дефисы, который больше двух
