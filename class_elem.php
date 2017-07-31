@@ -363,7 +363,7 @@ class Elem
                         <td width="200">Шифр</td>
                         <td width="400">
                           <label>
-                            <input type="text" name="shifr" id="shifr" value="' . $shifr . '" />
+                            <input name="shifr" id="shifr" value="' . $shifr . '" />
                           </label>
                         </td>
                     </tr>
@@ -371,7 +371,7 @@ class Elem
                         <td width="200">Обозначение (ДМ)*</td>
                         <td width="400">
                           <label>
-                            <input type="text" name="obozn" id="obozn" value="' . $obozn . '" />
+                            <input name="obozn" id="obozn" value="' . $obozn . '" />
                             </label>
                         </td>
                       </tr>

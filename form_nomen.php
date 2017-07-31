@@ -9,7 +9,7 @@ $E->Events();
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
@@ -31,7 +31,7 @@ $E->Events();
         <?php include("header.php"); ?>
         <!-- end masthead -->
         <div class="style1" id="pagecell1">
-            <input type="text" id="topic_title" title="Найти">
+            <input id="elem" title="Найти">
             <?php
 
             $UserG = array('admin', 'oper');
