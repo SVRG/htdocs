@@ -94,6 +94,10 @@ class Docum
                             <td>$del</td>
                          </tr>";
             }
+            else
+                {
+                    self::Delete($row['kod_docum']);
+                }
         }
 
         $res .= '</table>';
