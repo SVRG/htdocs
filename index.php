@@ -23,16 +23,18 @@ if (isset($_POST['login'],$_POST['password'])) {
     $row = mysqli_fetch_assoc($result);
     $salt = $row['salt'];
 
+    /*
     if($salt=='') // todo - при первом входе обновить пароли!
     {
         //generate a random salt to use for this account
         $salt = bin2hex(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
         $saltedPW =  $password . $salt;
         $hashedPW = hash('sha256', $saltedPW);
-        $query = /** @lang SQL */
+        $query =
             "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
         $mysqli->query($query);
     }
+    */
 
     $saltedPW =  $password . $salt;
     $hashedPW = hash('sha256', $saltedPW);
