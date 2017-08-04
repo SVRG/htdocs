@@ -235,7 +235,10 @@ class Func
         if ($Text == '')
             $Text = $Link;
 
-        return '<a href="' . $Link . '" target="_blank">' . $Text . '</a>';
+        if (strpos($Link, 'http') === false) {
+            $Link = "http://$Link";
+        }
+        return "<a href=\"$Link\" target=\"_blank\">$Text</a>";
     }
 
 //----------------------------------------------------------------------------------------------------------------------
