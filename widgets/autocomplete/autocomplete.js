@@ -3,7 +3,7 @@
  */
 $(function() {
 
-    $("#topic_title").autocomplete({
+    $("#elem").autocomplete({
         source: "../widgets/autocomplete/autocomplete.php",
         minLength: 2,
         select: function(event, ui) {

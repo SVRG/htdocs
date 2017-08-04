@@ -52,11 +52,10 @@ $cnt = count($parts);
 /**
  * Create SQL
  */
-$sql = 'SELECT name, shifr, kod_elem FROM elem WHERE elem.name IS NOT NULL ';
+$sql = 'SELECT name,shifr,kod_elem FROM elem WHERE elem.del=0 ';
 for ($i = 0; $i < $cnt; $i++) {
-    $sql .= ' AND elem.name LIKE ' . "'%" . $conn->real_escape_string($parts[$i]) . "%'";
+    $sql .= ' AND name LIKE ' . "'%" . $conn->real_escape_string($parts[$i]) . "%'";
 }
-
 $rs = $conn->query($sql);
 if ($rs === false) {
     $user_error = 'Wrong SQL: ' . $sql . 'Error: ' . $conn->errno . ' ' . $conn->error;
