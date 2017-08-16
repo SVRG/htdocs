@@ -4,6 +4,7 @@ include_once('class_kont.php');
 include_once('class_org.php');
 include_once('class_docum.php');
 include_once('class_db.php');
+include_once('class_mail.php');
 
 // Класс Договор
 class Doc
@@ -151,7 +152,7 @@ class Doc
      * @param $i - внешний счетчик
      * @return array
      */
-    private function getDocBuffer($rplan_rows, &$i)
+    private static function getDocBuffer($rplan_rows, &$i)
     {
         $buffer = array();
 
@@ -405,9 +406,9 @@ class Doc
             // Если договор закрыт то красим красным
             if ($row['zakryt'] == 1)
                 $clr = '<tr>
-                            <th scope="row"></th>
+                            <th ></th>
                             <td bgcolor="#F18585">Закрыт</td>
-                            <td>'. Func::ActButton2('',"Восстановить","DocOpen",'kod_dogovora_open',$row['kod_dogovora']) .'</td>
+                            <td>' . Func::ActButton2('',"Восстановить","DocOpen",'kod_dogovora_open',$row['kod_dogovora']) .'</td>
                         </tr>';
             else {
                 $close = true;
@@ -422,7 +423,7 @@ class Doc
 
                 if($Close == 1 and $close)
                     $clr = '<tr>
-                            <th scope="row"></th>
+                            <th ></th>
                             <td>' . Func::ActButton('', 'Закрыть', 'DocClose') . '</td>
                             </tr>';
             }
@@ -431,37 +432,37 @@ class Doc
 
             if ($this->kod_org == 683) {
                 $ISP = '<tr>
-                            <th scope="row">Исполнитель</th>
+                            <th >Исполнитель</th>
                             <td><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                             </tr>';
             }
 
             echo // todo - Проверить правильность. Округление! Валюта - пока только руб.
                 '<table width="600" border="0">
-                        <th width="202" scope="row">Номер</th>
+                        <th width="202" >Номер</th>
                         <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></td>
                       </tr>
                       <tr>
-                        <th scope="row">Дата Составления </th>
+                        <th >Дата Составления </th>
                         <td>' . Func::Date_from_MySQL($row['data_sost']) . '</td>
                       </tr>
                       <tr>
-                        <th scope="row">Заказчик</th>
+                        <th >Заказчик</th>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                       </tr>
                       <tr>
                       </tr>
                         ' . $ISP . '
                       <tr>
-                        <th scope="row">Сумма Договора</th>
+                        <th >Сумма Договора</th>
                         <td>' . Func::Rub($row['dogovor_summa']) . ' р.</td>
                       </tr>
                       <tr>
-                        <th scope="row">Сумма Платежей</th>
+                        <th >Сумма Платежей</th>
                         <td>' . Func::Rub($row['summa_plat']) . ' р.</td>
                       </tr>
                       <tr>
-                        <th scope="row">Остаток</th>
+                        <th >Остаток</th>
                         <td>' . Func::Rub($row['dogovor_ostat']) . ' р.</td>
                       </tr>
                         ' . $clr . '
@@ -512,30 +513,30 @@ class Doc
                             </td>
                       </tr>
                       <tr>
-                        <th width="202" scope="row">Номер</th>
+                        <th width="202" >Номер</th>
                         <td width="374"><span id="SNumR">
-                                  <input type="text" name="nomer" id="nomer" value="' . $nomer . '"/>
+                                  <input  name="nomer" id="nomer" value="' . $nomer . '"/>
                                   <span class="textfieldRequiredMsg">Нужно ввести значение.</span><span class="textfieldMinCharsMsg">Minimum
                                   number of characters not met.</span></span>
                          </td>
                       </tr>
                       <tr>
-                        <th scope="row">Дата Составления </th>
+                        <th >Дата Составления </th>
                         <td><span id="SDateR">
-                                  <input type="text" name="data_sost" id="data_sost" value="' . $data_sost . '" />
+                                  <input  name="data_sost" id="data_sost" value="' . $data_sost . '" />
                              <span class="textfieldRequiredMsg">Нужно ввести значение.</span>
                              <span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span>
                              </span>
                         </td>
                       </tr>
                       <tr>
-                        <th scope="row">Контрагент</th>
+                        <th >Контрагент</th>
                         <td>' . Org::formSelList($kod_org, '', 'kod_org') . '</td>
                       </tr>
                       <tr>
-                        <th scope="row">Тип Догвора</th>
+                        <th >Тип Догвора</th>
                             <td>     
-                                    <p><input name="doc_type" id="doc_type" type="radio" value="postav" '.$posav_checked.'>Поставка</p>
+                                    <p><input name="doc_type" id="doc_type" type="radio" value="postav" ' .$posav_checked.'>Поставка</p>
                                     <p><input name="doc_type" id="doc_type" type="radio" value="zakup" '.$zakup_checked.'>Закупка</p>
                             </td>
                       </tr>
@@ -1572,6 +1573,19 @@ class Doc
         $data = func::Date_to_MySQL($data);
 
         $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim')");
+
+        $mail = new Mail();
+        $data = $this->getData($kod_dogovora);
+        $dog_nomer = $data['nomer'];
+        $kod_org = $data['kod_org'];
+        $nazv_krat = $data['nazv_krat'];
+        $summa_str = func::Rub($summa);
+        $host = $_SERVER['HTTP_HOST'];
+        $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
+        $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
+        $body .= "Сумма: $summa_str<br>";
+        $body .= "Примечание: $prim";
+        $mail->send_mail($body,"Оплата: $dog_nomer - $nazv_krat - $summa_str");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1733,20 +1747,20 @@ class Doc
                                 <tr>
                                   <td width="126">Номер Счета</td>
                                   <td width="292"><span id="SNumR">
-                                  <input type="text" name="InvNum" id="InvNum" />
+                                  <input  name="InvNum" id="InvNum" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
                                   number of characters not met.</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Дата</td>
                                   <td><span id="SDateR">
-                                  <input type="text" name="InvDate" id="InvDate" value="' . date('d.m.Y') . '" />
+                                  <input  name="InvDate" id="InvDate" value="' . date('d.m.Y') . '" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Сумма</td>
                                   <td><span id="SSummR">
-                                  <input type="text" name="InvSumm" id="InvSumm" />
+                                  <input  name="InvSumm" id="InvSumm" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
                                   format.</span></span></td>
                                 </tr>
