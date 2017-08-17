@@ -3,16 +3,12 @@ include_once('class_db.php');
 
 class Docum
 {
-    public $path = "";
-
     /**
      * Docum constructor.
      */
     public function __construct()
     {
-        // Обрабатываем без секций
-        $ini_array = parse_ini_file("settings.ini");
-        $this->path = $ini_array['path'];
+
     }
 //---------------------------------------------------------------------
 //
@@ -194,22 +190,23 @@ class Docum
 
         if ($db->cnt != 1)
             return;
+        $kod_user = func::kod_user();
+
         $cnt = $db->cnt;
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $kod_docum = $row['kod_docum'];
-
             $path = $row['path'];
 
-            $db->query("UPDATE docum SET del=1 WHERE kod_docum=$kod_docum");
+            $db->query("UPDATE docum SET del=1,kod_user=$kod_user WHERE kod_docum=$kod_docum");
 
             if (!file_exists($path))
                 continue;
-            unlink($this->path . $row['path']); // todo - нужно задавать путь!
+            unlink($_SERVER["DOCUMENT_ROOT"] .'/'. $row['path']);
         }
 
-        $db->query("UPDATE docum_elem SET del=1 WHERE kod_elem=$kod_elem");
+        $db->query("UPDATE docum_elem SET del=1,kod_user=$kod_user WHERE kod_elem=$kod_elem");
     }
 //----------------------------------------------------------------------------------------------------------------------
     /**

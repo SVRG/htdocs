@@ -6,6 +6,7 @@
  * Time: 09:08
  */
 include_once 'PHPMailer/PHPMailerAutoload.php';
+include_once "class_config.php";
 
 class Mail
 {
@@ -21,13 +22,13 @@ class Mail
      */
     public function __construct()
     {
-        // Обрабатываем без секций
-        $ini_array = parse_ini_file("settings.ini");
-        $this->gmail_login = $ini_array['gmail_login'];
-        $this->gmail_pass = $ini_array['gmail_pass'];
-        $this->from_adress = $ini_array['from_adress'];
-        $this->from_name = $ini_array['from_name'];
-        $this->to_adress = $ini_array['to_adress'];
+        $config = new config();
+
+        $this->gmail_login = $config->gmail_login;
+        $this->gmail_pass = $config->gmail_pass;
+        $this->from_adress = $config->from_address;
+        $this->from_name = $config->from_name;
+        $this->to_adress = $config->to_adress;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
