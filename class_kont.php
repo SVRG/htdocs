@@ -25,7 +25,7 @@ class Kontakt
      * @param string $Doc_Org -
      * @return int
      */
-    public function getData($Doc_Org = "Doc")
+    public function getKontArray($Doc_Org = "Doc")
     {
         $db = new Db();
 
@@ -46,7 +46,7 @@ class Kontakt
     public function formKontakts($AddPh = 0, $Doc_Org = "Doc")
     {
         // Формируем массив контактов
-        $cnt = $this->getData($Doc_Org);
+        $cnt = $this->getKontArray($Doc_Org);
 
         $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
         //$res .= '<tr bgcolor="#CCCCCC" ><td width="200">Контакты</td></tr>';
@@ -150,7 +150,7 @@ class Kontakt
 
         if ($Add == 1)
             $res .= '<form id="form1" name="form1" method="post" action="">
-                           <input type="text" name="phone" id="phone" />
+                           <input name="phone" id="phone" />
                            <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
                            <input type="hidden" name="formPhones" value="formPhones" />
                            <input type="submit" name="Добавить" id="button" value="Добавить" />
@@ -180,19 +180,20 @@ class Kontakt
         $famil = Func::Mstr($famil);
         $name = Func::Mstr($name);
         $otch = Func::Mstr($otch);
+        $kod_user = func::kod_user();
 
         $db = new Db();
         $db->query(/** @lang SQL */
             "INSERT INTO 
-                      kontakty (kod_org,dolg,famil,name,otch)
-                    VALUES ($kod_org,'$dolg','$famil','$name','$otch')");
+                      kontakty (kod_org,dolg,famil,name,otch,kod_user)
+                    VALUES ($kod_org,'$dolg','$famil','$name','$otch',$kod_user)");
         $last_id = $db->last_id;
 
         if ($kod_dogovora > 0)
             $db->query(/** @lang SQL */
                 "INSERT INTO 
-                          kontakty_dogovora (kod_kontakta,kod_dogovora)
-                        VALUES($last_id,$kod_dogovora)");
+                          kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user)
+                        VALUES($last_id,$kod_dogovora,$kod_user)");
     }
     //-----------------------------------------------------------------
     //
@@ -207,9 +208,10 @@ class Kontakt
         $kod_kontakta = $this->kod_kontakta;
 
         if (!isset($phone) or $phone=="") return;
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO kontakty_data (kod_kontakta,data)
-                    VALUES($kod_kontakta,'$phone')");
+        $db->query("INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
+                    VALUES($kod_kontakta,'$phone',$kod_user)");
     }
     //-----------------------------------------------------------------
     //
@@ -217,7 +219,7 @@ class Kontakt
      * Загрузка данных. Проверить необходимость!
      * @param int $kod_kontakta
      */
-    public function Set($kod_kontakta)
+    public function getData($kod_kontakta)
     {
         $db = new Db();
         $this->kod_kontakta = $kod_kontakta;
@@ -282,7 +284,7 @@ class Kontakt
         $res .= /** @lang HTML */
             "</select>
                     <select name='Status' id='Status'>
-                    <option value='2' selected='selected'>По Договору</option>
+                    <option value='2' >По Договору</option>
                     <option value='4'>По Отгрузке</option>
                     <option value='1'>Подписант</option>
                     <option value='3'>По Финансированию</option>
@@ -304,7 +306,9 @@ class Kontakt
     public function AddKontaktToDoc($kod_dogovora)
     {
         $db = new Db();
-        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora) VALUES($this->kod_kontakta,$kod_dogovora)");
+        $kod_user = func::kod_user();
+
+        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user) VALUES($this->kod_kontakta,$kod_dogovora,$kod_user)");
     }
 
     //------------------------------------------------------------------------
@@ -319,8 +323,10 @@ class Kontakt
     public function Save($dolg, $famil, $name, $otch)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
+
         // Не обновляется код организации
-        $db->query("UPDATE kontakty SET dolg = '$dolg', famil = '$famil', name = '$name', otch = '$otch' WHERE kod_kontakta =$this->kod_kontakta");
+        $db->query("UPDATE kontakty SET dolg = '$dolg', famil = '$famil', name = '$name', otch = '$otch',kod_user=$kod_user WHERE kod_kontakta =$this->kod_kontakta");
     }
     //------------------------------------------------------------------------
     //
@@ -358,21 +364,21 @@ class Kontakt
                 <td width=\"78\">Должность</td>
                 <td width=\"256\">
                   <label>
-                    <input name=\"dolg\" type=\"text\" id=\"dolg\" size=\"35\" value=\"$dolg\" />
+                    <input name=\"dolg\" id=\"dolg\" size=\"35\" value=\"$dolg\" />
                   </label>
                 </td>
               </tr>
               <tr>
                 <td>Фамилия</td>
-                <td><input name=\"famil\" type=\"text\" id=\"famil\" size=\"35\" value=\"$famil\" /></td>
+                <td><input name=\"famil\" id=\"famil\" size=\"35\" value=\"$famil\" /></td>
               </tr>
               <tr>
                 <td>Имя</td>
-                <td><input name=\"name\" type=\"text\" id=\"name\" size=\"35\" value=\"$name\" /></td>
+                <td><input name=\"name\" id=\"name\" size=\"35\" value=\"$name\" /></td>
               </tr>
               <tr>
                 <td>Отчество</td>
-                <td><input name=\"otch\" type=\"text\" id=\"otch\" size=\"35\" value=\"$otch\" /></td>
+                <td><input name=\"otch\" id=\"otch\" size=\"35\" value=\"$otch\" /></td>
               </tr>
             </table>
                 <label>
@@ -465,7 +471,7 @@ class Kontakt
 
         if (isset($_POST['formSelList']))
             if(isset($_POST['kod_kontakta'])){
-                $this->Set($_POST['kod_kontakta']);
+                $this->getData($_POST['kod_kontakta']);
                 $this->AddKontaktToDoc($this->kod_dogovora);
                 $event = true;
         }
@@ -519,10 +525,11 @@ class Kontakt
 
         if ($kod_kontakta<0)
             $kod_kontakta = $this->kod_kontakta;
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty SET del=1 WHERE kod_kontakta=$kod_kontakta");
-        $db->query("UPDATE kontakty_data SET del=1 WHERE kod_kontakta=$kod_kontakta");
-        $db->query("UPDATE kontakty_dogovora SET del=1 WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
+        $db->query("UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -534,8 +541,9 @@ class Kontakt
     public function DelKonaktDog($kod_kont_dog)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty_dogovora SET del=1 WHERE kod_kont_dog=$kod_kont_dog");
+        $db->query("UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kont_dog=$kod_kont_dog");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -546,8 +554,9 @@ class Kontakt
     public function DelData($kod_dat)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty_data SET del=1 WHERE kod_dat=$kod_dat");
+        $db->query("UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_dat=$kod_dat");
     }
 //----------------------------------------------------------------------------------------------------------------------
 

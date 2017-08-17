@@ -99,28 +99,28 @@ class Org
 			  <form id="form1" name="form1" method="post" action="">
 			  <br>Реквизиты<br><table border=1 cellspacing=0 cellpadding=0 width="100%">
 			  <tr>
-                  <td bgcolor="#CCCCCC">ИНН</td><td width="250"><input type="text" name="inn" id="inn" value="' . $row['inn'] . '"/></td>
-                  <td bgcolor="#CCCCCC">КПП</td><td  width="250" ><input type="text" name="kpp" id="kpp" value="' . $row['kpp'] . '" /></td>
+                  <td bgcolor="#CCCCCC">ИНН</td><td width="250"><input  name="inn" id="inn" value="' . $row['inn'] . '"/></td>
+                  <td bgcolor="#CCCCCC">КПП</td><td  width="250" ><input  name="kpp" id="kpp" value="' . $row['kpp'] . '" /></td>
 			  </tr>
 			  <tr>
-                  <td bgcolor="#CCCCCC">Р/сч</td><td><input type="text" name="r_sch" id="r_sch" value="' . $row['r_sch'] . '" /></td>
-                  <td bgcolor="#CCCCCC">К/сч</td><td><input type="text" name="k_sch" id="k_sch" value="' . $row['k_sch'] . '" /></td>
+                  <td bgcolor="#CCCCCC">Р/сч</td><td><input  name="r_sch" id="r_sch" value="' . $row['r_sch'] . '" /></td>
+                  <td bgcolor="#CCCCCC">К/сч</td><td><input  name="k_sch" id="k_sch" value="' . $row['k_sch'] . '" /></td>
 			  </tr>
 			  <tr>
                   <td bgcolor="#CCCCCC">Банк Р/сч</td><td><textarea rows=3 name="bank_rs" id="bank_rs">' . $row['bank_rs'] . '</textarea></td>                  
                   <td bgcolor="#CCCCCC">Банк К/сч</td><td><textarea rows=3 name="bank_ks" id="bank_ks">' . $row['bank_ks'] . '</textarea></td>
 			  </tr>
 			  <tr>
-                  <td bgcolor="#CCCCCC">БИК</td><td><input type="text" name="bik" id="bik" value="' . $row['bik'] . '" /></td>
-                  <td bgcolor="#CCCCCC">ОКПО</td><td><input type="text" name="okpo" id="okpo" value="' . $row['okpo'] . '" /></td>
+                  <td bgcolor="#CCCCCC">БИК</td><td><input  name="bik" id="bik" value="' . $row['bik'] . '" /></td>
+                  <td bgcolor="#CCCCCC">ОКПО</td><td><input  name="okpo" id="okpo" value="' . $row['okpo'] . '" /></td>
 			  </tr>
 			  <tr>
-                  <td bgcolor="#CCCCCC">ОКОНХ</td><td><input type="text" name="okonh" id="okonh" value="' . $row['okonh'] . '"/></td>
+                  <td bgcolor="#CCCCCC">ОКОНХ</td><td><input name="okonh" id="okonh" value="' . $row['okonh'] . '"/></td>
                   <td bgcolor="#CCCCCC"></td><td></td>
 			  </tr>
 			  <tr>
-                  <td bgcolor="#CCCCCC">WWW</td><td><input type="text" name="www" id="www" value="' . $row['www'] . '"/></td>
-                  <td bgcolor="#CCCCCC">E-mail</td><td><input type="text" name="e_mail" id="e_mail" value="' . $row['e_mail'] . '" /></td>
+                  <td bgcolor="#CCCCCC">WWW</td><td><input name="www" id="www" value="' . $row['www'] . '"/></td>
+                  <td bgcolor="#CCCCCC">E-mail</td><td><input name="e_mail" id="e_mail" value="' . $row['e_mail'] . '" /></td>
 			  </tr>
 			  </table>
 			  <input id="AddRecvForm" type="hidden" value="1" name="AddRecvForm"/> 
@@ -160,7 +160,7 @@ class Org
                       <table border="0">
                         <tr>
                           <td width="10%">Адрес</td>
-                          <td width="80%"><input type="text" size="80%" name="adres" id="adres" /></td>
+                          <td width="80%"><input size="80%" name="adres" id="adres" /></td>
                           <td width="10%">Тип</td>
                           <td >
                               <select name="type" id="type">
@@ -305,7 +305,7 @@ class Org
                       <table border="0">
                         <tr>
                           <td width="133">Номер</td>
-                          <td ><input type="text" name="phone" id="phone" /></td>
+                          <td ><input name="phone" id="phone" /></td>
                         </tr>
                       </table>
                   <p>
@@ -385,19 +385,19 @@ class Org
                         <tr>
                           <td width="208">Наименование для поиска</td>
                           <td><span id="sprytextfield_poisk">
-                            <input name="poisk" type="text" id="poisk" size="30" value="' . $poisk . '" />
+                            <input name="poisk" id="poisk" size="30" value="' . $poisk . '" />
                           <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Краткое наименование</td>
                           <td><span id="sprytextfield_nazv_krat">
-                            <input name="nazv_krat" type="text" id="nazv_krat" size="30" value="' . $nazv_krat . '" />
+                            <input name="nazv_krat" id="nazv_krat" size="30" value="' . $nazv_krat . '" />
                           <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Полное наименование</td>
                           <td><span id="sprytextfield_nazv_poln">
-                            <input name="nazv_poln" type="text" id="nazv_poln" size="30" value="' . $nazv_poln . '" />
+                            <input name="nazv_poln" id="nazv_poln" size="30" value="' . $nazv_poln . '" />
                           <span class="textfieldRequiredMsg">A value is required.</span></span></td>
                         </tr>
                         <tr>
@@ -492,8 +492,9 @@ class Org
     {
         $db = new DB();
         $kod_org = $this->kod_org;
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO adresa (adres,kod_org,type) VALUES('$adres',$kod_org,$type)");
+        $db->query("INSERT INTO adresa (adres,kod_org,type,kod_user) VALUES('$adres',$kod_org,$type,$kod_user)");
     }
 //----------------------------------------------------------------------
 //
@@ -505,8 +506,9 @@ class Org
     {
         $db = new DB();
         $kod_org = $this->kod_org;
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO org_data (data,kod_org) VALUES('$phone',$kod_org)");
+        $db->query("INSERT INTO org_data (data,kod_org,kod_user) VALUES('$phone',$kod_org,$kod_user)");
     }
 //----------------------------------------------------------------------
 //
@@ -825,8 +827,9 @@ class Org
     private function DelOrgLink($kod_link)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE org_links SET del=1 WHERE kod_link=$kod_link");
+        $db->query("UPDATE org_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -860,8 +863,9 @@ class Org
     private function AddOrgLink($kod_org_master,$kod_org_slave, $prim="")
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
         $db->query(/** @lang SQL */
-            "INSERT INTO org_links (master, slave, prim) VALUE ($kod_org_master,$kod_org_slave,'$prim')");
+            "INSERT INTO org_links (master, slave, prim,kod_user) VALUE ($kod_org_master,$kod_org_slave,'$prim',$kod_user)");
     }
 }

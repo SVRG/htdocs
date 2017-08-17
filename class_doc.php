@@ -1456,8 +1456,9 @@ class Doc
         $db = new Db();
 
         $data_sost = func::Date_to_MySQL($data_sost);
+        $kod_user = func::kod_user();
 
-        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit)";
+        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user)";
 
         $db->query($sql);
 
@@ -1510,7 +1511,7 @@ class Doc
 
         if (isset($_POST['AddPrim']))
             if (isset($_POST['Prim'])) {
-                $this->AddPrim($_POST['Prim'],$_SESSION['MM_Username']);
+                $this->AddPrim($_POST['Prim']);
                 $event = true;
             }
 
@@ -1572,8 +1573,12 @@ class Doc
         $kod_dogovora = $this->kod_dogovora;
         $data = func::Date_to_MySQL($data);
 
-        $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim')");
+        $user = func::user();
+        $kod_user = func::kod_user();
 
+        $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
+
+        // Информирование по e-mail
         $mail = new Mail();
         $data = $this->getData($kod_dogovora);
         $dog_nomer = $data['nomer'];
@@ -1605,8 +1610,9 @@ class Doc
 
         $db = new Db();
         $data = func::Date_to_MySQL($data);
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim')");
+        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user)");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -1639,19 +1645,20 @@ class Doc
     /**
      * Добавить примечание
      * @param $text
-     * @param string $user
      */
-    public function AddPrim($text, $user="")
+    public function AddPrim($text)
     {
         if (strlen($text) < 4) {
             echo "Err: Слишком короткое примечание. Должно быть не менее 4-х символов.";
             return;
         }
 
-        $P = nl2br($text); // Вставлем <br> вместо перевода строки
+        $P = nl2br($text); // Вставялем <br> вместо перевода строки
+        $user = func::user();
+        $kod_user = func::kod_user();
 
         $db = new Db();
-        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user) VALUES($this->kod_dogovora,'$P','$user')");
+        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user) VALUES($this->kod_dogovora,'$P','$user',$kod_user)");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -1665,11 +1672,12 @@ class Doc
     public function DelPlat($kod_plat)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
         if (isset($kod_plat)) {
-            $db->query("UPDATE plat SET del=1 WHERE kod_plat=$kod_plat");
+            $db->query("UPDATE plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
 
-            $db->query("UPDATE raschety_plat SET del=1 WHERE kod_plat=$kod_plat");
+            $db->query("UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
 
         } else
             echo "Ошибка: Не задан ID платежа";
@@ -1682,9 +1690,10 @@ class Doc
     public function DelPrim($kod_prim)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
         if (isset($kod_prim)) {
-            $db->query("UPDATE dogovor_prim SET del=1 WHERE kod_prim=$kod_prim");
+            $db->query("UPDATE dogovor_prim SET del=1,kod_user=$kod_user WHERE kod_prim=$kod_prim");
 
         } else
             echo "Ошибка: Не задан ID примечания";
@@ -1700,9 +1709,11 @@ class Doc
      */
     public function Edit($nomer, $data_sost, $kod_org, $kod_ispolnit=683)
     {
-        $DateR = func::Date_to_MySQL($data_sost);
+        $data_sost = func::Date_to_MySQL($data_sost);
         $db = new Db();
-        $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$DateR', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit WHERE kod_dogovora=$this->kod_dogovora");
+        $kod_user = func::kod_user();
+
+        $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1715,7 +1726,9 @@ class Doc
         $db = new Db();
 
         if (isset($kod_scheta)) {
-            $db->query("DELETE FROM scheta WHERE kod_scheta=$kod_scheta");
+            $kod_user = func::kod_user();
+
+            $db->query("UPDATE scheta SET del=1,kod_user=$kod_user WHERE kod_scheta=$kod_scheta");
 
         } else
             echo "Ошибка: Не задан ID Счета";
@@ -1730,8 +1743,9 @@ class Doc
         $db = new Db();
 
         $now = date('y.m.d');
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now', edit=1 WHERE kod_dogovora=$this->kod_dogovora");
+        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now', edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1767,7 +1781,7 @@ class Doc
                                 <tr>
                                   <td>Примечание</td>
                                   <td><span id="STextNR">
-                                    <input type="text" name="InvPrim" id="InvPrim" />
+                                    <input  name="InvPrim" id="InvPrim" />
                                       <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
                                   </span></td>
                                 </tr>
@@ -1791,42 +1805,65 @@ class Doc
     {
         $date = date('d.m.Y');
         $res = /** @lang HTML */
-            "               <form id=\"form1\" name=\"form1\" method=\"post\" action=\"\">
-                                  <table width=\"434\" border=\"0\">
+            "               <form id='form1' name='form1' method='post' action=''>
+                                  <table width='434' border='0'>
                                     <tr>
-                                      <td width=\"126\">Номер ПП</td>
-                                      <td width=\"292\"><span id=\"SNumR\">
-                                      <input type=\"text\" name=\"nomer\" id=\"nomer\" />
-                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldMinCharsMsg\">Minimum
+                                      <td width='126'>Номер ПП</td>
+                                      <td width='292'><span id='SNumR'>
+                                      <input name='nomer' id='nomer' />
+                                      <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldMinCharsMsg'>Minimum
                                       number of characters not met.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Дата</td>
-                                      <td><span id=\"SDateR\">
-                                      <input type=\"text\" name=\"data\" id=\"data\" value=\"$date\"/>
-                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldInvalidFormatMsg\">Invalid
+                                      <td><span id='SDateR'>
+                                      <input name='data' id='data' value='$date'/>
+                                      <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                       format.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Сумма</td>
-                                      <td><span id=\"SSummR\">
-                                      <input type=\"text\" name=\"summa\" id=\"summa\" />
-                                      <span class=\"textfieldRequiredMsg\">A value is required.</span><span class=\"textfieldInvalidFormatMsg\">Invalid
+                                      <td><span id='SSummR'>
+                                      <input name='summa' id='summa' />
+                                      <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                       format.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Примечание</td>
-                                      <td><span id=\"STextNR\">
-                                        <input type=\"text\" name=\"prim\" id=\"prim\" />
+                                      <td><span id='STextNR'>
+                                        <input name='prim' id='prim' />
                                       </span></td>
                                     </tr>
                                   </table>
                                   <p>
-                                    <input type=\"submit\" name=\"button\" id=\"button\" value=\"Добавить\" />
-                                    <input type=\"hidden\" name=\"formAddPP\" value=\"formAddPP\" />
+                                    <input type='submit' name='button' id='button' value='Добавить' />
+                                    <input type='hidden' name='formAddPP' value='formAddPP' />
                                   </p>
                                 </form>";
         $res.= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
         return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Ссылка на форму договора вида - "НомерДоговора от дд.мм.гггг НазваниеКомпании"
+     * @param int $kod_dogovora
+     * @param bool $show_org
+     * @return string
+     */
+    public function getFormLink($kod_dogovora=-1, $show_org=true)
+    {
+        if($kod_dogovora==-1)
+            $kod_dogovora = $this->kod_dogovora;
+
+        $this->getData($kod_dogovora);
+        $Org = new Org();
+        $Org->kod_org = $this->Data['kod_org'];
+        $name = '№'.$this->Data['nomer'].' от '.func::Date_from_MySQL($this->Data['data_sost']);
+
+        if($show_org)
+            $name.=' '.$Org->getFormLink();
+
+        return "<a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$name</a>";
     }
 }// END CLASS

@@ -2,7 +2,7 @@
     <div id="masthead">
         <blockquote class="glink">
             <div class="glink" id="utility">
-                Добро пожаловать: <?php echo $_SESSION['MM_Username'];
+                Добро пожаловать: <?php echo func::user();
                 echo "<br><a href=". $_SERVER['PHP_SELF'] . "?doLogout=true>Выход</a>";?>
             </div>
         </blockquote>

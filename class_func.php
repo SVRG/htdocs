@@ -352,9 +352,39 @@ class Func
     } // function lat2rus($s)
 
 //----------------------------------------------------------------------------------------------------------------------
+    /**
+     * @param $s
+     * @return mixed
+     */
     static public function _strip($s)
     {
         $s = str_replace(" ", " ", $s);
         return $s;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Получение имени пользователя из SESSION
+     */
+    static public function user()
+    {
+        $user = "unknown";
+        if(isset($_SESSION['MM_Username']))
+            $user = $_SESSION['MM_Username'];
+
+        return $user;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Получение кода пользователя из SESSION
+     */
+    static public function kod_user()
+    {
+        $kod_user = 1;
+        if(isset($_SESSION['MM_kod_user']))
+            $kod_user = $_SESSION['MM_kod_user'];
+
+        return $kod_user;
     }
 }

@@ -12,9 +12,9 @@ include_once("class_kont.php");
 
 $Kontakt = new Kontakt();
 if (isset($_GET['kod_kontakta']))
-    $Kontakt->Set($_GET['kod_kontakta']);
+    $Kontakt->getData($_GET['kod_kontakta']);
 elseif (isset($_POST['kod_kontakta']))
-    $Kontakt->Set($_POST['kod_kontakta']);
+    $Kontakt->getData($_POST['kod_kontakta']);
 else
     die('Контакт не выбран либо ссылка на несуществующий контакт!');
 
@@ -23,7 +23,7 @@ $Kontakt->Events();
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->

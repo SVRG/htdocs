@@ -303,8 +303,8 @@ class Part
             $btn_del = Func::ActButton2('','Удалить', 'DelRasch',"kod_rascheta_del",$kod_rascheta);
 
             // Форма для ввода ПП в расчет
-            $Body =    "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
-                        <input type='text' name='summa' value='$ostatok_plat' />";
+            $Body = "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
+                        <input  name='summa' value='$ostatok_plat' />";
 
             $res.= '<tr>
                     <td width="80">' . $data . '</td>
@@ -409,10 +409,11 @@ class Part
     public function DelRasch($kod_rascheta)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE raschety_plat SET del=1 WHERE kod_rascheta=$kod_rascheta");
+        $db->query("UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
 
-        $db->query("UPDATE raschet SET del=1 WHERE kod_rascheta=$kod_rascheta");
+        $db->query("UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
     }
 //------------------------------------------------------------------------
 //
@@ -424,6 +425,7 @@ class Part
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora");
         $cnt = $db->cnt;
+        $kod_user = func::kod_user();
 
         for($i=0;$i<$cnt;$i++) {
             $row = $rows[$i];
@@ -432,7 +434,7 @@ class Part
             $data = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
             $type = 2; //ОК- расчет
 
-            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($kod_part,$part_summa,'$data',$type)");
+            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($kod_part,$part_summa,'$data',$type,$kod_user)");
         }
 
         return;
@@ -449,8 +451,8 @@ class Part
     {
         $summa = str_replace(' ', '', $summa);
         $summa = doubleval($summa);
-
         $db = new Db();
+        $kod_user = func::kod_user();
 
         $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat =$kod_plat");
         if($db->cnt==1)
@@ -463,7 +465,7 @@ class Part
             }
         }
 
-        $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat) VALUES($summa,$kod_rascheta,$kod_plat)");
+        $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat,kod_user) VALUES($summa,$kod_rascheta,$kod_plat,$kod_user)");
     }
 //--------------------------------------------------------------
 //
@@ -483,15 +485,16 @@ class Part
         $raschet_summa = round($part_summa * $AVPr, 2); // Сумма расчета
 
         $AVDate = func::Date_to_MySQL($AVDate);
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$raschet_summa,'$AVDate',1)");
+        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$raschet_summa,'$AVDate',1,$kod_user)");
 
         $ostatok = $part_summa - $raschet_summa;
 
         if ($ostatok > 0) {
             $data_postav = $rows[0]['data_postav'];
             $OKDate = Func::Date_to_MySQL($data_postav); // Дата окончательного расчета = дата поставки
-            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$ostatok,'$OKDate',2)");
+            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
         }
     }
 //--------------------------------------------------------------
@@ -502,15 +505,16 @@ class Part
      * @param $naklad
      * @param $data
      * @param $kod_oper
-     * @param $operator
      */
-    public function AddNaklad($numb, $naklad, $data, $kod_oper, $operator)
+    public function AddNaklad($numb, $naklad, $data, $kod_oper)
     {
         $db = new Db();
         $kod_part = $this->kod_part;
         $data = func::Date_to_MySQL($data);
+        $user = func::user();
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$operator')");
+        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper,kod_user) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$user',$kod_user)");
 
         return;
     }
@@ -523,9 +527,10 @@ class Part
     public function DelNaklad($kod_oborota)
     {
         $db = new Db();
+        $kod_user = func::kod_user();
 
         if (isset($kod_oborota)) {
-            $db->query("UPDATE sklad SET del=1 WHERE kod_oborota=$kod_oborota");
+            $db->query("UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_oborota=$kod_oborota");
 
         } else
             echo "Ошибка: Не задан ID накладной";
@@ -550,15 +555,15 @@ class Part
                 <table width="200" border="0">
                               <tr>
                                 <td>Номер </td>
-                                <td><input type="text" name="naklad" id="naklad" /></td>
+                                <td><input  name="naklad" id="naklad" /></td>
                               </tr>
                               <tr>
                                 <td>Дата</td>
-                                <td><input type="text" name="data" id="data" value="' . Func::NowE() . '" /></td>
+                                <td><input  name="data" id="data" value="' . Func::NowE() . '" /></td>
                               </tr>
                               <tr>
                                 <td>Кол-во </td>
-                                <td><input type="text" name="numb" id="numb" value="' . $numb . '" /></td>
+                                <td><input  name="numb" id="numb" value="' . $numb . '" /></td>
                               </tr>
                               <tr>
                                 <td></td>
@@ -593,10 +598,12 @@ class Part
     {
         $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
+        $kod_user = func::kod_user();
+
         if($Add==1)
-            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val)");
+            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val,kod_user) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val,$kod_user)");
         else
-            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1 WHERE kod_part=$this->kod_part");
+            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
@@ -662,21 +669,21 @@ class Part
                   </tr>
                   <tr>
                     <td>Модификация</td>
-                    <td><input type="text" name="modif" id="modif" value="' . $modif . '" /></td>
+                    <td><input  name="modif" id="modif" value="' . $modif . '" /></td>
                   </tr>
                   <tr>
                     <td>Дата Поставки </td>
                     <td><span id="SDateR">
-                              <input type="text" name="data_postav" id="data_postav" value="' . $data_postav . '" />
+                              <input  name="data_postav" id="data_postav" value="' . $data_postav . '" />
                               <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
                   </tr>
                   <tr>
                     <td>Количество</td>
-                        <td><input type="text" name="numb" id="numb" value="' . $numb. '" /></td>
+                        <td><input  name="numb" id="numb" value="' . $numb. '" /></td>
                   </tr>
                   <tr>
                     <td>Цена без НДС</td>
-                    <td><input type="text" name="price" id="price" value="' . $price . '" /></td>
+                    <td><input  name="price" id="price" value="' . $price . '" /></td>
                   </tr>
                   <tr>
                        <td>НДС</td>
@@ -726,19 +733,21 @@ class Part
             return;
 
         $db = new Db();
-        $db->query("UPDATE parts SET del=1 WHERE kod_part=$kod_part");
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE raschet SET del=1 WHERE kod_part=$kod_part");
+        $db->query("UPDATE parts SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+
+        $db->query("UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
 
         //todo - проверить
         $db->query("UPDATE
                             raschety_plat
                            INNER JOIN raschet ON raschet.kod_rascheta = raschety_plat.kod_rascheta
-                           SET raschety_plat.del=1
+                           SET raschety_plat.del=1,raschety_plat.kod_user=$kod_user
                            WHERE raschet.kod_part=$kod_part
                           ");
 
-        $db->query("UPDATE sklad SET del=1 WHERE kod_part=$kod_part");
+        $db->query("UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
     }
 
 //-------------------------------------------------------------------------
@@ -907,7 +916,7 @@ class Part
 
         if (isset($_POST['AddEditNacl']))
             if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'],$_POST['kod_oper'])) {
-                $this->AddNaklad($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'], $_SESSION['MM_Username']);
+                $this->AddNaklad($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper']);
                 $event = true;
         }
 

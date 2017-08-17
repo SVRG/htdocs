@@ -255,8 +255,9 @@ class Elem
 
         $obozn = ltrim($obozn);
         $name = ltrim($name);
+        $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO elem (obozn,name,nomen, shifr,shablon) VALUES('$obozn','$name',$nomen,'$shifr','$shablon')",1);
+        $db->query("INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user)");
 
     }
 //------------------------------------------------------------------------
@@ -275,8 +276,9 @@ class Elem
         $kod_elem = $this->kod_elem;
 
         if ($obozn == '' or $name == '') return;
+        $kod_user = func::kod_user();
 
-        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr' WHERE kod_elem = $kod_elem");
+        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
 
     }
 //------------------------------------------------------------------------
@@ -415,13 +417,15 @@ class Elem
 
         $name = $elem_name[0]['name'];
         $obozn = $elem_name[0]['obozn'];
+        $kod_user = func::kod_user();
 
         $new_name = $obozn;
         if(substr_count($name,$obozn)==0)
             $new_name = $name.' '.$obozn;
 
-        $db->query("UPDATE elem SET del=1 WHERE kod_elem=$kod_elem"); // Удаляем элемент
-        Docum::DeleteElemFiles($kod_elem); // Удаляем связные документы
+        $db->query("UPDATE elem SET del=1, kod_user=$kod_user WHERE kod_elem=$kod_elem"); // Удаляем элемент
+        $Docum = new Docum();
+        $Docum->DeleteElemFiles($kod_elem); // Удаляем связные документы
 
         $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем списое партий, где участвовал удаленный элемент
         if($db->cnt==0)
@@ -438,7 +442,7 @@ class Elem
             $modif = $new_name.$modif;
             $kod_part = $row['kod_part'];
 
-            $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1 WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
+            $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1, kod_user=$kod_user WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
         }
 
     }

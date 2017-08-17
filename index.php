@@ -47,10 +47,12 @@ if (isset($_POST['login'],$_POST['password'])) {
         $row = $res->fetch_assoc();
 
         $loginStrGroup = $row['rt'];
+        $kod_user = $row['kod_user'];
 
         //declare two session variables and assign them
-        $_SESSION['MM_Username'] = $loginUsername;
-        $_SESSION['MM_UserGroup'] = $loginStrGroup;
+        $_SESSION['MM_Username'] = $loginUsername; // имя пользователя
+        $_SESSION['MM_UserGroup'] = $loginStrGroup; // группа пользователя todo - доделать с правами
+        $_SESSION['MM_kod_user'] = $kod_user; // код пользователя
 
         // Запись сесии
         $SessionSQL = sprintf("INSERT INTO sessions VALUES('','%s','%s','%s')", $loginUsername, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
@@ -69,7 +71,7 @@ if (isset($_POST['login'],$_POST['password'])) {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Login</title>
@@ -96,7 +98,7 @@ require_once('class_func.php');
         <tr>
             <th width="92" scope="row"><span class="style1">Name</span></th>
             <td width="162"><label>
-                    <input name="login" type="text" class="style1" id="login"/>
+                    <input name="login" class="style1" id="login"/>
                 </label></td>
         </tr>
         <tr>

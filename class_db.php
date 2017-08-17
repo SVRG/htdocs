@@ -78,9 +78,7 @@ class Db
         // Если обновление или добавление то записываем в Лог
         if ((strpos($query, 'UPDATE') !== false) or (strpos($query, 'INSERT') !== false)) {
 
-            $user = "Test";
-            if(isset($_SESSION['MM_Username']))
-                $user = $_SESSION['MM_Username'];
+            $user = func::user();
 
             $safe_str = addslashes($query);
             $connection->query(/** @lang SQL */

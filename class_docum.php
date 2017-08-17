@@ -3,7 +3,17 @@ include_once('class_db.php');
 
 class Docum
 {
-    public $path = "C:/xampp/htdocs/";
+    public $path = "";
+
+    /**
+     * Docum constructor.
+     */
+    public function __construct()
+    {
+        // Обрабатываем без секций
+        $ini_array = parse_ini_file("settings.ini");
+        $this->path = $ini_array['path'];
+    }
 //---------------------------------------------------------------------
 //
     /**
@@ -146,19 +156,17 @@ class Docum
      */
     function Add($name, $path, $ID, $Dest = 'Doc')
     {
+        $kod_user = func::kod_user();
         $db = new Db();
+        $db->query("INSERT INTO docum (name,path,kod_user) VALUES('$name','$path',$kod_user)");
+        $last_id = $db->last_id;
+
         if ($Dest == 'Doc') {
-            $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $last_id = $db->last_id;
-            $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora) VALUES ($last_id,$ID)");
+            $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora,kod_user) VALUES ($last_id,$ID,$kod_user)");
         } elseif ($Dest == 'Org') {
-            $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $last_id = $db->last_id;
-            $db->query("INSERT INTO docum_org (kod_docum,kod_org) VALUES ($last_id,$ID)");
+            $db->query("INSERT INTO docum_org (kod_docum,kod_org,kod_user) VALUES ($last_id,$ID,$kod_user)");
         } elseif ($Dest == 'Elem') {
-            $db->query("INSERT INTO docum (name,path) VALUES('$name', '$path')");
-            $last_id = $db->last_id;
-            $db->query("INSERT INTO docum_elem (kod_docum,kod_elem) VALUES ($last_id,$ID)");
+            $db->query("INSERT INTO docum_elem (kod_docum,kod_elem,kod_user) VALUES ($last_id,$ID,$kod_user)");
         }
     }
 
@@ -170,7 +178,7 @@ class Docum
      * @return int|void
      * @internal param $kod_docum
      */
-    static public function DeleteElemFiles($kod_elem)
+    public function DeleteElemFiles($kod_elem)
     {
         $db = new Db();
 
@@ -198,7 +206,7 @@ class Docum
 
             if (!file_exists($path))
                 continue;
-            unlink("C:/xampp/htdocs/" . $row['path']); // todo - нужно задавать путь!
+            unlink($this->path . $row['path']); // todo - нужно задавать путь!
         }
 
         $db->query("UPDATE docum_elem SET del=1 WHERE kod_elem=$kod_elem");
