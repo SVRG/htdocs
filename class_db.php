@@ -7,6 +7,7 @@
  * @license MIT License
  * @see http://www.binpress.com/tutorial/using-php-with-mysql-the-right-way/17
  */
+include_once "class_config.php";
 class Db
 {
     // The database connection
@@ -18,7 +19,16 @@ class Db
 
     public $cnt = 0; // Количество записей
 
-    private $config = array("username"=>"root","password"=>"", "dbname"=>"trin");
+    private $config = array();
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Db constructor.
+     */
+    public function __construct()
+    {
+        $config = new config();
+        $this->config = $config->mysql_config;
+    }
 
 //----------------------------------------------------------------------------------------------------------------------
     /**
