@@ -11,8 +11,8 @@ $Text = '';
 // Договор
 if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
     $d = new Doc();
-    $d->getData($_GET['kod_dogovora']);
-    $Text = 'Договор: №' . $d->Data['nomer'] . ' с ' . $d->Data['nazv_krat'];
+    $d->kod_dogovora = $_GET['kod_dogovora'];
+    $Text = $d->getFormLink();
 }
 // Элемент
 elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
