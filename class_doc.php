@@ -632,6 +632,98 @@ class Doc
 //
 
     /**
+     * Список оплаченных договоров
+     * @return string
+     */
+    public function formRPlanOplach()
+    {
+        $sql = /** @lang SQL */
+            "SELECT
+                      view_rplan.kod_dogovora,
+                      view_rplan.nomer,
+                      view_rplan.kod_org,
+                      view_rplan.nazv_krat,
+                      view_rplan.modif,
+                      view_rplan.numb,
+                      view_rplan.data_postav,
+                      view_rplan.nds,
+                      view_rplan.part_summa,
+                      view_rplan.val,
+                      view_rplan.price,
+                      view_rplan.kod_elem,
+                      view_rplan.obozn,
+                      view_rplan.shifr,
+                      view_rplan.kod_part,
+                      view_rplan.zakryt,
+                      view_rplan.kod_ispolnit,
+                      view_rplan.name,
+                      view_rplan.ispolnit_nazv_krat,
+                      view_rplan.numb_otgruz,
+                      view_rplan.numb_ostat
+                    FROM
+                      view_rplan
+                      LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
+                    WHERE
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND view_plat.summa>0
+                    ORDER BY
+                      shifr ASC,
+                      numb DESC";
+
+        $db = new Db();
+        $rows = $db->rows($sql); // Массив данных
+
+        return $this->formRPlan_by_Elem($rows);
+    }
+//--------------------------------------------------------------
+//
+
+    /**
+     * Список не оплаченных договоров - по которым вообще нет никакой оплаты, частично оплаченные не выводятся
+     * @return string
+     */
+    public function formRPlanNeOplach()
+    {
+        $sql = /** @lang SQL */
+                "SELECT
+                      view_rplan.kod_dogovora,
+                      view_rplan.nomer,
+                      view_rplan.kod_org,
+                      view_rplan.nazv_krat,
+                      view_rplan.modif,
+                      view_rplan.numb,
+                      view_rplan.data_postav,
+                      view_rplan.nds,
+                      view_rplan.part_summa,
+                      view_rplan.val,
+                      view_rplan.price,
+                      view_rplan.kod_elem,
+                      view_rplan.obozn,
+                      view_rplan.shifr,
+                      view_rplan.kod_part,
+                      view_rplan.zakryt,
+                      view_rplan.kod_ispolnit,
+                      view_rplan.name,
+                      view_rplan.ispolnit_nazv_krat,
+                      view_rplan.numb_otgruz,
+                      view_rplan.numb_ostat
+                    FROM
+                      view_rplan
+                      LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
+                    WHERE
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND ISNULL(view_plat.summa)
+                    ORDER BY
+                      shifr ASC,
+                      numb DESC";
+
+        $db = new Db();
+        $rows = $db->rows($sql); // Массив данных
+
+        return $this->formRPlan_by_Elem($rows);
+    }
+//--------------------------------------------------------------
+//
+
+    /**
      * График поставок по изделиям (План Реализации)
      * todo - добавить итоговые значения оплаченных шт
      * @param array $rplan_rows - массив rplan отсортированный по элементам

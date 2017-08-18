@@ -29,14 +29,18 @@ include_once "security.php";
         $sgp = $_GET['sgp'];
     }
 
-    if ($sgp == 0)
-        echo $D->formRPlan(0);
-    elseif ($sgp == 1)
+    if($sgp == 1)
         echo $D->formDocsOpen();
     elseif ($sgp == 2)
         echo $D->formRPlan(1);
-    elseif (isset($_GET['sgphistory']))
+    elseif ($sgp == 3)
         echo $D->formSGPHistory();
+    elseif ($sgp == 4)
+        echo $D->formRPlanNeOplach();
+    elseif ($sgp == 5)
+        echo $D->formRPlanOplach();
+    else
+        echo $D->formRPlan(0);
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
     ?>
