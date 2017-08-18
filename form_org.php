@@ -57,9 +57,9 @@ Docum::Events();
                 $nazv_poln = $Org->Data['nazv_poln'];
 
                 if ($nazv_krat != $nazv_poln)
-                    echo '<br><h1>' . $nazv_krat . '</h1><br>' . $nazv_poln . '<br>';
+                    echo '<br><h1>' . $Org->getFormLink() . '</h1><br>' . $nazv_poln . '<br>';
                 else
-                    echo '<br><h1>' . $nazv_krat . '</h1><br>';
+                    echo '<br><h1>' . $Org->getFormLink() . '</h1><br>';
 
                 echo $Org->Data['poisk'];
 
