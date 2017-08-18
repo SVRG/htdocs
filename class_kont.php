@@ -1,5 +1,6 @@
 <?php
 include_once "class_db.php";
+include_once "class_func.php";
 
 class Kontakt
 {
