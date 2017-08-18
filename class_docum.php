@@ -69,13 +69,13 @@ class Docum
 
         $res = "";
         if ($Type == 'Doc')
-            $res .= Func::ActButton('upload.php?Desc=IncludeToDoc&kod_dogovora=' . $ID, 'Прикрепить Файл');
+            $res .= Func::ActButton('form_upload.php?Desc=IncludeToDoc&kod_dogovora=' . $ID, 'Прикрепить Файл');
         elseif ($Type == 'Elem')
-            $res .= Func::ActButton('upload.php?Desc=IncludeToElem&kod_elem=' . $ID, 'Прикрепить Файл');
+            $res .= Func::ActButton('form_upload.php?Desc=IncludeToElem&kod_elem=' . $ID, 'Прикрепить Файл');
         elseif ($Type == 'Org')
-            $res .= Func::ActButton('upload.php?Desc=IncludeToOrg&kod_org=' . $ID, 'Прикрепить Файл');
+            $res .= Func::ActButton('form_upload.php?Desc=IncludeToOrg&kod_org=' . $ID, 'Прикрепить Файл');
         elseif ($Type == 'Cont')
-            $res .= Func::ActButton('upload.php?Desc=IncludeToCont&kod_kontakta=' . $ID, 'Прикрепить Файл');
+            $res .= Func::ActButton('form_upload.php?Desc=IncludeToCont&kod_kontakta=' . $ID, 'Прикрепить Файл');
 
         if ($db->cnt == 0)
             return $res;
