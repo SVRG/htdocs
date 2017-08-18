@@ -14,7 +14,7 @@ if (isset($_POST['login'],$_POST['password'])) {
     $loginUsername = mysqli_real_escape_string($mysqli,$_POST['login']);
     $password = mysqli_real_escape_string($mysqli,$_POST['password']);
     $MM_fldUserAuthorization = "";
-    $MM_redirectLoginSuccess = "main.php";
+    $MM_redirectLoginSuccess = "form_main.php";
     $MM_redirectLoginFailed = "index.php";
     $MM_redirecttoReferrer = false;
 
