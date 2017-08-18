@@ -24,8 +24,7 @@ elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
 elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
     $Org = new Org();
     $Org->kod_org = $_GET['kod_org'];
-    $Org->getData();
-    $Text = $Org->Data['nazv_krat'];
+    $Text = $Org->getFormLink();
 }
 else
 {
@@ -38,12 +37,15 @@ $CopyOK = false;
 if (isset($_FILES["filename"])) {
     $dest = $_FILES["filename"]["tmp_name"];
 
+    $info = new SplFileInfo($_FILES["filename"]["name"]);
+    $ext = $info->getExtension();
+
     $fname = Func::rus2lat2(Func::_strip($_FILES["filename"]["name"]));
 
     $date = Func::NowDoc();
     $rnd = rand();
 
-    $new_file_name = $date . '-' . $rnd . '-' . $fname;
+    $new_file_name = $date . '-' . $rnd . '-' . $fname .'.'. $ext;
 
     $path = realpath($_SERVER["DOCUMENT_ROOT"]);
     $path.='/docs';
@@ -79,7 +81,7 @@ if (isset($_FILES["filename"])) {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
@@ -103,7 +105,7 @@ if (isset($_FILES["filename"])) {
         <table width="200" border="1">
             <tr>
                 <td>Примечание</td>
-                <td><input title="prim" name="Type" type="text" value="<?php if (isset($Type)) echo (string)$Type; ?>"/>
+                <td><input title="prim" name="Type" value="<?php if (isset($Type)) echo (string)$Type; ?>"/>
                 </td>
             </tr>
             <tr>
