@@ -611,7 +611,7 @@ class Doc
                       shifr ASC,
                       numb DESC";
 
-        else // Если договор внешний
+        else // Если внешних договор
             $sql = /** @lang SQL */
                 "SELECT 
                     * 
