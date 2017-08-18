@@ -12,7 +12,7 @@ body {
     line-height: 1.166;
     margin: 0;
     padding: 0;
-    background: #cccccc url(bg_grad.jpg) fixed;
+    background: #cccccc;
 }
 
 /******* hyperlink and anchor tag styles *******/
@@ -114,7 +114,6 @@ input {
     margin: 0;
     padding: 0;
     z-index: 100;
-    background-image: url(/img/bg_nav.jpg);
 }
 
 #tr {
@@ -124,7 +123,7 @@ input {
     margin: 0;
     padding: 0;
     z-index: 100;
-    font-family: "Helvetica", sans-serif, serif;
+    font-family: Arial, sans-serif, serif;
     font-size: 10px;
 }
 
@@ -145,12 +144,12 @@ input {
     background-color: #F5f7f7;
     border-right: 1px solid #cccccc;
     border-bottom: 1px solid #cccccc;
-    font: small Verdana, sans-serif;
+    font: small Arial, sans-serif;
 }
 
 #content {
-    padding: 0px 10px 0px 0px;
-    margin: 0px 0px 0px 178px;
+    padding: 0 10px 0 0;
+    margin: 0 0 0 178px;
     border-left: 1px solid #ccd2d2;
 }
 
@@ -158,25 +157,23 @@ input {
 /* Component Divs                              */
 /***********************************************/
 #siteName {
-    margin: 0px;
-    padding: 16px 0px 8px 0px;
+    margin: 0;
+    padding: 16px 0 8px 0;
     color: #ffffff;
     font-weight: normal;
 }
 
 /************** utility styles *****************/
-
+/* Прямоугольник Добро пожаловать */
 #utility {
-    font: 75% Verdana, sans-serif;
+    font: 75% Arial, sans-serif;
     position: absolute;
     right: 3px;
-    color: #919999;
-    background-image: url(/img/bg_nav.jpg);
-    top: 4px;
+    top: 0;
 }
 
 #utility a {
-    color: #ffffff;
+    color: #415bff;
 }
 
 #utility a:hover {
@@ -186,24 +183,24 @@ input {
 /************** pageName styles ****************/
 
 #pageName {
-    padding: 0px 0px 14px 10px;
-    margin: 0px;
+    padding: 0 0 14px 10px;
+    margin: 0;
     border-bottom: 1px solid #ccd2d2;
 }
 
 #pageName h2 {
     font: bold 175% Arial, sans-serif;
     color: #000000;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 #pageName img {
     position: absolute;
-    top: 0px;
+    top: 0;
     right: 6px;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 /************* globalNav styles ****************/
@@ -214,8 +211,8 @@ input {
     min-width: 640px;
     height: 32px;
     color: #336699;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     background-image: url(glbnav_background.gif);
     left: 0;
 }
@@ -244,8 +241,8 @@ input {
     top: 4px;
     height: 22px;
     min-width: 640px;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     left: 502px;
     z-index: 100;
     width: 367px;
@@ -255,7 +252,7 @@ a.glink, a.glink:visited {
     font-size: small;
     color: #000000;
     font-weight: bold;
-    margin: 0px;
+    margin: 0;
     padding: 2px 5px 4px 5px;
     border-right: 1px solid #8FB8BC;
 }
@@ -274,11 +271,11 @@ a.glink:hover {
 .subglobalNav {
     position: absolute;
     top: 85px;
-    left: 0px;
+    left: 0;
     /*width: 100%;*/
     min-width: 640px;
     height: 20px;
-    padding: 0px 0px 0px 10px;
+    padding: 0 0 0 10px;
     visibility: hidden;
     color: #ffffff;
 }
@@ -303,7 +300,7 @@ a.glink:hover {
 
 #search input {
     font-size: 70%;
-    margin: 0px 0px 0px 10px;
+    margin: 0 0 0 10px;
 }
 
 #search a:link, #search a:visited {
@@ -313,13 +310,13 @@ a.glink:hover {
 }
 
 #search a:hover {
-    margin: 0px;
+    margin: 0;
 }
 
 /************* breadCrumb styles ***************/
 
 #breadCrumb {
-    padding: 5px 0px 5px 10px;
+    padding: 5px 0 5px 10px;
     font: small Verdana, sans-serif;
     color: #AAAAAA;
 }
@@ -336,7 +333,7 @@ a.glink:hover {
 /************** feature styles *****************/
 
 .feature {
-    padding: 0px 0px 10px 10px;
+    padding: 0 0 10px 10px;
     font-size: 80%;
     min-height: 200px;
     height: 200px;
@@ -349,18 +346,18 @@ html > body .feature {
 .feature h3 {
     font: bold 175% Arial, sans-serif;
     color: #000000;
-    padding: 30px 0px 5px 0px;
+    padding: 30px 0 5px 0;
 }
 
 .feature img {
     float: left;
-    padding: 0px 10px 0px 0px;
+    padding: 0 10px 0 0;
 }
 
 /*************** story styles ******************/
 
 .story {
-    padding: 10px 0px 0px 10px;
+    padding: 10px 0 0 10px;
     font-size: 80%;
 }
 
@@ -370,7 +367,7 @@ html > body .feature {
 }
 
 .story p {
-    padding: 0px 0px 10px 0px;
+    padding: 0 0 10px 0;
 }
 
 .story a.capsule {
@@ -396,24 +393,24 @@ td.storyLeft {
     font-size: small;
     color: #cccccc;
     padding: 10px 10px 10px 10px;
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 #siteInfo img {
-    padding: 4px 4px 4px 0px;
+    padding: 4px 4px 4px 0;
     vertical-align: middle;
 }
 
 /************ sectionLinks styles **************/
 
 #sectionLinks {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 
 }
 
 #sectionLinks h3 {
-    padding: 10px 0px 2px 10px;
+    padding: 10px 0 2px 10px;
     border-bottom: 1px solid #cccccc;
 }
 
@@ -423,14 +420,13 @@ td.storyLeft {
     border-bottom: 1px solid #cccccc;
     background-image: url(bg_nav.jpg);
     font-weight: bold;
-    padding: 3px 0px 3px 10px;
+    padding: 3px 0 3px 10px;
     color: #21536A;
 }
 
 #sectionLinks a:hover {
     border-top: 1px solid #cccccc;
-    background-color: #DDEEFF;
-    background-image: none;
+    background: #DDEEFF none;
     font-weight: bold;
     text-decoration: none;
 }
@@ -438,13 +434,13 @@ td.storyLeft {
 /************* relatedLinks styles **************/
 
 .relatedLinks {
-    margin: 0px;
-    padding: 0px 0px 10px 10px;
+    margin: 0;
+    padding: 0 0 10px 10px;
     border-bottom: 1px solid #cccccc;
 }
 
 .relatedLinks h3 {
-    padding: 10px 0px 2px 0px;
+    padding: 10px 0 2px 0;
 }
 
 .relatedLinks a {
