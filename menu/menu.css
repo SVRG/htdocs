@@ -1,0 +1,154 @@
+/***********************************************/
+/* HTML tag styles                             */
+/***********************************************/
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.166;
+    margin: 0;
+    padding: 0;
+    background: #cccccc;
+}
+/************** header tag styles **************/
+
+h1 {
+    font: bold 100% Arial, sans-serif;
+    color: #334d55;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font: bold 94% Arial, sans-serif;
+    color: #006699;
+    margin: 0;
+    padding: 0;
+}
+
+h3 {
+    font: bold 90% Arial, sans-serif;
+    color: #334d55;
+    margin: 0;
+    padding: 0;
+}
+
+h4 {
+    font: 85% Arial, sans-serif;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+}
+
+h5 {
+    font: 80% Arial, sans-serif;
+    color: #334d55;
+    margin: 0;
+    padding: 0;
+}
+
+/*************** Меню ***************/
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: "Arial", Arial, sans-serif;
+    font-size: 14px;
+}
+
+.menu ul li {
+    display: block;
+    position: relative;
+    float: left;
+}
+
+.menu li ul {
+    display: none;
+}
+
+.menu ul li a {
+    display: block;
+    background: #e6e6e6;
+    padding: 5px 10px 5px 10px;
+    text-decoration: none;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.98);
+}
+
+.menu ul li a:hover {
+    background: #afafaf;
+}
+
+.menu li:hover ul {
+    display: block;
+    position: absolute;
+}
+
+.menu li:hover li {
+    float: none;
+}
+
+.menu li:hover a {
+    background: #9e9e9e;
+}
+
+.menu li:hover li a:hover {
+}
+
+.menu li ul li {
+    border-top: 0;
+}
+
+#drop-nav-menu {
+    position: absolute;
+    top: 0;
+    left: 29px;
+    z-index: 100;
+}
+/******* hyperlink and anchor tag styles *******/
+a:link, a:visited {
+    color: #005FA9;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+/************** Поле вывода *****************/
+#pagecell1 {
+    position: absolute;
+    top: 30px;
+    left: 29px;
+    right: 2%;
+    width: 95%;
+    background-color: #ffffff;
+    font-size: 14px;
+    font-family: Arial,sans-serif;
+}
+
+/************** Добро пожаловать *****************/
+#utility {
+    font: 75% Arial, sans-serif;
+    position: absolute;
+    right: 3px;
+    top: 0;
+}
+
+#utility a:link a:visited {
+    color: #415bff;
+}
+
+#utility a:hover {
+    text-decoration: underline;
+}
+
+a.glink, a.glink:visited {
+    font-size: small;
+    color: #000000;
+    font-weight: bold;
+    margin: 0;
+    padding: 2px 5px 4px 5px;
+    border-right: 1px solid #8FB8BC;
+}
+
+a.glink:hover {
+    text-decoration: none;
+}
