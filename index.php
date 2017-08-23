@@ -75,18 +75,7 @@ if (isset($_POST['login'],$_POST['password'])) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Login</title>
-    <link href="/img/emx_nav_left.css" rel="stylesheet" type="text/css"/>
-    <style type="text/css">
-        <!--
-        .style1 {
-            font-family: "Arial", Arial, sans-serif;
-        }
-
-        body {
-            background: #336699 url(img/bg_grad.jpg);
-        }
-        -->
-    </style>
+    <link rel="stylesheet" type="text/css" href="menu/menu.css">
 </head>
 <?php
 require_once('class_func.php');

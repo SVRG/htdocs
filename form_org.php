@@ -32,10 +32,8 @@ Docum::Events();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!-- DW6 -->
+<html>
 <head>
-    <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title><?php echo $Org->Data['nazv_krat']; ?></title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
@@ -45,9 +43,7 @@ Docum::Events();
 </head>
 <body>
 <?php include("header.php"); ?>
-<!-- end masthead -->
-<div class="style1" id="pagecell1">
-    <!--pagecell1-->
+<div id="pagecell1">
     <table width="100%" border="0">
         <tr>
             <td width="502" valign="top" bgcolor="#ECEEFD"><?php
@@ -199,7 +195,6 @@ Docum::Events();
         var sprytextfield4 = new Spry.Widget.ValidationTextField("sprytextfield4", "none", {isRequired: false});
         var sprytextfield5 = new Spry.Widget.ValidationTextField("sprytextfield5", "none", {isRequired: false});
         var sprytextfield6 = new Spry.Widget.ValidationTextField("sprytextfield6");
-
         var sprytextfield_poisk = new Spry.Widget.ValidationTextField("sprytextfield_poisk", "none", {isRequired: true});
         var sprytextfield_nazv_krat = new Spry.Widget.ValidationTextField("sprytextfield_nazv_krat", "none", {isRequired: true});
         var sprytextfield_nazv_poln = new Spry.Widget.ValidationTextField("sprytextfield_nazv_poln", "none", {isRequired: true});

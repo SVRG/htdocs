@@ -8,17 +8,13 @@ include_once "security.php";
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-<!-- DW6 -->
 <head>
-    <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>График Поставок</title>
 </head>
 <body>
 <?php include("header.php"); ?>
-<!-- end masthead -->
-<div class="style1" id="pagecell1">
-    <!--pagecell1-->
+<div id="pagecell1">
     <?php
     $t = date('H:i:s');
     include("class_doc.php");
@@ -30,17 +26,19 @@ include_once "security.php";
     }
 
     if($sgp == 1)
-        echo $D->formDocsOpen();
+        echo $D->formDocsOpen(); // Открытые
     elseif ($sgp == 2)
-        echo $D->formRPlan(1);
+        echo $D->formRPlan(1); // Внешние
     elseif ($sgp == 3)
-        echo $D->formSGPHistory();
+        echo $D->formSGPHistory(); // История по складу
     elseif ($sgp == 4)
-        echo $D->formRPlanNeOplach();
+        echo $D->formRPlanNeOplach(); // Не оплаченные
     elseif ($sgp == 5)
-        echo $D->formRPlanOplach();
+        echo $D->formRPlanOplach(); // Оплаченные
+    elseif ($sgp == 6)
+        echo $D->formSGPHistory(1); // История по складу
     else
-        echo $D->formRPlan(0);
+        echo $D->formRPlan(0); // Обычный
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
     ?>

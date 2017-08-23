@@ -1472,7 +1472,7 @@ class Doc
      * Форма - История по складу
      * @return string
      */
-    public function formSGPHistory()
+    public function formSGPHistory($dolg=0)
     {
         $db = new Db();
 
@@ -1505,6 +1505,8 @@ class Doc
             if ((double)$row['dogovor_summa'] > 0 && (double)$row['summa_plat'] > 0)
                 $procent = $row['summa_plat'] / (double)$row['dogovor_summa'];
 
+            if($dolg==1 and $procent >= 0.98)
+                continue;
 
             if ($procent >= 0.98)
                 $res .= '<tr>';
@@ -1519,7 +1521,7 @@ class Doc
                     <td>' . $row['naklad'] . '</td>
                     <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                     <td>' . $row['oper'] . '</td>
-                    <td>' . Func::Proc($procent) . '</td>
+                    <td align="right">' . Func::Proc($procent) . '%</td>
                 </tr>';
 
         }
