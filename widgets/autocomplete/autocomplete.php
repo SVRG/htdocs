@@ -37,6 +37,7 @@ if (preg_match("/[^\040\pL\pN_-]/u", $term)) {
 // *****************************************************************************
 
 // database connection
+// todo - ставить реальные данные
 $conn = new mysqli("localhost", "root", "", "trin");
 
 if ($conn->connect_error) {
