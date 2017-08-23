@@ -1470,6 +1470,7 @@ class Doc
 
     /**
      * Форма - История по складу
+     * @param int $dolg - Если 1 то возвращает только неоплаченные накладные
      * @return string
      */
     public function formSGPHistory($dolg=0)
