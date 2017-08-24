@@ -26,7 +26,7 @@ include_once "security.php";
     }
 
     if($sgp == 1)
-        echo $D->formDocsOpen(); // Открытые
+        echo $D->formDocsOpen(); // Открытые договоры
     elseif ($sgp == 2)
         echo $D->formRPlan(1); // Внешние
     elseif ($sgp == 3)
@@ -37,6 +37,8 @@ include_once "security.php";
         echo $D->formRPlanOplach(); // Оплаченные
     elseif ($sgp == 6)
         echo $D->formSGPHistory(1); // История по складу
+    elseif ($sgp == 7)
+        echo $D->formDocsOpen(1); // Внешние открытые договоры
     else
         echo $D->formRPlan(0); // Обычный
 
