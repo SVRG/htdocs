@@ -995,19 +995,24 @@ class Doc
 //
 
     /**
-     * Договоры по Организации - Внешние и Поставка
+     * Договоры - Внешние или Поставка
+     * @param int $VN
      * @return string
      */
-    public function formDocsOpen()
+    public function formDocsOpen($VN=0)
     {
         $db = new Db();
+
+        $and = "kod_ispolnit=683";
+        if($VN==1)
+            $and = "kod_org=683";
 
         $sql = "SELECT 
                 * 
                 FROM 
                     view_rplan 
                 WHERE 
-                    view_rplan.zakryt = 0 AND kod_ispolnit=683
+                    view_rplan.zakryt = 0 AND $and
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
