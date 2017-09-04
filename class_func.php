@@ -387,4 +387,20 @@ class Func
 
         return $kod_user;
     }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Возвращает знак валюты
+     * @param $kod_val = 1-руб;2-доллар;3-евро
+     * @return string
+     */
+    static public function val_sign($kod_val=1)
+    {
+        switch ($kod_val) {
+            case 2:
+                return "$";
+            case 3:
+                return "€";
+        }
+        return "";
+    }
 }
