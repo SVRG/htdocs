@@ -38,14 +38,91 @@ class Doc
     static public function formDocByElem($kod_elem)
     {
         $db = new Db();
-
+        // Открытые
         $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
-                                    WHERE kod_elem=$kod_elem
+                                    WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=683
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
+        $res = Doc::formRPlan_by_Elem($rows);
+        // Закрытые
+        $rows = $db->rows("SELECT
+                                      *
+                                    FROM view_rplan
+                                    WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=683
+                                    ORDER BY kod_dogovora DESC"); // Код договора по убыванию
+        $res .= "<b>Закрытые</b><br>". Doc::formRPlan_by_Elem($rows);
 
-        return Doc::formRPlan_by_Doc($rows);
+        // Внешние открытые
+        $rows = $db->rows("SELECT
+                                    `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
+                                    `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
+                                    `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
+                                    `trin`.`org`.`nazv_krat`                                                                             AS `nazv_krat`,
+                                    `trin`.`parts`.`modif`                                                                               AS `modif`,
+                                    `trin`.`parts`.`numb`                                                                                AS `numb`,
+                                    `trin`.`parts`.`data_postav`                                                                         AS `data_postav`,
+                                    round(`trin`.`parts`.`nds`, 2)                                                                       AS `nds`,
+                                    round(ifnull(((`trin`.`parts`.`numb` * `trin`.`parts`.`price`) * (1 + `trin`.`parts`.`nds`)), 0),
+                                          2)                                                                                             AS `part_summa`,
+                                    `trin`.`parts`.`val`                                                                                 AS `val`,
+                                    `trin`.`parts`.`price`                                                                               AS `price`,
+                                    `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
+                                    `trin`.`elem`.`obozn`                                                                                AS `obozn`,
+                                    `trin`.`elem`.`shifr`                                                                                AS `shifr`,
+                                    `trin`.`parts`.`kod_part`                                                                            AS `kod_part`,
+                                    ifnull(`trin`.`dogovory`.`zakryt`, 0)                                                                AS `zakryt`,
+                                    `trin`.`dogovory`.`kod_ispolnit`                                                                     AS `kod_ispolnit`,
+                                    `trin`.`elem`.`name`                                                                                 AS `name`,
+                                    `ispolnit`.`nazv_krat`                                                                               AS `ispolnit_nazv_krat`,
+                                    ifnull(`view_sklad_summ_postup`.`summ_postup`,
+                                           0)                                                                                            AS `numb_otgruz`,
+                                    (`trin`.`parts`.`numb` - ifnull(`view_sklad_summ_postup`.`summ_postup`, 0))                          AS `numb_ostat`
+                                  FROM (((((`trin`.`dogovory`
+                                    JOIN `trin`.`parts` ON ((`trin`.`dogovory`.`kod_dogovora` = `trin`.`parts`.`kod_dogovora`))) JOIN `trin`.`org`
+                                      ON ((`trin`.`org`.`kod_org` = `trin`.`dogovory`.`kod_org`))) JOIN `trin`.`elem`
+                                      ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
+                                      ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
+                                      ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=683
+                                  ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
+        $res .= "<b>Входящие</b><br>". Doc::formRPlan_by_Elem($rows);
+
+        // Внешние закрытые
+        $rows = $db->rows("SELECT
+                                    `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
+                                    `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
+                                    `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
+                                    `trin`.`org`.`nazv_krat`                                                                             AS `nazv_krat`,
+                                    `trin`.`parts`.`modif`                                                                               AS `modif`,
+                                    `trin`.`parts`.`numb`                                                                                AS `numb`,
+                                    `trin`.`parts`.`data_postav`                                                                         AS `data_postav`,
+                                    round(`trin`.`parts`.`nds`, 2)                                                                       AS `nds`,
+                                    round(ifnull(((`trin`.`parts`.`numb` * `trin`.`parts`.`price`) * (1 + `trin`.`parts`.`nds`)), 0),
+                                          2)                                                                                             AS `part_summa`,
+                                    `trin`.`parts`.`val`                                                                                 AS `val`,
+                                    `trin`.`parts`.`price`                                                                               AS `price`,
+                                    `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
+                                    `trin`.`elem`.`obozn`                                                                                AS `obozn`,
+                                    `trin`.`elem`.`shifr`                                                                                AS `shifr`,
+                                    `trin`.`parts`.`kod_part`                                                                            AS `kod_part`,
+                                    ifnull(`trin`.`dogovory`.`zakryt`, 0)                                                                AS `zakryt`,
+                                    `trin`.`dogovory`.`kod_ispolnit`                                                                     AS `kod_ispolnit`,
+                                    `trin`.`elem`.`name`                                                                                 AS `name`,
+                                    `ispolnit`.`nazv_krat`                                                                               AS `ispolnit_nazv_krat`,
+                                    ifnull(`view_sklad_summ_postup`.`summ_postup`,
+                                           0)                                                                                            AS `numb_otgruz`,
+                                    (`trin`.`parts`.`numb` - ifnull(`view_sklad_summ_postup`.`summ_postup`, 0))                          AS `numb_ostat`
+                                  FROM (((((`trin`.`dogovory`
+                                    JOIN `trin`.`parts` ON ((`trin`.`dogovory`.`kod_dogovora` = `trin`.`parts`.`kod_dogovora`))) JOIN `trin`.`org`
+                                      ON ((`trin`.`org`.`kod_org` = `trin`.`dogovory`.`kod_org`))) JOIN `trin`.`elem`
+                                      ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
+                                      ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
+                                      ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=683
+                                  ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
+        $res .= "<b>Входящие Закрытые</b><br>".  Doc::formRPlan_by_Elem($rows);
+        return $res;
     }
 //-----------------------------------------------------------------
 
@@ -606,7 +683,7 @@ class Doc
                     FROM 
                       view_rplan 
                     WHERE 
-                      kod_ispolnit=683 AND zakryt<>1 
+                      kod_ispolnit=683 AND zakryt<>1 AND numb_ostat>0
                     ORDER BY 
                       shifr ASC,
                       numb DESC";
@@ -618,7 +695,7 @@ class Doc
                     FROM 
                       view_rplan 
                     WHERE 
-                      kod_org=683 AND zakryt<>1 
+                      kod_org=683 AND zakryt<>1 AND numb_ostat>0
                     ORDER BY 
                       shifr ASC, 
                       numb DESC";
@@ -664,7 +741,7 @@ class Doc
                       view_rplan
                       LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>683 AND zakryt<>1 AND view_plat.summa>0
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND view_plat.summa>0
                     ORDER BY
                       shifr ASC,
                       numb DESC";
@@ -710,7 +787,7 @@ class Doc
                       view_rplan
                       LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>683 AND zakryt<>1 AND ISNULL(view_plat.summa)
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_plat.summa)
                     ORDER BY
                       shifr ASC,
                       numb DESC";
@@ -733,7 +810,7 @@ class Doc
     {
         $cnt = count($rplan_rows); // Количество записей
 
-        if ($cnt == 0) return "Список договоров пуст"; // Если данных нет то выходим
+        if ($cnt == 0) return "Список договоров пуст<br>"; // Если данных нет то выходим
 
         // Формируем заголовок таблицы
         $header = /** @lang HTML */
@@ -741,9 +818,10 @@ class Doc
                     <td width=\"200\">Наименование</td>
                     <td>Кол-во</td>
                     <td>Оплата</td>
-                    <td width=\"180\">Номер Договора</td>
+                    <td width=\"150\">Номер Договора</td>
                     <td>Организация</td>
                     <td width=\"100\">Дата</td>
+                    <td width=\"100\">Цена с НДС</td>
                     <td width=\"100\">Сумма с НДС</td>
                 </tr>";
 
@@ -757,20 +835,13 @@ class Doc
         $summ_numb_ostat = 0; // Сумма остатка отгрузки по элементу
         $summ_cnt = 0; // Счетчик - сколько раз считали сумму. Используется в условии
         $summ_numb_payed = 0; // Сумма оплаченных товаров
+        $summ_total = 0; // Сумма количества по всем партиям
 
-        // Вывод плана
+        // Формирование плана
         for ($i = 0; $i < $cnt; $i++) {
+            $input = false; // Входящий
 
             $row = $rplan_rows[$i];
-
-            // Партия
-            $numb_ostat = $row['numb_ostat'];
-
-            if($summ_cnt>1 and $i==$cnt-1) // Вывод итогов если последняя запись
-                $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat</b></td><th colspan='5'></th></tr>";
-
-            if ($numb_ostat == 0)
-                continue; // Если нет остатка то переходим к след. шагу
 
             // Договор
             $kod_dogovora = (int)$row['kod_dogovora']; // Код договора
@@ -778,11 +849,13 @@ class Doc
             $kod_org = (int)$row['kod_org']; // Код организации (Заказчик)
             $nazv_krat = $row['nazv_krat']; // Название Заказчика
             $kod_part = $row['kod_part'];
+            $zakryt = (int)$row['zakryt'];
 
             // Если заказчик НВС - то выводим исполнителя
             if($kod_org==683) {
                 $kod_org = $row['kod_ispolnit']; // Код исполнителя
                 $nazv_krat = $row['ispolnit_nazv_krat'];
+                $input = true;
             }
 
             $kod_elem = (int)$row['kod_elem']; // Код элемента
@@ -793,15 +866,7 @@ class Doc
             $nds = round((double)$row['nds'], 2);
             $price_nds = round($row['price'] * (1 + $nds), 2); // Цена с НДС
             $part_summa = $row['part_summa']; // Сумма остатка партии
-            $part_summa_ostat = $price_nds*$numb_ostat; // Сумма остатка партии
             $data_postav = $row['data_postav'];
-
-            $part_summa_ostat_str = ""; // Сумма неотгруженного остатка
-            if($part_summa_ostat!=$part_summa and $numb_ostat!=$numb)
-            {
-                $part_summa_ostat = func::Rub($part_summa_ostat);
-                $part_summa_ostat_str = "<br><abbr title=\"Сумма неотгруженного остатка\">($part_summa_ostat)</abbr>";
-            }
 
             $modif_str = '';            // Модификация
             if ($modif != '')
@@ -814,17 +879,24 @@ class Doc
                     '<br>НДС ' . $nds * 100 . '%';
 
             // Валюта
-            $val_str = '';
-            if ($val != 1)
-                $val_str = ' ' . $val;
-
+            $val_str = ' ' . func::val_sign($val);
+            // Процент оплаты
             $proc = self::getProcPay($kod_dogovora); // todo - Сравнить производительность - Ввести в запрос rplan или отдельно много запросов
             $proc_str = "";
             if($proc>0)
                 $proc_str ="$proc%";
 
+            if ($zebra == "#FFFFFF")
+                $zebra = "#E6E6E6";
+            else
+                $zebra = "#FFFFFF";
+
             $ind_data = ""; // Индикатор даты
-            if($proc>0)
+
+            // Остаток отгрузки/поcтупления
+            $numb_ostat = $row['numb_ostat']; // Осталось отгрузить/получить
+
+            if($proc>0 and $numb_ostat>0)
             {
                 $days_rem = func::DaysRem($data_postav);
                 if($days_rem<=14)
@@ -832,32 +904,38 @@ class Doc
                 elseif ($days_rem<=30)
                     $ind_data = " bgcolor='#f4df42'";
             }
+            elseif ($numb_ostat==0)
+                $zebra = "#85e085";
+
+            $otgruz_poluch = "отгрузить";
+            if($input)
+                $otgruz_poluch = "получить";
 
             $numb_ostat_str = ""; // Количество которое осталось отгрузить
-            if($numb_ostat!=$numb)
-                    $numb_ostat_str = " <abbr title=\"Осталось отгрузить $numb_ostat\">($numb_ostat)</abbr>";
+            if($numb_ostat!=$numb and $numb_ostat>0)
+                    $numb_ostat_str = " <abbr title=\"Осталось $otgruz_poluch $numb_ostat\">($numb_ostat)</abbr>";
 
             $itog_summ += $part_summa;// Итоговая Сумма по всем партиям
 
             $part_summa_str = Func::Rub($part_summa);// Сумма партии
 
-            if ($zebra == "#FFFFFF")
-                $zebra = "#E6E6E6";
-            else
-                $zebra = "#FFFFFF";
-
-            // Если предыдущий элемент другой то создаем заголовок
+            // Если предыдущий элемент другой то создаем заголовок + Итоги
             if ($kod_elem != $kod_elem_pred)
             {
                 if($summ_cnt>1)
-                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'><b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='5'></th></tr>";
-                $res .= "<tr><th colspan='7' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
+                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'>$summ_total <b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='6'></th></tr>";
+                $res .= "<tr><th colspan='8' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
                 $summ_numb_ostat = 0;
                 $summ_numb_payed = 0;
+                $summ_total = 0;
                 $summ_cnt = 0;
             }
             $kod_elem_pred = $kod_elem;
-            $summ_numb_ostat +=$numb_ostat;
+
+            if($zakryt==0)
+                $summ_numb_ostat +=$numb_ostat;
+            $summ_total+=$numb;
+
             if($proc>0)
                 $summ_numb_payed+=$numb_ostat;
 
@@ -865,6 +943,15 @@ class Doc
 
             $form_part_link = "form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora";
             $form_dogovor_link = "form_dogovor.php?kod_dogovora=$kod_dogovora";
+
+            // Красим строку
+            if($zakryt==1) // Если договор закрыт
+            {
+                if($numb_ostat==0)
+                    $zebra = "#85e085"; // Если все отгружено то красим в зеленый
+                else
+                    $zebra = "#F18585"; // Если не все отгружено то в красный
+            }
 
             // Формируем строку плана
             $row_str = /** @lang HTML */
@@ -875,10 +962,14 @@ class Doc
                                 <td align='right'><a href='$form_dogovor_link'>" . $nomer . "</a></td>
                                 <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
                                 <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
-                                <td align='right'>" . $part_summa_str . $val_str . $nds_str .$part_summa_ostat_str. "</td>
+                                <td align='right'>" .func::Rub($price_nds). "</td>
+                                <td align='right'>" . $part_summa_str . $val_str . $nds_str . "</td>
                          </tr>";
 
             $res.= $row_str;
+
+            if($summ_cnt>1 and $i==$cnt-1) // Вывод итогов если последняя запись
+                $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'>$summ_total <b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='6'></th></tr>";
         }
 
         $res .='</table>';
