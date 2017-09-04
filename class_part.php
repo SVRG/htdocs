@@ -162,14 +162,11 @@ class Part
 
             //--------------------------
             // Валюта
-            $Val = '';
+            $Val = func::val_sign($row['val']);
 
             // Процент оплаты
-            $PRC = 0; // Строка вывода процента // todo - $PRC = ???  Доработать. Не вычисляется если партия не в рублях. Нужно вводить данные о курсе и пересчитывать.
-            if ((int)$row['val'] != 1) { // todo - Доработать. Пока только USD, добавить EUR?
-                $Val = "$";
-            }
-            elseif ($dogovor_proc_pay > 0){
+            $PRC = 0; // Строка вывода процента
+            if ($dogovor_proc_pay > 0){
                 $prc = $this->getProcPayByPart($row);
 
                 if($prc!=$dogovor_proc_pay)
@@ -624,6 +621,7 @@ class Part
         $nds_0 = "";
         $rub_checked = "checked";
         $usd_checked = "";
+        $euro_checked = "";
         $form_name = "AddPart";
 
         $E = new Elem();
@@ -649,13 +647,12 @@ class Part
                 $nds_18 = "";
             }
 
-            $rub_checked = "";
-            $usd_checked = "";
-
             if ($val == 1)
                 $rub_checked = "checked";
             elseif ($val == 2)
                 $usd_checked = "checked";
+            else
+                $euro_checked = "checked";
 
             $E->kod_elem = $kod_elem;
         }
@@ -694,10 +691,11 @@ class Part
                   </tr>
                   <tr>
                    <td>Валюта</td>
-                   <td><input type="radio" name="val" value="1" '.$rub_checked.'> RUR<br>
-                   <input type="radio" name="val" value="2" '. $usd_checked .'> USD<br>
-                   <input type="radio" name="val" value="3"> EURO<br>
-                   </td>
+                       <td>
+                           <input type="radio" name="val" value="1" '.$rub_checked.'> RUR<br>
+                           <input type="radio" name="val" value="2" '. $usd_checked .'> USD<br>
+                           <input type="radio" name="val" value="3" '.$euro_checked.'> EURO<br>
+                       </td>
                   </tr>
                 </table>
 
@@ -810,6 +808,7 @@ class Part
 //
 //-------------------------------------------------------------------------
     /**
+     * // todo - нужно учитывать в какой валюте оплата и цена
      * Процент распределенных платежей от суммы партии
      * @param $rplan_row - поле 'part_summa'
      * @return int
