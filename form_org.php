@@ -176,6 +176,8 @@ Docum::Events();
                         if(isset($_POST['Flag']))
                                 if($_POST['Flag']=="AddDogovor")
                                     echo $Doc->formAddEdit();
+
+                        if($kod_org!=683) // Чтобы не выводить все договоры
                             echo $Org->formDocs();
                         ?>
                     </div>
@@ -186,8 +188,8 @@ Docum::Events();
     <script type="text/javascript">
         <!--
         var CollapsiblePanel1 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel1", {contentIsOpen: true});
-        var CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: true});
-        var CollapsiblePanel3 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel3", {contentIsOpen: true});
+        var CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: false});
+        var CollapsiblePanel3 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel3", {contentIsOpen: false});
         var CollapsiblePanel4 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel4", {contentIsOpen: true});
         var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1", "none", {isRequired: true});
         var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "none", {isRequired: false});
