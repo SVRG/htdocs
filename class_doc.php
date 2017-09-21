@@ -514,10 +514,12 @@ class Doc
                             </tr>';
             }
 
+            $copy_btn = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
+
             echo // todo - Проверить правильность. Округление! Валюта - пока только руб.
                 '<table width="600" border="0">
                         <th width="202" >Номер</th>
-                        <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></td>
+                        <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a>'.$copy_btn.'</td>
                       </tr>
                       <tr>
                         <th >Дата Составления </th>
@@ -1627,7 +1629,33 @@ class Doc
 
         return $res;
     }
-//-----------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Создает копию договора
+     * @return int
+     */
+    public function copy()
+{
+    $db = new Db();
+    $kod_dogovora = $this->kod_dogovora;
+    $kod_user = func::kod_user();
+    $db->query(/** @lang SQL */
+        "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user) 
+                      SELECT CONCAT(dogovory.nomer,' copy'),NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
+                      FROM dogovory
+                      WHERE kod_dogovora=$kod_dogovora");
+    $kod_dogovora_new = $db->last_id;
+
+    $db->query(/** @lang SQL */
+        "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, kod_dogovora, val, nds, kod_user) 
+                SELECT kod_elem, modif, numb, NOW(), price, $kod_dogovora_new, val, nds, $kod_user 
+                FROM parts
+                WHERE kod_dogovora=$kod_dogovora");
+
+    return $kod_dogovora_new;
+}
+//----------------------------------------------------------------------------------------------------------------------
 //
 
     /**
@@ -1743,6 +1771,12 @@ class Doc
             elseif($_POST['Flag'] == 'DelPrim') {
                 $this->DelPrim($_POST['kod_prim_del']);
                 $event = true;
+            }
+            elseif ($_POST['Flag'] == 'copyDogovor')
+            {
+                $kod_dogovora = $this->copy();
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora='.$kod_dogovora);
+                return;
             }
         }
             if($event)
