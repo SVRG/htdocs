@@ -568,6 +568,9 @@ class Elem
         if($obozn!=="" and strpos($name,$obozn)!==false)
             $obozn = "";
 
+        if($shifr==$obozn)
+            $obozn = "";
+
         return "$shifr $obozn $name $kod_elem";
     }
 }
