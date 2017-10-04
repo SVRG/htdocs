@@ -139,15 +139,6 @@ include_once("header.php");
         ?>
 </div>
 <script type="text/javascript">
-    var kod_elem, $kod_elem;
-
-    $kod_elem = $('#kod_elem').selectize({
-        onChange: function(value) {
-            if (!value.length) return;
-        }
-    });
-    kod_elem = $kod_elem[0].selectize;
-
     var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency",{isRequired: true});
     var sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");

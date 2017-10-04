@@ -182,6 +182,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 
+
 #############
 ## Python
 #############
@@ -191,7 +192,6 @@ $RECYCLE.BIN/
 # Packages
 *.egg
 *.egg-info
-dist/
 eggs/
 parts/
 var/
@@ -226,16 +226,11 @@ menu/Thumbs.db
 
 .idea/workspace.xml
 
-.idea/workspace.xml
-
 PHPMailer/examples/gmail.php
 
 .idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
 
 .idea/encodings.xml
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
 
 .idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata
 
@@ -244,41 +239,24 @@ PHPMailer/examples/gmail.php
 .idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/test.zip
 
 .idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/trin.zip
-
-.idea/workspace.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.values.at
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/test.zip
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/trin.zip
-
-.idea/encodings.xml
-
-.idea/workspace.xml
-
-*.db
 
 .idea/dataSources.local.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.values.at
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/test.zip
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/trin.zip
-
-.idea/encodings.xml
-
-.idea/workspace.xml
 
 img/Thumbs.db
 
 settings.ini
+
+/class_odbc.php
+
+class_config.php
+/import_tables.php
+/Connections/roo.php
+widgets/autocomplete/img/
+
+*.at
+
+*.len
+
+*.keystream
+
+.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata_i
