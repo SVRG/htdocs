@@ -284,12 +284,13 @@ class Doc
         $zakryt = $rplan_rows[0]['zakryt'];
 
         // Процент оплаты по договору
-        $oplacheno = "";
-        $dogovor_summa = self::getSummaDogovora($kod_dogovora); // todo - медленные запросы, надо подумать как их ускорить.
-        $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
-        if ((double)$dogovor_summa > 0 and (double)$summa_plat > 0)
-            $oplacheno = (int)((double)$summa_plat / (double)$dogovor_summa * 100) . "%"; // Процент оплаты по договору
+        $oplacheno = self::getProcPay($kod_dogovora); // todo - медленные запросы, надо подумать как их ускорить.
+        if($oplacheno>0)
+            $oplacheno.="%";
+        else
+            $oplacheno = "";
 
+        $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rplan_rows[$i];
