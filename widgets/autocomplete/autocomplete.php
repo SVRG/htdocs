@@ -7,6 +7,8 @@
  */
 // contains utility functions mb_stripos_all() and apply_highlight()
 require_once '../autocomplete/local_utils.php';
+require_once "../../class_config.php";
+$config = new config();
 
 // prevent direct access
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND
@@ -37,8 +39,7 @@ if (preg_match("/[^\040\pL\pN_-]/u", $term)) {
 // *****************************************************************************
 
 // database connection
-// todo - ставить реальные данные
-$conn = new mysqli("localhost", "root", "", "trin");
+$conn = new mysqli($config->mysql_config['host'], $config->mysql_config['username'], $config->mysql_config['password'], $config->mysql_config['dbname']);
 
 if ($conn->connect_error) {
     echo 'Database connection failed...' . 'Error: ' . $conn->connect_errno . ' ' . $conn->connect_error;
@@ -53,10 +54,14 @@ $cnt = count($parts);
 /**
  * Create SQL
  */
-$sql = 'SELECT name,shifr,kod_elem FROM elem WHERE elem.del=0 ';
+// Ќадо учесть, что если в отображаемом значении не будет строки поиска (которое выдел€етс€) то оно не будет выведено
+// »ными словами надо чтобы $row['name'] содержало $part
+$sql = "SELECT CONCAT_WS(' ',shifr,name,obozn,kod_elem) AS name,kod_elem FROM elem WHERE del=0";
 for ($i = 0; $i < $cnt; $i++) {
-    $sql .= ' AND name LIKE ' . "'%" . $conn->real_escape_string($parts[$i]) . "%'";
+    $part = $conn->real_escape_string($parts[$i]);
+    $sql .= " AND CONCAT_WS(' ',shifr,name,obozn,kod_elem) LIKE '%$part%'";
 }
+
 $rs = $conn->query($sql);
 if ($rs === false) {
     $user_error = 'Wrong SQL: ' . $sql . 'Error: ' . $conn->errno . ' ' . $conn->error;

@@ -662,7 +662,7 @@ class Part
                 <table border="0">
                   <tr>
                     <td>Элемент</td>
-                    <td>' . $E->formSelList() . '</td>
+                    <td width="100%">' . $E->formSelList2() . '</td>
                   </tr>
                   <tr>
                     <td>Модификация</td>
@@ -670,9 +670,8 @@ class Part
                   </tr>
                   <tr>
                     <td>Дата Поставки </td>
-                    <td><span id="SDateR">
+                    <td>
                               <input  name="data_postav" id="data_postav" value="' . $data_postav . '" />
-                              <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
                   </tr>
                   <tr>
                     <td>Количество</td>

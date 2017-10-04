@@ -198,6 +198,49 @@ class Elem
 
         return $res;
     }
+//----------------------------------------------------------------------
+//
+    /**
+     * Вывод списка-выбора Элементов
+     * @return string
+     */
+    public function formSelList2()
+    {
+        $db = new Db();
+
+        $sql = "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
+
+        $rows = $db->rows($sql);
+
+        if($db->cnt==0)
+            return "";
+
+        $res = "<select id='kod_elem' name='kod_elem' placeholder=\"Выбрать элемент...\">
+";
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $name = self::search_name($rows[$i]);
+            $kod_elem = $rows[$i]['kod_elem'];
+
+            $selected = "";
+            if ($rows[$i]['kod_elem'] == $this->kod_elem)
+                $selected = " selected='selected'";
+
+            $res .= "<option value='$kod_elem' $selected>$name</option>\r\n";
+        }
+        $res .= '</select>
+        <script type="text/javascript">
+                        var kod_elem, $kod_elem;
+    
+                        $kod_elem = $("#kod_elem").selectize({
+                            onChange: function(value) {
+            if (!value.length) return;
+        }
+                        });
+                        kod_elem = $kod_elem[0].selectize;
+                </script>';
+
+        return $res;
+    }
 //------------------------------------------------------------------------
 //
     /**
@@ -502,5 +545,29 @@ class Elem
         $db->query("UPDATE elem SET nomen = $nomen WHERE kod_elem = $kod_elem");
 
     }
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Выдает строку для поиска по элементам - Шифр - Обозначение - Наименование - Код
+     * @param $row
+     * @return mixed|string
+     */
+    public static function search_name($row)
+    {
+        if(count($row)===0)
+            return "";
+
+        $name = $row['name'];
+        $obozn = $row['obozn'];
+        $shifr = $row['shifr'];
+        $kod_elem = $row['kod_elem'];
+
+        if($shifr!=="" and $name==$shifr)
+            $name = "";
+
+        if($obozn!=="" and strpos($name,$obozn)!==false)
+            $obozn = "";
+
+        return "$shifr $obozn $name $kod_elem";
+    }
 }

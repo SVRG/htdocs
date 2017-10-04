@@ -38,17 +38,25 @@ $Part->kod_part = $kod_part;
 $Part->kod_dogovora = $_GET['kod_dogovora'];
 $Part->Events();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Партия</title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <link href="SpryAssets/SpryValidationSelect.css" rel="stylesheet" type="text/css"/>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Test</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <script src="js/jquery.min.js"></script>
+    <script src="widgets/selectize/dist/js/standalone/selectize.js"></script>
+    <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
+    <script src="js/index.js"></script>
 </head>
 <body>
 <?php
@@ -131,7 +139,15 @@ include_once("header.php");
         ?>
 </div>
 <script type="text/javascript">
-    <!--
+    var kod_elem, $kod_elem;
+
+    $kod_elem = $('#kod_elem').selectize({
+        onChange: function(value) {
+            if (!value.length) return;
+        }
+    });
+    kod_elem = $kod_elem[0].selectize;
+
     var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency",{isRequired: true});
     var sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");
@@ -141,4 +157,3 @@ include_once("header.php");
     //-->
 </script>
 </body>
-</html>

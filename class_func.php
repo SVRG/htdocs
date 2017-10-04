@@ -122,7 +122,7 @@ class Func
      */
     public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
-        $res = "<form id='FID' name='FNAME' method='POST' action='$Act '>
+        $res = "<form name='FNAME' method='POST' action='$Act '>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='submit' name='Button' value='$ButtValue' />
                 </form>";
@@ -189,7 +189,7 @@ class Func
      */
     public static function ActForm($Act = '', $Body = '', $ButtValue = 'OK', $FlagVal = 'OK')
     {
-        $res = "<form id='FID' name='FNAME' method='POST' action=' $Act '>
+        $res = "<form name='FNAME' method='POST' action=' $Act '>
                     $Body
                     <input type='submit' name='Button' value=' $ButtValue ' />
                     <input type='hidden' name='Flag' value='$FlagVal' />
