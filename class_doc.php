@@ -367,11 +367,14 @@ class Doc
             if ($mod != "")
                 $mod = " ($mod)";
 
+            // Нет контаката по договору
+            $no_contact = self::formNoContact($kod_dogovora);
+
             // Формируем строку
             if ($i == 0 and $cnt > 1) { // Когда требуется объединение строк
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
-                                <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
+                                <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
                                 <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
             }
             elseif ($cnt == 1) // Когда объединение строк не требуется
@@ -2091,5 +2094,21 @@ class Doc
             $name.=' '.$Org->getFormLink();
 
         return "<a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$name</a>";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Если в договоре нет контакта - выдает значек
+     * @param $kod_dogovora
+     * @return string
+     */
+    public static function formNoContact($kod_dogovora)
+    {
+        $db = new Db();
+        $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$kod_dogovora");
+
+        if($db->cnt==0)
+            return "<img src='img/sign_pr.gif' width='15'>";
+        else return "";
     }
 }// END CLASS
