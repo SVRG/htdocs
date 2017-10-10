@@ -218,7 +218,7 @@ class Elem
         $res = "<select id='kod_elem' name='kod_elem' placeholder=\"Выбрать элемент...\">
 ";
         for ($i = 0; $i < $db->cnt; $i++) {
-            $name = self::search_name($rows[$i]);
+            $name = self::getSearchName($rows[$i]);
             $kod_elem = $rows[$i]['kod_elem'];
 
             $selected = "";
@@ -450,7 +450,7 @@ class Elem
      * Удаление элемента с заменой
      * Заменяем указанный элемент в партиях на код Комплектующие=1001, в модификации добавляем наименование
      * @param int $kod_elem - код удаляемого элемента
-     * @param int $kod_dest - код элекмента на который надо заменить
+     * @param int $kod_dest - код элемента на который надо заменить
      */
     public function DeleteReplace($kod_elem, $kod_dest=1001)
     {
@@ -470,7 +470,7 @@ class Elem
         $Docum = new Docum();
         $Docum->DeleteElemFiles($kod_elem); // Удаляем связные документы
 
-        $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем списое партий, где участвовал удаленный элемент
+        $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем список партий, где участвовал удаленный элемент
         if($db->cnt==0)
             return;
 
@@ -552,7 +552,7 @@ class Elem
      * @param $row
      * @return mixed|string
      */
-    public static function search_name($row)
+    public static function getSearchName($row)
     {
         if(count($row)===0)
             return "";

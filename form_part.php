@@ -39,10 +39,7 @@ $Part->kod_dogovora = $_GET['kod_dogovora'];
 $Part->Events();
 ?>
 <!DOCTYPE html>
-<!-- DW6 -->
 <head>
-    <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Партия</title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
