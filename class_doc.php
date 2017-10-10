@@ -589,22 +589,17 @@ class Doc
 
         $res = /** @lang HTML */
             '<form id="form1" name="form1" method="post" action="">
-                    <table width="600" border="0">
-                      <tr>
-                            <td>
-                                Договор
-                            </td>
-                      </tr>
+                    <table width="100%" border="0">
                       <tr>
                         <th width="202" >Номер</th>
-                        <td width="374"><span id="SNumR">
+                        <td width="100%"><span id="SNumR">
                                   <input  name="nomer" id="nomer" value="' . $nomer . '"/>
                                   <span class="textfieldRequiredMsg">Нужно ввести значение.</span><span class="textfieldMinCharsMsg">Minimum
                                   number of characters not met.</span></span>
                          </td>
                       </tr>
                       <tr>
-                        <th >Дата Составления </th>
+                        <th >Дата</th>
                         <td><span id="SDateR">
                                   <input  name="data_sost" id="data_sost" value="' . $data_sost . '" />
                              <span class="textfieldRequiredMsg">Нужно ввести значение.</span>
@@ -745,9 +740,9 @@ class Doc
                       view_rplan.numb_ostat
                     FROM
                       view_rplan
-                      LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
+                      LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND view_plat.summa>0
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0
                     ORDER BY
                       shifr ASC,
                       numb DESC";
@@ -791,9 +786,9 @@ class Doc
                       view_rplan.numb_ostat
                     FROM
                       view_rplan
-                      LEFT JOIN view_plat ON view_plat.kod_dogovora=view_rplan.kod_dogovora
+                      LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_plat.summa)
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)
                     ORDER BY
                       shifr ASC,
                       numb DESC";
@@ -808,7 +803,6 @@ class Doc
 
     /**
      * График поставок по изделиям (План Реализации)
-     * todo - добавить итоговые значения оплаченных шт
      * @param array $rplan_rows - массив rplan отсортированный по элементам
      * @return string
      */
