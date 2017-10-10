@@ -52,7 +52,50 @@ class Org
 
         return $res;
     }
+//----------------------------------------------------------------------
+//
+    /**
+     * Вывод списка-выбора контрагента
+     * @param int $kod_org_selected - выбранный элемент
+     * @return string
+     */
+    public static function formSelList2($kod_org_selected = 0)
+    {
+        $db = new Db();
 
+        $sql = "SELECT * FROM org ORDER BY poisk";
+
+        $rows = $db->rows($sql);
+
+        if($db->cnt==0)
+            return "";
+
+        $res = "<select id='kod_org' name='kod_org' placeholder=\"Выбрать контрагента...\">
+";
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $name = self::getSearchName($rows[$i]);
+            $kod_org = $rows[$i]['kod_org'];
+
+            $selected = "";
+            if ($rows[$i]['kod_org'] == $kod_org_selected)
+                $selected = " selected='selected'";
+
+            $res .= "<option value='$kod_org' $selected>$name</option>\r\n";
+        }
+        $res .= '</select>
+        <script type="text/javascript">
+                        var kod_org, $kod_org;
+    
+                        $kod_org = $("#kod_org").selectize({
+                            onChange: function(value) {
+            if (!value.length) return;
+        }
+                        });
+                        kod_org = $kod_org[0].selectize;
+                </script>';
+
+        return $res;
+    }
 //-----------------------------------------------------------
 
     /**
@@ -867,5 +910,33 @@ class Org
 
         $db->query(/** @lang SQL */
             "INSERT INTO org_links (master, slave, prim,kod_user) VALUE ($kod_org_master,$kod_org_slave,'$prim',$kod_user)");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Выдает строку для поиска по организациям - Поиск - Название крат - Название полн - Код
+     * @param $row
+     * @return mixed|string
+     */
+    public static function getSearchName($row)
+    {
+        if(count($row)===0)
+            return "";
+
+        $nazv_krat = $row['nazv_krat'];
+        $nazv_poln = $row['nazv_poln'];
+        $poisk = $row['poisk'];
+        $kod_org = $row['kod_org'];
+
+        if($poisk!=="" and $nazv_krat==$poisk)
+            $nazv_krat = "";
+
+        if($nazv_poln!=="" and strpos($nazv_krat,$nazv_poln)!==false)
+            $nazv_poln = "";
+
+        if($nazv_krat==$nazv_poln)
+            $nazv_poln = "";
+
+        return "$poisk $nazv_krat $nazv_poln $kod_org";
     }
 }

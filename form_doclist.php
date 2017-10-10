@@ -9,16 +9,24 @@ include_once("class_doc.php");
 $Dogovor = new Doc();
 $Dogovor->Events();
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+?>
 <html>
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>Список Договоров</title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Test</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <script src="js/jquery.min.js"></script>
+    <script src="widgets/selectize/dist/js/standalone/selectize.js"></script>
+    <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
+    <script src="js/index.js"></script>
 </head>
 <body>
 <?php include("header.php"); ?>

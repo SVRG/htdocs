@@ -614,7 +614,7 @@ class Doc
                       </tr>
                       <tr>
                         <th >Контрагент</th>
-                        <td>' . Org::formSelList($kod_org, '', 'kod_org') . '</td>
+                        <td>' . Org::formSelList2($kod_org) . '</td>
                       </tr>
                       <tr>
                         <th >Тип Догвора</th>
