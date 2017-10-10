@@ -6,7 +6,7 @@
  * Time: 06:57
  */
 // contains utility functions mb_stripos_all() and apply_highlight()
-require_once '../autocomplete/local_utils.php';
+require_once 'local_utils.php';
 require_once "../../class_config.php";
 $config = new config();
 
