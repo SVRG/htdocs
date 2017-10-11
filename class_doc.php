@@ -922,8 +922,15 @@ class Doc
             // Если предыдущий элемент другой то создаем заголовок + Итоги
             if ($kod_elem != $kod_elem_pred)
             {
+                if($summ_total == $summ_numb_ostat)
+                    $summ_total = "";
+                if($summ_numb_ostat == $summ_numb_payed)
+                    $summ_numb_ostat = "";
+
                 if($summ_cnt>1)
-                    $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'>$summ_total <b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='6'></th></tr>";
+                    $res .= "<tr>
+                                <td align='right'><b>Итого:</b></td>
+                                <td align='right'>$summ_total <b><abbr title=\"Осталось отгрузить $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th></tr>";
                 $res .= "<tr><th colspan='8' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
                 $summ_numb_ostat = 0;
                 $summ_numb_payed = 0;
