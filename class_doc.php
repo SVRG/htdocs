@@ -381,7 +381,7 @@ class Doc
             {
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
-                                    <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$annulir</a></td>
+                                    <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
                                     <td width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
             } else
                 $res .= /** @lang HTML */
@@ -2110,6 +2110,7 @@ class Doc
 
         if($db->cnt==0)
             return "<img src='img/sign_pr.gif' width='15'>";
-        else return "";
+
+        return "";
     }
 }// END CLASS
