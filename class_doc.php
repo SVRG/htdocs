@@ -861,12 +861,12 @@ class Doc
             $kod_elem = (int)$row['kod_elem']; // Код элемента
             $shifr = $row['shifr']; // Обозначение
             $modif = $row['modif']; // Модификация
-            $numb = $row['numb'];
+            $numb = $row['numb'];   // Количество в партии
             $val = (int)$row['val']; // Валюта
-            $nds = round((double)$row['nds'], 2);
+            $nds = round((double)$row['nds'], 2); // НДС
             $price_nds = round($row['price'] * (1 + $nds), 2); // Цена с НДС
             $part_summa = $row['part_summa']; // Сумма остатка партии
-            $data_postav = $row['data_postav'];
+            $data_postav = $row['data_postav']; // Дата поставки
 
             $modif_str = '';            // Модификация
             if ($modif != '')
@@ -880,6 +880,7 @@ class Doc
 
             // Валюта
             $val_str = ' ' . func::val_sign($val);
+
             // Процент оплаты
             $proc = self::getProcPay($kod_dogovora); // todo - Сравнить производительность - Ввести в запрос rplan или отдельно много запросов
             $proc_str = "";
@@ -894,24 +895,24 @@ class Doc
             $ind_data = ""; // Индикатор даты
 
             // Остаток отгрузки/поcтупления
-            $numb_ostat = $row['numb_ostat']; // Осталось отгрузить/получить
+            $numb_ostat = $row['numb_ostat']; // Осталось отгрузить/получить (При получении используется другой запрос со структурой rplan)
 
             if($proc>0 and $numb_ostat>0)
             {
                 $days_rem = func::DaysRem($data_postav);
                 if($days_rem<=14)
-                    $ind_data = " bgcolor='#F18585'";
+                    $ind_data = " bgcolor='#F18585'"; // Внимание - менее 2х недель
                 elseif ($days_rem<=30)
-                    $ind_data = " bgcolor='#f4df42'";
+                    $ind_data = " bgcolor='#f4df42'"; // Менее 30-ти дней до отгрузки
             }
             elseif ($numb_ostat==0)
-                $zebra = "#85e085";
+                $zebra = "#85e085"; // Красим в зеленый - отгружено
 
             $otgruz_poluch = "отгрузить";
             if($input)
                 $otgruz_poluch = "получить";
 
-            $numb_ostat_str = ""; // Количество которое осталось отгрузить
+            $numb_ostat_str = ""; // Количество которое осталось отгрузить/получить
             if($numb_ostat!=$numb and $numb_ostat>0)
                     $numb_ostat_str = " <abbr title=\"Осталось $otgruz_poluch $numb_ostat\">($numb_ostat)</abbr>";
 
@@ -939,12 +940,14 @@ class Doc
             }
             $kod_elem_pred = $kod_elem;
 
-            if($zakryt==0)
+            if($zakryt==0 and $numb_ostat>0)
+            {
                 $summ_numb_ostat +=$numb_ostat;
-            $summ_total+=$numb;
 
-            if($proc>0)
-                $summ_numb_payed+=$numb_ostat;
+                if($proc>0)
+                    $summ_numb_payed+=$numb_ostat;
+            }
+            $summ_total+=$numb;
 
             $summ_cnt++;
 
@@ -976,7 +979,8 @@ class Doc
             $res.= $row_str;
 
             if($summ_cnt>1 and $i==$cnt-1) // Вывод итогов если последняя запись
-                $res .= "<tr><td align='right'><b>Итого:</b></td><td align='right'>$summ_total <b>$summ_numb_ostat (<abbr title=\"Оплачено $summ_numb_payed\">$summ_numb_payed</abbr>)</b></td><th colspan='6'></th></tr>";
+                $res .= "<tr><td align='right'><b>Итого:</b></td>
+                             <td align='right'>$summ_total <b><abbr title=\"Осталось отгрузить $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th></tr>";
         }
 
         $res .='</table>';
