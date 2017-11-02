@@ -45,15 +45,20 @@ class Doc
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
         $res = Doc::formRPlan_by_Elem($rows);
         // Закрытые
-        $rows = $db->rows("SELECT
+        $res.=func::ActButton2("","Закрытые","close","close",1);
+        if(isset($_POST['close']) or isset($_POST['in_close'])) {
+            $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
                                     WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=683
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
-        $res .= "<b>Закрытые</b><br>". Doc::formRPlan_by_Elem($rows);
+            $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
+        }
 
         // Внешние открытые
-        $rows = $db->rows("SELECT
+       $res.=func::ActButton2("","Внешние открытые","in_open","in_open",1);
+        if(isset($_POST['in_open']) or isset($_POST['in_close'])) {
+            $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
                                     `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
@@ -85,10 +90,14 @@ class Doc
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=683
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
-        $res .= "<b>Входящие</b><br>". Doc::formRPlan_by_Elem($rows);
+            $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
+        }
 
         // Внешние закрытые
-        $rows = $db->rows("SELECT
+        $res.=func::ActButton2("","Внешние закрытые","in_close","in_close",1);
+        if(isset($_POST['in_close']))
+        {
+            $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
                                     `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
@@ -119,8 +128,9 @@ class Doc
                                       ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=683
-                                  ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
-        $res .= "<b>Входящие Закрытые</b><br>".  Doc::formRPlan_by_Elem($rows);
+                                  ORDER BY kod_dogovora DESC;");
+            $res .= "<b>Входящие Закрытые</b><br>".  Doc::formRPlan_by_Elem($rows);
+        }
         return $res;
     }
 //-----------------------------------------------------------------
@@ -670,7 +680,7 @@ class Doc
 //
 
     /**
-     * Список договоров
+     * План реализации
      * @param int $VN : 1 - внешний; 0 - внутренний
      * @return string
      */
@@ -1192,10 +1202,10 @@ class Doc
     public function formPrim($AddForm=0, $Del=0)
     {
         $db = new Db();
-
+        // todo - проверить будет ли работать запрос в отсутствии поля kod_part
         $rows = $db->rows("SELECT * 
                                   FROM dogovor_prim 
-                                  WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 
+                                  WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 AND isnull(kod_part)
                                   ORDER BY dogovor_prim.time_stamp DESC
                                   ");
 
@@ -1901,9 +1911,12 @@ class Doc
         $user = func::user();
         $kod_user = func::kod_user();
 
-        $db = new Db();
-        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user) VALUES($this->kod_dogovora,'$P','$user',$kod_user)");
+        $kod_part = "NULL";
+        if(isset($_POST['kod_part']))
+            $kod_part = $_POST['kod_part'];
 
+        $db = new Db();
+        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part) VALUES($this->kod_dogovora,'$P','$user',$kod_user,$kod_part)");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2126,5 +2139,50 @@ class Doc
             return "<img src='img/sign_pr.gif' width='15'>";
 
         return "";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * @param int $kod_elem_sub
+     * @return string
+     */
+    public function formProduction($kod_elem_sub=1002)
+    {
+        $sql = /** @lang SQL */
+            "SELECT
+                      view_rplan.kod_dogovora,
+                      view_rplan.nomer,
+                      view_rplan.kod_org,
+                      view_rplan.nazv_krat,
+                      view_rplan.modif,
+                      view_rplan.numb,
+                      view_rplan.data_postav,
+                      view_rplan.nds,
+                      view_rplan.part_summa,
+                      view_rplan.val,
+                      view_rplan.price,
+                      view_rplan.kod_elem,
+                      view_rplan.obozn,
+                      view_rplan.shifr,
+                      view_rplan.kod_part,
+                      view_rplan.zakryt,
+                      view_rplan.kod_ispolnit,
+                      view_rplan.name,
+                      view_rplan.ispolnit_nazv_krat,
+                      view_rplan.numb_otgruz,
+                      view_rplan.numb_ostat
+                    FROM
+                      view_rplan
+                      INNER JOIN specs ON kod_elem_base=kod_elem
+                    WHERE
+                      view_rplan.kod_org<>683 AND zakryt<>1 AND numb_ostat>0 AND kod_elem_sub=$kod_elem_sub AND specs.del=0
+                    ORDER BY
+                      shifr ASC,
+                      numb DESC";
+
+        $db = new Db();
+        $rows = $db->rows($sql); // Массив данных
+
+        return $this->formRPlan_by_Elem($rows);
     }
 }// END CLASS

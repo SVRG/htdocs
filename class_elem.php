@@ -518,13 +518,27 @@ class Elem
 
         if(isset($_POST['Flag']))
         {
-            if($_POST['Flag']=='SetNomen' and isset($_POST['kod_elem_set']))
+            $flag = $_POST['Flag'];
+
+            if($flag=='SetNomen' and isset($_POST['kod_elem_set']))
             {
                 $this->setNomen($_POST['kod_elem_set'],1);
+                $event = true;
             }
-            elseif($_POST['Flag']=='UnsetNomen' and isset($_POST['kod_elem_set']))
+            elseif($flag=='UnsetNomen' and isset($_POST['kod_elem_set']))
             {
                 $this->setNomen($_POST['kod_elem_set'],0);
+                $event = true;
+            }
+            elseif ($flag=="AddSubElem" and isset($_POST['kod_elem_base'],$_POST['kod_elem']))
+            {
+                $this->addSubElem($_POST['kod_elem']);
+                $event = true;
+            }
+            elseif($flag=="DelFromSpec" and isset($_POST['kod_spec_del']))
+            {
+                $this->delSpec($_POST['kod_spec_del']);
+                $event = true;
             }
         }
 
@@ -572,5 +586,193 @@ class Elem
             $obozn = "";
 
         return "$shifr $obozn $name $kod_elem";
+    }
+//------------------------------------------------------------------------
+//
+    /**
+     * Добавление элемента в спецификацию
+     * @param $kod_elem - код подчиненного элемента
+     * @param int $quantity - количество/применяемость
+     * @param int $type - тип (обязательный или нет)
+     */
+    public function addSubElem($kod_elem, $quantity=1,$type=1)
+    {
+        if($kod_elem==$this->kod_elem) // Самого в себя нельзя добавить
+            return;
+        // todo - возможно потребуется проверка вложений, нет ли вхождений в подчиненные элементы
+
+        $db = new Db();
+
+        $kod_user = func::kod_user();
+        // Проверка - может элемент уже есть в спецификации
+        $db->rows("SELECT * FROM specs WHERE kod_elem_base=$this->kod_elem AND kod_elem_sub=$kod_elem");
+        if($db->cnt>0)
+            return;
+
+        $db->query("INSERT INTO specs (kod_elem_base,kod_elem_sub,quantity,type,kod_user) VALUES($this->kod_elem,$kod_elem,$quantity,$type,$kod_user)");
+    }
+//------------------------------------------------------------------------
+    public function formSpecTotal()
+    {
+        $res = func::ActButton2("","Добавить в спецификацию","AddSubElem","kod_elem",$this->kod_elem );
+
+        if(isset($_POST['kod_elem']))
+            if($_POST['kod_elem']==$this->kod_elem)
+            {
+                $res.= "<form method='post'>";
+                $res.= $this->formSelList2(); // kod_elem
+                $res.= "<input type='hidden' name='kod_elem_base' value='$this->kod_elem'>";
+                $res.= "<input type='hidden' name='Flag' value='AddSubElem'>";
+                $res.= "<input type='submit' value='Добавить'>";
+                $res.= "</form>";
+                $res.= func::Cansel();
+            }
+
+        $spec = $this->formSpec();
+        if($spec!=="")
+            $res.="<h3>Спецификация</h3>".$spec;
+
+        $spec = $this->formSpecSub();
+        if($spec!=="")
+            $res.="<h3><a href='form_main.php?sgp=8&kod_elem=$this->kod_elem'>Входит в состав</a></h3>".$spec;
+
+        return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Вывод списка элементов, которые входят в состав данного элемента
+     *
+     */
+    public function formSpec()
+    {
+        $db = new Db();
+        $rows = $db->rows("SELECT
+                                      view_elem.name AS elem_name,
+                                      view_elem.kod_elem,
+                                      view_elem.shifr,
+                                      view_elem.nomen,
+                                      photo.path,
+                                      specs.quantity,
+                                      specs.kod_spec
+                                    FROM specs
+                                      INNER JOIN view_elem ON kod_elem_sub=view_elem.kod_elem
+                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON specs.kod_elem_sub=photo.kod_elem
+                                    WHERE specs.kod_elem_base=$this->kod_elem AND specs.del=0
+                                    ORDER BY shifr ASC");
+
+        $cnt = $db->cnt;
+
+        if($cnt==0)
+            return "";
+
+        $res = $this->getSpec($rows);
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Вывод списка элементов, в состав которых входит данный элемент
+     *
+     */
+    public function formSpecSub()
+    {
+        $db = new Db();
+        $rows = $db->rows("SELECT
+                                      view_elem.name AS elem_name,
+                                      view_elem.kod_elem,
+                                      view_elem.shifr,
+                                      view_elem.nomen,
+                                      photo.path,
+                                      specs.quantity,
+                                      specs.kod_spec
+                                    FROM specs
+                                      INNER JOIN view_elem ON kod_elem_base=view_elem.kod_elem
+                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON specs.kod_elem_sub=photo.kod_elem
+                                    WHERE specs.kod_elem_sub=$this->kod_elem AND specs.del=0
+                                    ORDER BY shifr ASC");
+
+        $cnt = $db->cnt;
+
+        if($cnt==0)
+            return "";
+
+        $res = $this->getSpec($rows);
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @param $kod_spec
+     */
+    public function delSpec($kod_spec)
+    {
+        $db = new Db();
+        $db->query("UPDATE specs SET del=1 WHERE kod_spec=$kod_spec"); // Удаляем элемент
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    public function getSpec($rows)
+    {
+        $all=false;
+        if(isset($_GET['all']))
+            $all = true;
+
+        $res = '<table border=0 cellspacing=0 cellpadding=0 rules="rows" frame="below" width="100%">
+                 <tr bgcolor="#CCCCCC">
+                     <td width="10%">Фото</td>
+                     <td align="center">Наименование</td>
+                     <td align="center">Применяемость</td>
+                 </tr>';
+
+        $other = "";
+        $cnt = count($rows);
+
+        for ($i = 0; $i < $cnt; $i++)
+        {
+            $row = $rows[$i];
+            $kod_elem = $row['kod_elem'];
+            $shifr = $row['shifr'];
+            $img = "";
+            $link = "form_elem.php?kod_elem=$kod_elem";
+            if(isset($row['path']))
+            {
+                $path = $row['path'];
+                $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
+            }
+
+            $btn_nomen = func::ActButton2('','Удалить',"DelFromSpec","kod_spec_del",$row['kod_spec']);
+
+            $name = "";
+            if ($row['shifr'] != $row['elem_name'])
+                $name = $row['elem_name'];
+
+            $quantity = $row['quantity'];
+
+            $row_nomen = "<tr>
+                            <td align='left' valign='top'>$img</td>
+                            <td valign='top'><a href='$link'><h1> $shifr </h1> $name </td>
+                            <td valign='top'>$quantity $btn_nomen</td>
+                         </tr>";
+
+            if($row['nomen']==1)
+                $res.= $row_nomen;
+            elseif($row['nomen']==0 and $all)
+                $other.=$row_nomen;
+        }
+
+        if($all)
+        {
+            $res .= '<tr bgcolor="#CCCCCC">
+                     <td width="10%">Остальная номенклатура</td>
+                     <td align="center"></td>
+                    </tr>';
+            $res.=$other;
+        }
+
+        $res.=  '</table>';
+        return $res;
     }
 }

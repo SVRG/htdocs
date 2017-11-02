@@ -32,6 +32,7 @@ if(isset($_POST['kod_part'])) {
 
 $Dogovor = new Doc();
 $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
+$Dogovor->Events();
 
 $Part = new Part();
 $Part->kod_part = $kod_part;

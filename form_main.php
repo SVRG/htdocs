@@ -39,6 +39,8 @@ include_once "security.php";
         echo $D->formSGPHistory(1); // История по складу
     elseif ($sgp == 7)
         echo $D->formDocsOpen(1); // Внешние открытые договоры
+    elseif ($sgp == 8)
+        echo $D->formProduction($_GET['kod_elem']);
     else
         echo $D->formRPlan(0); // Обычный
 

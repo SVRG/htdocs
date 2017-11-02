@@ -177,12 +177,15 @@ class Part
 
             //$sn = ' s/n '. $row['kod_part']; // Идентификатор партии
 
+            //Примечание партии
+            $prim = $this->formPrim();
+
             // Кнопка редактирования партии
             $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn.'</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn.$prim.'</td>
                       <td width="70" align="right">' . (int)$row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
@@ -975,5 +978,91 @@ class Part
         $rows = $db->rows(/** @lang SQL */
             "SELECT kod_part FROM parts WHERE del=0 AND kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
         return $rows[0]['kod_part'];
+    }
+//-----------------------------------------------------------------------
+//
+    /**
+     * Нужна колонка kod_part - ALTER TABLE dogovor_prim ADD COLUMN kod_part INT(11) AFTER kod_dogovora
+     * Форма - Примечание партии
+     * @param int $Del
+     * @return string
+     */
+    public function formPrim($Del=1)
+    {
+
+        // Примечание
+        $res = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim',"kod_part",$this->kod_part);
+
+        $add_prim = 0;
+        if (isset($_POST['Flag']))
+            if ($_POST['Flag'] == 'AddPrim')
+                $add_prim = 1;
+
+        $db = new Db();
+
+        $rows = $db->rows("SELECT * 
+                                  FROM dogovor_prim 
+                                  WHERE kod_part=$this->kod_part AND dogovor_prim.del=0 
+                                  ORDER BY dogovor_prim.time_stamp DESC
+                                  ");
+
+        $cnt = $db->cnt;
+        if($add_prim==1 and isset($_POST['kod_part']))
+        if($_POST['kod_part']==$this->kod_part)
+        {
+            $res = "<form name='form1' method='post' action=''>
+                                      <table width='416' border='0'>
+                                        <tr>
+                                          <td width='185'>Примечание</td>
+                                          <td width='215'><span id='sprytextfield'>
+                                            <textarea name='Prim' id='Prim' cols='70' rows='3'></textarea>
+                                          <span class='textfieldRequiredMsg'>Необходимо ввести значение.</span></span></td>
+                                        </tr>
+                                        <tr>
+                                          <td><input type='submit' name='button' id='button' value='Добавить' /></td>
+                                        <td>&nbsp;</td>
+                                        </tr>
+                                      </table>
+                                    <input type='hidden' name='AddPrim' value='1' />
+                                    <input type='hidden' name='kod_part' value='$this->kod_part' />
+                    </form>";
+            $res.= Func::Cansel();
+        }
+
+        if ($cnt == 0)
+            return $res;
+
+        // Формируем таблицу
+        $res.= 'Примечание
+                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC" >
+                    <td width="80">Дата</td>
+                    <td>Текст</td>';
+
+        // Заполняем данными
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+
+            $user = "";
+            if($row['user']!="")
+                $user = "<br>".$row['user'];
+
+            $kod_prim = $row['kod_prim'];
+
+            $btn_del = "";
+            if($Del==1)
+            {
+                $btn_del = func::ActButton2("","Удалить","DelPrim","kod_prim_del",$kod_prim);
+            }
+
+            $res.= /** @lang HTML */
+                '<tr>
+                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $btn_del . '</td>
+                        <td>' . $row['text'] . '</td>
+                     </tr>';
+        }
+        $res.= '</table>';
+
+        return $res;
     }
 }

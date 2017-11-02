@@ -38,6 +38,15 @@ Docum::Events();
         <title>Элемент</title>
         <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
         <link href="SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Test</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="widgets/selectize/dist/js/standalone/selectize.js"></script>
+        <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
+        <script type="text/javascript" src="js/index.js"></script>
     </head>
         <body>
             <?php
@@ -67,6 +76,7 @@ Docum::Events();
                             echo $E->formPhoto() . '<br>';
 
                             echo '<h1>' . $E->Name('name',0). '</h1><br>'. $E->Data['shifr'] .'<br>'. $Form . '<br>';
+                            echo $E->formSpecTotal();
                             ?>
                             <div id="CollapsiblePanel1" class="CollapsiblePanel">
                                 <div class="CollapsiblePanelTab">Прикрепленные Файлы</div>
