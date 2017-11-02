@@ -49,7 +49,7 @@ if (isset($_POST['login'],$_POST['password'])) {
         $loginStrGroup = $row['rt'];
         $kod_user = $row['kod_user'];
 
-        //declare two session variables and assign them
+        //declare session variables and assign them
         $_SESSION['MM_Username'] = $loginUsername; // имя пользователя
         $_SESSION['MM_UserGroup'] = $loginStrGroup; // группа пользователя todo - доделать с правами
         $_SESSION['MM_kod_user'] = $kod_user; // код пользователя
@@ -64,9 +64,8 @@ if (isset($_POST['login'],$_POST['password'])) {
             $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];
         }
         header("Location: " . $MM_redirectLoginSuccess);
-    } else {
+    } else
         header("Location: " . $MM_redirectLoginFailed);
-    }
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
