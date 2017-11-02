@@ -657,7 +657,7 @@ class Elem
                                       specs.kod_spec
                                     FROM specs
                                       INNER JOIN view_elem ON kod_elem_sub=view_elem.kod_elem
-                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON specs.kod_elem_sub=photo.kod_elem
+                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                     WHERE specs.kod_elem_base=$this->kod_elem AND specs.del=0
                                     ORDER BY shifr ASC");
 
@@ -689,7 +689,7 @@ class Elem
                                       specs.kod_spec
                                     FROM specs
                                       INNER JOIN view_elem ON kod_elem_base=view_elem.kod_elem
-                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON specs.kod_elem_sub=photo.kod_elem
+                                      LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                     WHERE specs.kod_elem_sub=$this->kod_elem AND specs.del=0
                                     ORDER BY shifr ASC");
 
