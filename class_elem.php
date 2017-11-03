@@ -614,7 +614,9 @@ class Elem
 //------------------------------------------------------------------------
     public function formSpecTotal()
     {
-        $res = func::ActButton2("","Добавить в спецификацию","AddSubElem","kod_elem",$this->kod_elem );
+        if(isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
+            if($_SESSION['MM_UserGroup']==="admin")
+                $res = func::ActButton2("","Добавить в спецификацию","AddSubElem","kod_elem",$this->kod_elem );
 
         if(isset($_POST['kod_elem']))
             if($_POST['kod_elem']==$this->kod_elem)
@@ -743,7 +745,10 @@ class Elem
                 $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
             }
 
-            $btn_nomen = func::ActButton2('','Удалить',"DelFromSpec","kod_spec_del",$row['kod_spec']);
+            $btn_nomen = "";
+            if(isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
+                if($_SESSION['MM_UserGroup']==="admin")
+                    $btn_nomen = func::ActButton2('','Удалить',"DelFromSpec","kod_spec_del",$row['kod_spec']);
 
             $name = "";
             if ($row['shifr'] != $row['elem_name'])
