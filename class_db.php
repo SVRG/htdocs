@@ -8,6 +8,7 @@
  * @see http://www.binpress.com/tutorial/using-php-with-mysql-the-right-way/17
  */
 include_once "class_config.php";
+include_once "class_func.php";
 class Db
 {
     // The database connection
