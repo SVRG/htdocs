@@ -1,5 +1,6 @@
 <?php
-require_once('Connections/roo.php');
+//require_once('Connections/roo.php');
+require_once("class_db.php");
 // *** Validate request to login to this site.
 if (!isset($_SESSION)) {
     session_start();
@@ -11,40 +12,39 @@ if (isset($_GET['accesscheck'])) {
 }
 
 if (isset($_POST['login'],$_POST['password'])) {
-    $loginUsername = mysqli_real_escape_string($mysqli,$_POST['login']);
-    $password = mysqli_real_escape_string($mysqli,$_POST['password']);
+    $loginUsername = $_POST['login'];
+    $password = $_POST['password'];
     $MM_fldUserAuthorization = "";
     $MM_redirectLoginSuccess = "form_main.php";
     $MM_redirectLoginFailed = "index.php";
     $MM_redirecttoReferrer = false;
 
-    $saltQuery = "SELECT users.salt FROM users WHERE users.login='$loginUsername'";
-    $result = $mysqli->query($saltQuery);
-    $row = mysqli_fetch_assoc($result);
+    $db = new Db();
+    $rows = $db->rows("SELECT users.salt FROM users WHERE users.login='$loginUsername'");
+    $row = $rows[0];
     $salt = $row['salt'];
 
     /*
-    if($salt=='') // todo - при первом входе обновить пароли!
-    {
-        //generate a random salt to use for this account
-        $salt = bin2hex(mcrypt_create_iv(16,MCRYPT_DEV_URANDOM));
-        $saltedPW =  $password . $salt;
-        $hashedPW = hash('sha256', $saltedPW);
-        $query =
-            "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
-        $mysqli->query($query);
-    }
+        if($salt=="")// todo - при первом входе обновить пароли!
+            {
+                //generate a random salt to use for this account
+                $salt = bin2hex(mcrypt_create_iv(16));
+                $saltedPW =  $password . $salt;
+                $hashedPW = hash('sha256', $saltedPW);
+                $query =
+                    "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
+                $db->query($query);
+            }
     */
-
     $saltedPW =  $password . $salt;
     $hashedPW = hash('sha256', $saltedPW);
     $query = /** @lang SQL */
         "SELECT * FROM users WHERE users.login='$loginUsername' AND users.password='$hashedPW'";
-    $res = $mysqli->query($query);
+    $rows = $db->rows($query);
 
-    if ($res->num_rows > 0) {
+    if ($db->cnt > 0) {
 
-        $row = $res->fetch_assoc();
+        $row = $rows[0];
 
         $loginStrGroup = $row['rt'];
         $kod_user = $row['kod_user'];
@@ -56,9 +56,6 @@ if (isset($_POST['login'],$_POST['password'])) {
 
         // Запись сесии
         $SessionSQL = sprintf("INSERT INTO sessions VALUES('','%s','%s','%s')", $loginUsername, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
-        $mysqli->query($SessionSQL);
-        $res->close();
-        $mysqli->close();
 
         if (isset($_SESSION['PrevUrl']) && false) {
             $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];
@@ -76,10 +73,6 @@ if (isset($_POST['login'],$_POST['password'])) {
     <title>Login</title>
     <link rel="stylesheet" type="text/css" href="menu/menu.css">
 </head>
-<?php
-require_once('class_func.php');
-?>
-
 <body>
 <form id="form1" name="form1" method="POST" action="<?php echo $loginFormAction; ?>">
     <table width="253" border="0">
