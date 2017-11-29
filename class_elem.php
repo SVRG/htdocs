@@ -614,6 +614,7 @@ class Elem
 //------------------------------------------------------------------------
     public function formSpecTotal()
     {
+        $res = "";
         if(isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
             if($_SESSION['MM_UserGroup']==="admin")
                 $res = func::ActButton2("","Добавить в спецификацию","AddSubElem","kod_elem",$this->kod_elem );
