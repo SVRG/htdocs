@@ -96,6 +96,7 @@ else
                 }
 
                 echo $Dogovor->formDocum(); // Документы договора
+                echo $Dogovor->formAttributes(); // Аттрибуты
 
                 ?>
             </td>

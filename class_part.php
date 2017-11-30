@@ -9,6 +9,7 @@ class Part
     public $Item; // Связанный объект Изделие партии
     public $Parts;// Партии Договора
     public $Data; // Данные по партии
+    public $price_or = 1; // Вкл 1/Выкл 0 - ориентировочную цену
 
     //-------------------------------------------------------------------------
     /**
@@ -74,7 +75,7 @@ class Part
                     <tr bgcolor="#CCCCCC">
                         <td width="365">Наименование</td>
                         <td width="40">Кол-во</td>
-                        <td width="80">Дата Поставки</td>
+                        <td width="80">Дата</td>
                         <td width="80">Склад</td>
                         <td width="120">Цена без НДС</td>
                         <td width="120">Цена c НДС</td>
@@ -92,9 +93,9 @@ class Part
             if($row['modif']!='')
                 $modif = ' (' . $row['modif'] . ')'; // Модификация
 
-            $numb = (int)$row['numb']; // Количество товара в партии
+            $numb = (double)$row['numb']; // Количество товара в партии
             $numb_otgruz = $row['numb_otgruz']; // Количество отгруженного товара по партии
-            $part_summa = (double)$row['part_summa'];
+            $part_summa = self::getPartSumma($row);
 
             $ost = $row['numb_ostat']; // Осталось отгрузить
             $ostatok = ""; // Строка для вывода остатка по отгрузке
@@ -122,10 +123,15 @@ class Part
                 $nacl.= Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],"Добавить", 'AddNaklad',"kod_part",$row['kod_part']);
 
             // Цена --------------------------------------------------------------------------------------
-            $price = (double)$row['price'];
+            $price_str = self::formPrice($row);
+            $price = self::getPrice($row);
 
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
+            if(isset($row['data_nach']))
+            {
+                $data_postav.="<br>".Func::Date_from_MySQL($row['data_nach']); // Дата начала
+            }
 
             // Окраска отруженных/полученных партий в зелёный
             $ind = '';// Индикатор окраски даты поставки
@@ -168,7 +174,6 @@ class Part
             $PRC = 0; // Строка вывода процента
             if ($dogovor_proc_pay > 0){
                 $prc = $this->getProcPayByPart($row);
-
                 if($prc!=$dogovor_proc_pay)
                     $PRC = $prc . "($dogovor_proc_pay)";
                 else
@@ -189,7 +194,7 @@ class Part
                       <td width="70" align="right">' . (int)$row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav . '</td>
                       <td width="40">' . $nacl . '</td>
-                      <td width="120" >' . Func::Rub($price) . $Val . '</td>
+                      <td width="120" >' . $price_str. $Val . '</td>
                       <td width="120" >' . Func::Rub($price * (1 + (double)$row['nds'])) . $Val .  '</td>
                       <td width="120">' . Func::Rub($part_summa) . $Val . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
@@ -430,7 +435,7 @@ class Part
         for($i=0;$i<$cnt;$i++) {
             $row = $rows[$i];
             $kod_part = $row['kod_part'];
-            $part_summa = $row['part_summa'];
+            $part_summa = self::getPartSumma($row);
             $data = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
             $type = 2; //ОК- расчет
 
@@ -454,15 +459,13 @@ class Part
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat =$kod_plat");
+        $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat=$kod_plat");
         if($db->cnt==1)
         {
             $row = $rows[0];
             $ostat = ((double)$row['summa']-(double)$row['summa_raspred']);
             if($summa > $ostat)
-            {
                 $summa = $ostat;
-            }
         }
 
         $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat,kod_user) VALUES($summa,$kod_rascheta,$kod_plat,$kod_user)");
@@ -480,7 +483,10 @@ class Part
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$this->kod_part");
 
-        $part_summa = (double)$rows[0]['part_summa'];
+        if($db->cnt==0)
+            return;
+
+        $part_summa = self::getPartSumma($rows[0]);
 
         $raschet_summa = round($part_summa * $AVPr, 2); // Сумма расчета
 
@@ -588,22 +594,28 @@ class Part
      * @param $kod_elem
      * @param int $numb
      * @param $data_postav
-     * @param int $price
+     * @param float $price
      * @param string $modif
      * @param int $nds
      * @param int $val
      * @param int $Add
+     * @param float $price_or
      */
-    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0, $modif = '', $nds = 18, $val = 1,$Add=1)
+    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 18, $val = 1,$Add=1,$price_or = 0.)
     {
         $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
         $kod_user = func::kod_user();
 
+        if($price=="")
+            $price=0.;
+        if($price_or=="")
+            $price_or=0.;
+
         if($Add==1)
-            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val,kod_user) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val,$kod_user)");
+            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val,kod_user,price_or) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val,$kod_user,$price_or)");
         else
-            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user WHERE kod_part=$this->kod_part");
+            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
@@ -626,6 +638,7 @@ class Part
         $usd_checked = "";
         $euro_checked = "";
         $form_name = "AddPart";
+        $price_or_str = "";
 
         $E = new Elem();
 
@@ -641,6 +654,7 @@ class Part
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
             $numb = $row['numb'];
             $price = $row['price'];
+            $price_or = $row['price_or'];
             $val = (int)$row['val'];
             $nds = (double)$row['nds'];
 
@@ -648,6 +662,14 @@ class Part
             if ($nds == 0) {
                 $nds_0 = "checked";
                 $nds_18 = "";
+            }
+
+            if($this->price_or==1) // Форма Ориентировочной цены
+            {
+                $price_or_str = "<tr>
+                                    <td>Цена ОР Без НДС</td>
+                                    <td><input  name='price_or' id='price_or' value='$price_or' /></td>
+                                  </tr>";
             }
 
             if ($val == 1)
@@ -672,7 +694,7 @@ class Part
                     <td><input  name="modif" id="modif" value="' . $modif . '" /></td>
                   </tr>
                   <tr>
-                    <td>Дата Поставки </td>
+                    <td>Дата</td>
                     <td>
                               <input  name="data_postav" id="data_postav" value="' . $data_postav . '" />
                   </tr>
@@ -680,6 +702,7 @@ class Part
                     <td>Количество</td>
                         <td><input  name="numb" id="numb" value="' . $numb. '" /></td>
                   </tr>
+                  '.$price_or_str.'
                   <tr>
                     <td>Цена без НДС</td>
                     <td><input  name="price" id="price" value="' . $price . '" /></td>
@@ -813,18 +836,61 @@ class Part
      * // todo - нужно учитывать в какой валюте оплата и цена
      * Процент распределенных платежей от суммы партии
      * @param $rplan_row - поле 'part_summa'
-     * @return int
+     * @return float
      */
     public function getProcPayByPart($rplan_row)
     {
         $res = 0;
-        $part_summa = (double)$rplan_row['part_summa'];
+        $part_summa = self::getPartSumma($rplan_row);
+
         $summ_plat = $this->getSummPlatByPart();
 
         if($summ_plat >0 and $part_summa >0)
             $res = (int)($summ_plat / $part_summa * 100);
 
         return $res;
+    }
+//-------------------------------------------------------------------------
+
+    /**
+     * Цена партии
+     * @param $rplan_row
+     * @return float
+     */
+    public static function getPrice($rplan_row)
+    {
+        $price = round((double)$rplan_row['price'],2);
+        if($price==0.) // Берем ориентировочную
+            $price = round((double)$rplan_row['price_or'],2);
+        return $price;
+    }
+//-------------------------------------------------------------------------
+
+    /**
+     * Цена партии с НДС
+     * @param $rplan_row
+     * @return float
+     */
+    public static function getPriceNDS($rplan_row)
+    {
+        $price = round(self::getPrice($rplan_row)*(1+round((double)$rplan_row['nds'],2)),2);
+
+        return $price;
+    }
+//
+//-------------------------------------------------------------------------
+
+    /**
+     * // todo - нужно учитывать в какой валюте цена
+     * Сумма партии
+     * @param $rplan_row
+     * @return float
+     */
+    public static function getPartSumma($rplan_row)
+    {
+        $price = self::getPriceNDS($rplan_row);
+        $part_summa = round((double)$rplan_row['numb']*$price,2);
+        return $part_summa;
     }
 //
 //-------------------------------------------------------------------------
@@ -895,14 +961,14 @@ class Part
         if (isset($_POST['AddPart']))
             if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
             {
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or']);
                 $event = true;
             }
 
         if (isset($_POST['EditPart']))
             if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
             {
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'],0);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'],0, $_POST['price_or']);
                 $event = true;
             }
 
@@ -1064,5 +1130,20 @@ class Part
         $res.= '</table>';
 
         return $res;
+    }
+//-----------------------------------------------------------------------
+//
+    public static function formPrice($rplan_row)
+    {
+        $price = (double)$rplan_row['price'];
+        $price_str = func::Rub($price);
+
+        if ($price == 0)
+            $price_str = "";
+
+        if ((double)$rplan_row['price_or'] > 0.)
+            $price_str = "<b>" . Func::Rub((double)$rplan_row['price_or']) . "</b><br>" . $price_str;
+
+        return $price_str;
     }
 }
