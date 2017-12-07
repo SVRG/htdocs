@@ -51,6 +51,8 @@ if(isset($_POST['FormName']))
     {
         if(isset($_GET['dolg']))
             echo $org->formDolgOrg();
+        elseif(isset($_GET['pays']))
+            $org->formOrgPays("2017",1);
         else
             $org->formOrgList(true);
     }

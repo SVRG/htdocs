@@ -1,7 +1,7 @@
 <?php
 include_once("class_doc.php");
 include_once("class_func.php");
-include_once "class_elem.php";
+include_once("class_elem.php");
 
 class Org
 {
@@ -571,7 +571,7 @@ class Org
 //----------------------------------------------------------------------
 //
     /**
-     * Заказанная номенклатура по Договорам
+     * Оплаченная номенклатура по Договорам
      * @return string
      */
     public function formOrgNomen()
@@ -681,6 +681,9 @@ class Org
     public function formDolgOrg()
     {
         $db = new Db();
+        $conf = new config();
+        $kod_org_main = $conf->kod_org_main;
+
         $rows = $db->rows(/** @lang SQL */
             "SELECT
                     view_dogovor_data.kod_org,
@@ -691,7 +694,7 @@ class Org
                     WHERE
                         zakryt <> 1
                     AND dogovor_ostat > 1
-                    AND kod_org <> 683
+                    AND kod_org <> $kod_org_main
                     GROUP BY
                     view_dogovor_data.kod_org,
                     view_dogovor_data.nazv_krat
@@ -939,4 +942,74 @@ class Org
 
         return "$poisk $nazv_krat $nazv_poln $kod_org";
     }
+//-----------------------------------------------------------
+//
+    /**
+     * Вывод списка организаций
+     * @param string $year
+     * @param int $echo
+     * @return string
+     */
+    public function formOrgPays($year = "2017",$echo = 0)
+    {
+        $db = new DB();
+
+        $rows = $db->rows("SELECT sum(plat.summa) AS summ, 
+                                        view_dogovory_nvs.nazv_krat,
+                                        kod_org
+                                    FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
+                                    WHERE DATE(plat.`data`) > DATE('$year-01-01')
+                                    GROUP BY view_dogovory_nvs.kod_org
+                                    ORDER BY summ DESC");
+
+        $cnt = $db->cnt;
+
+        if ($cnt == 0)
+            return "Список организаций пуст";
+
+        $res = /** @lang HTML */
+            "<table border=1 cellspacing=0 rules=\"rows\" frame=\"void\">
+	                    <tr bgcolor=\"#CCCCCC\">
+	                            <td width='300'>Наименование краткое</td>
+	                            <td width='200'>Сумма</td>
+	                    </tr>";
+
+        if ($echo)
+            echo $res;
+        $itog = 0.;
+
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+
+            $kod_org = $row['kod_org'];
+            $nazv_krat = $row['nazv_krat'];
+            $summ = func::Rub($row['summ']);
+            $itog+=(double)$row['summ'];
+
+            $tab_row = /** @lang HTML */
+                "<tr>
+                      <td><a href=\"form_org.php?kod_org= $kod_org \">$nazv_krat</a></td>
+                      <td>$summ</td>
+		            </tr>";
+            if ($echo)
+                echo $tab_row;
+            else
+                $res .= $tab_row;
+        }
+        $itog = func::Rub($itog);
+        $tab_row = "<tr>
+                    <td><b>Итого</b></td>   
+                    <td><b>$itog</b></td> 
+                    </tr>
+                    </table>";
+
+        if ($echo)
+            echo $tab_row;
+        else {
+            $res .= $tab_row;
+            return $res;
+        }
+        return "";
+    }
+//-----------------------------------------------------------------
 }
