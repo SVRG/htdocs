@@ -947,10 +947,9 @@ class Org
     /**
      * Вывод списка организаций
      * @param string $year
-     * @param int $echo
      * @return string
      */
-    public function formOrgPays($year = "2017",$echo = 0)
+    public function formOrgPays($year = "2017")
     {
         $db = new DB();
 
@@ -962,54 +961,24 @@ class Org
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
 
-        $cnt = $db->cnt;
+        $res = '<table><tr><td>Название</td><td>Сумма за период</td></tr>';
 
-        if ($cnt == 0)
-            return "Список организаций пуст";
+        if ($db->cnt == 0)
+            return '';
 
-        $res = /** @lang HTML */
-            "<table border=1 cellspacing=0 rules=\"rows\" frame=\"void\">
-	                    <tr bgcolor=\"#CCCCCC\">
-	                            <td width='300'>Наименование краткое</td>
-	                            <td width='200'>Сумма</td>
-	                    </tr>";
+        $summ = 0;
 
-        if ($echo)
-            echo $res;
-        $itog = 0.;
-
-        for ($i = 0; $i < $cnt; $i++) {
+        for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-
-            $kod_org = $row['kod_org'];
-            $nazv_krat = $row['nazv_krat'];
-            $summ = func::Rub($row['summ']);
-            $itog+=(double)$row['summ'];
-
-            $tab_row = /** @lang HTML */
-                "<tr>
-                      <td><a href=\"form_org.php?kod_org= $kod_org \">$nazv_krat</a></td>
-                      <td>$summ</td>
-		            </tr>";
-            if ($echo)
-                echo $tab_row;
-            else
-                $res .= $tab_row;
+            $res .= '<tr>
+                        <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
+                        <td align="right">' . Func::Rub($row['summ']) . '</td>
+                     </tr>';
+            $summ += $row['summ'];
         }
-        $itog = func::Rub($itog);
-        $tab_row = "<tr>
-                    <td><b>Итого</b></td>   
-                    <td><b>$itog</b></td> 
-                    </tr>
-                    </table>";
-
-        if ($echo)
-            echo $tab_row;
-        else {
-            $res .= $tab_row;
-            return $res;
-        }
-        return "";
+        $res .= '</table>';
+        $res .= '<br>Сумма: ' . Func::Rub($summ);
+        return $res;
     }
 //-----------------------------------------------------------------
 }
