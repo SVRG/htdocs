@@ -16,7 +16,8 @@ class Mail
     private $from_adress = "";
     private $from_name = "";
     private $to_adress = array();
-
+    public $yandex_login = "";
+    public $yandex_pass = "";
     /**
      * Mail constructor.
      */
@@ -26,6 +27,8 @@ class Mail
 
         $this->gmail_login = $config->gmail_login;
         $this->gmail_pass = $config->gmail_pass;
+        $this->yandex_login = $config->yandex_login;
+        $this->yandex_pass = $config->yandex_pass;
         $this->from_adress = $config->from_address;
         $this->from_name = $config->from_name;
         $this->to_adress = $config->to_adress;
@@ -74,7 +77,9 @@ class Mail
         $mail->Debugoutput = 'html';
 
         //Set the hostname of the mail server
-        $mail->Host = 'smtp.gmail.com';
+        //$mail->Host = 'smtp.gmail.com';
+        $mail->Host = 'smtp.yandex.ru';
+
 
         //Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
         $mail->Port = 465;
@@ -86,10 +91,12 @@ class Mail
         $mail->SMTPAuth = true;
 
         //Username to use for SMTP authentication - use full email address for gmail
-        $mail->Username = $this->gmail_login;
+        //$mail->Username = $this->gmail_login;
+        $mail->Username = $this->yandex_login;
 
         //Password to use for SMTP authentication
-        $mail->Password = $this->gmail_pass;
+        //$mail->Password = $this->gmail_pass;
+        $mail->Password = $this->yandex_pass;
 
         //Set who the message is to be sent from
         $mail->setFrom($this->from_adress, $this->from_name);
