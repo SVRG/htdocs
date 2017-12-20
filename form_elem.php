@@ -8,6 +8,7 @@ $MM_donotCheckaccess = "true";
 include_once "security.php";
 
 include_once("class_elem.php");
+$UserA = array('admin');
 $UserG = array('admin', 'oper');
 $UserG1 = array('admin', 'oper', 'manager');
 
@@ -56,7 +57,7 @@ Docum::Events();
                 $Del = 1;
 
             $Form = '';
-            if (in_array($_SESSION['MM_UserGroup'], $UserG))
+            if (in_array($_SESSION['MM_UserGroup'], $UserA))
                 $Form = Func::ActButton('', 'Изменить', 'formAddEdit');
 
             if (isset($_POST['Flag']))
