@@ -176,7 +176,7 @@ else
 
                 if (isset($_POST['Flag'])) {
                     if ($_POST['Flag'] == 'AddInvoice') {
-                        echo $Dogovor->formAddInvoice();
+                        echo $Dogovor->formAddSchet();
                         $_POST['Flag'] = null;
                     }
                 }

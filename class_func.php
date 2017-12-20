@@ -18,7 +18,7 @@ class Func
      */
     public static function DaysRem($Date)
     {
-        if (!isset($Date)) return 0;
+        if (!isset($Date) or !self::validateDate($Date)) return 0;
         $now = new DateTime("now");
         $date = new DateTime($Date);
         $res = $now->diff($date)->format("%r%a");
@@ -62,8 +62,11 @@ class Func
      * @param string $MySQL_Date
      * @return string
      */
-    public static function Date_from_MySQL($MySQL_Date = "")
+    public static function Date_from_MySQL($MySQL_Date)
     {
+        if(!self::validateDate($MySQL_Date,"Y-m-d"))
+            return "";
+
         $date = strtotime($MySQL_Date);
         $res = date('d.m.Y',$date);
         return $res;

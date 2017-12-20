@@ -965,7 +965,7 @@ class Org
                                         view_dogovory_nvs.nazv_krat,
                                         kod_org
                                     FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
-                                    WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND kod_org<>$kod_org_main
+                                    WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND kod_org<>$kod_org_main AND plat.del=0
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
 
