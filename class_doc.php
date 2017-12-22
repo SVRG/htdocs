@@ -2478,13 +2478,16 @@ class Doc
         $db = new Db();
         $year = date('Y');
         $rows = $db->rows("SELECT MAX(nomer) AS nomer_max
-                                    FROM scheta
-                                    WHERE data>'$year-01-01'");
+                                    FROM view_scheta_dogovory_all
+                                    WHERE data_sost>'$year-01-01'");
         if($db->cnt==0)
-            return "1/".date(y);
+            return "1/".date("y");
 
-        $nomer = (int)explode('/',$rows[0]['nomer_max'])[0]+1;
-        $nomer.="/".date('y');
+        if(explode('-',$rows[0]['nomer_max']))
+        {
+            $nomer = (int)explode('/',$rows[0]['nomer_max'])[0]+1;
+            $nomer.=date("y");
+        }
 
         return $nomer;
     }

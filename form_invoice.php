@@ -27,20 +27,20 @@ echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="Content-Type" content="text/html"/>
         <title><?php echo "Счет №" . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']); ?></title>
         <style type="text/css">
             TABLE {
                 border-collapse: collapse; /* Убираем двойные линии между ячейками */
-                font-size: small;
+                font-size: medium;
             }
             body{
-                font-size: small;
+                font-size: medium;
                 width: 790px;
             }
             @media print {
                 body{
-                    font-size: small;
+                    font-size: medium;
                     alignment: center;
                 }
                 @page  {
@@ -49,14 +49,13 @@ echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
                 }
                 table{
                     border-collapse: collapse; /* Убираем двойные линии между ячейками */
-                    font-size: small;
+                    font-size: medium;
                     width: 100%;
                 }
                 header{
 
                 }
                 th{
-                    font-family: "Arial", Arial, sans-serif;
                     font-style: normal;
                 }
             }
