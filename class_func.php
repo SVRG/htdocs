@@ -65,7 +65,11 @@ class Func
     public static function Date_from_MySQL($MySQL_Date)
     {
         if(!self::validateDate($MySQL_Date,"Y-m-d"))
+        {
+            if(!self::validateTimeStamp($MySQL_Date))
+                echo $MySQL_Date;
             return "";
+        }
 
         $date = strtotime($MySQL_Date);
         $res = date('d.m.Y',$date);
@@ -84,6 +88,19 @@ class Func
     {
         $d = DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) == $date;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Проверка корректности даты
+     * @param $timestamp
+     * @return bool
+     */
+    public static function validateTimeStamp($timestamp)
+    {
+        return ((string) (int) $timestamp === $timestamp)
+            && ($timestamp <= PHP_INT_MAX)
+            && ($timestamp >= ~PHP_INT_MAX);
     }
 //----------------------------------------------------------------------------------------------------------------------
     /**
