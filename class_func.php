@@ -67,8 +67,7 @@ class Func
         if(!self::validateDate($MySQL_Date,"Y-m-d"))
         {
             if(!self::validateTimeStamp($MySQL_Date))
-                echo $MySQL_Date;
-            return "";
+                return "";
         }
 
         $date = strtotime($MySQL_Date);
@@ -98,9 +97,12 @@ class Func
      */
     public static function validateTimeStamp($timestamp)
     {
-        return ((string) (int) $timestamp === $timestamp)
-            && ($timestamp <= PHP_INT_MAX)
-            && ($timestamp >= ~PHP_INT_MAX);
+        if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $timestamp, $matches)) {
+            if (checkdate($matches[2], $matches[3], $matches[1])) {
+                return true;
+            }
+        }
+        return false;
     }
 //----------------------------------------------------------------------------------------------------------------------
     /**
