@@ -12,8 +12,11 @@ if (!isset($_GET['kod_dogovora']))
     exit("Не выбран договор");
 
 $D = new Doc();
-$D->kod_dogovora = $_GET['kod_dogovora'];
+$D->kod_dogovora = (int)$_GET['kod_dogovora'];
 $D->getData();
+$nomer = $D->Data['nomer'];
+$data_sost = func::Date_from_MySQL($D->Data['data_sost']);
+
 $conf = new config();
 //$kod_org_main = $conf->kod_org_main;
 
@@ -21,6 +24,23 @@ $Isp = new Org();
 $Isp->kod_org = $D->Data['kod_ispolnit'];
 echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
 $Isp->getData();
+
+if(isset($_GET['kod_scheta']))
+{
+$db = new Db();
+$kod_sceta = (int)$_GET['kod_scheta'];
+$rows = $db->rows(/** @lang MySQL */
+    "SELECT * FROM scheta WHERE kod_scheta=$kod_sceta");
+
+if($db->cnt>0)
+{
+    $row = $rows[0];
+    $nomer = $row['nomer'];
+    $data_sost = func::Date_from_MySQL($row['data']);
+}
+
+}
+
 echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
 ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -28,7 +48,7 @@ echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
     <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html"/>
-        <title><?php echo "Счет №" . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']); ?></title>
+        <title><?php echo "Счет №$nomer от $data_sost"; ?></title>
         <style type="text/css">
             TABLE {
                 border-collapse: collapse; /* Убираем двойные линии между ячейками */
@@ -99,7 +119,7 @@ else
 $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];
 
-echo "<p><h3>Счет №" . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost'])."</h3></p>";
+echo "<p><h3>Счет №$nomer от $data_sost</h3></p>";
 echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " .$adres;
 
@@ -129,14 +149,14 @@ for ($i = 0; $i < $cnt; $i++) {
         $modif = "($modif)";
     else
         $modif = "";
-    $numb = $row['numb']; // Общее количество / осталось отгрузить / отгружено
-    $price_str = func::Rub($row['price']);
-    $summ = $row['price'] * $row['numb'];
-    $summ_str = func::Rub($row['price'] * $row['numb']);
-
-    $nds_str = ($row['nds'] * 100) . '%';
-    $summ_nds = $summ * ($row['nds']);
+    $numb = round($row['numb'],2);
+    $summ = round($row['price'] * $row['numb'],2);
+    $summ_nds = round($summ * round($row['nds'],2),2);
     $summ_with_nds = $summ + $summ_nds;
+
+    $summ_str = func::Rub($summ);
+    $price_str = func::Rub($row['price']);
+    $nds_str = ($row['nds'] * 100) . '%';
     $summ_with_nds_str = func::Rub($summ_with_nds);
 
     $total_nds += $summ_nds;

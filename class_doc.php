@@ -1228,8 +1228,10 @@ class Doc
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
-            $res .= '<tr>
-                        <td>' . $row['nomer'] . '<br>' . Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']) . '</td>
+            $kod_dogovora = $row['kod_dogovora'];
+            $kod_scheta = $row['kod_scheta'];
+            $res .= "<tr>
+                        <td><a href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>". $row['nomer'] . "</a><br>" . Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']) . '</td>
                         <td>' . Func::Rub($row['summa']) . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
