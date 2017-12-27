@@ -211,7 +211,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-.idea/inspectionProfiles/
 .idea/*
 docs/
 .idea
@@ -224,23 +223,9 @@ menu/Thumbs.db
 
 .htpasswd
 
-.idea/workspace.xml
-
 PHPMailer/examples/gmail.php
 
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml
 
-.idea/encodings.xml
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.values.at
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/test.zip
-
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/trin.zip
-
-.idea/dataSources.local.xml
 
 img/Thumbs.db
 
@@ -250,7 +235,6 @@ settings.ini
 
 class_config.php
 /import_tables.php
-/Connections/roo.php
 widgets/autocomplete/img/
 
 *.at
@@ -258,5 +242,13 @@ widgets/autocomplete/img/
 *.len
 
 *.keystream
+PHPMailer/examples/yandex.php
+/img/sign.png
 
-.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata_i
+install.php
+
+.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.values.at
+
+.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata
+
+.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml

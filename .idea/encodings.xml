@@ -3,6 +3,7 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="windows-1251">
     <file url="file://$PROJECT_DIR$/Connections/roo.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/PHPMailer/examples/gmail.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_config.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_db.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_doc.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_docum.php" charset="UTF-8" />
@@ -20,6 +21,7 @@
     <file url="file://$PROJECT_DIR$/form_kontlist.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_main.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_nomen.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_order.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_org.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_orglist.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_part.php" charset="UTF-8" />

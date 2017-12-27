@@ -999,8 +999,10 @@ class Part
                 $price = round((double)$_POST['price'],2);
                 if(isset($_POST['nds_yn']))
                     if($_POST['nds_yn']==1)
-                        $price = round($price/round(1+(double)$_POST['nds'],2),2);
-
+                    {
+                        $nds = func::rnd($_POST['nds'])*100;
+                        $price = round($price*100/(100+$nds),2);
+                    }
                 $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'],$_POST['data_nach']);
                 $event = true;
             }
@@ -1011,8 +1013,10 @@ class Part
                 $price = round((double)$_POST['price'],2);
                 if(isset($_POST['nds_yn']))
                     if((int)$_POST['nds_yn']==1)
-                        $price = round($price/round(1+(double)$_POST['nds'],2),2);
-
+                    {
+                        $nds = func::rnd($_POST['nds'])*100;
+                        $price = round($price*100/(100+$nds),2);
+                    }
                 $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'],0, $_POST['price_or'],$_POST['data_nach']);
                 $event = true;
             }
