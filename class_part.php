@@ -919,12 +919,13 @@ class Part
      */
     public static function getPartSumma($rplan_row)
     {
-        $numb = func::rnd($rplan_row['numb']);
-        $price = func::rnd($rplan_row['price']);
-        $nds = func::rnd($rplan_row['nds']);
-        $price_wnds = func::rnd($price*(1+$nds));
-        $summ_nds = func::rnd($price_wnds*$numb);
-        return $summ_nds;
+        $numb = func::rnd($rplan_row['numb']);      // Количество
+        $price = func::rnd($rplan_row['price']);    // Цена без НДС
+        $nds = func::rnd($rplan_row['nds'])*100;    // Ставка НДС
+        $summ = $price*$numb;                       // Сумма без НДС
+        $summ_nds = func::rnd($summ*$nds/100); // Сумма НДС
+        $summ_with_nds = $summ+$summ_nds;           // Итоговая сумма
+        return $summ_with_nds;
     }
 //
 //-------------------------------------------------------------------------

@@ -152,10 +152,11 @@ for ($i = 0; $i < $cnt; $i++) {
     else
         $modif = "";
 
-    $numb = func::rnd($row['numb']);
-    $summ = func::rnd(func::rnd($row['price']) * $numb);
-    $summ_with_nds = Part::getPartSumma($row);
-    $summ_nds = func::rnd($summ_with_nds*18/118);
+    $numb = func::rnd($row['numb']);                            // Количество
+    $summ = func::rnd(func::rnd($row['price']) * $numb); // Сумма без НДС
+    $summ_with_nds = Part::getPartSumma($row);                  // Сумма партии с НДС
+    $nds = func::rnd($row['nds'])*100;                          // Ставка НДС
+    $summ_nds = func::rnd($summ*$nds/100);               // Сумма НДС
 
     $summ_str = func::Rub($summ);
     $price_str = func::Rub($row['price']);
