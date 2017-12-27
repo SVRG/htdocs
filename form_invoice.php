@@ -122,10 +122,6 @@ $Org->kod_org = $D->Data['kod_org'];
 echo "<p><h3>Счет №$nomer от $data_sost</h3></p>";
 echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " .$adres;
-
-$rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
-$cnt = $db->cnt;
-
 echo "<table border='1' cellspacing='0' cellpadding='3'>";
 echo "<tr>
             <td>№</td>
@@ -141,6 +137,12 @@ $total_nds = 0;
 $total_summ = 0;
 $total_summ_with_nds = 0;
 
+$rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
+$cnt = $db->cnt;
+
+if($cnt==0)
+    exit("Нет партий");
+
 for ($i = 0; $i < $cnt; $i++) {
     $row = $rows[$i];
     $name = $row['name'];
@@ -149,10 +151,11 @@ for ($i = 0; $i < $cnt; $i++) {
         $modif = "($modif)";
     else
         $modif = "";
-    $numb = round($row['numb'],2);
-    $summ = round($row['price'] * $row['numb'],2);
-    $summ_nds = round($summ * round($row['nds'],2),2);
-    $summ_with_nds = $summ + $summ_nds;
+
+    $numb = func::rnd($row['numb']);
+    $summ = func::rnd(func::rnd($row['price']) * $numb);
+    $summ_with_nds = Part::getPartSumma($row);
+    $summ_nds = func::rnd($summ_with_nds*18/118);
 
     $summ_str = func::Rub($summ);
     $price_str = func::Rub($row['price']);

@@ -907,7 +907,6 @@ class Part
     public static function getPriceNDS($rplan_row)
     {
         $price = round(self::getPrice($rplan_row)*(1+round((double)$rplan_row['nds'],2)),2);
-
         return $price;
     }
 //
@@ -920,9 +919,12 @@ class Part
      */
     public static function getPartSumma($rplan_row)
     {
-        $summ = round($rplan_row['price'] * $rplan_row['numb'],2);
-        $summ_nds = round($summ * round($rplan_row['nds'],2),2);
-        return ($summ + $summ_nds);
+        $numb = func::rnd($rplan_row['numb']);
+        $price = func::rnd($rplan_row['price']);
+        $nds = func::rnd($rplan_row['nds']);
+        $price_wnds = func::rnd($price*(1+$nds));
+        $summ_nds = func::rnd($price_wnds*$numb);
+        return $summ_nds;
     }
 //
 //-------------------------------------------------------------------------
