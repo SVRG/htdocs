@@ -16,6 +16,7 @@
         <li><a href="../form_orglist.php">Организации</a>
             <ul>
                 <li><a href="../form_orglist.php?dolg">Должники</a></li>
+                <li><a href="../form_orglist.php?pays">Рейтинг <?php echo date("Y"); ?></a></li>
             </ul>
         </li>
         <li><a href="../form_nomen.php">Номенклатура</a></li>
