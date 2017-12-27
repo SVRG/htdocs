@@ -10,8 +10,8 @@ class Part
     public $Item; // Связанный объект Изделие партии
     public $Parts;// Партии Договора
     public $Data; // Данные по партии
-    public $price_or = 1; // Вкл 1/Выкл 0 - ориентировочную цену
-    public $data_nach = 1; // Вкл 1/Выкл 0 - дата начала работ
+    public $price_or = 0; // Вкл 1/Выкл 0 - ориентировочную цену
+    public $data_nach = 0; // Вкл 1/Выкл 0 - дата начала работ
     public $kod_org_main = 0; // Код основной компании
     //-------------------------------------------------------------------------
     /**
@@ -96,7 +96,7 @@ class Part
             if($row['modif']!='')
                 $modif = ' (' . $row['modif'] . ')'; // Модификация
 
-            $numb = (double)$row['numb']; // Количество товара в партии
+            $numb = round((double)$row['numb'],2); // Количество товара в партии
             $numb_otgruz = (double)$row['numb_otgruz']; // Количество отгруженного товара по партии
             $part_summa = self::getPartSumma($row);
 
@@ -493,16 +493,16 @@ class Part
 
         $part_summa = self::getPartSumma($rows[0]);
 
-        $raschet_summa = round($part_summa * $AVPr, 2); // Сумма расчета
+        $raschet_summa = round($part_summa * round((double)$AVPr,2), 2); // Сумма расчета
 
         $AVDate = func::Date_to_MySQL($AVDate);
         $kod_user = func::kod_user();
 
         $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$raschet_summa,'$AVDate',1,$kod_user)");
 
-        $ostatok = $part_summa - $raschet_summa;
+        $ostatok = $part_summa - $raschet_summa; // todo - при равенстве величин возвращает значение >0
 
-        if ($ostatok > 0) {
+        if ($ostatok >= 0.01) { // Защита от малых значений
             $data_postav = $rows[0]['data_postav'];
             $OKDate = Func::Date_to_MySQL($data_postav); // Дата окончательного расчета = дата поставки
             $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
@@ -670,6 +670,7 @@ class Part
             $price_or = $row['price_or'];
             $val = (int)$row['val'];
             $nds = (double)$row['nds'];
+            $data_nach_str = "";
 
             $nds_0 = "";
             if ($nds == 0) {
@@ -681,20 +682,19 @@ class Part
             {
                 $price_or_str = "<tr>
                                     <td>Цена ОР Без НДС</td>
-                                    <td><input  name='price_or' id='price_or' value='$price_or' /></td>
+                                    <td colspan='2'><input  name='price_or' id='price_or' value='$price_or' /></td>
                                   </tr>";
             }
 
             if($this->data_nach == 1)
             {
-                $data_nach = "";
-
+                $data_nach="";
                 if(!($row['data_nach']==NULL))
                     $data_nach = func::Date_from_MySQL($row['data_nach']);
 
                 $data_nach_str = "<tr>
                                     <td>Дата Начала</td>
-                                    <td>
+                                    <td colspan='2'>
                                       <input  name='data_nach' id='data_nach' value='$data_nach' />
                                     </td>
                                   </tr>";
@@ -710,53 +710,57 @@ class Part
             $E->kod_elem = $kod_elem;
         }
 
-        $res =
-            '<form id="form1" name="form1" method="post" action="">
-                <table border="0">
+        $res = /** @lang HTML */
+            "<form id='form1' name='form1' method='post' action=''>
+                <table border='0' cellspacing='0' width='100%'>
                   <tr>
-                    <td>Элемент</td>
-                    <td width="100%">' . $E->formSelList2() . '</td>
+                    <td width='100'>Элемент</td>
+                    <td colspan='2'>".$E->formSelList2()."</td>
                   </tr>
                   <tr>
                     <td>Модификация</td>
-                    <td><input  name="modif" id="modif" value="' . $modif . '" /></td>
+                    <td colspan='2'><input size='100' name='modif' id='modif' value='$modif'/></td>
                   </tr>
-                  '.$data_nach_str.'
+                  $data_nach_str
                   <tr>
                     <td>Дата</td>
-                    <td>
-                              <input  name="data_postav" id="data_postav" value="' . $data_postav . '" />
+                    <td colspan='2'>
+                         <input  name='data_postav' id='data_postav' value='$data_postav' />
+                     </td>
                   </tr>
                   <tr>
                     <td>Количество</td>
-                        <td><input  name="numb" id="numb" value="' . $numb. '" /></td>
+                        <td colspan='2'><input  name='numb' id='numb' value='$numb' /></td>
                   </tr>
-                  '.$price_or_str.'
+                  $price_or_str
                   <tr>
-                    <td>Цена без НДС</td>
-                    <td><input  name="price" id="price" value="' . $price . '" /></td>
+                    <td>Цена</td>
+                    <td  width='100'><input  name='price' id='price' value='$price' /></td>
+                    <td>
+                            <input type='radio' name='nds_yn' value='0' checked>без НДС<br>
+                            <input type='radio' name='nds_yn' value='1'>вкл. НДС<br>
+                    </td>                    
                   </tr>
                   <tr>
                        <td>НДС</td>
-                       <td>
-                            <input type="radio" name="nds" value="0.18" ' .$nds_18. '> 18%<br>
-                            <input type="radio" name="nds" value="0" '. $nds_0 .'> 0%<br>
+                       <td colspan='2'>
+                            <input type='radio' name='nds' value='0.18' $nds_18> 18%<br>
+                            <input type='radio' name='nds' value='0' $nds_0> 0%<br>
                        </td>
                   </tr>
                   <tr>
                    <td>Валюта</td>
-                       <td>
-                           <input type="radio" name="val" value="1" '.$rub_checked.'> RUR<br>
-                           <input type="radio" name="val" value="2" '. $usd_checked .'> USD<br>
-                           <input type="radio" name="val" value="3" '.$euro_checked.'> EURO<br>
+                       <td colspan='2'>
+                           <input type='radio' name='val' value='1' $rub_checked> RUR<br>
+                           <input type='radio' name='val' value='2' $usd_checked> USD<br>
+                           <input type='radio' name='val' value='3' $euro_checked> EURO<br>
                        </td>
                   </tr>
                 </table>
-
-            <input id="EditPartForm" type="hidden" value="1" name="'.$form_name.'"/>
-            <input type="submit" value="Сохранить" />
+            <input id='EditPartForm' type='hidden' value='1' name='$form_name'/>
+            <input type='submit' value='Сохранить' />
             <br>
-            </form>';
+            </form>";
 
         $res.= Func::Cansel(0);
         return $res;
@@ -908,7 +912,6 @@ class Part
     }
 //
 //-------------------------------------------------------------------------
-
     /**
      * // todo - нужно учитывать в какой валюте цена
      * Сумма партии
@@ -917,9 +920,9 @@ class Part
      */
     public static function getPartSumma($rplan_row)
     {
-        $price = self::getPriceNDS($rplan_row);
-        $part_summa = round((double)$rplan_row['numb']*$price,2);
-        return $part_summa;
+        $summ = round($rplan_row['price'] * $rplan_row['numb'],2);
+        $summ_nds = round($summ * round($rplan_row['nds'],2),2);
+        return ($summ + $summ_nds);
     }
 //
 //-------------------------------------------------------------------------
@@ -990,14 +993,24 @@ class Part
         if (isset($_POST['AddPart']))
             if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
             {
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'],$_POST['data_nach']);
+                $price = round((double)$_POST['price'],2);
+                if(isset($_POST['nds_yn']))
+                    if($_POST['nds_yn']==1)
+                        $price = round($price/round(1+(double)$_POST['nds'],2),2);
+
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'],$_POST['data_nach']);
                 $event = true;
             }
 
         if (isset($_POST['EditPart']))
             if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
             {
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'],0, $_POST['price_or'],$_POST['data_nach']);
+                $price = round((double)$_POST['price'],2);
+                if(isset($_POST['nds_yn']))
+                    if((int)$_POST['nds_yn']==1)
+                        $price = round($price/round(1+(double)$_POST['nds'],2),2);
+
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'],0, $_POST['price_or'],$_POST['data_nach']);
                 $event = true;
             }
 
@@ -1050,7 +1063,7 @@ class Part
             $pr = (double)$_POST['AVPr'];
             $pr = round($pr / 100, 2);
 
-            if ($pr > 0 and $pr <= 1) {
+            if ($pr > 0. and $pr <= 1.) {
                 $this->SetPayGraph($pr, $_POST['data']);
                 $event = true;
             }
@@ -1168,14 +1181,14 @@ class Part
      */
     public static function formPrice($rplan_row)
     {
-        $price = (double)$rplan_row['price'];
+        $price = round((double)$rplan_row['price'],2);
         $price_str = func::Rub($price);
 
         if ($price == 0)
             $price_str = "";
 
         if ((double)$rplan_row['price_or'] > 0.)
-            $price_str = "<b>" . Func::Rub((double)$rplan_row['price_or']) . "</b><br>" . $price_str;
+            $price_str = "<b>" . Func::Rub(round((double)$rplan_row['price_or'],2)) . "</b><br>" . $price_str;
 
         return $price_str;
     }
