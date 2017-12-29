@@ -48,6 +48,12 @@ if (isset($_POST['login'],$_POST['password'])) {
 
         $loginStrGroup = $row['rt'];
         $kod_user = $row['kod_user'];
+        $conf = new config();
+        if($_SERVER['HTTP_HOST']==$conf->host and $kod_user!=1)
+        {
+            header("Location: " . $MM_redirectLoginFailed);
+            exit("Fail");
+        }
 
         //declare session variables and assign them
         $_SESSION['MM_Username'] = $loginUsername; // имя пользователя
