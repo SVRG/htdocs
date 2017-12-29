@@ -59,6 +59,9 @@ Docum::Events();
 
                 echo $Org->Data['poisk'];
 
+                if($_SESSION['MM_UserGroup']==="admin")
+                    echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Удалить', 'DelOrg',"kod_org_del",$Org->kod_org);
+
                 // SAve-------------------------
                 $Edit = 0;
                 if (isset($_POST['Flag']))
