@@ -127,7 +127,6 @@ class Part
 
             // Цена --------------------------------------------------------------------------------------
             $price_str = self::formPrice($row);
-            $price = self::getPrice($row);
 
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
@@ -200,7 +199,7 @@ class Part
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
                       <td width="120" >' . $price_str. $Val . '</td>
-                      <td width="120" >' . Func::Rub($price * (1 + (double)$row['nds'])) . $Val .  '</td>
+                      <td width="120" >' . Func::Rub(self::getPriceWithNDS($row)) . $Val .  '</td>
                       <td width="120">' . Func::Rub($part_summa) . $Val . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
@@ -493,7 +492,7 @@ class Part
 
         $part_summa = self::getPartSumma($rows[0]);
 
-        $raschet_summa = round($part_summa * round((double)$AVPr,2), 2); // Сумма расчета
+        $raschet_summa = func::rnd($part_summa * round((double)$AVPr,2)); // Сумма расчета
 
         $AVDate = func::Date_to_MySQL($AVDate);
         $kod_user = func::kod_user();
@@ -886,28 +885,31 @@ class Part
 //-------------------------------------------------------------------------
 
     /**
-     * Цена партии
+     * Цена
      * @param $rplan_row
      * @return float
      */
     public static function getPrice($rplan_row)
     {
-        $price = round((double)$rplan_row['price'],2);
+        $price = func::rnd($rplan_row['price']);
         if($price==0.) // Берем ориентировочную
-            $price = round((double)$rplan_row['price_or'],2);
+            $price = func::rnd($rplan_row['price_or']);
         return $price;
     }
 //-------------------------------------------------------------------------
 
     /**
-     * Цена партии с НДС
+     * Цена с НДС
      * @param $rplan_row
      * @return float
      */
-    public static function getPriceNDS($rplan_row)
+    public static function getPriceWithNDS($rplan_row)
     {
-        $price = round(self::getPrice($rplan_row)*(1+round((double)$rplan_row['nds'],2)),2);
-        return $price;
+        $price = self::getPrice($rplan_row);
+        $nds = func::rnd($rplan_row['nds']);
+        $summ_nds = $price*$nds;
+        $price_with_nds = $price+$summ_nds;
+        return $price_with_nds;
     }
 //
 //-------------------------------------------------------------------------
@@ -921,9 +923,9 @@ class Part
     {
         $numb = func::rnd($rplan_row['numb']);      // Количество
         $price = func::rnd($rplan_row['price']);    // Цена без НДС
-        $nds = func::rnd($rplan_row['nds'])*100;    // Ставка НДС
+        $nds = func::rnd($rplan_row['nds']);        // Ставка НДС
         $summ = $price*$numb;                       // Сумма без НДС
-        $summ_nds = func::rnd($summ*$nds/100); // Сумма НДС
+        $summ_nds = func::rnd($summ*$nds);   // Сумма НДС
         $summ_with_nds = $summ+$summ_nds;           // Итоговая сумма
         return $summ_with_nds;
     }
@@ -1188,14 +1190,14 @@ class Part
      */
     public static function formPrice($rplan_row)
     {
-        $price = round((double)$rplan_row['price'],2);
+        $price = func::rnd($rplan_row['price']);
         $price_str = func::Rub($price);
 
         if ($price == 0)
             $price_str = "";
 
-        if ((double)$rplan_row['price_or'] > 0.)
-            $price_str = "<b>" . Func::Rub(round((double)$rplan_row['price_or'],2)) . "</b><br>" . $price_str;
+        if (func::rnd((double)$rplan_row['price_or']) >= 0.01)
+            $price_str = "<b>" . Func::Rub(func::rnd($rplan_row['price_or'])) . "</b><br>" . $price_str;
 
         return $price_str;
     }
@@ -1203,7 +1205,7 @@ class Part
 //
     /**
      * @param $kod_part
-     * @return bool
+     * @return array|bool
      */
     public static function getData($kod_part)
     {
