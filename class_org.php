@@ -182,7 +182,10 @@ class Org
     public function getData()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM org WHERE del=0 AND kod_org=$this->kod_org");
+        $rows = $db->rows("SELECT * FROM org WHERE kod_org=$this->kod_org");
+        if($db->cnt==0)
+            return;
+
         $this->Data = $rows[0];
         return;
     }
@@ -313,9 +316,9 @@ class Org
             $tab_row = /** @lang HTML */
                 "<tr>
                       <td></td>
-                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $poisk </a></td>
-                      <td><a href=\"form_org.php?kod_org= $kod_org \">$nazv_krat</a></td>
-                      <td><a href=\"form_org.php?kod_org= $kod_org \"> $nazv_poln_str </a></td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$poisk</a></td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_krat</a></td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str</a></td>
                       <td> $www </td>
 		            </tr>";
             if ($echo)
@@ -522,7 +525,22 @@ class Org
         } else
             echo "Ошибка: Не задан ID адреса";
     }
+//----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Удаление организации
+     * @param $kod_org
+     */
+    public function Delete($kod_org)
+    {
+        $db = new Db();
+
+        if (isset($kod_org)) {
+            $db->query("UPDATE org SET del=1 WHERE kod_org=$kod_org");
+
+        } else
+            exit("Ошибка: Не задан ID организации");
+    }
 //----------------------------------------------------------------------
 //
 
@@ -794,6 +812,11 @@ class Org
             {
                 $this->AddOrgLink($this->kod_org,$_POST['kod_org_slave'],$_POST['prim']);
                 $event = true;
+            }
+            elseif($_POST['Flag']=='DelOrg' and isset($_POST['kod_org_del']))
+            {
+                $this->Delete($_POST['kod_org_del']);
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_orglist.php");
             }
         }
 
