@@ -15,6 +15,7 @@ class Doc
     public $kod_dogovora = '';  // код_договора
     public $kod_org = '';       // код_организации (Заказчик)
     public $nazv_krat = '';     // краткое название организации из расшиернного запроса
+    private $mail = 1;
 
 //----------------------------------------------------------------------------------------------------------------------
     /**
@@ -1275,8 +1276,9 @@ class Doc
 
             $res .= "<option value='$kod_attr' $selected>$kod_type_attr - $value</option>\r\n";
         }
-        $res .= '</select>
-        <script type="text/javascript">
+        $res .= /** @lang HTML */
+            '</select>
+                <script type="text/javascript">
                         var kod_attr, $kod_attr;
     
                         $kod_attr = $("#kod_attr").selectize({
@@ -2023,18 +2025,21 @@ class Doc
         $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
 
         // Информирование по e-mail
-        $mail = new Mail();
-        $data = $this->getData($kod_dogovora);
-        $dog_nomer = $data['nomer'];
-        $kod_org = $data['kod_org'];
-        $nazv_krat = $data['nazv_krat'];
-        $summa_str = func::Rub($summa);
-        $host = $_SERVER['HTTP_HOST'];
-        $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
-        $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
-        $body .= "Сумма: $summa_str<br>";
-        $body .= "Примечание: $prim";
-        $mail->send_mail($body, "Оплата: $dog_nomer - $nazv_krat - $summa_str");
+        if($this->mail==1)
+        {
+            $mail = new Mail();
+            $data = $this->getData($kod_dogovora);
+            $dog_nomer = $data['nomer'];
+            $kod_org = $data['kod_org'];
+            $nazv_krat = $data['nazv_krat'];
+            $summa_str = func::Rub($summa);
+            $host = $_SERVER['HTTP_HOST'];
+            $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
+            $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
+            $body .= "Сумма: $summa_str<br>";
+            $body .= "Примечание: $prim";
+            $mail->send_mail($body, "Оплата: $dog_nomer - $nazv_krat - $summa_str");
+        }
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2482,6 +2487,8 @@ class Doc
         $rows = $db->rows("SELECT MAX(nomer) AS nomer_max
                                     FROM view_scheta_dogovory_all
                                     WHERE data_sost>'$year-01-01'");
+        $nomer = 1;
+
         if($db->cnt==0)
             return "1/".date("y");
 
