@@ -654,6 +654,26 @@ class Part
 
         $E = new Elem();
 
+        if($this->price_or == 1) // Форма Ориентировочной цены
+        {
+            $price_or_str = "<tr>
+                                    <td>Цена ОР Без НДС</td>
+                                    <td colspan='2'><input  name='price_or' id='price_or' value='' /></td>
+                                  </tr>";
+        }
+
+        if($this->data_nach == 1) // Форма Дата начала
+        {
+            $data_nach=func::NowE();
+
+            $data_nach_str = "<tr>
+                                    <td>Дата Начала</td>
+                                    <td colspan='2'>
+                                      <input  name='data_nach' id='data_nach' value='$data_nach' />
+                                    </td>
+                                  </tr>";
+        }
+
         if($Edit==1) {
 
             $db = new Db();
@@ -878,7 +898,7 @@ class Part
         $summ_plat = $this->getSummPlatByPart();
 
         if($summ_plat >0 and $part_summa >0)
-            $res = (int)($summ_plat / $part_summa * 100);
+            $res = func::Proc( $summ_plat / $part_summa);
 
         return $res;
     }
@@ -922,7 +942,7 @@ class Part
     public static function getPartSumma($rplan_row)
     {
         $numb = func::rnd($rplan_row['numb']);      // Количество
-        $price = func::rnd($rplan_row['price']);    // Цена без НДС
+        $price = self::getPrice($rplan_row);    // Цена без НДС
         $nds = func::rnd($rplan_row['nds']);        // Ставка НДС
         $summ = $price*$numb;                       // Сумма без НДС
         $summ_nds = func::rnd($summ*$nds);   // Сумма НДС
