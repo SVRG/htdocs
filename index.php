@@ -25,10 +25,11 @@ if (isset($_POST['login'],$_POST['password'])) {
     $salt = $row['salt'];
 
     /*
-        if($salt=="")// todo - при первом входе обновить пароли!
+        if($salt=="")// todo - при первом входе обновить пароли! Придумать как сдалать через админку
             {
                 //generate a random salt to use for this account
-                $salt = bin2hex(mcrypt_create_iv(16));
+                //$salt = bin2hex(mcrypt_create_iv(16));
+                $salt = bin2hex(random_bytes(16));
                 $saltedPW =  $password . $salt;
                 $hashedPW = hash('sha256', $saltedPW);
                 $query =
