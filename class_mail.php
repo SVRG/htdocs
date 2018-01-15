@@ -23,15 +23,13 @@ class Mail
      */
     public function __construct()
     {
-        $config = new config();
-
-        $this->gmail_login = $config->gmail_login;
-        $this->gmail_pass = $config->gmail_pass;
-        $this->yandex_login = $config->yandex_login;
-        $this->yandex_pass = $config->yandex_pass;
-        $this->from_adress = $config->from_address;
-        $this->from_name = $config->from_name;
-        $this->to_adress = $config->to_adress;
+        $this->gmail_login = config::$gmail_login;
+        $this->gmail_pass = config::$gmail_pass;
+        $this->yandex_login = config::$yandex_login;
+        $this->yandex_pass = config::$yandex_pass;
+        $this->from_adress = config::$from_address;
+        $this->from_name = config::$from_name;
+        $this->to_adress = config::$to_adress;
     }
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -27,15 +27,14 @@ class Db
      */
     public function __construct()
     {
-        $config = new config();
-        $this->config = $config->mysql_config;
+        $this->config = config::$mysql_config;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Connect to the database
      *
-     * @return mysqli MySQLi object instance on success / bool false on failure
+     * @return mysqli|bool MySQLi object instance on success / bool false on failure
      */
     public function connect()
     {
@@ -48,7 +47,7 @@ class Db
         // If connection was not successful, handle the error
         if (self::$connection === false) {
             // Handle error - notify administrator, log to a file, show an error screen, etc.
-            //return false;
+            return false;
         }
         return self::$connection;
     }

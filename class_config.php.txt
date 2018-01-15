@@ -1,0 +1,24 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: svrg
+ * Date: 17/08/17
+ * Time: 15:04
+ */
+
+class config
+{
+    public static $gmail_login = "user1@gmail.com";
+    public static $gmail_pass = "12345";
+    public static $yandex_login = "user1@yandex.ru";
+    public static $yandex_pass = "12345";
+    public static $from_address = "MyCompany@yandex.ru";
+    public static $from_name = "MyCompany";
+    public static $to_adress = array("user1@mail.com", "user2@mail.com"); // Список рассылки
+    public static $mysql_config = array("username"=>"root","password"=>"12345", "dbname"=>"mydatabase","host"=>"localhost");
+    public static $kod_org_main = 1234; // Код основной компании
+    public static $invoice_sign_gd = "User 1"; // Подпись ГД
+    public static $invoice_sign_gb = "User 2"; // Подпись ГБ
+    public static $host = "localhost"; // С этого адреса доступ только для admin
+    public static $dogovor_marker = "MyCompDoc"; // Эти символы должны быть в договоре
+}

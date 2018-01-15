@@ -17,9 +17,6 @@ $D->getData();
 $nomer = $D->Data['nomer'];
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
-$conf = new config();
-//$kod_org_main = $conf->kod_org_main;
-
 $Isp = new Org();
 $Isp->kod_org = $D->Data['kod_ispolnit'];
 echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
@@ -192,12 +189,16 @@ echo "<tr><th colspan='8' align='left'>В случае увеличения ку
 echo "</table>";
 echo "<br>";
 if(isset($_GET['p'])){
+
+    $invoice_sign_gd = config::$invoice_sign_gd;
+    $invoice_sign_gb = config::$invoice_sign_gb;
+
     echo "<br><br>";
     echo "<table border='0' cellpadding='10'>
             <tr>
                 <td>Генеральный директор</td>
                 <td> _______________ </td>
-                <td>$conf->invoice_sign_gd</td>
+                <td>$invoice_sign_gd</td>
             </tr>
             <tr>
                 <td>МП</td>
@@ -207,7 +208,7 @@ if(isset($_GET['p'])){
             <tr>
                 <td>Главный бухгалтер</td>
                 <td>_______________ </td>
-                <td>$conf->invoice_sign_gb</td>
+                <td>$invoice_sign_gb</td>
             </tr>";
 }
 else

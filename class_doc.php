@@ -37,8 +37,7 @@ class Doc
     static public function formDocByElem($kod_elem)
     {
         $db = new Db();
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+        $kod_org_main = config::$kod_org_main;
         // Открытые
         $rows = $db->rows("SELECT
                                       *
@@ -168,8 +167,7 @@ class Doc
                     <th>Оплачено</th>
                   </tr>";
 
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+        $kod_org_main = config::$kod_org_main;
 
         for ($i = 0; $i < $cnt; $i++) { //
             // todo - Проверить пропуски
@@ -330,8 +328,7 @@ class Doc
                     $ind_row = " bgcolor='#ffaaa0'";
             }
 
-            $conf = new config();
-            $kod_org_main = $conf->kod_org_main;
+            $kod_org_main = config::$kod_org_main;
 
             $ostatok_str = ""; // Остаток отгрузки
             // Для исходящих договоров
@@ -528,8 +525,7 @@ class Doc
             }
 
             $ISP = '';
-            $conf = new config();
-            $kod_org_main = $conf->kod_org_main;
+            $kod_org_main = config::$kod_org_main;
             if ($this->kod_org == $kod_org_main) {
                 $ISP = '<tr>
                             <th >Исполнитель</th>
@@ -593,7 +589,6 @@ class Doc
      */
     public function formAddEdit($Edit = 0)
     {
-        $nomer = $this->getNextSchetNomer();
         $data_sost = Func::NowE();
         $kod_org = $this->kod_org;
         $FormName = "formAdd";
@@ -605,8 +600,8 @@ class Doc
             $nomer = $this->Data['nomer'];
             $data_sost = Func::Date_from_MySQL($this->Data['data_sost']);
             $kod_org = $this->Data['kod_org'];
-            $conf = new config();
-            $kod_org_main = $conf->kod_org_main;
+
+            $kod_org_main = config::$kod_org_main;
             if ($kod_org == $kod_org_main) {
                 $zakup_checked = "checked";
                 $posav_checked = "";
@@ -615,6 +610,8 @@ class Doc
 
             $FormName = "formEdit";
         }
+        else
+            $nomer = "NEXT"; // Запрашиваем следующий номер
 
         $res = /** @lang HTML */
             '<form id="form1" name="form1" method="post" action="">
@@ -677,7 +674,6 @@ class Doc
 
         $this->Data = $rows[0];
         $this->kod_org = $this->Data['kod_org'];
-        $this->nomer = $this->Data['nomer'];
         $this->nazv_krat = $this->Data['nazv_krat'];
 
         return $this->Data;
@@ -707,8 +703,8 @@ class Doc
      */
     public function formRPlan($VN = 0)
     {
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
 
         if ($VN == 0) //Если договор поставки
             $sql = /** @lang SQL */
@@ -748,8 +744,8 @@ class Doc
      */
     public function formRPlanOplach()
     {
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
 
         $sql = /** @lang SQL */
             "SELECT
@@ -798,8 +794,8 @@ class Doc
      */
     public function formRPlanNeOplach()
     {
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
         $sql = /** @lang SQL */
             "SELECT
                       view_rplan.kod_dogovora,
@@ -878,8 +874,8 @@ class Doc
         $summ_numb_payed = 0; // Сумма оплаченных товаров
         $summ_total = 0; // Сумма количества по всем партиям
 
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
 
         // Формирование плана
         for ($i = 0; $i < $cnt; $i++) {
@@ -1174,8 +1170,8 @@ class Doc
     public function formDocsOpen($VN = 0)
     {
         $db = new Db();
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
         $and = "kod_ispolnit=$kod_org_main";
         if ($VN == 1)
             $and = "kod_org=$kod_org_main";
@@ -1467,8 +1463,8 @@ class Doc
     {
         $c = new Kontakt();
         $c->kod_dogovora = $this->kod_dogovora;
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
         // Если организация NVS
         if ($this->kod_org != $kod_org_main)
             $c->kod_org = $this->kod_org;
@@ -1509,8 +1505,8 @@ class Doc
             return "";
 
         //$res = 'Количество Записей: ' . $cnt . '<br>';
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
 
         $res = '<table border=0 cellspacing=0 cellpadding=0 width="50%">';
         $res .= '<tr bgcolor="#CCCCCC">
@@ -1665,7 +1661,7 @@ class Doc
 
         $start_data = date('Y-m-01');
 
-        if ($Month > 0)
+        if ((int)$Month > 0)
             $start_data = date("Y-$Month-01");
 
         $db = new Db();
@@ -1864,9 +1860,15 @@ class Doc
         $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
         $kod_user = func::kod_user();
+
+        $this->getData();
+        $nomer = $this->Data['nomer']." copy";
+        if($this->Data['kod_ispolnit']==config::$kod_org_main and (stripos($nomer,config::$dogovor_marker)===false))
+            $nomer = $this->getNextSchetNomer();
+
         $db->query(/** @lang SQL */
             "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user) 
-                      SELECT CONCAT(dogovory.nomer,' copy'),NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
+                      SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
                       FROM dogovory
                       WHERE kod_dogovora=$kod_dogovora");
         $kod_dogovora_new = $db->last_id;
@@ -1901,10 +1903,12 @@ class Doc
         $data_sost = func::Date_to_MySQL($data_sost);
         $kod_user = func::kod_user();
         if (!isset($kod_ispolnit)) {
-            $conf = new config();
-            $kod_ispolnit = $conf->kod_org_main;
+
+            $kod_ispolnit = config::$kod_org_main;
         }
 
+        if($nomer==="NEXT" and $kod_ispolnit==config::$kod_org_main)
+            $nomer = self::getNextSchetNomer();
 
         $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user)";
 
@@ -1921,8 +1925,8 @@ class Doc
     public function Events()
     {
         $event = false;
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
 
         if (isset($_POST['formAdd'])) {
             if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['doc_type'])) {
@@ -2057,6 +2061,9 @@ class Doc
 
         if (!isset($prim)) $prim = '-';
 
+        if($nomer==="NEXT")
+            $nomer = doc::getNextSchetNomer();
+
         $db = new Db();
         $data = func::Date_to_MySQL($data);
         $kod_user = func::kod_user();
@@ -2105,8 +2112,8 @@ class Doc
         $kontakt->kod_dogovora = $this->kod_dogovora;
 
         $kod_org = $this->kod_org;
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
         if ($kod_org == $kod_org_main) {
             $this->getData();
             $kod_org = $this->Data['kod_ispolnit'];
@@ -2208,9 +2215,12 @@ class Doc
         $db = new Db();
         $kod_user = func::kod_user();
         if ($kod_ispolnit == 0) {
-            $conf = new config();
-            $kod_ispolnit = $conf->kod_org_main;
+
+            $kod_ispolnit = config::$kod_org_main;
         }
+
+        if($nomer==="NEXT" and $kod_ispolnit==config::$kod_org_main)
+            $nomer = self::getNextSchetNomer();
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
@@ -2256,7 +2266,7 @@ class Doc
      */
     public function formAddSchet()
     {
-        $nomer = $this->getNextSchetNomer();
+        $nomer = "NEXT";
         $summa = self::getSummaDogovora($this->kod_dogovora);
         $this->getData();
         $prim = "Оплата по договору/счету №".$this->Data['nomer']." от ".func::Date_from_MySQL($this->Data['data_sost']);
@@ -2396,8 +2406,8 @@ class Doc
      */
     public function formProduction($kod_elem_sub = 1002)
     {
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+
+        $kod_org_main = config::$kod_org_main;
         $sql = /** @lang SQL */
             "SELECT
                       view_rplan.kod_dogovora,
@@ -2484,19 +2494,18 @@ class Doc
     {
         $db = new Db();
         $year = date('Y');
-        $rows = $db->rows("SELECT MAX(nomer) AS nomer_max
-                                    FROM view_scheta_dogovory_all
-                                    WHERE data_sost>'$year-01-01'");
-        $nomer = 1;
-
+        $rows = $db->rows("SELECT MAX(value) AS value
+                                    FROM indexes
+                                    WHERE time_stamp>'$year-01-01'");
         if($db->cnt==0)
             return "1/".date("y");
+        $value = (int)$rows['0']['value']+1;
+        $nomer = $value."/".date("y");
 
-        if(explode('-',$rows[0]['nomer_max']))
-        {
-            $nomer = (int)explode('/',$rows[0]['nomer_max'])[0]+1;
-            $nomer.=date("y");
-        }
+        $kod_user = func::kod_user();
+
+        $db->query(/** @lang MySQL */
+            "INSERT INTO indexes(value, type, source_table, kod_user) VALUES($value,1,1,$kod_user);");
 
         return $nomer;
     }
