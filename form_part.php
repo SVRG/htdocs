@@ -12,21 +12,18 @@ include_once("class_doc.php");
 
 // todo - переделаль в нормальный вид
 $kod_part = 0;
-if (!isset($_GET['kod_part']))
-{
-    if(!isset($_GET['kod_dogovora']))
+if (!isset($_GET['kod_part'])) {
+    if (!isset($_GET['kod_dogovora']))
         exit("Не задан Код партии и договора");
-    else
-    {
-        $kod_part=Part::getFirstPartKod($_GET['kod_dogovora']);
+    else {
+        $kod_part = Part::getFirstPartKod($_GET['kod_dogovora']);
     }
-}
-else
-    $kod_part=$_GET['kod_part'];
+} else
+    $kod_part = $_GET['kod_part'];
 
 // Если код передан в форме
-if(isset($_POST['kod_part'])) {
-    if($_POST['kod_part']!=0)
+if (isset($_POST['kod_part'])) {
+    if ($_POST['kod_part'] != 0)
         $kod_part = $_POST['kod_part'];
 }
 
@@ -66,78 +63,49 @@ include_once("header.php");
 <div class="style1" id="pagecell1">
     <!--pagecell1-->
     <?php
-        $Dogovor->formDogovor();
+    $Dogovor->formDogovor();
 
-        if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+    if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
 
-            if (isset($_POST['Flag'])) {
+        if (isset($_POST['Flag'])) {
 
-                if ($_POST['Flag'] == 'AddNaklad')
-                    echo $Part->formPart(1); // Партия + Форма добавления накладной
-                else {
-                    echo $Part->formPart(0);
-                } // Партия
+            if ($_POST['Flag'] == 'AddNaklad')
+                echo $Part->formPart(1); // Партия + Форма добавления накладной
+            else {
+                echo $Part->formPart(0);
+            } // Партия
 
-                if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
-                    // Форма Редактирования партии
-                    if ($_POST['Flag'] == 'EditPartForm')
-                    {
-                        echo $Part->formAddEdit(1);
-                    }
-                    elseif ($_POST['Flag'] == 'AddPartForm')
-                        echo $Part->formAddEdit(0);
-                }
-            } else
-                echo $Part->formPart(0); // Партия
-
-            // График платежей
-            echo $Part->formPayGraph(true);
-
-            if (isset($_POST['Flag'])) {
-                // Форма для добавления Расчета
-                // Авторасчет
-                $dt = Func::NowE();
-                if ($_POST['Flag'] == 'AddAVOK') {
-                    echo "<form id='form1' name='form1' method='post' action=''>
-                              <table width='293' border='0'>
-                                    <tr>
-                                        <td width='105'>Процент АВ</td>
-                                            <td width='172'>
-                                            <span id='sprytextfield_AVPr'>
-                                                <input name='AVPr' type='text' id='text1' value='100'/>
-                                                <span class='textfieldRequiredMsg'>A value is required.</span>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Дата</td>
-                                        <td>
-                                            <span id='sprytextfield_data'>
-                                                <input type='text' name='data' id='data' value='$dt'/>
-                                                <span class='textfieldRequiredMsg'>A value is required.</span>
-                                                <span class='textfieldInvalidFormatMsg'>Invalid format.</span>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <input type='submit' name='button' id='button' value='Submit' />
-                                <input type='hidden' name='SubmitAddAVOK' value='1' />
-                          </form>";
-
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена');
-                }
-
+            if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
+                // Форма Редактирования партии
+                if ($_POST['Flag'] == 'EditPartForm') {
+                    echo $Part->formAddEdit(1);
+                } elseif ($_POST['Flag'] == 'AddPartForm')
+                    echo $Part->formAddEdit(0);
             }
-            echo $Dogovor->formParts(1);
-            echo '<br>';
-        } else {
-            echo $Part->formPayGraph(false);
-            if (isset($Err)) echo $Err;
+        } else
+            echo $Part->formPart(0); // Партия
+
+        // График платежей
+        echo $Part->formPayGraph(true);
+
+        if (isset($_POST['Flag'])) {
+            // Форма для добавления Расчета
+            // Авторасчет
+            if ($_POST['Flag'] == 'AddAVOK') {
+                echo $Part->formAddAVOK();
+            }
+
         }
-        ?>
+        echo $Dogovor->formParts(1);
+        echo '<br>';
+    } else {
+        echo $Part->formPayGraph(false);
+        if (isset($Err)) echo $Err;
+    }
+    ?>
 </div>
 <script type="text/javascript">
-    var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency",{isRequired: true});
+    var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency", {isRequired: true});
     var sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");
     var sprytextfield4 = new Spry.Widget.ValidationTextField("data", "date", {format: "dd.mm.yyyy", isRequired: true});

@@ -19,8 +19,7 @@ class Part
      */
     public function __construct()
     {
-        $conf = new config();
-        $this->kod_org_main = $conf->kod_org_main;
+        $this->kod_org_main = config::$kod_org_main;
     }
     //-------------------------------------------------------------------------
     /**
@@ -328,6 +327,50 @@ class Part
     }
 //--------------------------------------------------------------
 //
+    public function formAddAVOK()
+    {
+        $dt = Func::NowE();
+
+        $res = "<form id='form1' name='form1' method='post' action=''>
+                              <table width='293' border='0'>
+                                    <tr>
+                                        <td width='105'>Процент АВ</td>
+                                            <td width='172'>
+                                            <span id='sprytextfield_AVPr'>
+                                                <input name='AVPr' type='text' id='text1' value='100'/>
+                                                <span class='textfieldRequiredMsg'>A value is required.</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Дата</td>
+                                        <td>
+                                            <span id='sprytextfield_data'>
+                                                <input type='text' name='data' id='data' value='$dt'/>
+                                                <span class='textfieldRequiredMsg'>A value is required.</span>
+                                                <span class='textfieldInvalidFormatMsg'>Invalid format.</span>
+                                            </span>
+                                        </td>
+                                        <td>Дата ОК</td>
+                                        <td>
+                                            <span id='sprytextfield_data'>
+                                                <input type='text' name='data_ok' id='data_ok' value=''/>
+                                                <span class='textfieldRequiredMsg'>A value is required.</span>
+                                                <span class='textfieldInvalidFormatMsg'>Invalid format.</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <input type='submit' name='button' id='button' value='Submit' />
+                                <input type='hidden' name='SubmitAddAVOK' value='1' />
+                          </form>";
+
+        $res.= Func::Cansel();
+        return $res;
+    }
+
+//--------------------------------------------------------------
+//
     /**
      * Платежи по Расчету
      * @param $kod_rascheta
@@ -492,7 +535,7 @@ class Part
 
         $part_summa = self::getPartSumma($rows[0]);
 
-        $raschet_summa = func::rnd($part_summa * round((double)$AVPr,2)); // Сумма расчета
+        $raschet_summa = func::rnd($part_summa * func::rnd($AVPr)); // Сумма расчета
 
         $AVDate = func::Date_to_MySQL($AVDate);
         $kod_user = func::kod_user();
@@ -502,8 +545,12 @@ class Part
         $ostatok = $part_summa - $raschet_summa; // todo - при равенстве величин возвращает значение >0
 
         if ($ostatok >= 0.01) { // Защита от малых значений
-            $data_postav = $rows[0]['data_postav'];
-            $OKDate = Func::Date_to_MySQL($data_postav); // Дата окончательного расчета = дата поставки
+            $OKDate = $rows[0]['data_postav']; // Дата окончательного расчета = дата поставки
+
+            if(isset($_POST['data_ok']))
+                if(func::validateDate($_POST['data_ok']))
+                    $OKDate = func::Date_to_MySQL($_POST['data_ok']);
+
             $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
         }
     }
