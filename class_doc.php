@@ -1658,11 +1658,22 @@ class Doc
      */
     public function formCurrentMonthPays($Month = 0)
     {
-
         $start_data = date('Y-m-01');
 
-        if ((int)$Month > 0)
-            $start_data = date("Y-$Month-01");
+        $month = (int)$Month;
+        if ($month > 0)
+        {
+            if(isset($_GET['y']))
+            {
+                if((int)$_GET['y']>0)
+                {
+                    $Y = (int)$_GET['y'];
+                    $start_data = date("$Y-$Month-01");
+                }
+            }
+            else
+                $start_data = date("Y-$Month-01");
+        }
 
         $db = new Db();
 
@@ -1672,8 +1683,7 @@ class Doc
 
         if ($cnt == 0)
             return '';
-
-
+        
         $summ = 0; // Сумма по месяцу
 
         $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
