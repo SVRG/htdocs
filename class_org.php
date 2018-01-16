@@ -699,8 +699,7 @@ class Org
     public function formDolgOrg()
     {
         $db = new Db();
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+        $kod_org_main = config::$kod_org_main;
 
         $rows = $db->rows(/** @lang SQL */
             "SELECT
@@ -976,8 +975,7 @@ class Org
     {
         $db = new DB();
 
-        $conf = new config();
-        $kod_org_main = $conf->kod_org_main;
+        $kod_org_main = config::$kod_org_main;
 
         if(isset($_GET['y'])) {
             $year_g = (int)$_GET['y'];
