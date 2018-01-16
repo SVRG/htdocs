@@ -978,15 +978,18 @@ class Org
         $kod_org_main = config::$kod_org_main;
 
         if(isset($_GET['y'])) {
-            $year_g = (int)$_GET['y'];
-            if ($year_g>2000 and $year_g<3000)
-                $year = $year_g;
+            $year = (int)$_GET['y'];
         }
+        $year_next = $year+1;
+        if(isset($_GET['yn']))
+            $year_next = (int)$_GET['yn'];
+
         $rows = $db->rows("SELECT sum(plat.summa) AS summ, 
                                         view_dogovory_nvs.nazv_krat,
                                         kod_org
                                     FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
-                                    WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND kod_org<>$kod_org_main AND plat.del=0
+                                    WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND DATE(plat.`data`) < DATE('$year_next-01-01')
+                                          AND kod_org<>$kod_org_main AND plat.del=0
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
 
