@@ -705,6 +705,13 @@ class Doc
     {
 
         $kod_org_main = config::$kod_org_main;
+        $order_by = "numb DESC";
+
+        if(isset($_GET['order']))
+            if($_GET['order']=='data')
+            {
+                $order_by = "data_postav ASC";
+            }
 
         if ($VN == 0) //Если договор поставки
             $sql = /** @lang SQL */
@@ -716,7 +723,7 @@ class Doc
                       kod_ispolnit=$kod_org_main AND zakryt<>1 AND numb_ostat>0
                     ORDER BY 
                       shifr ASC,
-                      numb DESC";
+                      $order_by";
 
         else // Если внешних договор
             $sql = /** @lang SQL */
@@ -728,7 +735,7 @@ class Doc
                       kod_org=$kod_org_main AND zakryt<>1 AND numb_ostat>0
                     ORDER BY 
                       shifr ASC, 
-                      numb DESC";
+                      $order_by";
 
         $db = new Db();
         $rows = $db->rows($sql); // Массив данных
