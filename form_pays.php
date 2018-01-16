@@ -26,7 +26,7 @@ include_once "security.php";
         $D = new Doc();
 
         if(isset($_GET['m'])){
-            if((int)$_GET['m']>0 and (int)$_GET['m']<12)
+            if((int)$_GET['m']>0 and (int)$_GET['m']<=12)
                 echo $D->formCurrentMonthPays((int)$_GET['m']);
         }
         else
