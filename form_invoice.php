@@ -16,29 +16,6 @@ $D->kod_dogovora = (int)$_GET['kod_dogovora'];
 $D->getData();
 $nomer = $D->Data['nomer'];
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
-
-$Isp = new Org();
-$Isp->kod_org = $D->Data['kod_ispolnit'];
-echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
-$Isp->getData();
-
-if(isset($_GET['kod_scheta']))
-{
-$db = new Db();
-$kod_sceta = (int)$_GET['kod_scheta'];
-$rows = $db->rows(/** @lang MySQL */
-    "SELECT * FROM scheta WHERE kod_scheta=$kod_sceta");
-
-if($db->cnt>0)
-{
-    $row = $rows[0];
-    $nomer = $row['nomer'];
-    $data_sost = func::Date_from_MySQL($row['data']);
-}
-
-}
-
-echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
 ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -52,11 +29,13 @@ echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
                 font-size: medium;
             }
             body{
+                font-family: Arial, arial, sans-serif;
                 font-size: medium;
                 width: 790px;
             }
             @media print {
                 body{
+                    font-family: Arial, arial, sans-serif;
                     font-size: medium;
                     alignment: center;
                 }
@@ -79,7 +58,31 @@ echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
         </style>
     </head>
     <body>
+    <br><img src="<?php echo config::$logo_img?>" alt="<?php echo config::$from_name?>"/><br>
 <?php
+$Isp = new Org();
+$Isp->kod_org = $D->Data['kod_ispolnit'];
+echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
+$Isp->getData();
+
+if(isset($_GET['kod_scheta']))
+{
+    $db = new Db();
+    $kod_sceta = (int)$_GET['kod_scheta'];
+    $rows = $db->rows(/** @lang MySQL */
+        "SELECT * FROM scheta WHERE kod_scheta=$kod_sceta");
+
+    if($db->cnt>0)
+    {
+        $row = $rows[0];
+        $nomer = $row['nomer'];
+        $data_sost = func::Date_from_MySQL($row['data']);
+    }
+
+}
+
+echo "<br><b>ИНН". $Isp->Data['inn'] ." КПП".$Isp->Data['kpp']."</b><br>";
+
 $db = new Db();
 // Адрес Поставщика
 $rows = $db->rows(/** @lang MySQL */
