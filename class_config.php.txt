@@ -21,4 +21,6 @@ class config
     public static $invoice_sign_gb = "User 2"; // Подпись ГБ
     public static $host = "localhost"; // С этого адреса доступ только для admin
     public static $dogovor_marker = "MyCompDoc"; // Эти символы должны быть в договоре
+    public static $logo_img = "img/logo.png"; // Логотип компании
+    public static $comp_name_eng = "MyCompany"; // Название на английском
 }
