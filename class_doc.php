@@ -1683,7 +1683,7 @@ class Doc
 
         if ($cnt == 0)
             return '';
-        
+
         $summ = 0; // Сумма по месяцу
 
         $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
