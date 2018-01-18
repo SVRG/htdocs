@@ -590,12 +590,16 @@ class Org
 //
     /**
      * Оплаченная номенклатура по Договорам
+     * @param string $sql
      * @return string
      */
-    public function formOrgNomen()
+    public function formOrgNomen($sql="")
     {
         $db = new Db();
-        $rows = $db->rows(/** @lang SQL */
+        if($sql!="")
+            $rows = $db->rows($sql);
+        else
+            $rows = $db->rows(/** @lang SQL */
                 "SELECT view_rplan.kod_elem, 
                             view_rplan.name, 
                             sum(view_rplan.numb) AS summ_numb, 
@@ -984,12 +988,19 @@ class Org
         if(isset($_GET['yn']))
             $year_next = (int)$_GET['yn'];
 
+        $w_kod_org = "";
+        if(isset($_GET['kod_org']))
+        {
+            $kod_org = (int)$_GET['kod_org'];
+            $w_kod_org = " AND view_dogovory_nvs.kod_org=$kod_org ";
+        }
+
         $rows = $db->rows("SELECT sum(plat.summa) AS summ, 
                                         view_dogovory_nvs.nazv_krat,
                                         kod_org
                                     FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
                                     WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND DATE(plat.`data`) < DATE('$year_next-01-01')
-                                          AND kod_org<>$kod_org_main AND plat.del=0
+                                          AND kod_org<>$kod_org_main AND plat.del=0 $w_kod_org
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
 
@@ -1004,7 +1015,7 @@ class Org
             $row = $rows[$i];
             $res .= '<tr>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
-                        <td align="right">' . Func::Rub($row['summ']) . '</td>
+                        <td align="right"><a href="form_org_stat.php?kod_org=' . $row['kod_org'] . '&y=2017">' . Func::Rub($row['summ']) . '</a></td>
                      </tr>';
             $summ += $row['summ'];
         }
