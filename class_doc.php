@@ -751,6 +751,12 @@ class Doc
      */
     public function formRPlanOplach()
     {
+        $order_by = "numb DESC";
+        if(isset($_GET['order']))
+            if($_GET['order']=='data')
+            {
+                $order_by = "data_postav ASC";
+            }
 
         $kod_org_main = config::$kod_org_main;
 
@@ -785,7 +791,7 @@ class Doc
                       view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0
                     ORDER BY
                       shifr ASC,
-                      numb DESC";
+                      $order_by";
 
         $db = new Db();
         $rows = $db->rows($sql); // Массив данных
@@ -801,6 +807,13 @@ class Doc
      */
     public function formRPlanNeOplach()
     {
+
+        $order_by = "numb DESC";
+        if(isset($_GET['order']))
+            if($_GET['order']=='data')
+            {
+                $order_by = "data_postav ASC";
+            }
 
         $kod_org_main = config::$kod_org_main;
         $sql = /** @lang SQL */
@@ -834,7 +847,7 @@ class Doc
                       view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)
                     ORDER BY
                       shifr ASC,
-                      numb DESC";
+                      $order_by";
 
         $db = new Db();
         $rows = $db->rows($sql); // Массив данных
@@ -1131,14 +1144,23 @@ class Doc
     {
         $db = new Db();
 
+        $w_data_postav = "";
+        if(isset($_GET['y']))
+        {
+            $data_s = (int)$_GET['y']."-01-01";
+            $data_e = ((int)$_GET['y']+1)."-01-01";
+            $w_data_postav = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
+        }
+
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
         if (!isset($_POST['dogovory_all'])) {
+
             $sql = "SELECT 
                 * 
                 FROM 
                     view_rplan 
                 WHERE 
-                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0
+                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0 $w_data_postav
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
@@ -1153,7 +1175,7 @@ class Doc
                 FROM 
                     view_rplan 
                 WHERE 
-                    kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org
+                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) $w_data_postav
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
