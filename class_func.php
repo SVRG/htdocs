@@ -18,7 +18,9 @@ class Func
      */
     public static function DaysRem($Date)
     {
-        if (!isset($Date) or !self::validateDate($Date)) return 0;
+        if (!isset($Date) or !self::validateDate($Date,"Y-m-d"))
+            return 0;
+
         $now = new DateTime("now");
         $date = new DateTime($Date);
         $res = $now->diff($date)->format("%r%a");
