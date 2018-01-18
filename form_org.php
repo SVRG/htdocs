@@ -13,10 +13,10 @@ elseif (isset($_GET['kod_org']))
 $UserG = array('admin', 'oper', 'manager');
 
 include_once('class_org.php');
-$Org = new Org();
-$Org->kod_org = $kod_org;
-$Org->getData();
-$Org->Events();
+$org = new Org();
+$org->kod_org = $kod_org;
+$org->getData();
+$org->Events();
 
 
 $Kontakt = new Kontakt();
@@ -24,7 +24,7 @@ $Kontakt->kod_org = $kod_org;
 $Kontakt->Events();
 
 $Doc = new Doc();
-$Doc->kod_org = $Org->kod_org;
+$Doc->kod_org = $org->kod_org;
 $Doc->Events();
 
 Docum::Events();
@@ -35,7 +35,7 @@ Docum::Events();
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
-    <title><?php echo $Org->Data['nazv_krat']; ?></title>
+    <title><?php echo $org->Data['nazv_krat']; ?></title>
     <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
@@ -49,24 +49,24 @@ Docum::Events();
             <td width="502" valign="top" bgcolor="#ECEEFD"><?php
                 //---------------------------------------------------------------------------------
                 // Реквизиты
-                $nazv_krat = $Org->Data['nazv_krat'];
-                $nazv_poln = $Org->Data['nazv_poln'];
+                $nazv_krat = $org->Data['nazv_krat'];
+                $nazv_poln = $org->Data['nazv_poln'];
 
                 if ($nazv_krat != $nazv_poln)
-                    echo '<br><h1>' . $Org->getFormLink() . '</h1><br>' . $nazv_poln . '<br>';
+                    echo '<br><h1>' . $org->getFormLink() . '</h1><br>' . $nazv_poln . '<br>';
                 else
-                    echo '<br><h1>' . $Org->getFormLink() . '</h1><br>';
+                    echo '<br><h1>' . $org->getFormLink() . '</h1><br>';
 
-                echo $Org->Data['poisk'];
+                echo $org->Data['poisk'];
 
                 if($_SESSION['MM_UserGroup']==="admin")
-                    echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Удалить', 'DelOrg',"kod_org_del",$Org->kod_org);
+                    echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Удалить', 'DelOrg',"kod_org_del",$org->kod_org);
 
-                // SAve-------------------------
+                // Save-------------------------
                 $Edit = 0;
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'formAddEdit') {
-                        echo $Org->formAddEdit(1);
+                        echo $org->formAddEdit(1);
                         $Edit = 1;
                     }
 
@@ -78,7 +78,7 @@ Docum::Events();
 
                 // Задолженность
 
-                echo '<br>Задолженность: ' . $Org->getDolg();
+                echo '<br>Задолженность: ' . $org->getDolg();
 
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
@@ -87,16 +87,16 @@ Docum::Events();
                         <?php
 
                         // Документы
-                        echo '<br>' . $Org->Docum();
+                        echo '<br>' . $org->Docum();
 
                         // Связи
                         if (isset($_POST['Flag']))
                             if ($_POST['Flag'] == 'AddOrgLinkForm')
                             {
-                                echo $Org->formAddOrgLink();
+                                echo $org->formAddOrgLink();
                             }
                         echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Связь', 'AddOrgLinkForm');
-                        echo Org::formOrgLinks($Org->kod_org);
+                        echo Org::formOrgLinks($org->kod_org);
 
                         // Реквизиты
                         $Edit = 0;
@@ -105,7 +105,7 @@ Docum::Events();
                                 if ($_POST['Flag'] == 'SetRecv')
                                     $Edit = 1;
                         }
-                        $Org->formRecv($Edit);
+                        $org->formRecv($Edit);
 
                         if (in_array($_SESSION['MM_UserGroup'], $UserG))
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Изменить реквизиты', 'SetRecv');
@@ -120,7 +120,7 @@ Docum::Events();
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Адрес', 'AddOrgAdr');
                         }
 
-                        echo $Org->formAdressList($Add);
+                        echo $org->formAdressList($Add);
                         //---------------------------------------------------------------------------------
                         // Телефоны
                         $Add = 0;
@@ -128,7 +128,7 @@ Docum::Events();
                             if ($_POST['Flag'] == 'AddOrgPhone')
                                 $Add = 1;
 
-                        echo $Org->formPhones($Add);
+                        echo $org->formPhones($Add);
 
                         if (in_array($_SESSION['MM_UserGroup'], $UserG) and $Add != 1) {
                             echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Телефон', 'AddOrgPhone');
@@ -162,7 +162,7 @@ Docum::Events();
                 <div id="CollapsiblePanel3" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Номенклатура по Договорам</div>
                     <div class="CollapsiblePanelContent">
-                        <?php echo $Org->formOrgNomen(); ?>
+                        <?php echo $org->formOrgNomen(); ?>
                     </div>
                 </div>
             </td>
@@ -181,7 +181,7 @@ Docum::Events();
                                     echo $Doc->formAddEdit();
 
                         if($kod_org!=683) // Чтобы не выводить все договоры
-                            echo $Org->formDocs();
+                            echo $org->formDocs();
                         ?>
                     </div>
                 </div>
