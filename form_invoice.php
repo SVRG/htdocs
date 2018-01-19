@@ -72,6 +72,7 @@ $Isp->kod_org = $D->Data['kod_ispolnit'];
 echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
 $Isp->getData();
 
+$dogovor_nomer = "";
 if(isset($_GET['kod_scheta']))
 {
     $db = new Db();
@@ -84,6 +85,7 @@ if(isset($_GET['kod_scheta']))
         $row = $rows[0];
         $nomer = $row['nomer'];
         $data_sost = func::Date_from_MySQL($row['data']);
+        $dogovor_nomer = '<br>Договор: №'.$D->Data['nomer'].' от '.$D->Data['data_sost'];
     }
 
 }
@@ -129,6 +131,7 @@ $Org->kod_org = $D->Data['kod_org'];
 echo "<p><h3>Счет №$nomer от $data_sost</h3></p>";
 echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " .$adres;
+echo $dogovor_nomer;
 echo "<table border='1' cellspacing='0' cellpadding='3'>";
 echo "<tr>
             <td>№</td>
