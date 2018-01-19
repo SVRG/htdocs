@@ -1834,7 +1834,36 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_sklad");
+        $where = "";
+
+        // todo - вынести в функцию
+        if(isset($_GET['kod_org']))
+        {
+            $kod_org = (int)$_GET['kod_org'];
+            $where = " WHERE kod_org=$kod_org ";
+        }
+
+        if(isset($_GET['kod_elem']))
+        {
+            $kod_elem = (int)$_GET['kod_elem'];
+            if($where=="")
+                $where = " WHERE kod_elem=$kod_elem ";
+            else
+                $where.= " AND kod_elem=$kod_elem ";
+        }
+
+        if(isset($_GET['y']))
+        {
+            $y = (int)$_GET['y'];
+            $data_s = "$y-01-01";
+            $data_n = ($y+1)."-01-01";
+            if($where=="")
+                $where = " WHERE (data>='$data_s' AND data<'$data_n') ";
+            else
+                $where.= " AND (data>='$data_s' AND data<'$data_n') ";
+        }
+
+        $rows = $db->rows("SELECT * FROM view_sklad $where");
 
         $cnt = $db->cnt;
 
