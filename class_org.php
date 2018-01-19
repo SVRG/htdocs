@@ -971,14 +971,14 @@ class Org
 //-----------------------------------------------------------
 //
     /**
-     * Вывод списка организаций
-     * @param string $year
+     * Вывод списка организаций с суммами платежей в заданный год - $_GET['yn']
+     * @param bool $itog
      * @return string
      */
-    public function formOrgPays($year = "2017")
+    public function formOrgPays($itog=true)
     {
         $db = new DB();
-
+        $year = date("Y");
         $kod_org_main = config::$kod_org_main;
 
         if(isset($_GET['y'])) {
@@ -1003,8 +1003,12 @@ class Org
                                           AND kod_org<>$kod_org_main AND plat.del=0 $w_kod_org
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
-
-        $res = '<table><tr><td>Название</td><td>Сумма за период</td></tr>';
+        $year_p = $year-1;
+        $res = /** @lang HTML */
+            "<a href='form_orglist.php?pays&y=$year_p'>$year_p</a>
+            $year
+            <a href='form_orglist.php?pays&y=$year_next'>$year_next</a>
+                <table><tr><td>Название</td><td>Сумма за период</td></tr>";
 
         if ($db->cnt == 0)
             return '';
@@ -1015,12 +1019,13 @@ class Org
             $row = $rows[$i];
             $res .= '<tr>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
-                        <td align="right"><a href="form_org_stat.php?kod_org=' . $row['kod_org'] . '&y=2017">' . Func::Rub($row['summ']) . '</a></td>
+                        <td align="right"><a href="form_org_stat.php?kod_org=' . $row['kod_org'] . "&y=$year\">" . Func::Rub($row['summ']) . '</a></td>
                      </tr>';
             $summ += $row['summ'];
         }
         $res .= '</table>';
-        $res .= '<br>Сумма: ' . Func::Rub($summ);
+        if($itog)
+            $res .= '<br>Сумма: ' . Func::Rub($summ);
         return $res;
     }
 //-----------------------------------------------------------------
