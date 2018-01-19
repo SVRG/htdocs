@@ -7,19 +7,13 @@ class Part
 {
     public $kod_part=0;
     public $kod_dogovora;
-    public $Item; // Связанный объект Изделие партии
-    public $Parts;// Партии Договора
-    public $Data; // Данные по партии
-    public $price_or = 0; // Вкл 1/Выкл 0 - ориентировочную цену
-    public $data_nach = 0; // Вкл 1/Выкл 0 - дата начала работ
-    public $kod_org_main = 0; // Код основной компании
     //-------------------------------------------------------------------------
     /**
      * Part constructor.
      */
     public function __construct()
     {
-        $this->kod_org_main = config::$kod_org_main;
+
     }
     //-------------------------------------------------------------------------
     /**
@@ -103,7 +97,7 @@ class Part
             $ostatok = ""; // Строка для вывода остатка по отгрузке
             // Если договор входящий
             $numb_poluch = 0;
-            if($row['kod_ispolnit']!=$this->kod_org_main)
+            if($row['kod_ispolnit']!=config::$kod_org_main)
             {
                 $numb_poluch = $this->getNumbPoluch($row['kod_part']);
                 $ost = $numb - $numb_poluch;
@@ -116,7 +110,7 @@ class Part
 
             // Форма добавления накладной
             if ($AddNacl > 0) {
-                if ((int)$row['kod_org'] != $this->kod_org_main)
+                if ((int)$row['kod_org'] != config::$kod_org_main)
                     $nacl .= $this->formAddNacl($ost, 2); // Отгрузка
                 else
                     $nacl .= $this->formAddNacl($ost, 1); // Поступление
@@ -144,7 +138,7 @@ class Part
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
                 if ($ost != $numb) {
-                    if($row['kod_ispolnit']==$this->kod_org_main)
+                    if($row['kod_ispolnit']==config::$kod_org_main)
                         $ostatok = " (<abbr title=\"Осталось отгрузить $ost\">$ost</abbr>)<br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" />$numb_otgruz</abbr>";
                     else
                         $ostatok = " (<abbr title=\"Осталось получить $ost\">$ost</abbr>)<br><abbr title='Получено $numb_poluch'><img src=\"/img/in.gif\" height=\"14\" />$numb_poluch</abbr>";
@@ -701,7 +695,7 @@ class Part
 
         $E = new Elem();
 
-        if($this->price_or == 1) // Форма Ориентировочной цены
+        if(config::$price_or == 1) // Форма Ориентировочной цены
         {
             $price_or_str = "<tr>
                                     <td>Цена ОР Без НДС</td>
@@ -709,9 +703,9 @@ class Part
                                   </tr>";
         }
 
-        if($this->data_nach == 1) // Форма Дата начала
+        if(config::$data_nach == 1) // Форма Дата начала
         {
-            $data_nach=func::NowE();
+            $data_nach = func::NowE();
 
             $data_nach_str = "<tr>
                                     <td>Дата Начала</td>
@@ -744,7 +738,7 @@ class Part
                 $nds_18 = "";
             }
 
-            if($this->price_or == 1) // Форма Ориентировочной цены
+            if(config::$price_or == 1) // Форма Ориентировочной цены
             {
                 $price_or_str = "<tr>
                                     <td>Цена ОР Без НДС</td>
@@ -752,7 +746,7 @@ class Part
                                   </tr>";
             }
 
-            if($this->data_nach == 1)
+            if(config::$data_nach == 1)
             {
                 $data_nach="";
                 if(!($row['data_nach']==NULL))
