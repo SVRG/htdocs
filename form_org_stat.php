@@ -56,9 +56,13 @@ if(isset($_GET['y']))
                         ORDER BY summ_numb DESC
                       ";
 }
-echo "<br><b>Номенклатура по договорам:</b><br>".$org->formOrgNomen($sql);
-echo "<br><b>Сумма платежей:</b><br>".$org->formOrgPays();
+echo "<br><table width='50%'><tr><td><b>Номенклатура по договорам:</b></td></tr><tr><td>".$org->formOrgNomen($sql)."</td></tr></table>";
+echo "<br><b>Сумма платежей:</b><br>".$org->formOrgPays(false);
+echo "<br><b>Договоры:</b>";
 echo $org->formDocs();
+$doc = new Doc();
+$doc->kod_org = $kod_org;
+echo $doc->formSGPHistory();
 ?>
 </div>
 </body>
