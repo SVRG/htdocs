@@ -85,7 +85,7 @@ if(isset($_GET['kod_scheta']))
         $row = $rows[0];
         $nomer = $row['nomer'];
         $data_sost = func::Date_from_MySQL($row['data']);
-        $dogovor_nomer = '<br>Договор: №'.$D->Data['nomer'].' от '.$D->Data['data_sost'];
+        $dogovor_nomer = '<br>Договор: №'.$D->Data['nomer'].' от '.func::Date_from_MySQL($D->Data['data_sost']);
     }
 
 }
