@@ -1144,12 +1144,18 @@ class Doc
     {
         $db = new Db();
 
-        $w_data_postav = "";
+        $where = ""; // Фильтры
         if(isset($_GET['y']))
         {
             $data_s = (int)$_GET['y']."-01-01";
             $data_e = ((int)$_GET['y']+1)."-01-01";
-            $w_data_postav = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
+            $where = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
+        }
+
+        if(isset($_GET['kod_elem']))
+        {
+            $kod_elem = (int)$_GET['kod_elem'];
+            $where.=" AND kod_elem=$kod_elem";
         }
 
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
@@ -1160,7 +1166,7 @@ class Doc
                 FROM 
                     view_rplan 
                 WHERE 
-                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0 $w_data_postav
+                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0 $where
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
@@ -1175,7 +1181,7 @@ class Doc
                 FROM 
                     view_rplan 
                 WHERE 
-                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) $w_data_postav
+                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) $where
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
@@ -2576,5 +2582,43 @@ class Doc
             "INSERT INTO indexes(value, type, source_table, kod_user) VALUES($value,1,1,$kod_user);");
 
         return $nomer;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Запрос параметров фильтра в GET
+     *
+     */
+    public static function getWHERE()
+    {
+        $where = "";
+
+        if(isset($_GET['kod_org']))
+        {
+            $kod_org = (int)$_GET['kod_org'];
+            $where = " kod_org=$kod_org ";
+        }
+
+        if(isset($_GET['kod_elem']))
+        {
+            $kod_elem = (int)$_GET['kod_elem'];
+            if($where=="")
+                $where = " kod_elem=$kod_elem ";
+            else
+                $where.= " AND kod_elem=$kod_elem ";
+        }
+
+        if(isset($_GET['y']))
+        {
+            $y = (int)$_GET['y'];
+            $data_s = "$y-01-01";
+            $data_n = ($y+1)."-01-01";
+            if($where=="")
+                $where = " (data>='$data_s' AND data<'$data_n') ";
+            else
+                $where.= " AND (data>='$data_s' AND data<'$data_n') ";
+        }
+
+        return $where;
     }
 }// END CLASS
