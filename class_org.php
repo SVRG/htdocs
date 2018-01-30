@@ -595,18 +595,27 @@ class Org
      */
     public function formOrgNomen($sql="")
     {
+        $where = ""; // Фильтры
+        if(isset($_GET['y']))
+        {
+            $data_s = (int)$_GET['y']."-01-01";
+            $data_e = ((int)$_GET['y']+1)."-01-01";
+            $where = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
+        }
+
         $db = new Db();
         if($sql!="")
             $rows = $db->rows($sql);
         else
             $rows = $db->rows(/** @lang SQL */
                 "SELECT view_rplan.kod_elem, 
-                            view_rplan.name, 
+                            view_rplan.name,
+                            view_rplan.data_postav, 
                             sum(view_rplan.numb) AS summ_numb, 
                             view_rplan.kod_org, 
                             view_dogovor_summa_plat.summa_plat
                         FROM view_rplan INNER JOIN view_dogovor_summa_plat ON view_rplan.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
-                        WHERE view_rplan.kod_org=$this->kod_org
+                        WHERE view_rplan.kod_org=$this->kod_org $where
                         AND
                         view_dogovor_summa_plat.summa_plat>0
                         GROUP BY view_rplan.kod_elem
@@ -971,7 +980,7 @@ class Org
 //-----------------------------------------------------------
 //
     /**
-     * Вывод списка организаций с суммами платежей в заданный год - $_GET['yn']
+     * Вывод списка организаций с суммами платежей в заданный год - $_GET['y']
      * @param bool $itog
      * @return string
      */
@@ -985,8 +994,6 @@ class Org
             $year = (int)$_GET['y'];
         }
         $year_next = $year+1;
-        if(isset($_GET['yn']))
-            $year_next = (int)$_GET['yn'];
 
         $w_kod_org = "";
         if(isset($_GET['kod_org']))
@@ -1011,7 +1018,7 @@ class Org
                 <table><tr><td>Название</td><td>Сумма за период</td></tr>";
 
         if ($db->cnt == 0)
-            return '';
+            return $res;
 
         $summ = 0;
 
