@@ -47,11 +47,11 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
                     alignment: center;
                 }
                 @page  {
-                    size: 7in 9.25in;
-                    margin: 0 5mm 0 10mm;
+                    size: A4;
+                    margin: 0 5mm 0 15mm; <!-- Отступы при печати top right bottom left -->
                 }
                 table{
-                    border-collapse: collapse; /* Убираем двойные линии между ячейками */
+                    border-collapse: collapse; <!-- Убираем двойные линии между ячейками -->
                     font-size: medium;
                     width: 100%;
                 }
@@ -65,8 +65,11 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
         </style>
     </head>
     <body>
-    <br><img src="<?php echo config::$logo_img?>" alt="<?php echo config::$from_name?>"/><br>
-<?php
+    <br>
+    <?php
+    if($D->Data['kod_ispolnit'] == config::$kod_org_main)
+        echo "<img src='".config::$logo_img."' alt='". config::$from_name."'><br>";
+
 $Isp = new Org();
 $Isp->kod_org = $D->Data['kod_ispolnit'];
 echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
@@ -201,7 +204,8 @@ echo "<tr><th colspan='8' align='right'>$total_nds_text</th></tr>";
 echo "<tr><th colspan='8' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
 echo "</table>";
 echo "<br>";
-if(isset($_GET['p'])){
+
+if(isset($_GET['p']) and $D->Data['kod_ispolnit'] == config::$kod_org_main){
 
     $invoice_sign_gd = config::$invoice_sign_gd;
     $invoice_sign_gb = config::$invoice_sign_gb;
@@ -224,7 +228,7 @@ if(isset($_GET['p'])){
                 <td>$invoice_sign_gb</td>
             </tr>";
 }
-else
+elseif($D->Data['kod_ispolnit'] == config::$kod_org_main)
 {
     echo /** @lang HTML */
     "<img src='img/sign.png' width='776'></image>";
