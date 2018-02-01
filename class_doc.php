@@ -547,10 +547,14 @@ class Doc
                                 <td>$user</td>
                             </tr>";
 
+            $form_print = "";
+            if(stripos($row['nomer'],config::$dogovor_marker)===false)
+               $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora='.$this->kod_dogovora.'"><img src="img/printer.png"></a>';
+
             echo // todo - Проверить правильность. Округление! Валюта - пока только руб.
                 '<table width="600" border="0">
                         <th width="202" >Номер</th>
-                        <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a><a target="_blank" href="form_invoice.php?kod_dogovora='.$this->kod_dogovora.'"><img src="img/printer.png"></a>' . $copy_btn . '</h1></td>
+                        <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a>' . $form_print . $copy_btn . '</h1></td>
                       </tr>
                       <tr>
                         <th >Дата Составления </th>
