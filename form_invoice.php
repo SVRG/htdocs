@@ -76,6 +76,7 @@ echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat']."</b>";
 $Isp->getData();
 
 $dogovor_nomer = "";
+$schet_data = array();
 if(isset($_GET['kod_scheta']))
 {
     $db = new Db();
@@ -85,9 +86,9 @@ if(isset($_GET['kod_scheta']))
 
     if($db->cnt>0)
     {
-        $row = $rows[0];
-        $nomer = $row['nomer'];
-        $data_sost = func::Date_from_MySQL($row['data']);
+        $schet_data = $rows[0];
+        $nomer = $schet_data['nomer'];
+        $data_sost = func::Date_from_MySQL($schet_data['data']);
         $dogovor_nomer = '<br>Договор: №'.$D->Data['nomer'].' от '.func::Date_from_MySQL($D->Data['data_sost']);
     }
 
@@ -150,38 +151,39 @@ $total_nds = 0;
 $total_summ = 0;
 $total_summ_with_nds = 0;
 
-$rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
-$cnt = $db->cnt;
+if(count($schet_data)==0 or isset($_GET['d'])) {
 
-if($cnt==0)
-    exit("Нет партий");
+    $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
+    $cnt = $db->cnt;
 
-for ($i = 0; $i < $cnt; $i++) {
-    $row = $rows[$i];
-    $name = $row['name'];
-    $modif = $row['modif'];
-    if ($modif !== "")
-        $modif = "($modif)";
-    else
-        $modif = "";
+    if($cnt==0)
+        return "Нет партий";
+    for ($i = 0; $i < $cnt; $i++) {
+        $row = $rows[$i];
+        $name = $row['name'];
+        $modif = $row['modif'];
+        if ($modif !== "")
+            $modif = "($modif)";
+        else
+            $modif = "";
 
-    $numb = func::rnd($row['numb']);                            // Количество
-    $summ = func::rnd(func::rnd($row['price']) * $numb); // Сумма без НДС
-    $summ_with_nds = Part::getPartSumma($row);                  // Сумма партии с НДС
-    $nds = func::rnd($row['nds'])*100;                          // Ставка НДС
-    $summ_nds = func::rnd($summ*$nds/100);               // Сумма НДС
+        $numb = func::rnd($row['numb']);                            // Количество
+        $summ = func::rnd(func::rnd($row['price']) * $numb); // Сумма без НДС
+        $summ_with_nds = Part::getPartSumma($row);                  // Сумма партии с НДС
+        $nds = func::rnd($row['nds']) * 100;                          // Ставка НДС
+        $summ_nds = func::rnd($summ * $nds / 100);               // Сумма НДС
 
-    $summ_str = func::Rub($summ);
-    $price_str = func::Rub($row['price']);
-    $nds_str = ($row['nds'] * 100) . '%';
-    $summ_with_nds_str = func::Rub($summ_with_nds);
+        $summ_str = func::Rub($summ);
+        $price_str = func::Rub($row['price']);
+        $nds_str = ($row['nds'] * 100) . '%';
+        $summ_with_nds_str = func::Rub($summ_with_nds);
 
-    $total_nds += $summ_nds;
-    $total_summ += $summ;
-    $total_summ_with_nds += $summ_with_nds;
+        $total_nds += $summ_nds;
+        $total_summ += $summ;
+        $total_summ_with_nds += $summ_with_nds;
 
-    $n = $i + 1;
-    echo "<tr>
+        $n = $i + 1;
+        echo "<tr>
             <td align='center'>$n</td>
             <td align='left'>$name $modif</td>
             <td>шт.</td>
@@ -191,11 +193,38 @@ for ($i = 0; $i < $cnt; $i++) {
             <td align='center'>$nds_str</td>     
             <td align='right' nowrap>$summ_with_nds_str</td>
           </tr>";
+    }
+
+    $total_summ_with_nds_text = func::num2str($total_summ_with_nds);
+    $total_summ_with_nds = func::Rub($total_summ_with_nds);
+    $total_nds_text = func::num2str($total_nds);
+    $total_nds = func::Rub($total_nds);
 }
-$total_summ_with_nds_text = func::num2str($total_summ_with_nds);
-$total_summ_with_nds = func::Rub($total_summ_with_nds);
-$total_nds_text = func::num2str($total_nds);
-$total_nds = func::Rub($total_nds);
+else{
+    $name = $schet_data['prim'];
+    $numb = 1;
+    $summ_with_nds_str = func::Rub($schet_data['summa']);
+    $nds = $schet_data['summa']*0.18;
+    $price_str = func::Rub(func::rnd($schet_data['summa'])-$nds);
+    $summ_str = $price_str;
+    $nds_str = func::Rub($nds);
+    echo "<tr>
+            <td align='center'>1</td>
+            <td align='left'>$name</td>
+            <td>шт.</td>
+            <td align='center'>$numb</td>
+            <td align='right' nowrap>$price_str</td>
+            <td align='right' nowrap>$summ_str</td>  
+            <td align='center'>$nds_str</td>     
+            <td align='right' nowrap>$summ_with_nds_str</td>
+          </tr>";
+
+    $total_summ_with_nds_text = func::num2str($schet_data['summa']);
+    $total_summ_with_nds = func::Rub($schet_data['summa']);
+    $total_nds_text = func::num2str($nds);
+    $total_nds = func::Rub($nds);
+}
+
 
 echo "<tr><th colspan='7' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
 echo "<tr><th colspan='8' align='right'>$total_summ_with_nds_text</th></tr>";
