@@ -201,7 +201,8 @@ echo "<tr><th colspan='7' align='right'>Итого с учетом НДС</th><t
 echo "<tr><th colspan='8' align='right'>$total_summ_with_nds_text</th></tr>";
 echo "<tr><th colspan='7' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
 echo "<tr><th colspan='8' align='right'>$total_nds_text</th></tr>";
-echo "<tr><th colspan='8' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
+if($D->Data['kod_ispolnit'] == config::$kod_org_main)
+    echo "<tr><th colspan='8' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
 echo "</table>";
 echo "<br>";
 
