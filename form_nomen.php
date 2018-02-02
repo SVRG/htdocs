@@ -15,23 +15,11 @@ $E->Events();
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Номенклатура</title>
-    <link rel="stylesheet" type="text/css" href="/widgets/jquery-ui/jquery-ui.css">
-
-    <link rel="stylesheet" type="text/css" href="/widgets/autocomplete/autocomplete.css">
-
-    <script type="text/javascript" src="/widgets/jquery-ui/external/jquery/jquery.js"></script>
-
-    <script type="text/javascript" src="/widgets/jquery-ui/jquery-ui.min.js"></script>
-
-    <script type="text/javascript" src="/widgets/autocomplete/jquery.ui.autocomplete.html.js"></script>
-
-    <script type="text/javascript" src="/widgets/autocomplete/autocomplete.js"></script>
 </head>
     <body>
         <?php include("header.php"); ?>
         <!-- end masthead -->
         <div class="style1" id="pagecell1">
-            <input id="elem" title="Найти">
             <?php
 
             $UserG = array('admin', 'oper');
