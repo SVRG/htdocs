@@ -555,7 +555,7 @@ class Doc
                 '<table border="0">
                       <tr>  
                         <th width="202" >Номер</th>
-                        <td width="1"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a></h1></td>
+                        <td width="200"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a></h1></td>
                         <td width="1">'.$form_print.'</td>
                         <td width="1">'.$edit_btn.'</td>
                         <td width="1">'.$copy_btn.'</td>
