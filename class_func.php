@@ -146,6 +146,27 @@ class Func
         }
         return $Delim;
     }
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Кнопка в виде картинки
+     * @param $ButtValue
+     * @return string
+     */
+    public static function btnImage($ButtValue)
+{
+    $btn = " <input title='$ButtValue' type='submit' name='Button' value='$ButtValue' />";
+
+    if($ButtValue=="Копировать")
+        $btn = "<input title='$ButtValue' type='image' src='img/copy.png' name='Button' value='$ButtValue'/>";
+    elseif($ButtValue=="Редактировать" or $ButtValue=="Изменить")
+        $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
+    elseif($ButtValue=="Добавить")
+        $btn = "<input title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
+
+    return $btn;
+}
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
@@ -157,9 +178,11 @@ class Func
      */
     public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
     {
+        $btn = self::btnImage($ButtValue);
+
         $res = "<form name='FNAME' method='POST' action='$Act '>
                     <input type='hidden' name='Flag' value='$FlagVal' />
-                    <input type='submit' name='Button' value='$ButtValue' />
+                   $btn
                 </form>";
         return $res;
     }
@@ -174,11 +197,14 @@ class Func
      */
     public static function ActButtonConfirm($ButtValue = 'Подтвердить', $FlagVal = "Flag", $Message="Просьба подтвердить действие")
     {
-            $res = "<form name='FNAME' method='POST' action='' onsubmit='return confirm(\"$Message\");' >
+
+        $btn = self::btnImage($ButtValue);
+
+        $res = "<form name='FNAME' method='POST' action='' onsubmit='return confirm(\"$Message\");' >
                     <input type='hidden' name='Flag' value='$FlagVal' />
-                    <input type='submit' name='Button' value='$ButtValue' />
+                    $btn
                 </form>";
-            return $res;
+        return $res;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,17 +223,19 @@ class Func
      */
     public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val="1")
     {
+        $btn = self::btnImage($ButtValue);
+
         if(strpos($ButtValue,"Удалить")!==false)
             $res = "<form name='FNAME' method='POST' action='$Act' onsubmit='return confirm(\"Вы уверены, что хотите удалить запись?\");' >
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
-                    <input type='submit' name='Button' value='$ButtValue' />
+                    $btn
                 </form>";
         else
         $res = "<form name='FNAME' method='POST' action='$Act'>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
-                    <input type='submit' name='Button' value='$ButtValue' />
+                    $btn
                 </form>";
         return $res;
     }
