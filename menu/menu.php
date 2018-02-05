@@ -21,7 +21,7 @@
         </li>
         <li><a href="../form_nomen.php">Номенклатура</a></li>
         <li><a href="../form_pays.php">Платежи</a></li>
-        <li><a href="../form_main.php?sgp=3">Склад</a>
+        <li><a href="../form_main.php?sgp=3&<?php echo "y=".date("Y"); ?>">Склад</a>
             <ul>
                 <li><a href="../form_main.php?sgp=6">Отгрузка без оплаты</a></li>
             </ul>
