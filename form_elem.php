@@ -37,8 +37,8 @@ Docum::Events();
         <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
         <title>Элемент</title>
-        <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
-        <link href="SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
+        <script src="widgets/SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
+        <link href="widgets/SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
 
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Test</title>

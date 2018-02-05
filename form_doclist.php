@@ -15,8 +15,8 @@ $Dogovor->Events();
 <html>
 <head>
     <title>Список Договоров</title>
-    <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
+    <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">

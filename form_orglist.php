@@ -25,8 +25,8 @@ if(isset($_POST['FormName']))
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>Список Организаций</title>
-    <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
+    <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <?php include("header.php"); ?>

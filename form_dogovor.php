@@ -50,8 +50,8 @@ if (isset($_POST['DelDocum'])) {
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title><?php echo $Dogovor->Data['nomer'] ?></title>
-    <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
+    <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Test</title>
@@ -89,7 +89,6 @@ else
                     if (in_array($_SESSION['MM_UserGroup'], $UserG))
                     {
                         $Dogovor->formDogovor(0, 1);
-                        echo Func::ActButton('', 'Редактировать Договор', 'DocEditForm');
                     }
                     else
                         $Dogovor->formDogovor();

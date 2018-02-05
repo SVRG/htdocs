@@ -29,10 +29,10 @@ $Kontakt->Events();
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
     <title>Контакт</title>
-    <script src="/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <script src="SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
-    <link href="/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
-    <link href="SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
+    <script src="/widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <script src="widgets/SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
+    <link href="/widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
+    <link href="widgets/SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <?php
