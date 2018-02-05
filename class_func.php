@@ -14,11 +14,12 @@ class Func
     /**
      * Сколько дней осталось до указанной даты
      * @param string $Date - 17.07.2017
+     * @param string $format - формат даты
      * @return int
      */
-    public static function DaysRem($Date)
+    public static function DaysRem($Date, $format = "Y-m-d")
     {
-        if (!isset($Date) or !self::validateDate($Date,"Y-m-d"))
+        if (!isset($Date) or !self::validateDate($Date,$format))
             return 0;
 
         $now = new DateTime("now");

@@ -533,8 +533,6 @@ class Doc
                             </tr>';
             }
 
-            $copy_btn = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
-
             $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
             $summa_plat = self::getSummaPlat($row['kod_dogovora']);
             $ostatok = $summa_dogovora - $summa_plat;
@@ -549,12 +547,18 @@ class Doc
 
             $form_print = "";
             if(stripos($row['nomer'],config::$dogovor_marker)===false)
-               $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora='.$this->kod_dogovora.'"><img src="img/printer.png"></a>';
+               $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora='.$this->kod_dogovora.'"><img title="Форма для печати" src="img/printer.png"></a>';
+            $edit_btn = Func::ActButton('', 'Изменить', 'DocEditForm');
+            $copy_btn = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
-            echo // todo - Проверить правильность. Округление! Валюта - пока только руб.
-                '<table width="600" border="0">
+            echo // todo - Валюта - пока только руб.
+                '<table border="0">
+                      <tr>  
                         <th width="202" >Номер</th>
-                        <td width="374"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a>' . $form_print . $copy_btn . '</h1></td>
+                        <td width="1"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a></h1></td>
+                        <td width="1">'.$form_print.'</td>
+                        <td width="1">'.$edit_btn.'</td>
+                        <td width="1">'.$copy_btn.'</td>
                       </tr>
                       <tr>
                         <th >Дата Составления </th>

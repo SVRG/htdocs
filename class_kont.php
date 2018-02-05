@@ -150,11 +150,12 @@ class Kontakt
         $res .= '</table>';
 
         if ($Add == 1)
+            $btn = func::btnImage("Добавить");
             $res .= '<form id="form1" name="form1" method="post" action="">
                            <input name="phone" id="phone" />
                            <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
                            <input type="hidden" name="formPhones" value="formPhones" />
-                           <input type="submit" name="Добавить" id="button" value="Добавить" />
+                           '.$btn.'
                      </form>';
 
         return $res;
