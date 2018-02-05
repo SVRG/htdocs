@@ -147,7 +147,7 @@ class Part
                     $ostatok = "";
 
                 // Дней до отгрузки
-                $drem = Func::DaysRem($data_postav);
+                $drem = Func::DaysRem($row['data_postav']);
 
                 // Если осталось меньше 30 и больше 14 дней то красим в оранжевый
                 if ($drem <= 14)
