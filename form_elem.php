@@ -76,7 +76,6 @@ if (isset($_POST['Flag']))
                 <?php
                 echo $E->formPhoto() . '<br>';
                 echo $E->formName('all', 1) . $Form;
-                echo $E->formSpecTotal();
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Прикрепленные Файлы</div>
@@ -92,6 +91,13 @@ if (isset($_POST['Flag']))
                                         <div class="CollapsiblePanelContent">
                                             <a href="form_kontlist.php?kod_elem=' . $E->kod_elem . '">Контакты</a>' . $E->formOrgByElem() . '
                                         </div>
+                                  </div>';
+
+                echo ' <div id="CollapsiblePanel4" class="CollapsiblePanel">
+                                        <div class="CollapsiblePanelTab" tabindex="0">Спецификация</div>
+                                        <div class="CollapsiblePanelContent">'.
+                                            $E->formSpecTotal()
+                                    .' </div>
                                   </div>';
                 ?>
             </td>
@@ -112,6 +118,7 @@ if (isset($_POST['Flag']))
         var CollapsiblePanel1 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel1", {contentIsOpen: false});
         var CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: false});
         var CollapsiblePanel3 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel3", {contentIsOpen: true});
+        var CollapsiblePanel4 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel4", {contentIsOpen: false});
         //-->
     </script>
 </div>
