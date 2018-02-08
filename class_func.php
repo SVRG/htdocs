@@ -27,6 +27,18 @@ class Func
         $res = $now->diff($date)->format("%r%a");
         return $res;
     }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * @param $FlagName
+     * @return bool
+     */
+    public static function issetFlag($FlagName)
+    {
+        if(isset($_POST['Flag']))
+            if($_POST['Flag']===$FlagName)
+                return true;
+        return false;
+    }
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -164,7 +176,10 @@ class Func
         $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
     elseif($ButtValue=="Добавить")
         $btn = "<input title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
-
+    elseif($ButtValue=="Добавить Примечание")
+        $btn = "<input title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
+    elseif($ButtValue=="Удалить")
+        $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
     return $btn;
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -254,7 +269,7 @@ class Func
     {
         $res = "<form name='FNAME' method='POST' action=' $Act '>
                     $Body
-                    <input type='submit' name='Button' value=' $ButtValue ' />
+                    <input type='submit' name='Button' value='$ButtValue' />
                     <input type='hidden' name='Flag' value='$FlagVal' />
                </form>";
 

@@ -131,7 +131,7 @@ else
                 ?></td>
         </tr>
         <tr valign="top">
-            <td colspan="2" align="left">Партии:
+            <td colspan="2" align="left">
                     <?php
                     if (isset($_POST['Flag'])){
                         if ($_POST['Flag'] == 'AddPartForm')
@@ -152,33 +152,12 @@ else
                 <?php
 
                 // Платежи - ------------------
-                echo $Dogovor->formPlat(1);
-
-                // Ввод платежей
-                if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Платеж', 'AddPP');
-
-                if (isset($_POST['Flag'])) {
-                    if ($_POST['Flag'] == 'AddPP') {
-                        echo $Dogovor->formAddPP();
-                    }
-                }
+                echo $Dogovor->formPlat();
                 ?>  </td>
             <td width="50%" align="left" valign="top">
                 <?php
                 // Счета ------------------------------------
                 echo $Dogovor->formInvoice();
-
-                // Добавить Счет
-                if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Счет', 'AddInvoice');
-
-                if (isset($_POST['Flag'])) {
-                    if ($_POST['Flag'] == 'AddInvoice') {
-                        echo $Dogovor->formAddSchet();
-                        $_POST['Flag'] = null;
-                    }
-                }
                 ?></td>
         </tr>
         <tr>
@@ -188,16 +167,7 @@ else
                 <?php
                 //-----------------------------------------------------------------------------------------------------
                 // Примечание
-                if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim');
-
-                    $add_prim = 0;
-                    if (isset($_POST['Flag']))
-                        if ($_POST['Flag'] == 'AddPrim')
-                            $add_prim = 1;
-
-                    echo $Dogovor->formPrim($add_prim,1);
-                }
+                    echo $Dogovor->formPrim();
                 ?></td>
         </tr>
         <tr>

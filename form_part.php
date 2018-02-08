@@ -28,12 +28,12 @@ if (isset($_POST['kod_part'])) {
 }
 
 $Dogovor = new Doc();
-$Dogovor->kod_dogovora = $_GET['kod_dogovora'];
+$Dogovor->kod_dogovora = (int)$_GET['kod_dogovora'];
 $Dogovor->Events();
 
 $Part = new Part();
 $Part->kod_part = $kod_part;
-$Part->kod_dogovora = $_GET['kod_dogovora'];
+$Part->kod_dogovora = (int)$_GET['kod_dogovora'];
 $Part->Events();
 ?>
 <!DOCTYPE html>
@@ -100,7 +100,9 @@ include_once("header.php");
         echo '<br>';
     } else {
         echo $Part->formPayGraph(false);
-        if (isset($Err)) echo $Err;
+
+        if (isset($Err))
+            echo $Err;
     }
     ?>
 </div>

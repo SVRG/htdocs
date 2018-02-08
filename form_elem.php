@@ -75,8 +75,7 @@ Docum::Events();
                         <td align="left" bgcolor="#ECEEFD">
                             <?php
                             echo $E->formPhoto() . '<br>';
-
-                            echo '<h1>' . $E->Name('name',0). '</h1><br>'. $E->Data['shifr'] .'<br>'. $Form . '<br>';
+                            echo $E->formName('all',1). $Form;
                             echo $E->formSpecTotal();
                             ?>
                             <div id="CollapsiblePanel1" class="CollapsiblePanel">

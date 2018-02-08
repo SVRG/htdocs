@@ -555,10 +555,14 @@ class Doc
                 '<table border="0">
                       <tr>  
                         <th width="202" >Номер</th>
-                        <td width="200"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</a></h1></td>
-                        <td width="1">'.$form_print.'</td>
-                        <td width="1">'.$edit_btn.'</td>
-                        <td width="1">'.$copy_btn.'</td>
+                        <td width="200">
+                        <div class="btn">
+                            <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
+                            <div>'.$form_print.'</div>
+                            <div>'.$edit_btn.'</div>
+                            <div>'.$copy_btn.'</div>
+                        </div>
+                       </td>
                       </tr>
                       <tr>
                         <th >Дата Составления </th>
@@ -1101,21 +1105,28 @@ class Doc
 
     /**
      * Форма - Платежи по договору
-     * @param int $Del - 1 Кнопка удаления
      * @return string
      */
-    public function formPlat($Del = 0)
+    public function formPlat()
     {
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPP');
+
+        $res = "<div class='btn'>
+                    <biv><b>Платежи</b></biv>
+                    <div>$btn_add</div>
+                </div>";
+
+        if (func::issetFlag("AddPP"))
+            $res.= $this->formAddPP();
+
         $db = new Db();
         $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora AND plat.del=0");
-
         $cnt = $db->cnt;
 
         if ($cnt == 0)
-            return "";
+            return $res;
 
-        $res = '<br>Платежные поручения<br>
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC"><td width="100">Сумма</td>
                         <td width="80">Номер ПП</td>
                         <td width="80">Дата</td>
@@ -1126,13 +1137,15 @@ class Doc
             $row = $rows[$i];
             $kod_plat = $row['kod_plat'];
 
-            $del = "";
-            if ($Del == 1)
-                $del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
+            $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
+            $nomer = "<div class='btn'>
+                    <biv><b>".$row['nomer']."</b></biv>
+                    <div>$btn_del</div>
+                </div>";
 
             $res .= '<tr>
                         <td>' . Func::Rub($row['summa']) . '</td>
-                        <td>' . $row['nomer'] . $del . '</td>
+                        <td>' .$nomer . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
                     </tr>';
@@ -1157,7 +1170,7 @@ class Doc
         {
             $data_s = (int)$_GET['y']."-01-01";
             $data_e = ((int)$_GET['y']+1)."-01-01";
-            $where = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
+            $where = " AND (data_postav>='$data_s' AND data_postav<'$data_e')";
         }
 
         if(isset($_GET['kod_elem']))
@@ -1247,18 +1260,25 @@ class Doc
      */
     public function formInvoice()
     {
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddInvoice');
+
+        $res = "<div class='btn'>
+                    <biv><b>Счета</b></biv>
+                    <div>$btn_add</div>
+                </div>";
+
+        if (func::issetFlag("AddInvoice"))
+            $res.= $this->formAddSchet();
 
         $db = new Db();
-
         $rows = $db->rows("SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora AND scheta.del=0");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
-            return "";
+            return $res;
 
-        $res = /** @lang HTML */
-            '<br>Счета<br>
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res .= /** @lang HTML */
+            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                 <tr bgcolor="#CCCCCC" >
                     <td width="60">Номер</td>
                     <td width="100">Сумма</td>
@@ -1270,9 +1290,15 @@ class Doc
             $row = $rows[$i];
             $kod_dogovora = $row['kod_dogovora'];
             $kod_scheta = $row['kod_scheta'];
+            $btn_del = Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']);
+            $nomer = "<div class='btn'>
+                    <biv><b><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>". $row['nomer'] . "</a></b></biv>
+                    <div>$btn_del</div>
+                </div>";
+
             $res .= "<tr>
-                        <td><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>". $row['nomer'] . "</a><br>" . Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']) . '</td>
-                        <td>' . Func::Rub($row['summa']) . '</td>
+                        <td>$nomer</td>
+                        <td>" . Func::Rub($row['summa']) . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
                     </tr>';
@@ -1426,27 +1452,20 @@ class Doc
 
     /**
      * Форма - Примечание договора
-     * @param int $AddForm
-     * @param int $Del
      * @return string
      */
-    public function formPrim($AddForm = 0, $Del = 0)
+    public function formPrim()
     {
-        $db = new Db();
-        // todo - проверить будет ли работать запрос в отсутствии поля kod_part
-        $rows = $db->rows("SELECT * 
-                                  FROM dogovor_prim 
-                                  WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 AND isnull(kod_part)
-                                  ORDER BY dogovor_prim.time_stamp DESC
-                                  ");
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim');
+        $res = "<div class='btn'>
+                    <biv><b>Примечание</b></biv>
+                    <div>$btn_add</div>
+                </div>";
 
-        $cnt = $db->cnt;
-        $res = "";
-        if ($AddForm == 1) {
-            $res = '<form id="form1" name="form1" method="post" action="">
+        if (func::issetFlag('AddPrim') == 1) {
+            $res .= '<form id="form1" name="form1" method="post" action="">
                                       <table width="416" border="0">
                                         <tr>
-                                          <td width="185">Примечание</td>
                                           <td width="215"><span id="sprytextfield1">
                                             <textarea name="Prim" id="Prim" cols="70" rows="3"></textarea>
                                           <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
@@ -1461,12 +1480,21 @@ class Doc
             $res .= Func::Cansel();
         }
 
+        $db = new Db();
+        // todo - проверить будет ли работать запрос в отсутствии поля kod_part
+        $rows = $db->rows("SELECT * 
+                                  FROM dogovor_prim 
+                                  WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 AND isnull(kod_part)
+                                  ORDER BY dogovor_prim.time_stamp DESC
+                                  ");
+
+        $cnt = $db->cnt;
+
         if ($cnt == 0)
             return $res;
 
         // Формируем таблицу
-        $res .= 'Примечание
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res .= ' <table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
                     <td width="80">Дата</td>
                     <td>Текст</td>';
@@ -1481,10 +1509,7 @@ class Doc
 
             $kod_prim = $row['kod_prim'];
 
-            $btn_del = "";
-            if ($Del == 1) {
-                $btn_del = func::ActButton2("", "Удалить", "DelPrim", "kod_prim_del", $kod_prim);
-            }
+            $btn_del = func::ActButton2("", "Удалить", "DelPrim", "kod_prim_del", $kod_prim);
 
             $res .= /** @lang HTML */
                 '<tr>
@@ -2356,7 +2381,7 @@ class Doc
             '<form id="form1" name="form1" method="post" action="">
                               <table width="434" border="0">
                                 <tr>
-                                  <td width="126">Номер Счета</td>
+                                  <td width="126">Номер</td>
                                   <td width="292"><span id="SNumR">
                                   <input  name="InvNum" id="InvNum" value="'.$nomer.'" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
@@ -2383,17 +2408,14 @@ class Doc
                                   </span></td>
                                 </tr>
                               </table>
-                              <p>
                                 <input type="submit" name="button" id="button" value="Добавить" />
-                                <input type="reset" name="button" id="button" value="Сброс" />
                                 <input type="hidden" name="AddInv" id="button" value="1" />
-                              </p>
                             </form>';
         $res .= func::Cansel();
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
-
+//
     /**
      * Форма - добавление платежного поручения
      * @return string
@@ -2432,10 +2454,8 @@ class Doc
                                       </span></td>
                                     </tr>
                                   </table>
-                                  <p>
                                     <input type='submit' name='button' id='button' value='Добавить' />
                                     <input type='hidden' name='formAddPP' value='formAddPP' />
-                                  </p>
                                 </form>";
         $res .= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
         return $res;

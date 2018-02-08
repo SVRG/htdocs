@@ -6,9 +6,9 @@ include_once "security.php";
 
 $kod_org = 0;
 if (isset($_POST['kod_org']))
-    $kod_org = $_POST['kod_org'];
+    $kod_org = (int)$_POST['kod_org'];
 elseif (isset($_GET['kod_org']))
-    $kod_org = $_GET['kod_org'];
+    $kod_org = (int)$_GET['kod_org'];
 
 $UserG = array('admin', 'oper', 'manager');
 
@@ -48,91 +48,27 @@ Docum::Events();
         <tr>
             <td width="502" valign="top" bgcolor="#ECEEFD"><?php
                 //---------------------------------------------------------------------------------
-                // Реквизиты
-                $nazv_krat = $org->Data['nazv_krat'];
-                $nazv_poln = $org->Data['nazv_poln'];
-
-                if ($nazv_krat != $nazv_poln)
-                    echo '<br><h1>' . $org->getFormLink() . '</h1><br>' . $nazv_poln . '<br>';
-                else
-                    echo '<br><h1>' . $org->getFormLink() . '</h1><br>';
-
-                echo $org->Data['poisk'];
-
-                if($_SESSION['MM_UserGroup']==="admin")
-                    echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Удалить', 'DelOrg',"kod_org_del",$org->kod_org);
-
-                // Save-------------------------
-                $Edit = 0;
-                if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'formAddEdit') {
-                        echo $org->formAddEdit(1);
-                        $Edit = 1;
-                    }
-
-                if ($Edit == 0)
-                    if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                        echo Func::ActButton('', 'Изменить Название', 'formAddEdit');
-                echo '<br>';
-                // SAve-------------------------
-
+                // Организация
+                echo $org->formOrg();
                 // Задолженность
-
                 echo '<br>Задолженность: ' . $org->getDolg();
-
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Реквизиты</div>
                     <div class="CollapsiblePanelContent">
                         <?php
-
                         // Документы
-                        echo '<br>' . $org->Docum();
-
-                        // Связи
-                        if (isset($_POST['Flag']))
-                            if ($_POST['Flag'] == 'AddOrgLinkForm')
-                            {
-                                echo $org->formAddOrgLink();
-                            }
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Связь', 'AddOrgLinkForm');
-                        echo Org::formOrgLinks($org->kod_org);
-
+                        echo $org->Docum();
                         // Реквизиты
-                        $Edit = 0;
-                        if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-                            if (isset($_POST['Flag']))
-                                if ($_POST['Flag'] == 'SetRecv')
-                                    $Edit = 1;
-                        }
-                        $org->formRecv($Edit);
-
-                        if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Изменить реквизиты', 'SetRecv');
-
+                        echo $org->formRecv();
                         //---------------------------------------------------------------------------------
                         // Адреса
-                        $Add = 0;
-                        if (isset($_POST['Flag']))
-                            if ($_POST['Flag'] == 'AddOrgAdr')
-                                $Add = 1;
-                        if (in_array($_SESSION['MM_UserGroup'], $UserG) and $Add != 1) {
-                            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Адрес', 'AddOrgAdr');
-                        }
-
-                        echo $org->formAdressList($Add);
+                        echo "<br>".$org->formAdress();
                         //---------------------------------------------------------------------------------
                         // Телефоны
-                        $Add = 0;
-                        if (isset($_POST['Flag']))
-                            if ($_POST['Flag'] == 'AddOrgPhone')
-                                $Add = 1;
-
-                        echo $org->formPhones($Add);
-
-                        if (in_array($_SESSION['MM_UserGroup'], $UserG) and $Add != 1) {
-                            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Телефон', 'AddOrgPhone');
-                        }
+                        echo "<br>".$org->formPhones();
+                        // Связи
+                        echo "<br>".Org::formLinks($org->kod_org);
                         ?>
                     </div>
                 </div>

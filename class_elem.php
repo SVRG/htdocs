@@ -53,20 +53,36 @@ class Elem
      * @param int $Link
      * @return string
      */
-    public function Name($field = 'name', $Link = 1) //
+    public function formName($field = 'name', $Link = 1) //
     {
         $db = new Db();
         $rows = $db->rows(/** @lang SQL */
-            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem AND del=0");
+            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem");
 
         if ($db->cnt == 0)
-            return "";
+            return "Элемент не найден";
 
         $row = $rows[0];
-        $this->Data = $row;
 
-        if ($field == 'shablon' and $this->Mod != "" and $row['shablon'] != "")
+        if ($field == 'shablon' and $row['shablon'] != "")
             $res = str_replace('[Mod]', $this->Mod, $row['shablon']);
+        elseif($field=="all")
+        {
+            $name = $row['name'];
+            $obozn = $row['obozn'];
+            $shifr = "";
+
+            if($row['shifr']!="")
+                $shifr = "<b>".$row['shifr']."</b><br>";
+
+            if($name==$row['shifr'])
+                $name = "";
+
+            if(strpos($row['name'],$obozn)!==false)
+                $obozn = "";
+
+            $res = "$shifr $name $obozn";
+        }
         else
             $res = $row[$field];
 

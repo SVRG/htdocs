@@ -34,38 +34,26 @@ class Part
         $rows = $db->rows($SQL);
         $cnt = $db->cnt;
 
-        if($cnt==0)
-            return Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
-
         $btn_auto_ras = '';
-        $btn_add_part = '';
         $btn_add_100 = '';
 
         // Если вызов списка партий - выводим кнопки Добавить партию и Авто-Расчет 100%
         // Если вызов из формы Партия - выводим только Авторасчет
         if($this->kod_part!=0)
-            $btn_auto_ras = Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=".$this->kod_part, 'Авто-Расчет', 'AddAVOK');
+            $btn_auto_ras = "<div>".Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=".$this->kod_part, 'Авто-Расчет', 'AddAVOK')."</div>";
         else
-        {
-            $btn_add_part = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Партию', 'AddPartForm');
-            $btn_add_100 = Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100');
-        }
+            $btn_add_100 = "<div>".Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100')."</div>";
+
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPartForm');
 
         // Шапка
         // Кнопки Добавить Партию / Добавить расчет во все партии / Добавить расчет в партию
-        $res = "<table>
-                    <tr>
-                        <td>
-                            $btn_add_part
-                        </td>
-                        <td>
-                            $btn_add_100
-                        </td>
-                        <td>
-                            $btn_auto_ras
-                        </td>
-                    </tr>
-                </table>";
+        $res = "<div class='btn'>
+                  <biv><b>Партии</b></biv>
+                  <div>$btn_add</div>
+                  $btn_add_100
+                  $btn_auto_ras
+                </div>";
 
         $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC">
@@ -184,10 +172,22 @@ class Part
 
             // Кнопка редактирования партии
             $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
+            $btn_del = "";
+
+            // todo - Придумать глобальные права
+            if(isset($_GET['del']))
+                $btn_del = "<div>".Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del',$this->kod_part)."</div>";
+
+            $btn_panel = /** @lang HTML */
+            "<div class='btn'>
+                    <div>$btn</div>
+                    <div>$prim</div>
+                    $btn_del
+            </div>";
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn.$prim.'</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn_panel.'</td>
                       <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
@@ -236,7 +236,12 @@ class Part
             else
                 if ($row['kod_oper'] == 4) // Возврат
                     $res .= '<br>Возврат:' . $naklad;
-            $res .= Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
+            $btn_add = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
+
+            $res = "<div class='btn'>
+                    <biv>$res</biv>
+                    <div>$btn_add</div>
+                </div>";
         }
 
         return $res;
@@ -252,9 +257,6 @@ class Part
     {
         // Шапка
         $res = $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
-        if(isset($_GET['del']))
-            $res .= Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del',$this->kod_part);
-
         return $res;
     }
 //--------------------------------------------------------------
@@ -1167,28 +1169,21 @@ class Part
      */
     public function formPrim($Del=1)
     {
-
-        // Примечание
-        $res = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim',"kod_part",$this->kod_part);
-
         $add_prim = 0;
         if (isset($_POST['Flag']))
             if ($_POST['Flag'] == 'AddPrim')
                 $add_prim = 1;
 
         $db = new Db();
+        $res = "";
+        // Примечание
+        $btd_add = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim',"kod_part",$this->kod_part);
 
-        $rows = $db->rows("SELECT * 
-                                  FROM dogovor_prim 
-                                  WHERE kod_part=$this->kod_part AND dogovor_prim.del=0 
-                                  ORDER BY dogovor_prim.time_stamp DESC
-                                  ");
-
-        $cnt = $db->cnt;
         if($add_prim==1 and isset($_POST['kod_part']))
-        if($_POST['kod_part']==$this->kod_part)
         {
-            $res = "<form name='form1' method='post' action=''>
+            if($_POST['kod_part']==$this->kod_part)
+            {
+                $res = "<form name='form1' method='post' action=''>
                                       <table width='416' border='0'>
                                         <tr>
                                           <td width='185'>Примечание</td>
@@ -1204,18 +1199,33 @@ class Part
                                     <input type='hidden' name='AddPrim' value='1' />
                                     <input type='hidden' name='kod_part' value='$this->kod_part' />
                     </form>";
-            $res.= Func::Cansel();
+                $res.= Func::Cansel();
+                return $res;
+            }
         }
+        else
+            $res = $btd_add;
+
+        $rows = $db->rows("SELECT * 
+                                  FROM dogovor_prim 
+                                  WHERE kod_part=$this->kod_part AND dogovor_prim.del=0 
+                                  ORDER BY dogovor_prim.time_stamp DESC
+                                  ");
+        $cnt = $db->cnt;
 
         if ($cnt == 0)
             return $res;
 
         // Формируем таблицу
-        $res.= 'Примечание
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res= '
+                    <div class="btn">
+                        <div>Примечание</div><div>'.$btd_add.'</div>
+                    </div>
+                    <table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
-                    <td width="80">Дата</td>
-                    <td>Текст</td>';
+                        <td width="80">Дата</td>
+                        <td width="100%">Текст</td>
+                    </tr>';
 
         // Заполняем данными
         for ($i = 0; $i < $cnt; $i++) {

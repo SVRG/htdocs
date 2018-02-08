@@ -83,7 +83,7 @@ $Org->getData();
             <td width="50%" valign="top"><?php echo '<h1>' . $Org->getFormLink() . '</h1>'; ?>
                     <div id="CollapsiblePanel1" class="CollapsiblePanel">
                         <div class="CollapsiblePanelTab">Реквизиты</div>
-                        <div class="CollapsiblePanelContent"><?php $Org->formRecv(); ?></div>
+                        <div class="CollapsiblePanelContent"><?php echo $Org->formRecv(); ?></div>
                     </div>
             </td>
         </tr>

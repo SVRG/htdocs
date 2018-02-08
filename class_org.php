@@ -67,7 +67,7 @@ class Org
 
         $rows = $db->rows($sql);
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return "";
 
         $res = "<select id='kod_org' name='kod_org' placeholder=\"Выбрать контрагента...\">
@@ -99,19 +99,23 @@ class Org
 //-----------------------------------------------------------
 
     /**
-     * @param int $Edit
      */
-    public function formRecv($Edit = 0)
+    public function formRecv()
     {
         $this->getData();
 
         $row = $this->Data;
         $www = func::Link($row['www']);
 
-        if ($Edit == 0) {
-            echo '<table border=1 cellspacing=0 cellpadding=0>';
-            echo
-                '<tr>
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Изменить', "SetRecv");
+        $res = "<div class='btn'>
+                    <div><b>Реквизиты</b></div>
+                    <div>$btn_add</div>
+                </div>";
+
+        if (!func::issetFlag("SetRecv")) {
+            $res .= '<table border=1 cellspacing=0 cellpadding=0>
+                <tr>
                     <td bgcolor="#CCCCCC" width="50">ИНН</td><td width="250">' . $row['inn'] . '</td>
                     <td width="50" bgcolor="#CCCCCC">КПП</td><td  width="250">' . $row['kpp'] . '</td>
                 </tr>
@@ -132,15 +136,15 @@ class Org
 			        <td bgcolor="#CCCCCC"></td><td></td>
 			    </tr>
 			    <tr>
-			        <td bgcolor="#CCCCCC">WWW</td><td>'. $www .'</td>
+			        <td bgcolor="#CCCCCC">WWW</td><td>' . $www . '</td>
 			        <td bgcolor="#CCCCCC">E-mail</td><td>' . $row['e_mail'] . '</td>
 			    </tr>
 			  </table>';
         } else {
-            echo
+            $res .=
                 '
 			  <form id="form1" name="form1" method="post" action="">
-			  <br>Реквизиты<br><table border=1 cellspacing=0 cellpadding=0 width="100%">
+			  <table border=1 cellspacing=0 cellpadding=0 width="100%">
 			  <tr>
                   <td bgcolor="#CCCCCC">ИНН</td><td width="250"><input  name="inn" id="inn" value="' . $row['inn'] . '"/></td>
                   <td bgcolor="#CCCCCC">КПП</td><td  width="250" ><input  name="kpp" id="kpp" value="' . $row['kpp'] . '" /></td>
@@ -168,12 +172,11 @@ class Org
 			  </table>
 			  <input id="AddRecvForm" type="hidden" value="1" name="AddRecvForm"/> 
 			  <input type="submit" value="Сохранить" />
-			  </form>
-			  ';
-            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
+			  </form>';
+            $res.=func::Cansel();
         }
+        return $res;
     }
-
 //-----------------------------------------------------------
 
     /**
@@ -183,7 +186,7 @@ class Org
     {
         $db = new Db();
         $rows = $db->rows("SELECT * FROM org WHERE kod_org=$this->kod_org");
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return;
 
         $this->Data = $rows[0];
@@ -197,12 +200,17 @@ class Org
      * @param int $Add
      * @return string
      */
-    public function formAdressList($Add = 0)
+    public function formAdress($Add = 0)
     {
 
-        $res = "";
-        if ($Add == 1) {
-            return '<form id="form1" name="form1" method="post" action="">
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddOrgAdr');
+        $res = "<div class='btn'>
+                    <biv><b>Адреса</b></biv>
+                    <div>$btn_add</div>
+                </div>";
+
+        if (func::issetFlag("AddOrgAdr")) {
+            $res .= '<form id="form1" name="form1" method="post" action="">
                       <table border="0">
                         <tr>
                           <td width="10%">Адрес</td>
@@ -218,20 +226,18 @@ class Org
                           </tr>
                       
                         </table>
-                      <p>
                         <input type="submit" name="button" id="button" value="Добавить" />
                         <input type="hidden" name="AddOrgAdr" id="AddOrgAdr" value="1" />
-                    </form>'. Func::Cansel();
+                    </form>';
+            $res.=func::Cansel();
         }
 
         $db = new DB();
-
         $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0 ORDER BY kod_adresa DESC");
-
         $cnt = $db->cnt;
 
         if ($cnt == 0)
-            return "";
+            return $res;
 
         $res .= '<table border="0" cellspacing=0 cellpadding=0 width="100%">';
 
@@ -244,9 +250,9 @@ class Org
             elseif ($row['type'] == 3)
                 $type = "Почтовый: ";
 
-            $btn_del = func::ActButton2('','Удалить',"DelAddr","kod_adresa_del",$row['kod_adresa']);
+            $btn_del = func::ActButton2('', 'Удалить', "DelAddr", "kod_adresa_del", $row['kod_adresa']);
             $res .= '<tr>
-                           <td>' . $type . $row['adres'] .'</td><td>'. $btn_del . '</td>
+                           <td>' . $type . $row['adres'] . '</td><td>' . $btn_del . '</td>
                      </tr>';
         }
 
@@ -266,6 +272,44 @@ class Org
         $doc = new Doc();
         $doc->kod_org = $this->kod_org;
         return $doc->formDocsByOrg();
+    }
+//-----------------------------------------------------------
+//
+    public function formOrg()
+    {
+        if (!isset($this->Data))
+            $this->getData();
+
+        $nazv_krat = $this->Data['nazv_krat'];
+        $nazv_poln = $this->Data['nazv_poln'];
+
+        $res = "";
+
+        if ($nazv_krat != $nazv_poln)
+            $res .= '<h1>' . $this->getFormLink() . '</h1>' . $nazv_poln . '<br>';
+        else
+            $res .= '<h1>' . $this->getFormLink() . '</h1>';
+
+        $poisk = $this->Data['poisk'];
+
+        $btn_del = "";
+        if ($_SESSION['MM_UserGroup'] === "admin")
+            $btn_del = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Удалить', 'DelOrg', "kod_org_del", $this->kod_org);
+
+        $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
+
+        $res.="<div class='btn'>
+                    <div>$poisk</div>
+                    <div>$btn_edit</div>
+                    <div>$btn_del</div>
+                </div>";
+
+        // Save-------------------------
+        if (func::issetFlag('formAddEdit')) {
+            $res .= $this->formAddEdit(1);
+        }
+
+        return $res;
     }
 //-----------------------------------------------------------
 //
@@ -341,51 +385,50 @@ class Org
 //
     /**
      * Телефоны организации + Форма добавления
-     * @param int $Add
      * @return string
      */
-    public function formPhones($Add = 0)
+    public function formPhones()
     {
-        if ($Add == 1) {
-            echo '<form id="form1" name="form1" method="post" action="">
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', "AddOrgPhone");
+        $res = "<div class='btn'>
+                    <biv><b>Телефоны</b></biv>
+                    <div>$btn_add</div>
+                </div>";
+
+        if (func::issetFlag("AddOrgPhone")) {
+            $res .= '<form id="form1" name="form1" method="post" action="">
                       <table border="0">
                         <tr>
                           <td width="133">Номер</td>
                           <td ><input name="phone" id="phone" /></td>
                         </tr>
                       </table>
-                  <p>
                     <input type="submit" name="button" id="button" value="Добавить" />
                     <input type="hidden" name="AddOrgPhone" id="AddOrgPhone" value="1" />
                 </form>';
-            Func::Cansel(1);
+            $res.=func::Cansel();
         }
 
         $db = new DB();
-
         $rows = $db->rows("SELECT * FROM org_data WHERE del=0 AND kod_org=$this->kod_org");
-
         $cnt = $db->cnt;
 
         if ($cnt == 0)
-            return "";
+            return $res;
 
-
-        $res = '<br>Телефоны<br>
-                <table border=0 cellspacing=0 cellpadding=0 width="100%">';
-
-
+        // Таблица с телефонами
+        $res .= "<table border=0 cellspacing=0 cellpadding=0 width='200'>";
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
-            $btn_del = func::ActButton2('','Удалить',"DelOrgData","kod_dat_del",$row['kod_dat']);
+            $btn_del = func::ActButton2('', 'Удалить', "DelOrgData", "kod_dat_del", $row['kod_dat']);
 
             $res .= '<tr>
                         <td>' . $row['data'] . '</td>
-                        <td>'.$btn_del.'</td>
-		            </tr>';
+                        <td>' . $btn_del . '</td>
+		             </tr>';
         }
-        $res .= '</table>';
+        $res .= "</table>";
 
         return $res;
     }
@@ -426,34 +469,33 @@ class Org
         }
 
         $res = /** @lang HTML */
-            '<form id="form1" name="form1" method="post" action="">
-                      <table border="0">
+            "<form id='form1' name='form1' method='post' action=''>
+                      <table border='0'>
                         <tr>
-                          <td width="208">Наименование для поиска</td>
-                          <td><span id="sprytextfield_poisk">
-                            <input name="poisk" id="poisk" size="30" value="' . $poisk . '" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
+                          <td width='208'>Наименование для поиска</td>
+                          <td><span id='sprytextfield_poisk'>
+                            <input name='poisk' id='poisk' size='30' value='$poisk' />
+                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Краткое наименование</td>
-                          <td><span id="sprytextfield_nazv_krat">
-                            <input name="nazv_krat" id="nazv_krat" size="30" value="' . $nazv_krat . '" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
+                          <td><span id='sprytextfield_nazv_krat'>
+                            <input name='nazv_krat' id='nazv_krat' size='30' value='$nazv_krat' />
+                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
                         </tr>
                         <tr>
                           <td>Полное наименование</td>
-                          <td><span id="sprytextfield_nazv_poln">
-                            <input name="nazv_poln" id="nazv_poln" size="30" value="' . $nazv_poln . '" />
-                          <span class="textfieldRequiredMsg">A value is required.</span></span></td>
+                          <td><span id='sprytextfield_nazv_poln'>
+                            <input name='nazv_poln' id='nazv_poln' size='30' value='$nazv_poln' />
+                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
                         </tr>
                         <tr>
-                          <td><input type="submit" name="button" id="button" value="Сохранить" />
-                          <td><input type="hidden" value="FormAddEdit" name="FormName"></td>
+                          <td><input type='submit' name='button' id='button' value='Сохранить' />
+                          <td><input type='hidden' value='FormAddEdit' name='FormName'></td>
                         </tr>
                       </table>
-                    </form>';
-        $res .= Func::Cansel(0);
-
+                    </form>";
+            $res.=func::Cansel();
         return $res;
     }
 //----------------------------------------------------------------------
@@ -481,7 +523,7 @@ class Org
     public function AddOrg($poisk, $nazv_krat, $nazv_poln)
     {
         $db = new Db();
-
+        // todo - сделать проверку на наличие контрагента
         $db->query("INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
     }
 //----------------------------------------------------------------------
@@ -549,8 +591,11 @@ class Org
      * @param string $adres
      * @param int $type
      */
-    public function AddAdr($adres = '', $type = 1)
+    public function AddAdr($adres = "", $type = 1)
     {
+        if ($adres == "")
+            return;
+
         $db = new DB();
         $kod_org = $this->kod_org;
         $kod_user = func::kod_user();
@@ -565,6 +610,9 @@ class Org
      */
     public function AddPhone($phone)
     {
+        if ($phone == "")
+            return;
+
         $db = new DB();
         $kod_org = $this->kod_org;
         $kod_user = func::kod_user();
@@ -593,18 +641,17 @@ class Org
      * @param string $sql
      * @return string
      */
-    public function formOrgNomen($sql="")
+    public function formOrgNomen($sql = "")
     {
         $where = ""; // Фильтры
-        if(isset($_GET['y']))
-        {
-            $data_s = (int)$_GET['y']."-01-01";
-            $data_e = ((int)$_GET['y']+1)."-01-01";
+        if (isset($_GET['y'])) {
+            $data_s = (int)$_GET['y'] . "-01-01";
+            $data_e = ((int)$_GET['y'] + 1) . "-01-01";
             $where = " AND data_postav>='$data_s' AND data_postav<'$data_e'";
         }
 
         $db = new Db();
-        if($sql!="")
+        if ($sql != "")
             $rows = $db->rows($sql);
         else
             $rows = $db->rows(/** @lang SQL */
@@ -786,8 +833,8 @@ class Org
             $event = true;
         }
 
-        if(isset($_POST['FormName']))
-            if($_POST['FormName']=="FormAddEdit")
+        if (isset($_POST['FormName']))
+            if ($_POST['FormName'] == "FormAddEdit")
                 if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln']))
                     if ($_POST['poisk'] != '' and $_POST['nazv_krat'] != '' and $_POST['nazv_poln'] != '') {
                         $this->Save($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
@@ -809,44 +856,62 @@ class Org
             $event = true;
         }
 
-        if(isset($_POST['Flag'])){
-            if($_POST['Flag']=='DelOrgData' and isset($_POST['kod_dat_del']))
-            {
+        if (isset($_POST['Flag'])) {
+            if ($_POST['Flag'] == 'DelOrgData' and isset($_POST['kod_dat_del'])) {
                 $this->DelData($_POST['kod_dat_del']);
                 $event = true;
-            }
-            elseif($_POST['Flag']=='DelOrgLink' and isset($_POST['kod_link_del']))
-            {
+            } elseif ($_POST['Flag'] == 'DelOrgLink' and isset($_POST['kod_link_del'])) {
                 $this->DelOrgLink($_POST['kod_link_del']);
                 $event = true;
-            }
-            elseif($_POST['Flag']=='AddOrgLink' and isset($_POST['kod_org_slave']))
-            {
-                $this->AddOrgLink($this->kod_org,$_POST['kod_org_slave'],$_POST['prim']);
+            } elseif ($_POST['Flag'] == 'AddOrgLink' and isset($_POST['kod_org_slave'])) {
+                $this->AddOrgLink($this->kod_org, $_POST['kod_org_slave'], $_POST['prim']);
                 $event = true;
-            }
-            elseif($_POST['Flag']=='DelOrg' and isset($_POST['kod_org_del']))
-            {
+            } elseif ($_POST['Flag'] == 'DelOrg' and isset($_POST['kod_org_del'])) {
                 $this->Delete($_POST['kod_org_del']);
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_orglist.php");
             }
         }
 
-        if($event)
+        if ($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Связи организации
+     * Связи контрагента с другими контрагентами
      * @param $kod_org
      * @return string
      */
-    public static function formOrgLinks($kod_org)
+    public static function formLinks($kod_org)
     {
-        if(!isset($kod_org))
+        if (!isset($kod_org))
             return "";
+
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddOrgLinkForm');
+        $res = "<div class='btn'>
+                    <biv><b>Связи</b></biv>
+                    <div>$btn_add</div>
+                </div>";
+
+        $org = new Org();
+        $org->kod_org = (int)$kod_org;
+
+        if (func::issetFlag("AddOrgLinkForm")) {
+            $sel = self::formSelList(0, 'nazv_krat', 'kod_org_slave');
+
+            $res .= "<form id='form1' name='form1' method='post' action=''>
+                      <table border='0'>
+                        <tr>
+                          <td width='133'>Связь</td>
+                          <td >$sel</td>
+                          <td><input name='prim'></td>                         
+                        </tr>
+                      </table>
+                    <input type='submit' name='button' id='button' value='Добавить' />
+                    <input type='hidden' name='Flag' id='Flag' value='AddOrgLink' />
+                </form>";
+            $res.=func::Cansel();
+        }
 
         $db = new Db();
         $rows = $db->rows(/** @lang SQL */
@@ -869,13 +934,9 @@ class Org
                       ");
 
         if ($db->cnt == 0)
-            return '';
+            return $res;
 
-        $res = '<table>
-                    <tr>
-                       <td>Название</td>
-                       <td>Примечание</td>
-                    </tr>';
+        $res .= '<table>';
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
@@ -883,13 +944,12 @@ class Org
             $kod = $row['kod_org_slave'];
             $nazv = $row['nazv_krat_slave'];
             $prim = $row['prim'];
-            if($kod_org==$row['kod_org_slave'])
-            {
+            if ($kod_org == $row['kod_org_slave']) {
                 $kod = $row['kod_org'];
                 $nazv = $row['nazv_krat'];
             }
 
-            $btn_del = func::ActButton2('','Удалить',"DelOrgLink","kod_link_del",$row['kod_link']);
+            $btn_del = func::ActButton2('', 'Удалить', "DelOrgLink", "kod_link_del", $row['kod_link']);
             $res .= "<tr>
                             <td><a href='form_org.php?kod_org=$kod'>$nazv</a></td>
                             <td align='right'>$prim</td>
@@ -915,33 +975,13 @@ class Org
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Форма добавления связи
-     *
-     */
-    public function formAddOrgLink()
-    {
-        $sel = self::formSelList(0,'nazv_krat','kod_org_slave');
-        $body = "<table>
-                    <tr>
-                        <td>
-                          $sel
-                        </td>
-                        <td><input name='prim'></td>
-                    </tr>
-                </table>";
-        $res = func::ActForm("",$body,"Добавить","AddOrgLink");
-        return $res;
-    }
-//----------------------------------------------------------------------------------------------------------------------
-//
-    /**
      * Удаление связи организации
      * @param $kod_org_master
      * @param $kod_org_slave
      * @param string $prim
      * @internal param $kod_link
      */
-    private function AddOrgLink($kod_org_master,$kod_org_slave, $prim="")
+    private function AddOrgLink($kod_org_master, $kod_org_slave, $prim = "")
     {
         $db = new Db();
         $kod_user = func::kod_user();
@@ -958,7 +998,7 @@ class Org
      */
     public static function getSearchName($row)
     {
-        if(count($row)===0)
+        if (count($row) === 0)
             return "";
 
         $nazv_krat = $row['nazv_krat'];
@@ -966,13 +1006,13 @@ class Org
         $poisk = $row['poisk'];
         $kod_org = $row['kod_org'];
 
-        if($poisk!=="" and $nazv_krat==$poisk)
+        if ($poisk !== "" and $nazv_krat == $poisk)
             $nazv_krat = "";
 
-        if($nazv_poln!=="" and strpos($nazv_krat,$nazv_poln)!==false)
+        if ($nazv_poln !== "" and strpos($nazv_krat, $nazv_poln) !== false)
             $nazv_poln = "";
 
-        if($nazv_krat==$nazv_poln)
+        if ($nazv_krat == $nazv_poln)
             $nazv_poln = "";
 
         return "$poisk $nazv_krat $nazv_poln $kod_org";
@@ -984,20 +1024,19 @@ class Org
      * @param bool $itog
      * @return string
      */
-    public function formOrgPays($itog=true)
+    public function formOrgPays($itog = true)
     {
         $db = new DB();
         $year = date("Y");
         $kod_org_main = config::$kod_org_main;
 
-        if(isset($_GET['y'])) {
+        if (isset($_GET['y'])) {
             $year = (int)$_GET['y'];
         }
-        $year_next = $year+1;
+        $year_next = $year + 1;
 
         $w_kod_org = "";
-        if(isset($_GET['kod_org']))
-        {
+        if (isset($_GET['kod_org'])) {
             $kod_org = (int)$_GET['kod_org'];
             $w_kod_org = " AND view_dogovory_nvs.kod_org=$kod_org ";
         }
@@ -1010,7 +1049,7 @@ class Org
                                           AND kod_org<>$kod_org_main AND plat.del=0 $w_kod_org
                                     GROUP BY view_dogovory_nvs.kod_org
                                     ORDER BY summ DESC");
-        $year_p = $year-1;
+        $year_p = $year - 1;
         $res = /** @lang HTML */
             "<a href='form_orglist.php?pays&y=$year_p'>$year_p</a>
             $year
@@ -1031,7 +1070,7 @@ class Org
             $summ += $row['summ'];
         }
         $res .= '</table>';
-        if($itog)
+        if ($itog)
             $res .= '<br>Сумма: ' . Func::Rub($summ);
         return $res;
     }

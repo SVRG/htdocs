@@ -88,7 +88,7 @@ class Kontakt
                 $res .= /** @lang HTML */
                     "<tr>
                         <td>
-                            <a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $dolg . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a>".$del_btn;
+                            <div class='btn'><div><a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $dolg . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a></div><div>$del_btn</div></div>";
 
                 // Если флаг - Добавить телефон
                 $res .= $this->formPhones($row['kod_kontakta'], $AddPh).'</td></tr>';
@@ -282,20 +282,21 @@ class Kontakt
                     . '</option>';
             }
         }
+        $res.= /** @lang HTML */
+            "<input type='hidden' name='formSelList' id='formSelList' />
+             <input type='submit' name='button' id='button' value='Добавить из списка' />";
 
         $res .= /** @lang HTML */
             "</select>
                     <select name='Status' id='Status'>
-                    <option value='2' >По Договору</option>
+                    <option value='2'>По Договору</option>
                     <option value='4'>По Отгрузке</option>
                     <option value='1'>Подписант</option>
                     <option value='3'>По Финансированию</option>
                  </select>";
 
         $res.= /** @lang HTML */
-                    "<input type='hidden' name='formSelList' id='formSelList' />
-                    <br><input type='submit' name='button' id='button' value='Добавить из списка' />
-                </form>";
+        "</form>";
 
         return $res;
     }
