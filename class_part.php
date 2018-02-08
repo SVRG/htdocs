@@ -557,10 +557,10 @@ class Part
 //
     /**
      * Добавить Накладную
-     * @param $numb
-     * @param $naklad
-     * @param $data
-     * @param $kod_oper
+     * @param $numb - количество
+     * @param $naklad - номер
+     * @param $data - дата
+     * @param $kod_oper - код оператора
      */
     public function AddNaklad($numb, $naklad, $data, $kod_oper)
     {

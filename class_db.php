@@ -69,7 +69,6 @@ class Db
         $connection->query("SET NAMES 'utf8'"); // cp1251 - для Win
 
         $query = preg_replace('/\s\s+/', ' ', $query); // В запросе удаляем лишние пробелы
-        // todo - Подумать как в INSERT / UPDATE запросах удалять пробелы в значениях '_VALUE_'
 
         // Query the database
         $result = $connection->query($query);
@@ -89,6 +88,8 @@ class Db
         if ((strpos($query, 'UPDATE') !== false) or (strpos($query, 'INSERT') !== false)) {
 
             $user = func::user();
+
+            // todo - Подумать как в INSERT / UPDATE запросах удалять пробелы в значениях '_VALUE_'
 
             $safe_str = addslashes($query);
             $connection->query(/** @lang SQL */

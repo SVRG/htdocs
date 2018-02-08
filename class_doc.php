@@ -184,7 +184,6 @@ class Doc
         $kod_org_main = config::$kod_org_main;
 
         for ($i = 0; $i < $cnt; $i++) { //
-            // todo - Проверить пропуски
             $buffer = self::getDocBuffer($rplan_rows, $i);
 
             // Записываем буфер

@@ -35,7 +35,7 @@ Docum::Events();
     <!-- DW6 -->
     <head>
         <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
-        <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <title>Элемент</title>
         <script src="widgets/SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
         <link href="widgets/SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>

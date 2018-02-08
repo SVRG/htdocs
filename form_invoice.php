@@ -28,7 +28,7 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html"/>
+        <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
         <title><?php echo "Счет №$nomer от $data_sost"; ?></title>
         <style type="text/css">
             TABLE {

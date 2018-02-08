@@ -27,7 +27,7 @@ $Kontakt->Events();
 <!-- DW6 -->
 <head>
     <!-- Copyright 2005 Macromedia, Inc. All rights reserved. -->
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Контакт</title>
     <script src="/widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <script src="widgets/SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>

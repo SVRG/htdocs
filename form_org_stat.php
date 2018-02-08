@@ -20,7 +20,7 @@ $org->getData();
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title><?php echo $org->Data['nazv_krat']; ?></title>
     <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
     <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
