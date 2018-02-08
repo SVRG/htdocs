@@ -36,13 +36,27 @@ class Doc
      */
     static public function formDocByElem($kod_elem)
     {
+        $where = ""; // Условия отбора в _GET
+        if(isset($_GET['kod_org']))
+        {
+            $where .= " AND kod_org=".(int)$_GET['kod_org'];
+        }
+
+        if(isset($_GET['y']))
+        {
+            $y = (int)$_GET['y'];
+            $data_s = "$y-01-01";
+            $data_n = ($y+1)."-01-01";
+            $where.= " AND (data_postav>='$data_s' AND data_postav<'$data_n') ";
+        }
+
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         // Открытые
         $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
-                                    WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main
+                                    WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main $where
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
         $res = Doc::formRPlan_by_Elem($rows);
         // Закрытые
@@ -51,7 +65,7 @@ class Doc
             $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
-                                    WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main
+                                    WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
             $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
@@ -89,7 +103,7 @@ class Doc
                                       ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
                                       ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
-                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
             $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
@@ -127,7 +141,7 @@ class Doc
                                       ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
                                       ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
-                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;");
             $res .= "<b>Входящие Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
@@ -1857,7 +1871,7 @@ class Doc
         $res .= '</select></td>
                 </tr>
                 </table>' . $Body . '
-                <br><input type="submit" name="Submit" value="Добавить" />
+                '.func::btnImage("Добавить").'
                 </form>';
         return $res;
     }
