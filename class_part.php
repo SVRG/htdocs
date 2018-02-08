@@ -222,6 +222,8 @@ class Part
             $kod_oborota = $row['kod_oborota']; // Код оборота = код накладной
             $naklad = $row['numb'] . '(№' . $row['naklad'] . $date . ')'; // Номер документа и дата
 
+            $btn_poluch = ""; // Кнопка отметки получения накладной
+
             if ((int)$row['kod_oper'] == 1) // Поступление
                 $res .= '<br><img src="/img/in.gif" height="14" />' . $naklad;
             else if ((int)$row['kod_oper'] == 2) // Отгрузка
@@ -230,17 +232,18 @@ class Part
 
                 // Форма отметки о получении накладной
                 if ((int)$row['poluch'] <> 1)
-                    $res.= Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch',$kod_oborota);
+                    $btn_poluch = Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch',$kod_oborota);
             } else if ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
             else
                 if ($row['kod_oper'] == 4) // Возврат
                     $res .= '<br>Возврат:' . $naklad;
-            $btn_add = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
+            $btn_del = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
 
             $res = "<div class='btn'>
                     <biv>$res</biv>
-                    <div>$btn_add</div>
+                    <div>$btn_del</div>
+                    <div>$btn_poluch</div>
                 </div>";
         }
 
