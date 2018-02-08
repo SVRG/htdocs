@@ -5,7 +5,7 @@ $MM_donotCheckaccess = "true";
 include_once "security.php";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <!-- DW6 -->
 <head>
@@ -32,22 +32,20 @@ include_once "security.php";
         echo "<table width='100%' border='1' cellspacing='0'>";
 
         $current_month = date('n'); // Текущий месяц
-        $summ = array(0,0,0,0,0,0,0,0,0,0,0,0); // массив сумм по 12 месяцам
+        $summ = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // массив сумм по 12 месяцам
 
         $month_row = "<tr bgcolor='#a9a9a9'>
                     <td>Договор</td>
                     <td>Организация</td>
                     <td>Номенклатура</td>";
 
-        for ($j=0;$j<=11;$j++)
-        {
-            $month_row.= "<td width='50'>".($j+1)."</td>";
+        for ($j = 0; $j <= 11; $j++) {
+            $month_row .= "<td width='50'>" . ($j + 1) . "</td>";
         }
-        echo $month_row.="</rt>";
+        echo $month_row .= "</rt>";
 
         $cnt = $db->cnt;
-        for($i=0;$i<$cnt;$i++)
-        {
+        for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
             $nomer = $row['nomer'];
@@ -60,19 +58,16 @@ include_once "security.php";
             echo "<tr>
                     <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer</a></td>
                     <td><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>
-                    <td><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></td>"
-            ;
+                    <td><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></td>";
             // Договор
-            for ($j=1;$j<=12;$j++)
-            {
+            for ($j = 1; $j <= 12; $j++) {
                 echo "<td>";
 
                 $date = strtotime($row['data_postav']);
 
-                if(date('n',$date)==$j and $row['numb_ostat']>0)
-                {
+                if (date('n', $date) == $j and $row['numb_ostat'] > 0) {
                     echo $row['numb_ostat'];
-                    $summ[$j-1]+=$row['numb_ostat'];
+                    $summ[$j - 1] += $row['numb_ostat'];
                 }
                 echo "</td>";
             }
@@ -86,13 +81,12 @@ include_once "security.php";
                     <td></td>
                     <td>Итого</td>";
 
-        for ($j=0;$j<=11;$j++)
-        {
+        for ($j = 0; $j <= 11; $j++) {
             $sm = "";
-            if($summ[$j]>0)
+            if ($summ[$j] > 0)
                 $sm = $summ[$j];
 
-            echo "<td>".$sm."</td>";
+            echo "<td>" . $sm . "</td>";
         }
         echo "</tr>";
 
@@ -101,13 +95,12 @@ include_once "security.php";
                     <td></td>
                     <td></td>
                     <td>Итого с накоплением</td>";
-        $sm=0;
-        for ($j=0;$j<=11;$j++)
-        {
-            if($summ[$j]>0)
+        $sm = 0;
+        for ($j = 0; $j <= 11; $j++) {
+            if ($summ[$j] > 0)
                 $sm += $summ[$j];
             echo "<td>";
-            if($sm>0)
+            if ($sm > 0)
                 echo $sm;
             echo "</td>";
         }

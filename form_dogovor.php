@@ -84,13 +84,10 @@ else
                         $edit = true;
                     }
 
-                if(!$edit)
-                {
-                    if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    {
+                if (!$edit) {
+                    if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                         $Dogovor->formDogovor(0, 1);
-                    }
-                    else
+                    } else
                         $Dogovor->formDogovor();
                 }
 
@@ -116,14 +113,12 @@ else
                             $add_kont = true;
                         }
 
-                        if(!$add_kont)
-                        {
-                            // Вывод контактов
-                            $Dogovor->formDocKontakts(1);
-                            echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Контакт', 'AddKontakt');
-                        }
-                }
-                elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+                    if (!$add_kont) {
+                        // Вывод контактов
+                        $Dogovor->formDocKontakts(1);
+                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Контакт', 'AddKontakt');
+                    }
+                } elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                     $Dogovor->formDocKontakts(1);
                 } else
                     $Dogovor->formDocKontakts(0);
@@ -132,19 +127,18 @@ else
         </tr>
         <tr valign="top">
             <td colspan="2" align="left">
-                    <?php
-                    if (isset($_POST['Flag'])){
-                        if ($_POST['Flag'] == 'AddPartForm')
-                            echo $Part->formAddEdit(0);
-                        elseif($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part']))
-                        {
-                            $Part->kod_part = $_POST['kod_part'];
-                            echo $Part->formPart(1);
-                        }
+                <?php
+                if (isset($_POST['Flag'])) {
+                    if ($_POST['Flag'] == 'AddPartForm')
+                        echo $Part->formAddEdit(0);
+                    elseif ($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part'])) {
+                        $Part->kod_part = $_POST['kod_part'];
+                        echo $Part->formPart(1);
                     }
-                    // Партии
-                    echo $Part->formParts(1, "", 0);
-                    ?>
+                }
+                // Партии
+                echo $Part->formParts(1, "", 0);
+                ?>
             </td>
         </tr>
         <tr align="left" valign="top">
@@ -167,12 +161,8 @@ else
                 <?php
                 //-----------------------------------------------------------------------------------------------------
                 // Примечание
-                    echo $Dogovor->formPrim();
+                echo $Dogovor->formPrim();
                 ?></td>
-        </tr>
-        <tr>
-            <td align="left" valign="top"></td>
-            <td align="left" valign="top">&nbsp;</td>
         </tr>
     </table>
 </div>

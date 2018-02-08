@@ -89,7 +89,7 @@ class Docum
                 $name = $row['name'];
                 $path = $row['path'];
                 $date = "";
-                if(isset($row['time_stamp'])) // todo - разобраться, если time_stamp = NULL выдает ошибку Notice: Undefined index: time_stamp
+                if (isset($row['time_stamp'])) // todo - разобраться, если time_stamp = NULL выдает ошибку Notice: Undefined index: time_stamp
                     $date = func::Date_from_MySQL($row['time_stamp']);
 
                 $del = Func::ActButton2('', "Удалить", 'DelDocum', "kod_docum_del", $row['kod_docum']);
@@ -99,11 +99,9 @@ class Docum
                             <td> <a href='$path' target='_blank'> $name </a></td>
                             <td>$del</td>
                          </tr>";
+            } else {
+                self::Delete($row['kod_docum']);
             }
-            else
-                {
-                    self::Delete($row['kod_docum']);
-                }
         }
 
         $res .= '</table>';
@@ -203,12 +201,13 @@ class Docum
 
             if (!file_exists($path))
                 continue;
-            unlink($_SERVER["DOCUMENT_ROOT"] .'/'. $row['path']);
+            unlink($_SERVER["DOCUMENT_ROOT"] . '/' . $row['path']);
         }
 
         $db->query("UPDATE docum_elem SET del=1,kod_user=$kod_user WHERE kod_elem=$kod_elem");
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Обработка событий
      */

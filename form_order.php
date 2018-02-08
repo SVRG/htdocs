@@ -13,16 +13,13 @@ if (!isset($_GET['kod_dogovora']) and !isset($_GET['kod_part']))
 
 $D = new Doc();
 $prefix = "D";
-if(isset($_GET['kod_part']))
-{
+if (isset($_GET['kod_part'])) {
     $PData = Part::getData($_GET['kod_part']);
-    if($PData!==false)
-    {
+    if ($PData !== false) {
         $D->kod_dogovora = $PData['kod_dogovora'];
-        $prefix = "P".$_GET['kod_part']."-";
+        $prefix = "P" . $_GET['kod_part'] . "-";
     }
-}
-else
+} else
     $D->kod_dogovora = $_GET['kod_dogovora'];
 
 $D->getData();
@@ -32,14 +29,14 @@ $Isp->kod_org = $D->Data['kod_ispolnit'];
 echo "Заказчик: " . $D->Data['ispolnit_nazv_krat'];
 $Isp->formRecv();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title><?php echo "Заказ №" . $D->Data['kod_dogovora'] . ' от ' . func::NowE(); ?></title>
-</head>
-<body>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title><?php echo "Заказ №" . $D->Data['kod_dogovora'] . ' от ' . func::NowE(); ?></title>
+    </head>
+    <body>
 <?php
 $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];

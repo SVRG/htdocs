@@ -12,15 +12,15 @@ include_once("class_org.php");
 $org = new Org();
 //---------------------------------------------------------------------------
 // Добавление Организации
-if(isset($_POST['FormName']))
-    if($_POST['FormName']=="FormAddEdit")
+if (isset($_POST['FormName']))
+    if ($_POST['FormName'] == "FormAddEdit")
         if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
             $org->AddOrg($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
-}
+        }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -47,11 +47,10 @@ if(isset($_POST['FormName']))
     }
 
     // Вывод список организаций
-    if(!$add_edit)
-    {
-        if(isset($_GET['dolg']))
+    if (!$add_edit) {
+        if (isset($_GET['dolg']))
             echo $org->formDolgOrg();
-        elseif(isset($_GET['pays']))
+        elseif (isset($_GET['pays']))
             echo $org->formOrgPays();
         else
             $org->formOrgList(true);

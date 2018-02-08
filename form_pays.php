@@ -5,7 +5,7 @@ $MM_donotCheckaccess = "true";
 include_once "security.php";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!-- DW6 -->
 <head>
@@ -25,11 +25,10 @@ include_once "security.php";
 
         $D = new Doc();
 
-        if(isset($_GET['m'])){
-            if((int)$_GET['m']>0 and (int)$_GET['m']<=12)
+        if (isset($_GET['m'])) {
+            if ((int)$_GET['m'] > 0 and (int)$_GET['m'] <= 12)
                 echo $D->formCurrentMonthPays((int)$_GET['m']);
-        }
-        else
+        } else
             echo $D->formCurrentMonthPays();
 
         echo 'begin:' . $t . ' end:' . date('H:i:s');

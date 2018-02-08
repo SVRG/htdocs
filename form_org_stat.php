@@ -17,7 +17,7 @@ $org->kod_org = $kod_org;
 $org->getData();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -30,19 +30,18 @@ $org->getData();
 <body>
 <?php include "header.php"; ?>
 <div id="pagecell1">
-<?php
-echo '<h1>' . $org->getFormLink() . '</h1>';
-echo '<br>Задолженность: ' . $org->getDolg() . "<br>";
+    <?php
+    echo '<h1>' . $org->getFormLink() . '</h1>';
+    echo '<br>Задолженность: ' . $org->getDolg() . "<br>";
 
-$sql = "";
-if(isset($_GET['y']))
-{
-    $y = (int)$_GET['y'];
+    $sql = "";
+    if (isset($_GET['y'])) {
+        $y = (int)$_GET['y'];
 
-    $data_s = "$y-01-01"; // Начало периода
-    $data_e = ($y+1)."-01-01"; // Конец периода
-    $sql = /** @lang SQL */
-        "SELECT view_rplan.kod_elem, 
+        $data_s = "$y-01-01"; // Начало периода
+        $data_e = ($y + 1) . "-01-01"; // Конец периода
+        $sql = /** @lang SQL */
+            "SELECT view_rplan.kod_elem, 
                             view_rplan.name, 
                             sum(view_rplan.numb) AS summ_numb, 
                             view_rplan.kod_org, 
@@ -55,15 +54,15 @@ if(isset($_GET['y']))
                         GROUP BY view_rplan.kod_elem
                         ORDER BY summ_numb DESC
                       ";
-}
-echo "<br><table width='50%'><tr><td><b>Номенклатура по договорам:</b></td></tr><tr><td>".$org->formOrgNomen($sql)."</td></tr></table>";
-echo "<br><b>Сумма платежей:</b><br>".$org->formOrgPays(false); // Платежи за период
-echo "<br><b>Договоры:</b>";
-echo $org->formDocs(); // Договоры за период
-$doc = new Doc();
-$doc->kod_org = $kod_org;
-echo $doc->formSGPHistory(); // История отгрузок
-?>
+    }
+    echo "<br><table width='50%'><tr><td><b>Номенклатура по договорам:</b></td></tr><tr><td>" . $org->formOrgNomen($sql) . "</td></tr></table>";
+    echo "<br><b>Сумма платежей:</b><br>" . $org->formOrgPays(false); // Платежи за период
+    echo "<br><b>Договоры:</b>";
+    echo $org->formDocs(); // Договоры за период
+    $doc = new Doc();
+    $doc->kod_org = $kod_org;
+    echo $doc->formSGPHistory(); // История отгрузок
+    ?>
 </div>
 </body>
 </html>

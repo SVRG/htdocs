@@ -173,7 +173,7 @@ class Org
 			  <input id="AddRecvForm" type="hidden" value="1" name="AddRecvForm"/> 
 			  <input type="submit" value="Сохранить" />
 			  </form>';
-            $res.=func::Cansel();
+            $res .= func::Cansel();
         }
         return $res;
     }
@@ -229,7 +229,7 @@ class Org
                         <input type="submit" name="button" id="button" value="Добавить" />
                         <input type="hidden" name="AddOrgAdr" id="AddOrgAdr" value="1" />
                     </form>';
-            $res.=func::Cansel();
+            $res .= func::Cansel();
         }
 
         $db = new DB();
@@ -298,7 +298,7 @@ class Org
 
         $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
 
-        $res.="<div class='btn'>
+        $res .= "<div class='btn'>
                     <div>$poisk</div>
                     <div>$btn_edit</div>
                     <div>$btn_del</div>
@@ -406,7 +406,7 @@ class Org
                     <input type="submit" name="button" id="button" value="Добавить" />
                     <input type="hidden" name="AddOrgPhone" id="AddOrgPhone" value="1" />
                 </form>';
-            $res.=func::Cansel();
+            $res .= func::Cansel();
         }
 
         $db = new DB();
@@ -495,7 +495,7 @@ class Org
                         </tr>
                       </table>
                     </form>";
-            $res.=func::Cansel();
+        $res .= func::Cansel();
         return $res;
     }
 //----------------------------------------------------------------------
@@ -910,7 +910,7 @@ class Org
                     <input type='submit' name='button' id='button' value='Добавить' />
                     <input type='hidden' name='Flag' id='Flag' value='AddOrgLink' />
                 </form>";
-            $res.=func::Cansel();
+            $res .= func::Cansel();
         }
 
         $db = new Db();

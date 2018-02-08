@@ -18,6 +18,7 @@ class Mail
     private $to_adress = array();
     public $yandex_login = "";
     public $yandex_pass = "";
+
     /**
      * Mail constructor.
      */
@@ -41,17 +42,13 @@ class Mail
      */
     public function send_mail($Body = '', $subject = "НВС Навигационные Технологии")
     {
-        if(isset($this->to_adress))
-        {
+        if (isset($this->to_adress)) {
             $cnt = count($this->to_adress);
-            if($cnt==0)
-            {
+            if ($cnt == 0) {
                 $this->err = "Error: Не удалось получить список адресатов. Проверьте settings.ini";
                 return false;
             }
-        }
-        else
-        {
+        } else {
             $this->err = "Error: Не удалось получить список адресатов. Проверьте settings.ini";
             return false;
         }
@@ -100,7 +97,7 @@ class Mail
         $mail->setFrom($this->from_adress, $this->from_name);
 
         //Set who the message is to be sent to
-        for($i=0;$i<$cnt;$i++)
+        for ($i = 0; $i < $cnt; $i++)
             $mail->addAddress($this->to_adress[$i]);
 
         //Set the subject line

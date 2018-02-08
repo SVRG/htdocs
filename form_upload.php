@@ -13,21 +13,17 @@ if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
     $d = new Doc();
     $d->kod_dogovora = $_GET['kod_dogovora'];
     $Text = $d->getFormLink();
-}
-// Элемент
+} // Элемент
 elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
     $E = new Elem();
     $E->kod_elem = $_GET['kod_elem'];
     $Text = $E->getFormLink();
-}
-// Организация
+} // Организация
 elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
     $Org = new Org();
     $Org->kod_org = $_GET['kod_org'];
     $Text = $Org->getFormLink();
-}
-else
-{
+} else {
     exit("Err: Не задан объект");
 }
 
@@ -45,14 +41,14 @@ if (isset($_FILES["filename"])) {
     $date = Func::NowDoc();
     $rnd = rand();
 
-    $new_file_name = $date . '-' . $rnd . '-' . $fname .'.'. $ext;
+    $new_file_name = $date . '-' . $rnd . '-' . $fname . '.' . $ext;
 
     $path = realpath($_SERVER["DOCUMENT_ROOT"]);
-    $path.='/docs';
+    $path .= '/docs';
 
-    if (copy($dest, $path .'/'. $new_file_name)) {
+    if (copy($dest, $path . '/' . $new_file_name)) {
 
-        if (file_exists($path .'/'. $new_file_name))
+        if (file_exists($path . '/' . $new_file_name))
             $CopyOK = true;
 
         $path = 'docs/' . $new_file_name;
@@ -73,7 +69,7 @@ if (isset($_FILES["filename"])) {
             $btn = Func::ActButton('form_elem.php?kod_elem=' . $_GET['kod_elem'], 'Перейти к Элементу');
         } // ------------------------------------------------------------------------------
         elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
-            $docum->Add($name, $path, $_GET['kod_org'],'Org');
+            $docum->Add($name, $path, $_GET['kod_org'], 'Org');
             $btn = Func::ActButton('form_org.php?kod_org=' . $_GET['kod_org'], 'Перейти к Организации');
         }
     }
@@ -89,7 +85,7 @@ if (isset($_FILES["filename"])) {
     <title>Загрузка Файла</title>
 </head>
 <body>
-<?php  include("header.php");
+<?php include("header.php");
 ?>
 
 <!-- end masthead -->

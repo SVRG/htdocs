@@ -19,7 +19,7 @@ class Func
      */
     public static function DaysRem($Date, $format = "Y-m-d")
     {
-        if (!isset($Date) or !self::validateDate($Date,$format))
+        if (!isset($Date) or !self::validateDate($Date, $format))
             return 0;
 
         $now = new DateTime("now");
@@ -28,14 +28,15 @@ class Func
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param $FlagName
      * @return bool
      */
     public static function issetFlag($FlagName)
     {
-        if(isset($_POST['Flag']))
-            if($_POST['Flag']===$FlagName)
+        if (isset($_POST['Flag']))
+            if ($_POST['Flag'] === $FlagName)
                 return true;
         return false;
     }
@@ -65,7 +66,7 @@ class Func
         if ($Date == "" or !self::validateDate($Date))
             return date('Y-m-d');
 
-        $date = date_create_from_format("d.m.Y",$Date);
+        $date = date_create_from_format("d.m.Y", $Date);
         $date_to_MySQL = $date->format("Y-m-d");
         return $date_to_MySQL;
     }
@@ -79,14 +80,13 @@ class Func
      */
     public static function Date_from_MySQL($MySQL_Date)
     {
-        if(!self::validateDate($MySQL_Date,"Y-m-d"))
-        {
-            if(!self::validateTimeStamp($MySQL_Date))
+        if (!self::validateDate($MySQL_Date, "Y-m-d")) {
+            if (!self::validateTimeStamp($MySQL_Date))
                 return "";
         }
 
         $date = strtotime($MySQL_Date);
-        $res = date('d.m.Y',$date);
+        $res = date('d.m.Y', $date);
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ class Func
      */
     public static function rnd($numb)
     {
-        $res =  round((double)$numb,2);
+        $res = round((double)$numb, 2);
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,6 +130,7 @@ class Func
         return false;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Процент
      * @param $R
@@ -167,21 +168,21 @@ class Func
      * @return string
      */
     public static function btnImage($ButtValue)
-{
-    $btn = " <input title='$ButtValue' type='submit' name='Button' value='$ButtValue' />";
+    {
+        $btn = " <input title='$ButtValue' type='submit' name='Button' value='$ButtValue' />";
 
-    if($ButtValue=="Копировать")
-        $btn = "<input title='$ButtValue' type='image' src='img/copy.png' name='Button' value='$ButtValue'/>";
-    elseif($ButtValue=="Редактировать" or $ButtValue=="Изменить")
-        $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
-    elseif($ButtValue=="Добавить")
-        $btn = "<input title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
-    elseif($ButtValue=="Добавить Примечание")
-        $btn = "<input title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
-    elseif($ButtValue=="Удалить")
-        $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
-    return $btn;
-}
+        if ($ButtValue == "Копировать")
+            $btn = "<input title='$ButtValue' type='image' src='img/copy.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Редактировать" or $ButtValue == "Изменить")
+            $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Добавить")
+            $btn = "<input title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Добавить Примечание")
+            $btn = "<input title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Удалить")
+            $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
+        return $btn;
+    }
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
@@ -210,7 +211,7 @@ class Func
      * @param string $Message
      * @return string
      */
-    public static function ActButtonConfirm($ButtValue = 'Подтвердить', $FlagVal = "Flag", $Message="Просьба подтвердить действие")
+    public static function ActButtonConfirm($ButtValue = 'Подтвердить', $FlagVal = "Flag", $Message = "Просьба подтвердить действие")
     {
 
         $btn = self::btnImage($ButtValue);
@@ -236,18 +237,18 @@ class Func
      * @param string $hidden_val
      * @return string
      */
-    public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val="1")
+    public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val = "1")
     {
         $btn = self::btnImage($ButtValue);
 
-        if(strpos($ButtValue,"Удалить")!==false)
+        if (strpos($ButtValue, "Удалить") !== false)
             $res = "<form name='FNAME' method='POST' action='$Act' onsubmit='return confirm(\"Вы уверены, что хотите удалить запись?\");' >
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
                     $btn
                 </form>";
         else
-        $res = "<form name='FNAME' method='POST' action='$Act'>
+            $res = "<form name='FNAME' method='POST' action='$Act'>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
                     $btn
@@ -388,11 +389,13 @@ class Func
         $s = rawurlencode($s); // Разрешённые символы URL - латинские буквы, точка, минус и подчёркивание
         return $s;
     }
-//----------------------------------------------------------------------------------------------------------------------
-    static public function rus2lat2($string) {
 
-        $rus    = array('ё', 'ж', 'ц', 'ч', 'ш', 'щ', 'ю', 'я', 'Ё', 'Ж', 'Ц', 'Ч', 'Ш', 'Щ', 'Ю', 'Я');
-        $lat    = array('yo', 'zh', 'tc', 'ch', 'sh', 'sh', 'yu', 'ya', 'YO', 'ZH', 'TC', 'CH', 'SH', 'SH', 'YU', 'YA');
+//----------------------------------------------------------------------------------------------------------------------
+    static public function rus2lat2($string)
+    {
+
+        $rus = array('ё', 'ж', 'ц', 'ч', 'ш', 'щ', 'ю', 'я', 'Ё', 'Ж', 'Ц', 'Ч', 'Ш', 'Щ', 'Ю', 'Я');
+        $lat = array('yo', 'zh', 'tc', 'ch', 'sh', 'sh', 'yu', 'ya', 'YO', 'ZH', 'TC', 'CH', 'SH', 'SH', 'YU', 'YA');
         $string = str_replace($rus, $lat, $string);
         $string = func::mb_strtr($string,
             "АБВГДЕЗИЙКЛМНОПРСТУФХЪЫЬЭабвгдезийклмнопрстуфхъыьэ",
@@ -408,18 +411,22 @@ class Func
         // приводим к нижнему регистру
         $string = strtolower($string);
         // убираем "-" дефисы, который больше двух
-        $string = preg_replace("/(-){2,}/","-",$string);
+        $string = preg_replace("/(-){2,}/", "-", $string);
         // убираем "-" дефисы в начале и конце строки
-        $string = preg_replace("/(^-)|(-$)/","",$string);
+        $string = preg_replace("/(^-)|(-$)/", "", $string);
 
         return ($string);
     }
+
 //----------------------------------------------------------------------------------------------------------------------
-    static public function mb_strtr($str, $from, $to) {
+    static public function mb_strtr($str, $from, $to)
+    {
         return str_replace(func::mb_str_split($from), func::mb_str_split($to), $str);
     }
+
 //----------------------------------------------------------------------------------------------------------------------
-    static public function mb_str_split($str) {
+    static public function mb_str_split($str)
+    {
         return preg_split('~~u', $str, null, PREG_SPLIT_NO_EMPTY);
     }
 
@@ -465,7 +472,7 @@ class Func
     static public function user()
     {
         $user = "unknown";
-        if(isset($_SESSION['MM_Username']))
+        if (isset($_SESSION['MM_Username']))
             $user = $_SESSION['MM_Username'];
 
         return $user;
@@ -478,18 +485,19 @@ class Func
     static public function kod_user()
     {
         $kod_user = 1;
-        if(isset($_SESSION['MM_kod_user']))
+        if (isset($_SESSION['MM_kod_user']))
             $kod_user = $_SESSION['MM_kod_user'];
 
         return $kod_user;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Возвращает знак валюты
      * @param $kod_val = 1-руб;2-доллар;3-евро
      * @return string
      */
-    static public function val_sign($kod_val=1)
+    static public function val_sign($kod_val = 1)
     {
         switch ($kod_val) {
             case 2:
@@ -500,6 +508,7 @@ class Func
         return "";
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Возвращает сумму прописью
      * @author runcore
@@ -507,44 +516,44 @@ class Func
      * @param $num
      * @return string
      */
-    public static function num2str($num) {
-        $nul='ноль';
-        $ten=array(
-            array('','один','два','три','четыре','пять','шесть','семь', 'восемь','девять'),
-            array('','одна','две','три','четыре','пять','шесть','семь', 'восемь','девять'),
+    public static function num2str($num)
+    {
+        $nul = 'ноль';
+        $ten = array(
+            array('', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'),
+            array('', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'),
         );
-        $a20=array('десять','одиннадцать','двенадцать','тринадцать','четырнадцать' ,'пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать');
-        $tens=array(2=>'двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят' ,'восемьдесят','девяносто');
-        $hundred=array('','сто','двести','триста','четыреста','пятьсот','шестьсот', 'семьсот','восемьсот','девятьсот');
-        $unit=array( // Units
-            array('копейка' ,'копейки' ,'копеек',	 1),
-            array('рубль'   ,'рубля'   ,'рублей'    ,0),
-            array('тысяча'  ,'тысячи'  ,'тысяч'     ,1),
-            array('миллион' ,'миллиона','миллионов' ,0),
-            array('миллиард','милиарда','миллиардов',0),
+        $a20 = array('десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать');
+        $tens = array(2 => 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
+        $hundred = array('', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот');
+        $unit = array( // Units
+            array('копейка', 'копейки', 'копеек', 1),
+            array('рубль', 'рубля', 'рублей', 0),
+            array('тысяча', 'тысячи', 'тысяч', 1),
+            array('миллион', 'миллиона', 'миллионов', 0),
+            array('миллиард', 'милиарда', 'миллиардов', 0),
         );
         //
-        list($rub,$kop) = explode('.',sprintf("%015.2f", floatval($num)));
+        list($rub, $kop) = explode('.', sprintf("%015.2f", floatval($num)));
         $out = array();
-        if (intval($rub)>0) {
-            foreach(str_split($rub,3) as $uk=>$v) { // by 3 symbols
+        if (intval($rub) > 0) {
+            foreach (str_split($rub, 3) as $uk => $v) { // by 3 symbols
                 if (!intval($v)) continue;
-                $uk = sizeof($unit)-$uk-1; // unit key
+                $uk = sizeof($unit) - $uk - 1; // unit key
                 $gender = $unit[$uk][3];
-                list($i1,$i2,$i3) = array_map('intval',str_split($v,1));
+                list($i1, $i2, $i3) = array_map('intval', str_split($v, 1));
                 // mega-logic
                 $out[] = $hundred[$i1]; # 1xx-9xx
-                if ($i2>1) $out[]= $tens[$i2].' '.$ten[$gender][$i3]; # 20-99
-                else $out[]= $i2>0 ? $a20[$i3] : $ten[$gender][$i3]; # 10-19 | 1-9
+                if ($i2 > 1) $out[] = $tens[$i2] . ' ' . $ten[$gender][$i3]; # 20-99
+                else $out[] = $i2 > 0 ? $a20[$i3] : $ten[$gender][$i3]; # 10-19 | 1-9
                 // units without rub & kop
-                if ($uk>1) $out[]= self::morph($v,$unit[$uk][0],$unit[$uk][1],$unit[$uk][2]);
+                if ($uk > 1) $out[] = self::morph($v, $unit[$uk][0], $unit[$uk][1], $unit[$uk][2]);
             } //foreach
-        }
-        else $out[] = $nul;
-        $out[] = self::morph(intval($rub), $unit[1][0],$unit[1][1],$unit[1][2]); // rub
-        $out[] = $kop.' '.self::morph($kop,$unit[0][0],$unit[0][1],$unit[0][2]); // kop
+        } else $out[] = $nul;
+        $out[] = self::morph(intval($rub), $unit[1][0], $unit[1][1], $unit[1][2]); // rub
+        $out[] = $kop . ' ' . self::morph($kop, $unit[0][0], $unit[0][1], $unit[0][2]); // kop
         mb_internal_encoding("UTF-8");
-        $res = trim(preg_replace('/ {2,}/', ' ', join(' ',$out)));
+        $res = trim(preg_replace('/ {2,}/', ' ', join(' ', $out)));
         $res = mb_strtoupper(mb_substr($res, 0, 1)) . mb_substr($res, 1);
         return $res;
     }
@@ -559,12 +568,30 @@ class Func
      * @param $f5
      * @return mixed
      */
-    public static function morph($n, $f1, $f2, $f5) {
+    public static function morph($n, $f1, $f2, $f5)
+    {
         $n = abs(intval($n)) % 100;
-        if ($n>10 && $n<20) return $f5;
+        if ($n > 10 && $n < 20) return $f5;
         $n = $n % 10;
-        if ($n>1 && $n<5) return $f2;
-        if ($n==1) return $f1;
+        if ($n > 1 && $n < 5) return $f2;
+        if ($n == 1) return $f1;
         return $f5;
+    }
+//
+
+    /**
+     * Генератор произвольной строки
+     * @param int $length
+     * @return string
+     */
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }

@@ -63,12 +63,12 @@ Docum::Events();
                         echo $org->formRecv();
                         //---------------------------------------------------------------------------------
                         // Адреса
-                        echo "<br>".$org->formAdress();
+                        echo "<br>" . $org->formAdress();
                         //---------------------------------------------------------------------------------
                         // Телефоны
-                        echo "<br>".$org->formPhones();
+                        echo "<br>" . $org->formPhones();
                         // Связи
-                        echo "<br>".Org::formLinks($org->kod_org);
+                        echo "<br>" . Org::formLinks($org->kod_org);
                         ?>
                     </div>
                 </div>
@@ -112,11 +112,11 @@ Docum::Events();
 
                         echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Договор', 'AddDogovor');
 
-                        if(isset($_POST['Flag']))
-                                if($_POST['Flag']=="AddDogovor")
-                                    echo $Doc->formAddEdit();
+                        if (isset($_POST['Flag']))
+                            if ($_POST['Flag'] == "AddDogovor")
+                                echo $Doc->formAddEdit();
 
-                        if($kod_org!=683) // Чтобы не выводить все договоры
+                        if ($kod_org != 683) // Чтобы не выводить все договоры
                             echo $org->formDocs();
                         ?>
                     </div>

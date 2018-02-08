@@ -10,7 +10,7 @@ include_once("class_doc.php");
 $d = new Doc();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!-- DW6 -->
 <head>
@@ -27,10 +27,9 @@ $d = new Doc();
 
         $c = new Kontakt();
         $query = "";
-        if(isset($_GET['kod_elem']))
-        {
+        if (isset($_GET['kod_elem'])) {
             $kod_elem = $_GET['kod_elem'];
-            $query =           "SELECT
+            $query = "SELECT
                                     kontakty.kod_kontakta,
                                     kontakty.kod_org,
                                     kontakty.dolg,

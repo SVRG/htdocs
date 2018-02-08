@@ -22,7 +22,7 @@ $Kontakt->Events();
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <!-- DW6 -->
 <head>
@@ -65,26 +65,26 @@ $Org->getData();
                         <td>
                             <?php
                             echo func::ActButton2("", /** @lang HTML */
-                                "Удалить","DelKontakt","kod_kontakta_del",$Kontakt->kod_kontakta);
+                                "Удалить", "DelKontakt", "kod_kontakta_del", $Kontakt->kod_kontakta);
                             ?>
                         </td>
                     </tr>
                 </table>
                 <?php
-                    if (isset($_POST['Flag']))
-                        if ($_POST['Flag'] == 'EditCont') {
-                            echo $Kontakt->formAddEdit(1);
-                            Func::Cansel(1);
-                        }
+                if (isset($_POST['Flag']))
+                    if ($_POST['Flag'] == 'EditCont') {
+                        echo $Kontakt->formAddEdit(1);
+                        Func::Cansel(1);
+                    }
                 ?>
-                    <br>
-                    <?php echo $Kontakt->formPhones(-1,1,1); ?>
+                <br>
+                <?php echo $Kontakt->formPhones(-1, 1, 1); ?>
             </td>
             <td width="50%" valign="top"><?php echo '<h1>' . $Org->getFormLink() . '</h1>'; ?>
-                    <div id="CollapsiblePanel1" class="CollapsiblePanel">
-                        <div class="CollapsiblePanelTab">Реквизиты</div>
-                        <div class="CollapsiblePanelContent"><?php echo $Org->formRecv(); ?></div>
-                    </div>
+                <div id="CollapsiblePanel1" class="CollapsiblePanel">
+                    <div class="CollapsiblePanelTab">Реквизиты</div>
+                    <div class="CollapsiblePanelContent"><?php echo $Org->formRecv(); ?></div>
+                </div>
             </td>
         </tr>
         <tr>
@@ -94,7 +94,7 @@ $Org->getData();
                     <div class="CollapsiblePanelContent">
                         <?php
                         // Вывод договоров по контакту
-                            echo Doc::formDocsByKontakt($Kontakt->kod_kontakta);
+                        echo Doc::formDocsByKontakt($Kontakt->kod_kontakta);
                         ?>
                     </div>
                 </div>

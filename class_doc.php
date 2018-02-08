@@ -18,6 +18,7 @@ class Doc
     private $mail = 1;
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Doc constructor.
      * @param int $kod_dogovora
@@ -37,17 +38,15 @@ class Doc
     static public function formDocByElem($kod_elem)
     {
         $where = ""; // Условия отбора в _GET
-        if(isset($_GET['kod_org']))
-        {
-            $where .= " AND kod_org=".(int)$_GET['kod_org'];
+        if (isset($_GET['kod_org'])) {
+            $where .= " AND kod_org=" . (int)$_GET['kod_org'];
         }
 
-        if(isset($_GET['y']))
-        {
+        if (isset($_GET['y'])) {
             $y = (int)$_GET['y'];
             $data_s = "$y-01-01";
-            $data_n = ($y+1)."-01-01";
-            $where.= " AND (data_postav>='$data_s' AND data_postav<'$data_n') ";
+            $data_n = ($y + 1) . "-01-01";
+            $where .= " AND (data_postav>='$data_s' AND data_postav<'$data_n') ";
         }
 
         $db = new Db();
@@ -552,15 +551,15 @@ class Doc
 
             $user = $this->getUser();
             $row_user = "";
-            if($user!=="")
+            if ($user !== "")
                 $row_user = "<tr>
                                 <th >Введен</th>
                                 <td>$user</td>
                             </tr>";
 
             $form_print = "";
-            if(stripos($row['nomer'],config::$dogovor_marker)===false)
-               $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora='.$this->kod_dogovora.'"><img title="Форма для печати" src="img/printer.png"></a>';
+            if (stripos($row['nomer'], config::$dogovor_marker) === false)
+                $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="Форма для печати" src="img/printer.png"></a>';
             $edit_btn = Func::ActButton('', 'Изменить', 'DocEditForm');
             $copy_btn = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
@@ -571,9 +570,9 @@ class Doc
                         <td width="200">
                         <div class="btn">
                             <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
-                            <div>'.$form_print.'</div>
-                            <div>'.$edit_btn.'</div>
-                            <div>'.$copy_btn.'</div>
+                            <div>' . $form_print . '</div>
+                            <div>' . $edit_btn . '</div>
+                            <div>' . $copy_btn . '</div>
                         </div>
                        </td>
                       </tr>
@@ -599,7 +598,7 @@ class Doc
                       <tr>
                         <th >Остаток</th>
                         <td>' . Func::Rub($ostatok) . ' р.</td>
-                      </tr>'. $row_user . $clr . '
+                      </tr>' . $row_user . $clr . '
                 </table>';
 
         }
@@ -634,12 +633,11 @@ class Doc
             }
 
             $FormName = "formEdit";
-        }
-        else
+        } else
             $nomer = "NEXT"; // Запрашиваем следующий номер
 
         $res = /** @lang HTML */
-            '<form id="form1" name="form1" method="post" action="">
+            '<form name="form1" method="post" action="">
                     <table width="100%" border="0">
                       <tr>
                         <th width="202" >Номер</th>
@@ -732,9 +730,8 @@ class Doc
         $kod_org_main = config::$kod_org_main;
         $order_by = "numb DESC";
 
-        if(isset($_GET['order']))
-            if($_GET['order']=='data')
-            {
+        if (isset($_GET['order']))
+            if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
             }
 
@@ -777,9 +774,8 @@ class Doc
     public function formRPlanOplach()
     {
         $order_by = "numb DESC";
-        if(isset($_GET['order']))
-            if($_GET['order']=='data')
-            {
+        if (isset($_GET['order']))
+            if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
             }
 
@@ -834,9 +830,8 @@ class Doc
     {
 
         $order_by = "numb DESC";
-        if(isset($_GET['order']))
-            if($_GET['order']=='data')
-            {
+        if (isset($_GET['order']))
+            if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
             }
 
@@ -1054,7 +1049,7 @@ class Doc
                                 <td align='right'><a href='$form_part_link'>" . $numb . $numb_ostat_str . "</a></td>
                                 <td align='right'><a href='$form_part_link'>" . $proc_str . "</a></td>
                                 <td align='right'><a href='$form_dogovor_link'>" . $nomer . "</a></td>
-                                <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</td>
+                                <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</a></td>
                                 <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
                                 <td align='right'>" . func::Rub($price_nds) . "</td>
                                 <td align='right'>" . $part_summa_str . $val_str . $nds_str . "</td>
@@ -1125,12 +1120,12 @@ class Doc
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPP');
 
         $res = "<div class='btn'>
-                    <biv><b>Платежи</b></biv>
+                    <div><b>Платежи</b></div>
                     <div>$btn_add</div>
                 </div>";
 
         if (func::issetFlag("AddPP"))
-            $res.= $this->formAddPP();
+            $res .= $this->formAddPP();
 
         $db = new Db();
         $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora AND plat.del=0");
@@ -1152,13 +1147,13 @@ class Doc
 
             $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
             $nomer = "<div class='btn'>
-                    <biv><b>".$row['nomer']."</b></biv>
+                    <div><b>" . $row['nomer'] . "</b></div>
                     <div>$btn_del</div>
                 </div>";
 
             $res .= '<tr>
                         <td>' . Func::Rub($row['summa']) . '</td>
-                        <td>' .$nomer . '</td>
+                        <td>' . $nomer . '</td>
                         <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                         <td>' . $row['prim'] . '</td>
                     </tr>';
@@ -1179,17 +1174,15 @@ class Doc
         $db = new Db();
 
         $where = ""; // Фильтры
-        if(isset($_GET['y']))
-        {
-            $data_s = (int)$_GET['y']."-01-01";
-            $data_e = ((int)$_GET['y']+1)."-01-01";
+        if (isset($_GET['y'])) {
+            $data_s = (int)$_GET['y'] . "-01-01";
+            $data_e = ((int)$_GET['y'] + 1) . "-01-01";
             $where = " AND (data_postav>='$data_s' AND data_postav<'$data_e')";
         }
 
-        if(isset($_GET['kod_elem']))
-        {
+        if (isset($_GET['kod_elem'])) {
             $kod_elem = (int)$_GET['kod_elem'];
-            $where.=" AND kod_elem=$kod_elem";
+            $where .= " AND kod_elem=$kod_elem";
         }
 
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
@@ -1276,12 +1269,12 @@ class Doc
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddInvoice');
 
         $res = "<div class='btn'>
-                    <biv><b>Счета</b></biv>
+                    <div><b>Счета</b></div>
                     <div>$btn_add</div>
                 </div>";
 
         if (func::issetFlag("AddInvoice"))
-            $res.= $this->formAddSchet();
+            $res .= $this->formAddSchet();
 
         $db = new Db();
         $rows = $db->rows("SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora AND scheta.del=0");
@@ -1305,7 +1298,7 @@ class Doc
             $kod_scheta = $row['kod_scheta'];
             $btn_del = Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']);
             $nomer = "<div class='btn'>
-                    <biv><b><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>". $row['nomer'] . "</a></b></biv>
+                    <div><b><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>" . $row['nomer'] . "</a></b></div>
                     <div>$btn_del</div>
                 </div>";
 
@@ -1415,7 +1408,7 @@ class Doc
                                       <table width="416" border="0">
                                         <tr>
                                           <td width="185">Аттрибут
-                                            '.self::formAttrebuteTypeSelList().'
+                                            ' . self::formAttrebuteTypeSelList() . '
                                           </td>
                                           <td width="215">
                                             <input type="text" name="value" id="value">
@@ -1470,13 +1463,15 @@ class Doc
     public function formPrim()
     {
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim');
-        $res = "<div class='btn'>
-                    <biv><b>Примечание</b></biv>
+        $res = /** @lang HTML */
+            "<div class='btn'>
+                    <div><b>Примечание</b></div>
                     <div>$btn_add</div>
                 </div>";
 
         if (func::issetFlag('AddPrim') == 1) {
-            $res .= '<form id="form1" name="form1" method="post" action="">
+            $res .= /** @lang HTML */
+                '<form id="form1" name="form1" method="post" action="">
                                       <table width="416" border="0">
                                         <tr>
                                           <td width="215"><span id="sprytextfield1">
@@ -1507,7 +1502,8 @@ class Doc
             return $res;
 
         // Формируем таблицу
-        $res .= ' <table border=1 cellspacing=0 cellpadding=0 width="100%">
+        $res .= /** @lang HTML */
+            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
                     <td width="80">Дата</td>
                     <td>Текст</td>';
@@ -1530,7 +1526,8 @@ class Doc
                         <td>' . $row['text'] . '</td>
                      </tr>';
         }
-        $res .= '</table>';
+        $res .= /** @lang HTML */
+            '</table>';
 
         return $res;
     }
@@ -1742,17 +1739,13 @@ class Doc
         $start_data = date('Y-m-01');
 
         $month = (int)$Month;
-        if ($month > 0)
-        {
-            if(isset($_GET['y']))
-            {
-                if((int)$_GET['y']>0)
-                {
+        if ($month > 0) {
+            if (isset($_GET['y'])) {
+                if ((int)$_GET['y'] > 0) {
                     $Y = (int)$_GET['y'];
                     $start_data = date("$Y-$Month-01");
                 }
-            }
-            else
+            } else
                 $start_data = date("Y-$Month-01");
         }
 
@@ -1870,7 +1863,7 @@ class Doc
         $res .= '</select></td>
                 </tr>
                 </table>' . $Body . '
-                '.func::btnImage("Добавить").'
+                ' . func::btnImage("Добавить") . '
                 </form>';
         return $res;
     }
@@ -1889,30 +1882,27 @@ class Doc
         $where = "";
 
         // todo - вынести в функцию
-        if(isset($_GET['kod_org']))
-        {
+        if (isset($_GET['kod_org'])) {
             $kod_org = (int)$_GET['kod_org'];
             $where = " WHERE kod_org=$kod_org ";
         }
 
-        if(isset($_GET['kod_elem']))
-        {
+        if (isset($_GET['kod_elem'])) {
             $kod_elem = (int)$_GET['kod_elem'];
-            if($where=="")
+            if ($where == "")
                 $where = " WHERE kod_elem=$kod_elem ";
             else
-                $where.= " AND kod_elem=$kod_elem ";
+                $where .= " AND kod_elem=$kod_elem ";
         }
 
-        if(isset($_GET['y']))
-        {
+        if (isset($_GET['y'])) {
             $y = (int)$_GET['y'];
             $data_s = "$y-01-01";
-            $data_n = ($y+1)."-01-01";
-            if($where=="")
+            $data_n = ($y + 1) . "-01-01";
+            if ($where == "")
                 $where = " WHERE (data>='$data_s' AND data<'$data_n') ";
             else
-                $where.= " AND (data>='$data_s' AND data<'$data_n') ";
+                $where .= " AND (data>='$data_s' AND data<'$data_n') ";
         }
 
         $rows = $db->rows("SELECT * FROM view_sklad $where");
@@ -1982,8 +1972,8 @@ class Doc
         $kod_user = func::kod_user();
 
         $this->getData();
-        $nomer = $this->Data['nomer']." copy";
-        if($this->Data['kod_ispolnit']==config::$kod_org_main and (stripos($nomer,config::$dogovor_marker)===false))
+        $nomer = $this->Data['nomer'] . " copy";
+        if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false))
             $nomer = $this->getNextSchetNomer();
 
         $db->query(/** @lang SQL */
@@ -2027,7 +2017,7 @@ class Doc
             $kod_ispolnit = config::$kod_org_main;
         }
 
-        if($nomer==="NEXT" and $kod_ispolnit==config::$kod_org_main)
+        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
             $nomer = self::getNextSchetNomer();
 
         $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user)";
@@ -2149,8 +2139,7 @@ class Doc
         $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
 
         // Информирование по e-mail
-        if($this->mail==1)
-        {
+        if ($this->mail == 1) {
             $mail = new Mail();
             $data = $this->getData($kod_dogovora);
             $dog_nomer = $data['nomer'];
@@ -2181,7 +2170,7 @@ class Doc
 
         if (!isset($prim)) $prim = '-';
 
-        if($nomer==="NEXT")
+        if ($nomer === "NEXT")
             $nomer = doc::getNextSchetNomer();
 
         $db = new Db();
@@ -2212,8 +2201,7 @@ class Doc
             $db->query("INSERT INTO attributes (value, kod_type_attr,kod_user) VALUES($value,$kod_type_attr,$kod_user)");
             $kod_attr = $db->last_id;
             $db->query("INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
-        }
-        else
+        } else
             $db->query("INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
 
     }
@@ -2339,7 +2327,7 @@ class Doc
             $kod_ispolnit = config::$kod_org_main;
         }
 
-        if($nomer==="NEXT" and $kod_ispolnit==config::$kod_org_main)
+        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
             $nomer = self::getNextSchetNomer();
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
@@ -2389,14 +2377,14 @@ class Doc
         $nomer = "NEXT";
         $summa = self::getSummaDogovora($this->kod_dogovora);
         $this->getData();
-        $prim = "Оплата по договору/счету №".$this->Data['nomer']." от ".func::Date_from_MySQL($this->Data['data_sost']);
+        $prim = "Оплата по договору/счету №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
         $res = /** @lang HTML */
             '<form id="form1" name="form1" method="post" action="">
                               <table width="434" border="0">
                                 <tr>
                                   <td width="126">Номер</td>
                                   <td width="292"><span id="SNumR">
-                                  <input  name="InvNum" id="InvNum" value="'.$nomer.'" />
+                                  <input  name="InvNum" id="InvNum" value="' . $nomer . '" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
                                   number of characters not met.</span></span></td>
                                 </tr>
@@ -2409,14 +2397,14 @@ class Doc
                                 <tr>
                                   <td>Сумма</td>
                                   <td><span id="SSummR">
-                                  <input  name="InvSumm" id="InvSumm" value="'.$summa.'" />
+                                  <input  name="InvSumm" id="InvSumm" value="' . $summa . '" />
                                   <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
                                   format.</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Примечание</td>
                                   <td><span id="STextNR">
-                                    <input  name="InvPrim" id="InvPrim" value="'.$prim.'" />
+                                    <input  name="InvPrim" id="InvPrim" value="' . $prim . '" />
                                       <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
                                   </span></td>
                                 </tr>
@@ -2437,7 +2425,7 @@ class Doc
     {
         $date = date('d.m.Y');
         $res = /** @lang HTML */
-            "               <form id='form1' name='form1' method='post' action=''>
+            "               <form name='form1' method='post' action=''>
                                   <table width='434' border='0'>
                                     <tr>
                                       <td width='126'>Номер ПП</td>
@@ -2612,10 +2600,10 @@ class Doc
         $rows = $db->rows("SELECT MAX(value) AS value
                                     FROM indexes
                                     WHERE time_stamp>'$year-01-01'");
-        if($db->cnt==0)
-            return "1/".date("y");
-        $value = (int)$rows['0']['value']+1;
-        $nomer = $value."/".date("y");
+        if ($db->cnt == 0)
+            return "1/" . date("y");
+        $value = (int)$rows['0']['value'] + 1;
+        $nomer = $value . "/" . date("y");
 
         $kod_user = func::kod_user();
 
@@ -2634,30 +2622,27 @@ class Doc
     {
         $where = "";
 
-        if(isset($_GET['kod_org']))
-        {
+        if (isset($_GET['kod_org'])) {
             $kod_org = (int)$_GET['kod_org'];
             $where = " kod_org=$kod_org ";
         }
 
-        if(isset($_GET['kod_elem']))
-        {
+        if (isset($_GET['kod_elem'])) {
             $kod_elem = (int)$_GET['kod_elem'];
-            if($where=="")
+            if ($where == "")
                 $where = " kod_elem=$kod_elem ";
             else
-                $where.= " AND kod_elem=$kod_elem ";
+                $where .= " AND kod_elem=$kod_elem ";
         }
 
-        if(isset($_GET['y']))
-        {
+        if (isset($_GET['y'])) {
             $y = (int)$_GET['y'];
             $data_s = "$y-01-01";
-            $data_n = ($y+1)."-01-01";
-            if($where=="")
+            $data_n = ($y + 1) . "-01-01";
+            if ($where == "")
                 $where = " (data>='$data_s' AND data<'$data_n') ";
             else
-                $where.= " AND (data>='$data_s' AND data<'$data_n') ";
+                $where .= " AND (data>='$data_s' AND data<'$data_n') ";
         }
 
         return $where;

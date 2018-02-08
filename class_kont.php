@@ -21,6 +21,7 @@ class Kontakt
     }
 
     //------------------------------------------------------------------------
+
     /**
      * Формирует массив контактов договора или организации
      * @param string $Doc_Org -
@@ -38,6 +39,7 @@ class Kontakt
         return $db->cnt;
     }
     //------------------------------------------------------------------------
+
     /**
      * Форма со списком контактов по Договору или Организации
      * @param int $AddPh - 0 не добавлять телефон
@@ -59,7 +61,7 @@ class Kontakt
             $res .= '</td></tr>';
         }
 
-        if($cnt==0) // если нет контактов то возвращаем список
+        if ($cnt == 0) // если нет контактов то возвращаем список
         {
             // todo: Информировать, что контакт не выбран
             return $this->formSelList();
@@ -77,12 +79,12 @@ class Kontakt
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
                 $del_btn = '';
-                if($Doc_Org=='Doc')
-                    $del_btn = func::ActButton2('','Удалить',"DelKonaktDog","kod_kont_dog_del",$row['kod_kont_dog']);
+                if ($Doc_Org == 'Doc')
+                    $del_btn = func::ActButton2('', 'Удалить', "DelKonaktDog", "kod_kont_dog_del", $row['kod_kont_dog']);
 
                 $dolg = "";
-                if($row['dolg']!="")
-                   $dolg = $row['dolg'] . "<br>";
+                if ($row['dolg'] != "")
+                    $dolg = $row['dolg'] . "<br>";
 
                 // Добавляем должность, фамилию, имя и отчество
                 $res .= /** @lang HTML */
@@ -91,7 +93,7 @@ class Kontakt
                             <div class='btn'><div><a href='form_kont.php?kod_kontakta=" . $row['kod_kontakta'] . "' >" . $dolg . $row['famil'] . " " . $row['name'] . " " . $row['otch'] . "</a></div><div>$del_btn</div></div>";
 
                 // Если флаг - Добавить телефон
-                $res .= $this->formPhones($row['kod_kontakta'], $AddPh).'</td></tr>';
+                $res .= $this->formPhones($row['kod_kontakta'], $AddPh) . '</td></tr>';
             }
         }
 
@@ -107,15 +109,15 @@ class Kontakt
      * @param int $Del
      * @return string
      */
-    public function formPhones($kod_kontakta=-1, $Add = 0, $Del=0)
+    public function formPhones($kod_kontakta = -1, $Add = 0, $Del = 0)
     {
-        if($kod_kontakta==-1)
-            $kod_kontakta=$this->kod_kontakta;
+        if ($kod_kontakta == -1)
+            $kod_kontakta = $this->kod_kontakta;
 
         $db = new Db();
 
         $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$kod_kontakta AND del=0");
-        if(count($rows)==0)
+        if (count($rows) == 0)
             return "";
         $kontakt_data = $rows[0];
 
@@ -134,28 +136,28 @@ class Kontakt
                 $res .= '<tr>
                             <td>
                                 <a href="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
-                                . $row['data'] .
-                                '</a>
+                    . $row['data'] .
+                    '</a>
                             </td>';
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>';
 
-            if($Del==1)
-                $res.='<td>'.func::ActButton2('','Удалить',"DelData","kod_dat_del",$row['kod_dat']).'</td>';
+            if ($Del == 1)
+                $res .= '<td>' . func::ActButton2('', 'Удалить', "DelData", "kod_dat_del", $row['kod_dat']) . '</td>';
 
-            $res.='</tr>';
+            $res .= '</tr>';
         }
 
         $res .= '</table>';
 
         if ($Add == 1)
             $btn = func::btnImage("Добавить");
-            $res .= '<form id="form1" name="form1" method="post" action="">
+        $res .= '<form name="form1" method="post" action="">
                            <input name="phone" id="phone" />
                            <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
                            <input type="hidden" name="formPhones" value="formPhones" />
-                           '.$btn.'
+                           ' . $btn . '
                      </form>';
 
         return $res;
@@ -209,7 +211,7 @@ class Kontakt
         $db = new Db();
         $kod_kontakta = $this->kod_kontakta;
 
-        if (!isset($phone) or $phone=="") return;
+        if (!isset($phone) or $phone == "") return;
         $kod_user = func::kod_user();
 
         $db->query("INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
@@ -260,7 +262,7 @@ class Kontakt
 
         // Формируем компонет - список
         $res = /** @lang HTML */
-            "<form id='form1' name='form1' method='post' action='' >
+            "<form name='form1' method='post' action='' >
                 <select name='kod_kontakta' id='kod_kontakta'>";
 
         $exc = array(); // Массив ФИО, чтобы не было повторений
@@ -277,26 +279,28 @@ class Kontakt
                     '<option value="' . $row['kod_kontakta'] . '">' .
                     Func::Mstr($row['famil']) . ' ' .
                     Func::Mstr($row['name']) . ' ' .
-                    Func::Mstr($row['otch']) . ' '.
+                    Func::Mstr($row['otch']) . ' ' .
                     Func::Mstr($row['dolg'])
                     . '</option>';
             }
         }
-        $res.= /** @lang HTML */
+        $res .= /** @lang HTML */
+            "</select>";
+
+        $res .= /** @lang HTML */
             "<input type='hidden' name='formSelList' id='formSelList' />
              <input type='submit' name='button' id='button' value='Добавить из списка' />";
 
         $res .= /** @lang HTML */
-            "</select>
-                    <select name='Status' id='Status'>
+            "<select name='Status' id='Status'>
                     <option value='2'>По Договору</option>
                     <option value='4'>По Отгрузке</option>
                     <option value='1'>Подписант</option>
                     <option value='3'>По Финансированию</option>
                  </select>";
 
-        $res.= /** @lang HTML */
-        "</form>";
+        $res .= /** @lang HTML */
+            "</form>";
 
         return $res;
     }
@@ -338,7 +342,7 @@ class Kontakt
      * @param int $Edit
      * @return string
      */
-    public function formAddEdit($Edit=0)
+    public function formAddEdit($Edit = 0)
     {
 
         $dolg = "";
@@ -347,7 +351,7 @@ class Kontakt
         $otch = "";
         $form_name = "formAdd";
 
-        if($Edit==1) {
+        if ($Edit == 1) {
             $db = new Db();
             $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta AND del=0");
 
@@ -361,7 +365,7 @@ class Kontakt
         }
 
         $res = /** @lang HTML */
-            "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"\">
+            "<form name=\"form1\" method=\"post\" action=\"\">
              <table width=\"290\" border=\"0\">
               <tr>
                 <td width=\"78\">Должность</td>
@@ -400,11 +404,11 @@ class Kontakt
      * @param string $query - Запрос на выборку строк из БД с контатами, должен содержать (kod_kontakta,kod_org,dolg,famil,name,otch,nazv_krat)
      * @return string
      */
-    public function formAllKontats($query="")
+    public function formAllKontats($query = "")
     {
         $db = new Db();
-        if($query=="")
-            $query =           "SELECT
+        if ($query == "")
+            $query = "SELECT
                                     kontakty.kod_kontakta,
                                     kontakty.kod_org,
                                     kontakty.dolg,
@@ -439,7 +443,7 @@ class Kontakt
             $row = $rows[$i];
 
 
-            $res.= /** @lang HTML */
+            $res .= /** @lang HTML */
                 '<tr>
                             <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
                 ' ' . Func::Mstr($row['name']) .
@@ -450,11 +454,12 @@ class Kontakt
                  </tr>';
         }
 
-        $res.= '</table>';
+        $res .= '</table>';
 
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Перехватчик событий
      * Добавление телефона в контакт
@@ -473,46 +478,42 @@ class Kontakt
             }
 
         if (isset($_POST['formSelList']))
-            if(isset($_POST['kod_kontakta'])){
+            if (isset($_POST['kod_kontakta'])) {
                 $this->getData($_POST['kod_kontakta']);
                 $this->AddKontaktToDoc($this->kod_dogovora);
                 $event = true;
-        }
+            }
 
         if (isset($_POST['formEdit']))
-            if(isset($_POST['famil'], $_POST['name']))
-            {
-            $this->Save($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
-            $event = true;
+            if (isset($_POST['famil'], $_POST['name'])) {
+                $this->Save($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+                $event = true;
             }
 
         if (isset($_POST['formAdd']))
-            if(isset($_POST['famil'], $_POST['name']))
-            {
-            $this->AddKontakt($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
-            $event = true;
+            if (isset($_POST['famil'], $_POST['name'])) {
+                $this->AddKontakt($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
+                $event = true;
             }
 
-        if(isset($_POST['kod_dat_del']))
-        {
+        if (isset($_POST['kod_dat_del'])) {
             $this->DelData($_POST['kod_dat_del']);
             $event = true;
         }
 
-        if(isset($_POST['Flag'])) {
+        if (isset($_POST['Flag'])) {
             if ($_POST['Flag'] == "DelKontakt" and isset($_POST['kod_kontakta_del'])) {
                 $this->DelKonakt($_POST['kod_kontakta_del']);
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_org.php?kod_org=' . $this->kod_org); // todo - поправить переадресацию, если не корень то не работает
             }
 
-            if ($_POST['Flag']=='DelKonaktDog' and isset($_POST['kod_kont_dog_del']))
-            {
+            if ($_POST['Flag'] == 'DelKonaktDog' and isset($_POST['kod_kont_dog_del'])) {
                 $this->DelKonaktDog($_POST['kod_kont_dog_del']);
-                $event=true;
+                $event = true;
             }
         }
 
-        if($event)
+        if ($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 
@@ -522,11 +523,11 @@ class Kontakt
      * Удаление Контакта
      * @param int $kod_kontakta
      */
-    public function DelKonakt($kod_kontakta=-1)
+    public function DelKonakt($kod_kontakta = -1)
     {
         $db = new Db();
 
-        if ($kod_kontakta<0)
+        if ($kod_kontakta < 0)
             $kod_kontakta = $this->kod_kontakta;
         $kod_user = func::kod_user();
 

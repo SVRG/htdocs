@@ -17,13 +17,12 @@ class Elem
      * @param int $kod_elem
      * @return string
      */
-    public function getFormLink($name='',$kod_elem=-1)
+    public function getFormLink($name = '', $kod_elem = -1)
     {
-        if($name=='' or $kod_elem==-1)
-        {
+        if ($name == '' or $kod_elem == -1) {
             $kod_elem = $this->kod_elem;
             $this->getData($this->kod_elem);
-            $name=$this->Data['name'];
+            $name = $this->Data['name'];
         }
 
         return "<a href='form_elem.php?kod_elem=$kod_elem'>$name</a>";
@@ -66,24 +65,22 @@ class Elem
 
         if ($field == 'shablon' and $row['shablon'] != "")
             $res = str_replace('[Mod]', $this->Mod, $row['shablon']);
-        elseif($field=="all")
-        {
+        elseif ($field == "all") {
             $name = $row['name'];
             $obozn = $row['obozn'];
             $shifr = "";
 
-            if($row['shifr']!="")
-                $shifr = "<b>".$row['shifr']."</b><br>";
+            if ($row['shifr'] != "")
+                $shifr = "<b>" . $row['shifr'] . "</b><br>";
 
-            if($name==$row['shifr'])
+            if ($name == $row['shifr'])
                 $name = "";
 
-            if(strpos($row['name'],$obozn)!==false)
+            if (strpos($row['name'], $obozn) !== false)
                 $obozn = "";
 
             $res = "$shifr $name $obozn";
-        }
-        else
+        } else
             $res = $row[$field];
 
         if ($Link == 1)
@@ -114,11 +111,11 @@ class Elem
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
-        $all=false;
-        if(isset($_GET['all']))
+        $all = false;
+        if (isset($_GET['all']))
             $all = true;
 
         $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
@@ -129,15 +126,13 @@ class Elem
 
         $other = "";
 
-        for ($i = 0; $i < $db->cnt; $i++)
-        {
+        for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $kod_elem = $row['kod_elem'];
             $shifr = $row['shifr'];
             $img = "";
             $link = "form_elem.php?kod_elem=$kod_elem";
-            if(isset($row['path']))
-            {
+            if (isset($row['path'])) {
                 $path = $row['path'];
                 $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
             }
@@ -152,22 +147,21 @@ class Elem
                             <td valign='top'><a href='$link'><h1> $shifr </h1> $name </td>
                          </tr>";
 
-            if($row['nomen']==1)
-                $res.= $row_nomen;
-            elseif($row['nomen']==0 and $all)
-                $other.=$row_nomen;
+            if ($row['nomen'] == 1)
+                $res .= $row_nomen;
+            elseif ($row['nomen'] == 0 and $all)
+                $other .= $row_nomen;
         }
 
-        if($all)
-        {
+        if ($all) {
             $res .= '<tr bgcolor="#CCCCCC">
                      <td width="10%">Остальная номенклатура</td>
                      <td align="center"></td>
                     </tr>';
-            $res.=$other;
+            $res .= $other;
         }
 
-        $res.=  '</table>';
+        $res .= '</table>';
 
         return $res;
     }
@@ -228,7 +222,7 @@ class Elem
 
         $rows = $db->rows($sql);
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return "";
 
         $res = "<select id='kod_elem' name='kod_elem' placeholder=\"Выбрать элемент...\">
@@ -286,7 +280,7 @@ class Elem
 
         $db = new Db();
         $rows = $db->rows($sql);
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return "";
 
         $res = '';
@@ -308,7 +302,7 @@ class Elem
      * @param int $nomen
      * @param string $shablon
      */
-    public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon='')
+    public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon = '')
     {
         $db = new Db();
 
@@ -392,7 +386,7 @@ class Elem
      * @param int $Edit
      * @return string
      */
-    public function formAddEdit($Edit=0)
+    public function formAddEdit($Edit = 0)
     {
 
         $shifr = "";
@@ -402,7 +396,7 @@ class Elem
         $FormName = "formAdd";
         $btn_nomen = "";
 
-        if($Edit==1){
+        if ($Edit == 1) {
             $this->getData();
             $row = $this->Data;
             $shifr = $row['shifr'];
@@ -411,10 +405,10 @@ class Elem
             $shablon = $row['shablon'];
             $FormName = "formEdit";
 
-            if($row['nomen']==1)
-                $btn_nomen = func::ActButton2('','Удалить из номенклатуры',"UnsetNomen","kod_elem_set",$row['kod_elem']);
-            elseif($row['nomen']==0)
-                $btn_nomen = func::ActButton2('','Добавить в номенклатуру',"SetNomen","kod_elem_set",$row['kod_elem']);
+            if ($row['nomen'] == 1)
+                $btn_nomen = func::ActButton2('', 'Удалить из номенклатуры', "UnsetNomen", "kod_elem_set", $row['kod_elem']);
+            elseif ($row['nomen'] == 0)
+                $btn_nomen = func::ActButton2('', 'Добавить в номенклатуру', "SetNomen", "kod_elem_set", $row['kod_elem']);
         }
 
         $res = '
@@ -453,10 +447,10 @@ class Elem
                          </td>
                       </tr>
                   </table>
-                  <input id="'.$FormName.'" type="hidden" value="'.$FormName.'" name="'.$FormName.'"/>
+                  <input id="' . $FormName . '" type="hidden" value="' . $FormName . '" name="' . $FormName . '"/>
                   <input type="submit" value="Сохранить" />
                 </form>';
-        $res.=$btn_nomen;
+        $res .= $btn_nomen;
         return $res . Func::Cansel(0);
     }
 //------------------------------------------------------------------
@@ -468,7 +462,7 @@ class Elem
      * @param int $kod_elem - код удаляемого элемента
      * @param int $kod_dest - код элемента на который надо заменить
      */
-    public function DeleteReplace($kod_elem, $kod_dest=1001)
+    public function DeleteReplace($kod_elem, $kod_dest = 1001)
     {
         $db = new Db();
 
@@ -479,15 +473,15 @@ class Elem
         $kod_user = func::kod_user();
 
         $new_name = $obozn;
-        if(substr_count($name,$obozn)==0)
-            $new_name = $name.' '.$obozn;
+        if (substr_count($name, $obozn) == 0)
+            $new_name = $name . ' ' . $obozn;
 
         $db->query("UPDATE elem SET del=1, kod_user=$kod_user WHERE kod_elem=$kod_elem"); // Удаляем элемент
         $Docum = new Docum();
         $Docum->DeleteElemFiles($kod_elem); // Удаляем связные документы
 
         $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем список партий, где участвовал удаленный элемент
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return;
 
         $cnt = $db->cnt;
@@ -495,10 +489,10 @@ class Elem
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $modif = $row['modif'];
-            if($modif!='')
-                $modif='('.$modif.')';
+            if ($modif != '')
+                $modif = '(' . $modif . ')';
 
-            $modif = $new_name.$modif;
+            $modif = $new_name . $modif;
             $kod_part = $row['kod_part'];
 
             $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1, kod_user=$kod_user WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
@@ -513,10 +507,9 @@ class Elem
     public function Events()
     {
         $event = false;
-        if(isset($_GET['setCompl'], $_GET['kod_elem']))
-        {
-            if((int)$_GET['setCompl']>0)
-                $this->DeleteReplace($_GET['kod_elem'],(int)$_GET['setCompl']);
+        if (isset($_GET['setCompl'], $_GET['kod_elem'])) {
+            if ((int)$_GET['setCompl'] > 0)
+                $this->DeleteReplace($_GET['kod_elem'], (int)$_GET['setCompl']);
             else
                 $this->DeleteReplace($_GET['kod_elem']);
             header('Location: http://' . $_SERVER['HTTP_HOST'] . "/form_nomen.php");
@@ -532,33 +525,25 @@ class Elem
             $event = true;
         }
 
-        if(isset($_POST['Flag']))
-        {
+        if (isset($_POST['Flag'])) {
             $flag = $_POST['Flag'];
 
-            if($flag=='SetNomen' and isset($_POST['kod_elem_set']))
-            {
-                $this->setNomen($_POST['kod_elem_set'],1);
+            if ($flag == 'SetNomen' and isset($_POST['kod_elem_set'])) {
+                $this->setNomen($_POST['kod_elem_set'], 1);
                 $event = true;
-            }
-            elseif($flag=='UnsetNomen' and isset($_POST['kod_elem_set']))
-            {
-                $this->setNomen($_POST['kod_elem_set'],0);
+            } elseif ($flag == 'UnsetNomen' and isset($_POST['kod_elem_set'])) {
+                $this->setNomen($_POST['kod_elem_set'], 0);
                 $event = true;
-            }
-            elseif ($flag=="AddSubElem" and isset($_POST['kod_elem_base'],$_POST['kod_elem']))
-            {
+            } elseif ($flag == "AddSubElem" and isset($_POST['kod_elem_base'], $_POST['kod_elem'])) {
                 $this->addSubElem($_POST['kod_elem']);
                 $event = true;
-            }
-            elseif($flag=="DelFromSpec" and isset($_POST['kod_spec_del']))
-            {
+            } elseif ($flag == "DelFromSpec" and isset($_POST['kod_spec_del'])) {
                 $this->delSpec($_POST['kod_spec_del']);
                 $event = true;
             }
         }
 
-        if($event)
+        if ($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -568,7 +553,7 @@ class Elem
      * @param $kod_elem
      * @param int $nomen - 0-не в номенклатуре, 1-в номенклатуре(продаем)
      */
-    public function setNomen($kod_elem,$nomen=0)
+    public function setNomen($kod_elem, $nomen = 0)
     {
         $db = new Db();
 
@@ -584,7 +569,7 @@ class Elem
      */
     public static function getSearchName($row)
     {
-        if(count($row)===0)
+        if (count($row) === 0)
             return "";
 
         $name = $row['name'];
@@ -592,13 +577,13 @@ class Elem
         $shifr = $row['shifr'];
         $kod_elem = $row['kod_elem'];
 
-        if($shifr!=="" and $name==$shifr)
+        if ($shifr !== "" and $name == $shifr)
             $name = "";
 
-        if($obozn!=="" and strpos($name,$obozn)!==false)
+        if ($obozn !== "" and strpos($name, $obozn) !== false)
             $obozn = "";
 
-        if($shifr==$obozn)
+        if ($shifr == $obozn)
             $obozn = "";
 
         return "$shifr $obozn $name $kod_elem";
@@ -611,9 +596,9 @@ class Elem
      * @param int $quantity - количество/применяемость
      * @param int $type - тип (обязательный или нет)
      */
-    public function addSubElem($kod_elem, $quantity=1,$type=1)
+    public function addSubElem($kod_elem, $quantity = 1, $type = 1)
     {
-        if($kod_elem==$this->kod_elem) // Самого в себя нельзя добавить
+        if ($kod_elem == $this->kod_elem) // Самого в себя нельзя добавить
             return;
         // todo - возможно потребуется проверка вложений, нет ли вхождений в подчиненные элементы
 
@@ -622,38 +607,38 @@ class Elem
         $kod_user = func::kod_user();
         // Проверка - может элемент уже есть в спецификации
         $db->rows("SELECT * FROM specs WHERE kod_elem_base=$this->kod_elem AND kod_elem_sub=$kod_elem");
-        if($db->cnt>0)
+        if ($db->cnt > 0)
             return;
 
         $db->query("INSERT INTO specs (kod_elem_base,kod_elem_sub,quantity,type,kod_user) VALUES($this->kod_elem,$kod_elem,$quantity,$type,$kod_user)");
     }
+
 //------------------------------------------------------------------------
     public function formSpecTotal()
     {
         $res = "";
-        if(isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
-            if($_SESSION['MM_UserGroup']==="admin")
-                $res = func::ActButton2("","Добавить в спецификацию","AddSubElem","kod_elem",$this->kod_elem );
+        if (isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
+            if ($_SESSION['MM_UserGroup'] === "admin")
+                $res = func::ActButton2("", "Добавить в спецификацию", "AddSubElem", "kod_elem", $this->kod_elem);
 
-        if(isset($_POST['kod_elem']))
-            if($_POST['kod_elem']==$this->kod_elem)
-            {
-                $res.= "<form method='post'>";
-                $res.= $this->formSelList2(); // kod_elem
-                $res.= "<input type='hidden' name='kod_elem_base' value='$this->kod_elem'>";
-                $res.= "<input type='hidden' name='Flag' value='AddSubElem'>";
-                $res.= "<input type='submit' value='Добавить'>";
-                $res.= "</form>";
-                $res.= func::Cansel();
+        if (isset($_POST['kod_elem']))
+            if ($_POST['kod_elem'] == $this->kod_elem) {
+                $res .= "<form method='post'>";
+                $res .= $this->formSelList2(); // kod_elem
+                $res .= "<input type='hidden' name='kod_elem_base' value='$this->kod_elem'>";
+                $res .= "<input type='hidden' name='Flag' value='AddSubElem'>";
+                $res .= "<input type='submit' value='Добавить'>";
+                $res .= "</form>";
+                $res .= func::Cansel();
             }
 
         $spec = $this->formSpec();
-        if($spec!=="")
-            $res.="<h3>Спецификация</h3>".$spec;
+        if ($spec !== "")
+            $res .= "<h3>Спецификация</h3>" . $spec;
 
         $spec = $this->formSpecSub();
-        if($spec!=="")
-            $res.="<h3><a href='form_main.php?sgp=8&kod_elem=$this->kod_elem'>Входит в состав</a></h3>".$spec;
+        if ($spec !== "")
+            $res .= "<h3><a href='form_main.php?sgp=8&kod_elem=$this->kod_elem'>Входит в состав</a></h3>" . $spec;
 
         return $res;
     }
@@ -682,7 +667,7 @@ class Elem
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
         $res = $this->getSpec($rows);
@@ -714,7 +699,7 @@ class Elem
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
         $res = $this->getSpec($rows);
@@ -731,12 +716,13 @@ class Elem
         $db = new Db();
         $db->query("UPDATE specs SET del=1 WHERE kod_spec=$kod_spec"); // Удаляем элемент
     }
+
 //----------------------------------------------------------------------------------------------------------------------
 
     public function getSpec($rows)
     {
-        $all=false;
-        if(isset($_GET['all']))
+        $all = false;
+        if (isset($_GET['all']))
             $all = true;
 
         $res = '<table border=0 cellspacing=0 cellpadding=0 rules="rows" frame="below" width="100%">
@@ -749,23 +735,21 @@ class Elem
         $other = "";
         $cnt = count($rows);
 
-        for ($i = 0; $i < $cnt; $i++)
-        {
+        for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $kod_elem = $row['kod_elem'];
             $shifr = $row['shifr'];
             $img = "";
             $link = "form_elem.php?kod_elem=$kod_elem";
-            if(isset($row['path']))
-            {
+            if (isset($row['path'])) {
                 $path = $row['path'];
                 $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
             }
 
             $btn_nomen = "";
-            if(isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
-                if($_SESSION['MM_UserGroup']==="admin")
-                    $btn_nomen = func::ActButton2('','Удалить',"DelFromSpec","kod_spec_del",$row['kod_spec']);
+            if (isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
+                if ($_SESSION['MM_UserGroup'] === "admin")
+                    $btn_nomen = func::ActButton2('', 'Удалить', "DelFromSpec", "kod_spec_del", $row['kod_spec']);
 
             $name = "";
             if ($row['shifr'] != $row['elem_name'])
@@ -779,22 +763,21 @@ class Elem
                             <td valign='top'>$quantity $btn_nomen</td>
                          </tr>";
 
-            if($row['nomen']==1)
-                $res.= $row_nomen;
-            elseif($row['nomen']==0 and $all)
-                $other.=$row_nomen;
+            if ($row['nomen'] == 1)
+                $res .= $row_nomen;
+            elseif ($row['nomen'] == 0 and $all)
+                $other .= $row_nomen;
         }
 
-        if($all)
-        {
+        if ($all) {
             $res .= '<tr bgcolor="#CCCCCC">
                      <td width="10%">Остальная номенклатура</td>
                      <td align="center"></td>
                     </tr>';
-            $res.=$other;
+            $res .= $other;
         }
 
-        $res.=  '</table>';
+        $res .= '</table>';
         return $res;
     }
 }

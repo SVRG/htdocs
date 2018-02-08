@@ -5,9 +5,10 @@ include_once('class_config.php');
 
 class Part
 {
-    public $kod_part=0;
+    public $kod_part = 0;
     public $kod_dogovora;
     //-------------------------------------------------------------------------
+
     /**
      * Part constructor.
      */
@@ -16,6 +17,7 @@ class Part
 
     }
     //-------------------------------------------------------------------------
+
     /**
      * Формируем таблицу партий по договору. На входе rplan
      * @param int $sgp - вывод накладных о поступлении на склад и об отгрузке (1-вывод,0-не выводить)
@@ -39,17 +41,17 @@ class Part
 
         // Если вызов списка партий - выводим кнопки Добавить партию и Авто-Расчет 100%
         // Если вызов из формы Партия - выводим только Авторасчет
-        if($this->kod_part!=0)
-            $btn_auto_ras = "<div>".Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=".$this->kod_part, 'Авто-Расчет', 'AddAVOK')."</div>";
+        if ($this->kod_part != 0)
+            $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
         else
-            $btn_add_100 = "<div>".Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100')."</div>";
+            $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
 
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPartForm');
 
         // Шапка
         // Кнопки Добавить Партию / Добавить расчет во все партии / Добавить расчет в партию
         $res = "<div class='btn'>
-                  <biv><b>Партии</b></biv>
+                  <div><b>Партии</b></div>
                   <div>$btn_add</div>
                   $btn_add_100
                   $btn_auto_ras
@@ -73,11 +75,11 @@ class Part
             $row = $rows[$i];
 
             $this->kod_part = $row['kod_part'];
-            $modif ='';
-            if($row['modif']!='')
+            $modif = '';
+            if ($row['modif'] != '')
                 $modif = ' (' . $row['modif'] . ')'; // Модификация
 
-            $numb = round((double)$row['numb'],2); // Количество товара в партии
+            $numb = round((double)$row['numb'], 2); // Количество товара в партии
             $numb_otgruz = (double)$row['numb_otgruz']; // Количество отгруженного товара по партии
             $part_summa = self::getPartSumma($row);
 
@@ -85,8 +87,7 @@ class Part
             $ostatok = ""; // Строка для вывода остатка по отгрузке
             // Если договор входящий
             $numb_poluch = 0;
-            if($row['kod_ispolnit']!=config::$kod_org_main)
-            {
+            if ($row['kod_ispolnit'] != config::$kod_org_main) {
                 $numb_poluch = $this->getNumbPoluch($row['kod_part']);
                 $ost = $numb - $numb_poluch;
             }
@@ -102,9 +103,8 @@ class Part
                     $nacl .= $this->formAddNacl($ost, 2); // Отгрузка
                 else
                     $nacl .= $this->formAddNacl($ost, 1); // Поступление
-            }
-            elseif($ost>0) // Выводим кнопку Добавить только когда есть отстаток
-                $nacl.= Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'],"Добавить", 'AddNaklad',"kod_part",$row['kod_part']);
+            } elseif ($ost > 0) // Выводим кнопку Добавить только когда есть отстаток
+                $nacl .= Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], "Добавить", 'AddNaklad', "kod_part", $row['kod_part']);
 
             // Цена --------------------------------------------------------------------------------------
             $price_str = self::formPrice($row);
@@ -112,10 +112,9 @@ class Part
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
             $data_postav_str = $data_postav;
-            if(isset($row['data_nach']))
-            {
-                if($row['data_nach']!=='0000-00-00')
-                    $data_postav_str=Func::Date_from_MySQL($row['data_nach'])."<br>".$data_postav; // Дата начала
+            if (isset($row['data_nach'])) {
+                if ($row['data_nach'] !== '0000-00-00')
+                    $data_postav_str = Func::Date_from_MySQL($row['data_nach']) . "<br>" . $data_postav; // Дата начала
             }
 
             // Окраска отруженных/полученных партий в зелёный
@@ -126,12 +125,11 @@ class Part
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
                 if ($ost != $numb) {
-                    if($row['kod_ispolnit']==config::$kod_org_main)
+                    if ($row['kod_ispolnit'] == config::$kod_org_main)
                         $ostatok = " (<abbr title=\"Осталось отгрузить $ost\">$ost</abbr>)<br><abbr title='Отгружено $numb_otgruz'><img src=\"/img/out.gif\" height=\"14\" />$numb_otgruz</abbr>";
                     else
                         $ostatok = " (<abbr title=\"Осталось получить $ost\">$ost</abbr>)<br><abbr title='Получено $numb_poluch'><img src=\"/img/in.gif\" height=\"14\" />$numb_poluch</abbr>";
-                }
-                else
+                } else
                     $ostatok = "";
 
                 // Дней до отгрузки
@@ -139,7 +137,7 @@ class Part
 
                 // Если осталось меньше 30 и больше 14 дней то красим в оранжевый
                 if ($drem <= 14)
-                        $ind = "bgcolor='#F18585'";// Красный
+                    $ind = "bgcolor='#F18585'";// Красный
                 elseif ($drem <= 30)
                     $ind = 'bgcolor="#FFD222"';// Оранжевый
             }
@@ -157,9 +155,9 @@ class Part
 
             // Процент оплаты
             $PRC = 0; // Строка вывода процента
-            if ($dogovor_proc_pay > 0){
+            if ($dogovor_proc_pay > 0) {
                 $prc = $this->getProcPayByPart($row);
-                if($prc!=$dogovor_proc_pay)
+                if ($prc != $dogovor_proc_pay)
                     $PRC = $prc . "($dogovor_proc_pay)";
                 else
                     $PRC = $prc;
@@ -171,15 +169,15 @@ class Part
             $prim = $this->formPrim();
 
             // Кнопка редактирования партии
-            $btn = Func::ActButton("form_part.php?kod_part=".$row['kod_part'] .'&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
+            $btn = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
             $btn_del = "";
 
             // todo - Придумать глобальные права
-            if(isset($_GET['del']))
-                $btn_del = "<div>".Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del',$this->kod_part)."</div>";
+            if (isset($_GET['del']))
+                $btn_del = "<div>" . Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del', $this->kod_part) . "</div>";
 
             $btn_panel = /** @lang HTML */
-            "<div class='btn'>
+                "<div class='btn'>
                     <div>$btn</div>
                     <div>$prim</div>
                     $btn_del
@@ -187,12 +185,12 @@ class Part
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>'.$btn_panel.'</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>' . $btn_panel . '</td>
                       <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
-                      <td width="120" >' . $price_str. $Val . '</td>
-                      <td width="120" >' . Func::Rub(self::getPriceWithNDS($row)) . $Val .  '</td>
+                      <td width="120" >' . $price_str . $Val . '</td>
+                      <td width="120" >' . Func::Rub(self::getPriceWithNDS($row)) . $Val . '</td>
                       <td width="120">' . Func::Rub($part_summa) . $Val . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
@@ -202,6 +200,7 @@ class Part
         return $res;
     }
 //-------------------------------------------------------------------------
+
     /**
      * Все накладные отсортированные по дате
      * @return string
@@ -232,16 +231,16 @@ class Part
 
                 // Форма отметки о получении накладной
                 if ((int)$row['poluch'] <> 1)
-                    $btn_poluch = Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch',$kod_oborota);
+                    $btn_poluch = Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch', $kod_oborota);
             } else if ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
             else
                 if ($row['kod_oper'] == 4) // Возврат
                     $res .= '<br>Возврат:' . $naklad;
-            $btn_del = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del',$kod_oborota);
+            $btn_del = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del', $kod_oborota);
 
             $res = "<div class='btn'>
-                    <biv>$res</biv>
+                    <div>$res</div>
                     <div>$btn_del</div>
                     <div>$btn_poluch</div>
                 </div>";
@@ -276,7 +275,7 @@ class Part
 
         $cnt = $db->cnt;
 
-        if($cnt==0)
+        if ($cnt == 0)
             return "";
 
         $res = '<br>График Расчетов<br>
@@ -299,7 +298,7 @@ class Part
             $summa = Func::Rub($row['summa']);
             $type_rascheta = $row['type_rascheta'];
 
-            if($type_rascheta=="1")
+            if ($type_rascheta == "1")
                 $type_rascheta = "АВ";
             else
                 $type_rascheta = "OK";
@@ -307,21 +306,21 @@ class Part
             $ostatok_plat = $raschet_summa - $summa_pays;
             $ostatok_plat = Func::Rub($ostatok_plat);
 
-            $btn_del = Func::ActButton2('','Удалить', 'DelRasch',"kod_rascheta_del",$kod_rascheta);
+            $btn_del = Func::ActButton2('', 'Удалить', 'DelRasch', "kod_rascheta_del", $kod_rascheta);
 
             // Форма для ввода ПП в расчет
             $Body = "<input type='hidden' name='kod_rascheta' value='$kod_rascheta' />
                         <input  name='summa' value='$ostatok_plat' />";
 
-            $res.= '<tr>
+            $res .= '<tr>
                     <td width="80">' . $data . '</td>
                     <td width="100">' . $summa . '</td>
-                    <td width="20" align="center">' . $type_rascheta ."<br>". $btn_del. '</td>
-                    <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body)."</td>
+                    <td width="20" align="center">' . $type_rascheta . "<br>" . $btn_del . '</td>
+                    <td>' . $this->formPPRascheta($kod_rascheta, $Edit, $Body) . "</td>
                     </tr>";
         }
 
-        $res.= '</table>';
+        $res .= '</table>';
         return $res;
     }
 //--------------------------------------------------------------
@@ -364,7 +363,7 @@ class Part
                                 <input type='hidden' name='SubmitAddAVOK' value='1' />
                           </form>";
 
-        $res.= Func::Cansel();
+        $res .= Func::Cansel();
         return $res;
     }
 
@@ -385,8 +384,7 @@ class Part
 
         $res = "";
 
-        if($cnt==0)
-        {
+        if ($cnt == 0) {
             $d = new Doc();
             $d->kod_dogovora = $this->kod_dogovora;
             $res .= "<br>" . $d->formPaySelList('', $Body);
@@ -478,7 +476,7 @@ class Part
         $cnt = $db->cnt;
         $kod_user = func::kod_user();
 
-        for($i=0;$i<$cnt;$i++) {
+        for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $kod_part = $row['kod_part'];
             $part_summa = self::getPartSumma($row);
@@ -506,11 +504,10 @@ class Part
         $kod_user = func::kod_user();
 
         $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat=$kod_plat");
-        if($db->cnt==1)
-        {
+        if ($db->cnt == 1) {
             $row = $rows[0];
-            $ostat = ((double)$row['summa']-(double)$row['summa_raspred']);
-            if($summa > $ostat)
+            $ostat = ((double)$row['summa'] - (double)$row['summa_raspred']);
+            if ($summa > $ostat)
                 $summa = $ostat;
         }
 
@@ -529,7 +526,7 @@ class Part
         $db = new Db();
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$this->kod_part");
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return;
 
         $part_summa = self::getPartSumma($rows[0]);
@@ -546,8 +543,8 @@ class Part
         if ($ostatok >= 0.01) { // Защита от малых значений
             $OKDate = $rows[0]['data_postav']; // Дата окончательного расчета = дата поставки
 
-            if(isset($_POST['data_ok']))
-                if(func::validateDate($_POST['data_ok']))
+            if (isset($_POST['data_ok']))
+                if (func::validateDate($_POST['data_ok']))
                     $OKDate = func::Date_to_MySQL($_POST['data_ok']);
 
             $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
@@ -592,6 +589,7 @@ class Part
             echo "Ошибка: Не задан ID накладной";
     }
 //-----------------------------------------------------------------------
+
     /**
      * Форма добавления накладной - поставка=отгрузка/ заказ=поступление
      * @param int $numb
@@ -629,7 +627,7 @@ class Part
                               </tr>
                             </table>
                 <input type="hidden" name="AddEditNacl" value="1" />
-                <input type="hidden" name="kod_part" value='. $this->kod_part .' />
+                <input type="hidden" name="kod_part" value=' . $this->kod_part . ' />
                 <input type="submit" name="button" id="button" value="Сохранить" />
                 </form>
                 ';
@@ -652,24 +650,24 @@ class Part
      * @param float $price_or
      * @param string $data_nach
      */
-    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 18, $val = 1,$Add=1,$price_or = 0.,$data_nach="")
+    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
         $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
 
-        if($data_nach!="")
+        if ($data_nach != "")
             $data_nach = func::Date_to_MySQL($data_nach);
         else
             $data_nach = "null";
 
         $kod_user = func::kod_user();
 
-        if($price=="")
-            $price=0.;
-        if($price_or=="")
-            $price_or=0.;
+        if ($price == "")
+            $price = 0.;
+        if ($price_or == "")
+            $price_or = 0.;
 
-        if($Add==1)
+        if ($Add == 1)
             $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
         else
             $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
@@ -681,7 +679,7 @@ class Part
      * @param int $Edit
      * @return string
      */
-    public function formAddEdit($Edit=1)
+    public function formAddEdit($Edit = 1)
     {
 
         //Данные
@@ -700,7 +698,7 @@ class Part
 
         $E = new Elem();
 
-        if(config::$price_or == 1) // Форма Ориентировочной цены
+        if (config::$price_or == 1) // Форма Ориентировочной цены
         {
             $price_or_str = "<tr>
                                     <td>Цена ОР Без НДС</td>
@@ -708,7 +706,7 @@ class Part
                                   </tr>";
         }
 
-        if(config::$data_nach == 1) // Форма Дата начала
+        if (config::$data_nach == 1) // Форма Дата начала
         {
             $data_nach = func::NowE();
 
@@ -720,7 +718,7 @@ class Part
                                   </tr>";
         }
 
-        if($Edit==1) {
+        if ($Edit == 1) {
 
             $db = new Db();
             $rows = $db->rows("SELECT * FROM parts WHERE del=0 AND kod_part=$this->kod_part");
@@ -743,7 +741,7 @@ class Part
                 $nds_18 = "";
             }
 
-            if(config::$price_or == 1) // Форма Ориентировочной цены
+            if (config::$price_or == 1) // Форма Ориентировочной цены
             {
                 $price_or_str = "<tr>
                                     <td>Цена ОР Без НДС</td>
@@ -751,10 +749,9 @@ class Part
                                   </tr>";
             }
 
-            if(config::$data_nach == 1)
-            {
-                $data_nach="";
-                if(!($row['data_nach']==NULL))
+            if (config::$data_nach == 1) {
+                $data_nach = "";
+                if (!($row['data_nach'] == NULL))
                     $data_nach = func::Date_from_MySQL($row['data_nach']);
 
                 $data_nach_str = "<tr>
@@ -780,7 +777,7 @@ class Part
                 <table border='0' cellspacing='0' width='100%'>
                   <tr>
                     <td width='100'>Элемент</td>
-                    <td colspan='2'>".$E->formSelList2()."</td>
+                    <td colspan='2'>" . $E->formSelList2() . "</td>
                   </tr>
                   <tr>
                     <td>Модификация</td>
@@ -827,7 +824,7 @@ class Part
             <br>
             </form>";
 
-        $res.= Func::Cansel(0);
+        $res .= Func::Cansel(0);
         return $res;
     }
 //-------------------------------------------------------------------------
@@ -848,9 +845,9 @@ class Part
      * Удаление партии и связей
      * @param int $kod_part
      */
-    public static function Delete($kod_part=0)
+    public static function Delete($kod_part = 0)
     {
-        if($kod_part==0)
+        if ($kod_part == 0)
             return;
 
         $db = new Db();
@@ -884,7 +881,7 @@ class Part
         $rows = $db->rows("SELECT * FROM raschety_plat WHERE del=0 AND kod_rascheta=$kod_rascheta");
 
         $cnt = $db->cnt;
-        if($cnt==0)
+        if ($cnt == 0)
             return 0.;
 
         $res = 0.;
@@ -920,7 +917,7 @@ class Part
                                 raschet.kod_part");
 
         $cnt = $db->cnt;
-        if($cnt==0)
+        if ($cnt == 0)
             return 0.;
 
         $row = $rows[0];
@@ -943,8 +940,8 @@ class Part
 
         $summ_plat = $this->getSummPlatByPart();
 
-        if($summ_plat >0 and $part_summa >0)
-            $res = func::Proc( $summ_plat / $part_summa);
+        if ($summ_plat > 0 and $part_summa > 0)
+            $res = func::Proc($summ_plat / $part_summa);
 
         return $res;
     }
@@ -958,7 +955,7 @@ class Part
     public static function getPrice($rplan_row)
     {
         $price = func::rnd($rplan_row['price']);
-        if($price==0.) // Берем ориентировочную
+        if ($price == 0.) // Берем ориентировочную
             $price = func::rnd($rplan_row['price_or']);
         return $price;
     }
@@ -973,8 +970,8 @@ class Part
     {
         $price = self::getPrice($rplan_row);
         $nds = func::rnd($rplan_row['nds']);
-        $summ_nds = $price*$nds;
-        $price_with_nds = $price+$summ_nds;
+        $summ_nds = $price * $nds;
+        $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
     }
 //
@@ -990,9 +987,9 @@ class Part
         $numb = func::rnd($rplan_row['numb']);      // Количество
         $price = self::getPrice($rplan_row);    // Цена без НДС
         $nds = func::rnd($rplan_row['nds']);        // Ставка НДС
-        $summ = $price*$numb;                       // Сумма без НДС
-        $summ_nds = func::rnd($summ*$nds);   // Сумма НДС
-        $summ_with_nds = $summ+$summ_nds;           // Итоговая сумма
+        $summ = $price * $numb;                       // Сумма без НДС
+        $summ_nds = func::rnd($summ * $nds);   // Сумма НДС
+        $summ_with_nds = $summ + $summ_nds;           // Итоговая сумма
         return $summ_with_nds;
     }
 //
@@ -1015,8 +1012,8 @@ class Part
                                       view_sklad_otgruzka.kod_part = $kod_part
                                     GROUP BY
                                       view_sklad_otgruzka.kod_part"
-                            );
-        if($db->cnt==0)
+        );
+        if ($db->cnt == 0)
             return 0;
 
         $res = $rows[0]['summ_numb'];
@@ -1045,7 +1042,7 @@ class Part
                                       view_sklad_postuplenie.kod_part"
         );
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return 0;
 
         $res = $rows[0]['summ_numb'];
@@ -1062,67 +1059,56 @@ class Part
         $event = false;
 
         if (isset($_POST['AddPart']))
-            if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
-            {
-                $price = round((double)$_POST['price'],2);
-                if(isset($_POST['nds_yn']))
-                    if($_POST['nds_yn']==1)
-                    {
-                        $nds = func::rnd($_POST['nds'])*100;
-                        $price = round($price*100/(100+$nds),2);
+            if (isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'])) {
+                $price = round((double)$_POST['price'], 2);
+                if (isset($_POST['nds_yn']))
+                    if ($_POST['nds_yn'] == 1) {
+                        $nds = func::rnd($_POST['nds']) * 100;
+                        $price = round($price * 100 / (100 + $nds), 2);
                     }
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'],$_POST['data_nach']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'], $_POST['data_nach']);
                 $event = true;
             }
 
         if (isset($_POST['EditPart']))
-            if(isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price']))
-            {
-                $price = round((double)$_POST['price'],2);
-                if(isset($_POST['nds_yn']))
-                    if((int)$_POST['nds_yn']==1)
-                    {
-                        $nds = func::rnd($_POST['nds'])*100;
-                        $price = round($price*100/(100+$nds),2);
+            if (isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'])) {
+                $price = round((double)$_POST['price'], 2);
+                if (isset($_POST['nds_yn']))
+                    if ((int)$_POST['nds_yn'] == 1) {
+                        $nds = func::rnd($_POST['nds']) * 100;
+                        $price = round($price * 100 / (100 + $nds), 2);
                     }
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'],0, $_POST['price_or'],$_POST['data_nach']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 0, $_POST['price_or'], $_POST['data_nach']);
                 $event = true;
             }
 
         if (isset($_POST['kod_oborota_poluch'])) { // Получение накладной
             $this->PostNacl($_POST['kod_oborota_poluch']);
             $event = true;
-        }
-        elseif (isset($_POST['kod_oborota_del'])) { // Удаление накладной
+        } elseif (isset($_POST['kod_oborota_del'])) { // Удаление накладной
             $this->DelNaklad($_POST['kod_oborota_del']);
             $event = true;
         }
 
         if (isset($_POST['AddEditNacl']))
-            if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'],$_POST['kod_oper'])) {
+            if (isset($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper'])) {
                 $this->AddNaklad($_POST['numb'], $_POST['naklad'], $_POST['data'], $_POST['kod_oper']);
                 $event = true;
-        }
+            }
 
         if (isset($_POST['summa']) and isset($_POST['data']) and isset($_POST['type_rascheta'])) {
             $this->AddRasch($_POST['summa'], $_POST['data'], $_POST['type_rascheta']);
             $event = true;
         }
 
-        if (isset($_POST['Flag']))
-        {
-            if ($_POST['Flag'] == 'AddRasch100')
-            {
+        if (isset($_POST['Flag'])) {
+            if ($_POST['Flag'] == 'AddRasch100') {
                 $this->AddRasch100();
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta_del']))
-            {
+            } elseif ($_POST['Flag'] == 'DelRasch' and isset($_POST['kod_rascheta_del'])) {
                 $this->DelRasch($_POST['kod_rascheta_del']);
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'DelPart' and isset($_POST['kod_part_del']))
-            {
+            } elseif ($_POST['Flag'] == 'DelPart' and isset($_POST['kod_part_del'])) {
                 $this->Delete($_POST['kod_part_del']);
                 $event = true;
             }
@@ -1133,8 +1119,7 @@ class Part
             $event = true;
         }
 
-        if (isset($_POST['AVPr'],$_POST['data']))
-        {
+        if (isset($_POST['AVPr'], $_POST['data'])) {
             $pr = (double)$_POST['AVPr'];
             $pr = round($pr / 100, 2);
 
@@ -1144,7 +1129,7 @@ class Part
             }
         }
 
-        if($event)
+        if ($event)
             header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
     }
 //-------------------------------------------------------------------------
@@ -1170,7 +1155,7 @@ class Part
      * @param int $Del
      * @return string
      */
-    public function formPrim($Del=1)
+    public function formPrim($Del = 1)
     {
         $add_prim = 0;
         if (isset($_POST['Flag']))
@@ -1180,12 +1165,10 @@ class Part
         $db = new Db();
         $res = "";
         // Примечание
-        $btd_add = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim',"kod_part",$this->kod_part);
+        $btd_add = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Примечание', 'AddPrim', "kod_part", $this->kod_part);
 
-        if($add_prim==1 and isset($_POST['kod_part']))
-        {
-            if($_POST['kod_part']==$this->kod_part)
-            {
+        if ($add_prim == 1 and isset($_POST['kod_part'])) {
+            if ($_POST['kod_part'] == $this->kod_part) {
                 $res = "<form name='form1' method='post' action=''>
                                       <table width='416' border='0'>
                                         <tr>
@@ -1202,11 +1185,10 @@ class Part
                                     <input type='hidden' name='AddPrim' value='1' />
                                     <input type='hidden' name='kod_part' value='$this->kod_part' />
                     </form>";
-                $res.= Func::Cansel();
+                $res .= Func::Cansel();
                 return $res;
             }
-        }
-        else
+        } else
             $res = $btd_add;
 
         $rows = $db->rows("SELECT * 
@@ -1220,9 +1202,9 @@ class Part
             return $res;
 
         // Формируем таблицу
-        $res= '
+        $res = '
                     <div class="btn">
-                        <div>Примечание</div><div>'.$btd_add.'</div>
+                        <div>Примечание</div><div>' . $btd_add . '</div>
                     </div>
                     <table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
@@ -1235,24 +1217,23 @@ class Part
             $row = $rows[$i];
 
             $user = "";
-            if($row['user']!="")
-                $user = "<br>".$row['user'];
+            if ($row['user'] != "")
+                $user = "<br>" . $row['user'];
 
             $kod_prim = $row['kod_prim'];
 
             $btn_del = "";
-            if($Del==1)
-            {
-                $btn_del = func::ActButton2("","Удалить","DelPrim","kod_prim_del",$kod_prim);
+            if ($Del == 1) {
+                $btn_del = func::ActButton2("", "Удалить", "DelPrim", "kod_prim_del", $kod_prim);
             }
 
-            $res.= /** @lang HTML */
+            $res .= /** @lang HTML */
                 '<tr>
                         <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $btn_del . '</td>
                         <td>' . $row['text'] . '</td>
                      </tr>';
         }
-        $res.= '</table>';
+        $res .= '</table>';
 
         return $res;
     }
@@ -1287,7 +1268,7 @@ class Part
         $kod_part = (int)$kod_part;
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$kod_part");
 
-        if($db->cnt==0)
+        if ($db->cnt == 0)
             return false;
 
         return $rows[0];
