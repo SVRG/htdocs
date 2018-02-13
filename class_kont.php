@@ -51,13 +51,19 @@ class Kontakt
         // Формируем массив контактов
         $cnt = $this->getKontArray($Doc_Org);
 
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-        //$res .= '<tr bgcolor="#CCCCCC" ><td width="200">Контакты</td></tr>';
+        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddKontakt');
+
+        $res = "<div class='btn'>
+                    <div><b>Контакты</b></div>
+                    <div>$btn_add</div>
+                </div>";
+
+        $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
 
         // Если можно добалять телефон то Разрешено "Добавить контакт из списка"
         if ($AddPh !== 0 and $Doc_Org == "Doc") {
             $res .= '<tr bgcolor="#CCCCCC"><td>';
-            $res .= '<br>' . $this->formSelList(); // Список выбора по организации
+            $res .= $this->formSelList(); // Список выбора по организации
             $res .= '</td></tr>';
         }
 
@@ -151,6 +157,7 @@ class Kontakt
 
         $res .= '</table>';
 
+        $btn = "";
         if ($Add == 1)
             $btn = func::btnImage("Добавить");
         $res .= '<form name="form1" method="post" action="">
@@ -288,16 +295,16 @@ class Kontakt
             "</select>";
 
         $res .= /** @lang HTML */
-            "<input type='hidden' name='formSelList' id='formSelList' />
-             <input type='submit' name='button' id='button' value='Добавить из списка' />";
-
-        $res .= /** @lang HTML */
             "<select name='Status' id='Status'>
                     <option value='2'>По Договору</option>
                     <option value='4'>По Отгрузке</option>
                     <option value='1'>Подписант</option>
                     <option value='3'>По Финансированию</option>
                  </select>";
+
+        $res .= /** @lang HTML */
+            "<input type='hidden' name='formSelList' id='formSelList' />
+             <input type='image' src='img/add.png' name='button' id='button' value='Добавить из списка' />";
 
         $res .= /** @lang HTML */
             "</form>";

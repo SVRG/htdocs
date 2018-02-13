@@ -116,7 +116,6 @@ else
                     if (!$add_kont) {
                         // Вывод контактов
                         $Dogovor->formDocKontakts(1);
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Контакт', 'AddKontakt');
                     }
                 } elseif (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                     $Dogovor->formDocKontakts(1);
