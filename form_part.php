@@ -63,7 +63,20 @@ include_once("header.php");
 <div class="style1" id="pagecell1">
     <!--pagecell1-->
     <?php
-    $Dogovor->formDogovor();
+    $edit = false;
+    if (isset($_POST['Flag']))
+        if ($_POST['Flag'] == 'DocEditForm') {
+            echo $Dogovor->formAddEdit(1);
+            echo func::Cansel();
+            $edit = true;
+        }
+
+    if (!$edit) {
+        if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+            $Dogovor->formDogovor(0, 1);
+        } else
+            $Dogovor->formDogovor();
+    }
 
     if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
 
