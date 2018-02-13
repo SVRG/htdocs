@@ -359,7 +359,7 @@ class Part
                                         </td>
                                     </tr>
                                 </table>
-                                <input type='submit' name='button' id='button' value='Submit' />
+                                <input type='submit' name='button' id='button' value='Добавить' />
                                 <input type='hidden' name='SubmitAddAVOK' value='1' />
                           </form>";
 
@@ -970,7 +970,7 @@ class Part
     {
         $price = self::getPrice($rplan_row);
         $nds = func::rnd($rplan_row['nds']);
-        $summ_nds = $price * $nds;
+        $summ_nds = func::rnd($price * $nds);
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
     }
