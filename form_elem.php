@@ -111,8 +111,6 @@ if (isset($_POST['Flag']))
             ?>
         </div>
     </div>
-
-
     <script type="text/javascript">
         <!--
         var CollapsiblePanel1 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel1", {contentIsOpen: false});
