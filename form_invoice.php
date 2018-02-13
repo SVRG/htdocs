@@ -95,7 +95,6 @@ if (isset($_GET['kod_scheta'])) {
         $data_sost = func::Date_from_MySQL($schet_data['data']);
         $dogovor_nomer = '<br>Договор: №' . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']);
     }
-
 }
 
 echo "<br><b>ИНН" . $Isp->Data['inn'] . " КПП" . $Isp->Data['kpp'] . "</b><br>";
@@ -154,7 +153,7 @@ $total_nds = 0;
 $total_summ = 0;
 $total_summ_with_nds = 0;
 
-if (count($schet_data) == 0 or isset($_GET['d'])) {
+if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставлен по договору
 
     $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
     $cnt = $db->cnt;
@@ -205,8 +204,10 @@ if (count($schet_data) == 0 or isset($_GET['d'])) {
 } else {
     $name = $schet_data['prim'];
     $numb = 1;
-    $summ_with_nds_str = func::Rub($schet_data['summa']);
-    $nds = $schet_data['summa'] * 0.18;
+    $summ_with_nds = $schet_data['summa']; // Сумма с НДС
+    $nds = $summ_with_nds - func::rnd($schet_data['summa'] * 100 / 118);
+
+    $summ_with_nds_str = func::Rub($schet_data['summa']); // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']) - $nds);
     $summ_str = $price_str;
     $nds_str = func::Rub($nds);
