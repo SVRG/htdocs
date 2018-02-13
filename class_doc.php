@@ -621,6 +621,9 @@ class Doc
         $zakup_checked = "";
 
         if ($Edit == 1) {
+            if(!isset($this->Data))
+                $this->getData();
+
             $nomer = $this->Data['nomer'];
             $data_sost = Func::Date_from_MySQL($this->Data['data_sost']);
             $kod_org = $this->Data['kod_org'];
@@ -1571,9 +1574,27 @@ class Doc
      */
     public function formDocList($sql = "")
     {
+        $where = ""; // GET Filter
+
+        if (isset($_GET['kod_org'])) {
+            $kod_org = (int)$_GET['kod_org'];
+            $where = "WHERE kod_org=$kod_org ";
+        }
+
+        if (isset($_GET['y'])) {
+            $y = (int)$_GET['y'];
+            $data_s = "$y-01-01";
+            $data_n = ($y + 1) . "-01-01";
+            if ($where == "")
+                $where = "WHERE (data_sost>='$data_s' AND data_sost<'$data_n') ";
+            else
+                $where .= " AND (data_sost>='$data_s' AND data_sost<'$data_n') ";
+        }
+
         $db = new Db();
         if ($sql == "")
-            $sql = "SELECT * FROM view_scheta_dogovory_all";
+            $sql = /** @lang MySQL */
+                "SELECT * FROM view_scheta_dogovory_all $where";
 
         $rows = $db->rows($sql);
 
