@@ -8,8 +8,9 @@ body {
     padding: 0;
     background: #cccccc;
 }
+
 input, textarea {
-    font: 80% Arial;
+    font: 90% Arial;
 }
 /************** header tag styles **************/
 
