@@ -58,19 +58,18 @@ class Kontakt
                     <div>$btn_add</div>
                 </div>";
 
-        $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
+        if ($cnt == 0) // если нет контактов то возвращаем список
+        {
+            // todo: Информировать, что контакт не выбран
+            return $res.$this->formSelList();
+        }
 
+        $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
         // Если можно добалять телефон то Разрешено "Добавить контакт из списка"
         if ($AddPh !== 0 and $Doc_Org == "Doc") {
             $res .= '<tr bgcolor="#CCCCCC"><td>';
             $res .= $this->formSelList(); // Список выбора по организации
             $res .= '</td></tr>';
-        }
-
-        if ($cnt == 0) // если нет контактов то возвращаем список
-        {
-            // todo: Информировать, что контакт не выбран
-            return $this->formSelList();
         }
 
         $exc = array();
