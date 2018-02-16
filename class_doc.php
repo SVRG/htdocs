@@ -1482,7 +1482,10 @@ class Doc
                                           <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
                                         </tr>
                                         <tr>
-                                          <td><input type="submit" name="button" id="button" value="Добавить" /></td>
+                                          <td>
+                                            <input type="radio" name="status" value="0" checked>Примечание
+                                            <input type="radio" name="status" value="1">Доставка                                          
+                                          <input type="submit" name="button" id="button" value="Добавить" /></td>
                                         <td>&nbsp;</td>
                                         </tr>
                                       </table>
@@ -1508,7 +1511,7 @@ class Doc
         $res .= /** @lang HTML */
             '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC" >
-                    <td width="80">Дата</td>
+                    <td width="100">Дата</td>
                     <td>Текст</td>';
 
         // Заполняем данными
@@ -1517,16 +1520,45 @@ class Doc
 
             $user = "";
             if ($row['user'] != "")
-                $user = "<br>" . $row['user'];
+                $user = $row['user'];
 
             $kod_prim = $row['kod_prim'];
 
             $btn_del = func::ActButton2("", "Удалить", "DelPrim", "kod_prim_del", $kod_prim);
 
+            $status = (int)$row['status'];
+            $status_str = "";
+            $delivery_color = "";
+            if($status==1)
+            {
+                $btn_submit = func::ActButton2("", "Подтвердить доставку", "SubmitDelivery", "kod_prim_status", $kod_prim);
+                $status_str = "<div class='btn'><div>Доставка</div><div>$btn_submit</div></div>";
+                $yellow = func::$yellow;
+                $delivery_color = /** @lang HTML */
+                    " bgcolor='$yellow' ";
+            }
+            elseif ($status==2)
+            {
+                $status_str = "Доставлено<br>";
+                $green = func::$green;
+                $delivery_color = /** @lang HTML */
+                    " bgcolor='$green' ";
+            }
+
+            $btn_set_stat1 = "";
+            if($status==0)
+                $btn_set_stat1 = "<div>".func::ActButton2("", "Доставка", "SetPrimStatus1", "kod_prim_status", $kod_prim)."</div>";
+
             $res .= /** @lang HTML */
-                '<tr>
-                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . $btn_del . '</td>
-                        <td>' . $row['text'] . '</td>
+                '<tr'.$delivery_color.'>
+                        <td>
+                            <div class="btn">
+                                <div>' . Func::Date_from_MySQL($row['time_stamp'])."</div>
+                                <div>$btn_del</div>
+                                $btn_set_stat1
+                            </div>". $user .
+                       '</td>
+                        <td>' . $status_str . $row['text'] . '</td>
                      </tr>';
         }
         $res .= /** @lang HTML */
@@ -2133,6 +2165,14 @@ class Doc
                 $this->DelAttr($_POST['kod_attr_del']);
                 $event = true;
             }
+            elseif ($_POST['Flag'] == 'SubmitDelivery' and isset($_POST['kod_prim_status'])) {
+                $this->setPrimStatus($_POST['kod_prim_status'],2);
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'SetPrimStatus1' and isset($_POST['kod_prim_status'])) {
+                $this->setPrimStatus($_POST['kod_prim_status'],1);
+                $event = true;
+            }
         }
 
         if ($event)
@@ -2272,8 +2312,14 @@ class Doc
         if (isset($_POST['kod_part']))
             $kod_part = $_POST['kod_part'];
 
+        $status = 0;
+        if(isset($_POST['status']))
+        {
+            $status = (int)$_POST['status'];
+        }
+
         $db = new Db();
-        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part) VALUES($this->kod_dogovora,'$P','$user',$kod_user,$kod_part)");
+        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$P','$user',$kod_user,$kod_part,$status)");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2352,6 +2398,17 @@ class Doc
             $nomer = self::getNextSchetNomer();
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    public function setPrimStatus($kod_prim, $status = 0)
+    {
+        $db = new Db();
+        $kod_user = func::kod_user();
+
+        if(!isset($kod_prim))
+            return;
+
+        $db->query("UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1, time_stamp=NOW() WHERE kod_prim=$kod_prim");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
