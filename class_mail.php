@@ -115,6 +115,12 @@ class Mail
         //send the message, check for errors
         if (!$mail->send()) {
             $this->err = "Mailer Error: " . $mail->ErrorInfo;
+            $err_log = $this->err;
+            $user = func::user();
+            // Запись ошибок в log
+            $db = new Db();
+            $db->query(/** @lang MySQL */
+                "INSERT INTO log (log, user) VALUES ('$err_log','$user')");
             return false;
         } else {
             return true;
