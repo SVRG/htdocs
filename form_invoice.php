@@ -205,7 +205,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     $name = $schet_data['prim'];
     $numb = 1;
     $summ_with_nds = $schet_data['summa']; // Сумма с НДС
-    $nds = $summ_with_nds - func::rnd($schet_data['summa'] * 100 / 118);
+    $nds = $summ_with_nds - func::rnd($schet_data['summa'] * 100 / 118); // Сумма НДС
 
     $summ_with_nds_str = func::Rub($schet_data['summa']); // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']) - $nds);
