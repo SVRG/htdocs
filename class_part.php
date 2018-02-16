@@ -644,13 +644,13 @@ class Part
      * @param $data_postav
      * @param float $price
      * @param string $modif
-     * @param int $nds
+     * @param float $nds
      * @param int $val
      * @param int $Add
      * @param float $price_or
      * @param string $data_nach
      */
-    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
+    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 0.18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
         $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
@@ -663,7 +663,11 @@ class Part
         $kod_user = func::kod_user();
 
         if ($price == "")
-            $price = 0.;
+        {
+            $E = new Elem();
+            $E->kod_elem = (int)$kod_elem;
+            $price = func::rnd($E->getPriceForQuantity((int)$numb)*100/(100+$nds*100));
+        }
         if ($price_or == "")
             $price_or = 0.;
 
