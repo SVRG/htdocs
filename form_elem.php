@@ -55,16 +55,6 @@ include("header.php");
 $Del = 0;
 if (in_array($_SESSION['MM_UserGroup'], $UserG))
     $Del = 1;
-
-$Form = '';
-if (in_array($_SESSION['MM_UserGroup'], $UserA))
-    $Form = Func::ActButton('', 'Изменить', 'formAddEdit');
-
-if (isset($_POST['Flag']))
-    if ($_POST['Flag'] == 'formAddEdit') {
-        $Form = $E->formAddEdit(1);
-    }
-
 ?>
 
 <!-- end masthead -->
@@ -75,7 +65,8 @@ if (isset($_POST['Flag']))
             <td align="left" bgcolor="#ECEEFD">
                 <?php
                 echo $E->formPhoto() . '<br>';
-                echo $E->formName('all', 1) . $Form;
+                echo $E->formName('all', 1);
+                echo $E->formPriceList();
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Прикрепленные Файлы</div>

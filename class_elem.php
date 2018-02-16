@@ -60,11 +60,18 @@ class Elem
 
         if ($db->cnt == 0)
             return "Элемент не найден";
+        $res = "";
+        $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
+
+        if (isset($_POST['Flag']))
+            if ($_POST['Flag'] == 'formAddEdit') {
+                return $this->formAddEdit(1);
+            }
 
         $row = $rows[0];
 
         if ($field == 'shablon' and $row['shablon'] != "")
-            $res = str_replace('[Mod]', $this->Mod, $row['shablon']);
+            $res .= str_replace('[Mod]', $this->Mod, $row['shablon']);
         elseif ($field == "all") {
             $name = $row['name'];
             $obozn = $row['obozn'];
@@ -79,9 +86,10 @@ class Elem
             if (strpos($row['name'], $obozn) !== false)
                 $obozn = "";
 
-            $res = "$shifr $name $obozn";
+            $res .= /** @lang HTML */
+                "<div class='btn'><div>$shifr</div><div>$btn_edit</div></div>$name $obozn";
         } else
-            $res = $row[$field];
+            $res .= $row[$field];
 
         if ($Link == 1)
             return '<a href="form_elem.php?kod_elem=' . $this->kod_elem . '">' . $res . '</a>';
@@ -137,6 +145,7 @@ class Elem
                 $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
             }
 
+            $this->kod_elem = $kod_elem;
 
             $name = "";
             if ($row['shifr'] != $row['elem_name'])
@@ -144,7 +153,7 @@ class Elem
 
             $row_nomen = "<tr>
                             <td align='left' valign='top'>$img</td>
-                            <td valign='top'><a href='$link'><h1> $shifr </h1> $name </td>
+                            <td valign='top'><a href='$link'><h1> $shifr </h1> $name </a></td>
                          </tr>";
 
             if ($row['nomen'] == 1)
@@ -405,10 +414,14 @@ class Elem
             $shablon = $row['shablon'];
             $FormName = "formEdit";
 
-            if ($row['nomen'] == 1)
-                $btn_nomen = func::ActButton2('', 'Удалить из номенклатуры', "UnsetNomen", "kod_elem_set", $row['kod_elem']);
-            elseif ($row['nomen'] == 0)
-                $btn_nomen = func::ActButton2('', 'Добавить в номенклатуру', "SetNomen", "kod_elem_set", $row['kod_elem']);
+            if (isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
+                if ($_SESSION['MM_UserGroup'] === "admin")
+                {
+                    if ($row['nomen'] == 1)
+                        $btn_nomen = func::ActButton2('', 'Удалить из номенклатуры', "UnsetNomen", "kod_elem_set", $row['kod_elem']);
+                    elseif ($row['nomen'] == 0)
+                        $btn_nomen = func::ActButton2('', 'Добавить в номенклатуру', "SetNomen", "kod_elem_set", $row['kod_elem']);
+                }
         }
 
         $res = '
@@ -539,6 +552,14 @@ class Elem
                 $event = true;
             } elseif ($flag == "DelFromSpec" and isset($_POST['kod_spec_del'])) {
                 $this->delSpec($_POST['kod_spec_del']);
+                $event = true;
+            }
+            elseif ($flag == "AddPrice" and isset($_POST['price'],$_POST['quantity'])) {
+                $this->addPrice($_POST['price'],$_POST['quantity']);
+                $event = true;
+            }
+            elseif ($flag == "DelPrice" and isset($_POST['kod_price_del'])) {
+                $this->delPrice($_POST['kod_price_del']);
                 $event = true;
             }
         }
@@ -778,6 +799,156 @@ class Elem
         }
 
         $res .= '</table>';
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Добавление цены
+     * @param int $price
+     * @param int $quantity
+     */
+    public function addPrice($price=1, $quantity=10)
+    {
+        $kod_elem = $this->kod_elem;
+        $db = new Db();
+        $price = func::rnd($price);
+        if($price<=0.01 or (int)$quantity<=0)
+            return;
+        $quantity = (int)$quantity;
+        $kod_user = func::kod_user();
+        $db->query(/** @lang MySQL */
+            "INSERT INTO price_list (kod_elem, price, quantity,kod_user) VALUES ($kod_elem,$price,$quantity,$kod_user)");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление цены
+     * @param $kod_price
+     */
+    public function delPrice($kod_price)
+    {
+        $kod_price = (int)$kod_price;
+        $db = new Db();
+        $db->query(/** @lang MySQL */
+            "UPDATE price_list SET del=1 WHERE kod_price=$kod_price");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    public function formPriceList()
+    {
+        $db = new Db();
+        $kod_elem = $this->kod_elem;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ");
+
+        $btn_add = "";
+        if(func::user_group()=="admin")
+            $btn_add = Func::ActButton('', 'Добавить', 'formAddPrice');
+
+        $res = /** @lang HTML */
+            "<div class='btn'><div><h1>Прайс-лист</h1></div><div>$btn_add</div></div>";
+
+        if(isset($_POST['Flag']) and func::user_group()=="admin")
+        if($_POST['Flag']=='formAddPrice')
+        {
+            $res .= /** @lang HTML */
+                "<form action='' method='post'>
+                    Цена<input title='price' name='price'>
+                    Кол-во<input title='quantity' name='quantity'>
+                    <input type='hidden' name='kod_elem' value='$kod_elem'>
+                    <input type='submit' value='Добавить'>
+                    <input type='hidden' name='Flag' value='AddPrice'>                       
+                </form>";
+            $res .= func::Cansel();
+        }
+
+        $res.="<table border='0'>";
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            $btn_del = "";
+            if(func::user_group()=="admin")
+                $btn_del = func::ActButton2('', 'Удалить', "DelPrice", "kod_price_del", $row['kod_price']);
+
+            $price = func::Rub($row['price']);
+            $quantity = $row['quantity'];
+
+            $res .= /** @lang HTML */
+                "<tr><td><$quantity</td><td>-</td><td>$price</td><td>$btn_del</td></tr>";
+        }
+        $res.="</table>";
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    public function getPriceForQuantity($quantity_for=1)
+    {
+        $db = new Db();
+        $kod_elem = $this->kod_elem;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ");
+
+        if($db->cnt==0)
+            return 0;
+
+        $price = func::rnd($rows[0]['price']);
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $quantity = $row['quantity'];
+
+            if($quantity_for>=$quantity){
+                $price = func::rnd($row['price']);
+            }
+        }
+
+        return $price;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    public function formPriceListAll()
+    {
+        $db = new Db();
+        $kod_elem = $this->kod_elem;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT elem.kod_elem,kod_price,price,quantity,obozn,name,shifr FROM price_list INNER JOIN elem ON elem.kod_elem=price_list.kod_elem WHERE price_list.del=0 ORDER BY shifr ASC,quantity ASC ");
+
+        $btn_add = "";
+        if(func::user_group()=="admin")
+            $btn_add = Func::ActButton('', 'Добавить', 'formAddPrice');
+
+        $res = /** @lang HTML */
+            "<div class='btn'><div><h1>Прайс-лист</h1></div><div>$btn_add</div></div>";
+
+        if(isset($_POST['Flag']) and func::user_group()=="admin")
+            if($_POST['Flag']=='formAddPrice')
+            {
+                $res .= /** @lang HTML */
+                    "<form action='' method='post'>
+                    Цена<input title='price' name='price'>
+                    Кол-во<input title='quantity' name='quantity'>
+                    <input type='hidden' name='kod_elem' value='$kod_elem'>
+                    <input type='submit' value='Добавить'>
+                    <input type='hidden' name='Flag' value='AddPrice'>                       
+                </form>";
+                $res .= func::Cansel();
+            }
+
+        $res.="<table border='0'>";
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            $btn_del = "";
+            if(func::user_group()=="admin")
+                $btn_del = func::ActButton2('', 'Удалить', "DelPrice", "kod_price_del", $row['kod_price']);
+
+            $price = func::Rub($row['price']);
+            $quantity = $row['quantity'];
+            $shifr = $row['shifr'];
+            $res .= /** @lang HTML */
+                "<tr><td>$shifr</td><td><$quantity</td><td>-</td><td>$price</td><td>$btn_del</td></tr>";
+        }
+        $res.="</table>";
+
         return $res;
     }
 }
