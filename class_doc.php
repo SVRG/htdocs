@@ -2408,7 +2408,7 @@ class Doc
         if(!isset($kod_prim))
             return;
 
-        $db->query("UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1, time_stamp=NOW() WHERE kod_prim=$kod_prim");
+        $db->query("UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1 WHERE kod_prim=$kod_prim");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
