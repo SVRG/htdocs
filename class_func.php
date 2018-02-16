@@ -5,11 +5,11 @@
 class Func
 {
 
-    public $green = '#ADFAC2'; // Зеленый
-    public $orange = '#FFD222'; // Оранж
-    public $red = '#F18585'; // Красный
-    public $grey = '#CCCCCC'; // Серый
-    public $yellow = '#FFFF99'; // Желтый
+    public static $green = '#ADFAC2'; // Зеленый
+    public static $orange = '#FFD222'; // Оранж
+    public static $red = '#F18585'; // Красный
+    public static $grey = '#CCCCCC'; // Серый
+    public static $yellow = '#FFFF99'; // Желтый
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * Сколько дней осталось до указанной даты
@@ -484,11 +484,24 @@ class Func
      */
     static public function kod_user()
     {
-        $kod_user = 1;
+        $kod_user = 0;
         if (isset($_SESSION['MM_kod_user']))
             $kod_user = $_SESSION['MM_kod_user'];
 
         return $kod_user;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Получение группы пользователя из SESSION
+     */
+    static public function user_group()
+    {
+        $user_group = 0;
+        if (isset($_SESSION['MM_UserGroup']))
+            $user_group = $_SESSION['MM_UserGroup'];
+
+        return $user_group;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
