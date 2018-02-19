@@ -85,6 +85,7 @@ class Doc
                                           2)                                                                                             AS `part_summa`,
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
+                                    `trin`.`parts`.`price_or`                                                                            AS `price_or`,
                                     `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
                                     `trin`.`elem`.`obozn`                                                                                AS `obozn`,
                                     `trin`.`elem`.`shifr`                                                                                AS `shifr`,
@@ -123,6 +124,7 @@ class Doc
                                           2)                                                                                             AS `part_summa`,
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
+                                    `trin`.`parts`.`price_or`                                                                            AS `price_or`,
                                     `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
                                     `trin`.`elem`.`obozn`                                                                                AS `obozn`,
                                     `trin`.`elem`.`shifr`                                                                                AS `shifr`,
@@ -1148,7 +1150,10 @@ class Doc
             $row = $rows[$i];
             $kod_plat = $row['kod_plat'];
 
-            $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
+            $btn_del = "";
+
+            if(func::user_group()=="admin")
+                $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
             $nomer = "<div class='btn'>
                     <div><b>" . $row['nomer'] . "</b></div>
                     <div>$btn_del</div>
