@@ -224,26 +224,28 @@ class Part
             $btn_poluch = ""; // Кнопка отметки получения накладной
 
             if ((int)$row['kod_oper'] == 1) // Поступление
-                $res .= '<br><img src="/img/in.gif" height="14" />' . $naklad;
-            else if ((int)$row['kod_oper'] == 2) // Отгрузка
+                $res .= '<img src="/img/in.gif" height="14" />' . $naklad;
+            elseif ((int)$row['kod_oper'] == 2) // Отгрузка
             {
-                $res .= '<br><img src="/img/out.gif" height="14" />' . $naklad;
+                $res .= '<img src="/img/out.gif" height="14" />' . $naklad;
 
                 // Форма отметки о получении накладной
                 if ((int)$row['poluch'] <> 1)
                     $btn_poluch = Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch', $kod_oborota);
-            } else if ($row['kod_oper'] == 3) // Акт
+            }
+            elseif ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
-            else
-                if ($row['kod_oper'] == 4) // Возврат
+            elseif ($row['kod_oper'] == 4) // Возврат
                     $res .= '<br>Возврат:' . $naklad;
+
+            // todo - Права доступа
             $btn_del = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del', $kod_oborota);
 
             $res = "<div class='btn'>
-                    <div>$res</div>
-                    <div>$btn_del</div>
-                    <div>$btn_poluch</div>
-                </div>";
+                        <div>$res</div>
+                        <div>$btn_del</div>
+                        <div>$btn_poluch</div>
+                   </div>";
         }
 
         return $res;
@@ -959,7 +961,7 @@ class Part
     public static function getPrice($rplan_row)
     {
         $price = func::rnd($rplan_row['price']);
-        if ($price == 0.) // Берем ориентировочную
+        if ($price == 0. and config::$price_or==1) // Берем ориентировочную
             $price = func::rnd($rplan_row['price_or']);
         return $price;
     }
