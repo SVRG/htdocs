@@ -160,7 +160,7 @@ class Kontakt
         if ($Add == 1)
             $btn = func::btnImage("Добавить");
         $res .= '<form name="form1" method="post" action="">
-                           <input name="phone" id="phone" />
+                           <input name="phone" />
                            <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
                            <input type="hidden" name="formPhones" value="formPhones" />
                            ' . $btn . '
