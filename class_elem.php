@@ -75,21 +75,24 @@ class Elem
         elseif ($field == "all") {
             $name = $row['name'];
             $obozn = $row['obozn'];
-            $shifr = "";
+            $shifr = $obozn;
 
             if ($row['shifr'] != "")
-                $shifr = "<b>" . $row['shifr'] . "</b><br>";
+                $shifr = $row['shifr'];
 
             if ($name == $row['shifr'])
                 $name = "";
 
-            if (strpos($row['name'], $obozn) !== false)
-                $obozn = "";
+            if($name!=="" and $obozn!=="")
+            {
+                if (strpos($row['name'], $obozn) !== false)
+                    $obozn = "";
+            }
 
             $res .= /** @lang HTML */
-                "<div class='btn'><div>$shifr</div><div>$btn_edit</div></div>$name $obozn";
+                "<div class='btn'><div><b>$shifr</b></div><div>$btn_edit</div></div>$name $obozn";
         } else
-            $res .= $row[$field];
+            $res = $row[$field];
 
         if ($Link == 1)
             return '<a href="form_elem.php?kod_elem=' . $this->kod_elem . '">' . $res . '</a>';
@@ -315,6 +318,9 @@ class Elem
     {
         $db = new Db();
 
+        if($obozn==="" or $name==="")
+            return;
+
         $obozn = ltrim($obozn);
         $name = ltrim($name);
         $kod_user = func::kod_user();
@@ -470,13 +476,17 @@ class Elem
 //
 
     /**
-     * Удаление элемента с заменой
-     * Заменяем указанный элемент в партиях на код Комплектующие=1001, в модификации добавляем наименование
+     * Удаление элемента с заменой - чтоб не плодить одноразовые наименования
+     * Заменяем указанный элемент в партиях на код Комплектующие=1001,
+     * в модификации добавляем наименование+модификацию старого элемента
      * @param int $kod_elem - код удаляемого элемента
      * @param int $kod_dest - код элемента на который надо заменить
      */
     public function DeleteReplace($kod_elem, $kod_dest = 1001)
     {
+        if(func::user_group()!=="admin") // todo - Придумать глобальные права
+            return;
+
         $db = new Db();
 
         $elem_name = $db->rows("SELECT * FROM elem WHERE kod_elem = $kod_elem AND del=0"); // Получаем название удаляемого элемента
@@ -734,6 +744,9 @@ class Elem
      */
     public function delSpec($kod_spec)
     {
+        if(func::user_group()!=="amin") // todo - Придумать глобальные права
+            return;
+
         $db = new Db();
         $db->query("UPDATE specs SET del=1 WHERE kod_spec=$kod_spec"); // Удаляем элемент
     }
