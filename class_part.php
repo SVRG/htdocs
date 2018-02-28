@@ -975,13 +975,16 @@ class Part
     public static function getSummNDS($rplan_row)
     {
         $price = self::getPrice($rplan_row);
-        $nds = func::rnd($rplan_row['nds']);
+        $nds = func::rnd($rplan_row['nds']*100);
+        $numb = func::rnd($rplan_row['numb']);
+        $summ_nds = 0;
         if($nds>0)
         {
-            $res = func::rnd($price*$nds);
-            return $res;
+            $summ_nds = func::rnd($price*$nds/100);
+            return $summ_nds;
         }
-        else return 0;
+
+        return $summ_nds;
     }
 
 //-------------------------------------------------------------------------

@@ -144,9 +144,7 @@ echo "<tr>
             <td>Наименование</td>
             <td>Ед. изм.</td>
             <td>Кол-во</td>
-            <td>Цена без НДС</td>
-            <td>Сумма</td>  
-            <td>НДС</td>     
+            <td>Цена с НДС</td>
             <td>Сумма с НДС</td>
           </tr>";
 $total_nds = 0;
@@ -169,20 +167,21 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         else
             $modif = "";
 
-        $numb = func::rnd($row['numb']);                            // Количество
-        $summ = func::rnd(func::rnd($row['price']) * $numb); // Сумма без НДС
-        $summ_with_nds = Part::getPartSumma($row);                  // Сумма партии с НДС
-        $nds = func::rnd($row['nds']) * 100;                          // Ставка НДС
-        $summ_nds = func::rnd($summ * $nds / 100);               // Сумма НДС
-
-        $summ_str = func::Rub($summ);
-        $price_str = func::Rub($row['price']);
-        $nds_str = ($row['nds'] * 100) . '%';
-        $summ_with_nds_str = func::Rub($summ_with_nds);
+        $numb = func::rnd($row['numb']);                                // Количество
+        $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
+        $nds = func::rnd($row['nds']) * 100;                            // Ставка НДС
+        $summ_nds = func::rnd($summ_with_nds*$nds/(100+$nds));   // Сумма НДС
+        $summ = $summ_with_nds-$summ_nds;                               // Сумма без НДС
 
         $total_nds += $summ_nds;
         $total_summ += $summ;
         $total_summ_with_nds += $summ_with_nds;
+
+        $price = Part::getPriceWithNDS($row);
+
+        $summ_str = func::Rub($summ);
+        $price_str = func::Rub($price);
+        $summ_with_nds_str = func::Rub($summ_with_nds);
 
         $n = $i + 1;
         echo "<tr>
@@ -191,8 +190,6 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             <td>шт.</td>
             <td align='center'>$numb</td>
             <td align='right' nowrap>$price_str</td>
-            <td align='right' nowrap>$summ_str</td>  
-            <td align='center'>$nds_str</td>     
             <td align='right' nowrap>$summ_with_nds_str</td>
           </tr>";
     }
@@ -217,8 +214,6 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             <td>шт.</td>
             <td align='center'>$numb</td>
             <td align='right' nowrap>$price_str</td>
-            <td align='right' nowrap>$summ_str</td>  
-            <td align='center'>$nds_str</td>     
             <td align='right' nowrap>$summ_with_nds_str</td>
           </tr>";
 
@@ -229,12 +224,12 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 }
 
 
-echo "<tr><th colspan='7' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
-echo "<tr><th colspan='8' align='right'>$total_summ_with_nds_text</th></tr>";
-echo "<tr><th colspan='7' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
-echo "<tr><th colspan='8' align='right'>$total_nds_text</th></tr>";
+echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
+echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
+echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
+echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
 if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
-    echo "<tr><th colspan='8' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
+    echo "<tr><th colspan='6' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
 echo "</table>";
 echo "<br>";
 
