@@ -968,6 +968,25 @@ class Part
 //-------------------------------------------------------------------------
 
     /**
+     * Возвращает сумму НДС
+     * @param $rplan_row
+     * @return float|int
+     */
+    public static function getSummNDS($rplan_row)
+    {
+        $price = self::getPrice($rplan_row);
+        $nds = func::rnd($rplan_row['nds']);
+        if($nds>0)
+        {
+            $res = func::rnd($price*$nds);
+            return $res;
+        }
+        else return 0;
+    }
+
+//-------------------------------------------------------------------------
+
+    /**
      * Цена с НДС
      * @param $rplan_row
      * @return float
@@ -975,8 +994,7 @@ class Part
     public static function getPriceWithNDS($rplan_row)
     {
         $price = self::getPrice($rplan_row);
-        $nds = func::rnd($rplan_row['nds']);
-        $summ_nds = func::rnd($price * $nds);
+        $summ_nds = self::getSummNDS($rplan_row);
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
     }
@@ -991,11 +1009,7 @@ class Part
     public static function getPartSumma($rplan_row)
     {
         $numb = func::rnd($rplan_row['numb']);      // Количество
-        $price = self::getPrice($rplan_row);    // Цена без НДС
-        $nds = func::rnd($rplan_row['nds']);        // Ставка НДС
-        $summ = $price * $numb;                       // Сумма без НДС
-        $summ_nds = func::rnd($summ * $nds);   // Сумма НДС
-        $summ_with_nds = $summ + $summ_nds;           // Итоговая сумма
+        $summ_with_nds = $numb * self::getPriceWithNDS($rplan_row);
         return $summ_with_nds;
     }
 //
