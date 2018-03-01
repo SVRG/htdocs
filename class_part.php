@@ -968,28 +968,6 @@ class Part
 //-------------------------------------------------------------------------
 
     /**
-     * Возвращает сумму НДС
-     * @param $rplan_row
-     * @return float|int
-     */
-    public static function getSummNDS($rplan_row)
-    {
-        $price = self::getPrice($rplan_row);
-        $nds = func::rnd($rplan_row['nds']*100);
-        $numb = func::rnd($rplan_row['numb']);
-        $summ_nds = 0;
-        if($nds>0)
-        {
-            $summ_nds = func::rnd($price*$nds/100);
-            return $summ_nds;
-        }
-
-        return $summ_nds;
-    }
-
-//-------------------------------------------------------------------------
-
-    /**
      * Цена с НДС
      * @param $rplan_row
      * @return float
@@ -997,14 +975,17 @@ class Part
     public static function getPriceWithNDS($rplan_row)
     {
         $price = self::getPrice($rplan_row);
-        $summ_nds = self::getSummNDS($rplan_row);
+        $nds = func::rnd($rplan_row['nds']);
+        $summ_nds = 0;
+        if($nds>0)
+            $summ_nds = func::rnd($price*$nds);
+
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
     }
 //
 //-------------------------------------------------------------------------
     /**
-     * // todo - нужно учитывать в какой валюте цена
      * Сумма партии
      * @param $rplan_row
      * @return float

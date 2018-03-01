@@ -134,7 +134,7 @@ else {
 $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];
 
-echo "<p><h3>Счет №$nomer от $data_sost</h3></p>";
+echo "<h3>Счет №$nomer от $data_sost</h3>";
 echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " . $adres;
 echo $dogovor_nomer;
@@ -201,11 +201,11 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 } else {
     $name = $schet_data['prim'];
     $numb = 1;
-    $summ_with_nds = $schet_data['summa']; // Сумма с НДС
-    $nds = $summ_with_nds - func::rnd($schet_data['summa'] * 100 / 118); // Сумма НДС
+    $summ_with_nds = $schet_data['summa'];                  // Сумма с НДС
+    $nds = func::rnd($summ_with_nds * 18 / 118);     // Сумма НДС
 
-    $summ_with_nds_str = func::Rub($schet_data['summa']); // Строка
-    $price_str = func::Rub(func::rnd($schet_data['summa']) - $nds);
+    $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
+    $price_str = func::Rub(func::rnd($schet_data['summa']));
     $summ_str = $price_str;
     $nds_str = func::Rub($nds);
     echo "<tr>
@@ -257,7 +257,7 @@ if (isset($_GET['p']) and $D->Data['kod_ispolnit'] == config::$kod_org_main) {
             </tr>";
 } elseif ($D->Data['kod_ispolnit'] == config::$kod_org_main) {
     echo /** @lang HTML */
-    "<img src='img/sign.png' width='776'></image>";
+    "<img alt='sign' src='img/sign.png' width='776'>";
 }
 ?>
 </body>
