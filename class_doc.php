@@ -2045,7 +2045,7 @@ class Doc
             "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, kod_dogovora, val, nds, kod_user) 
                 SELECT kod_elem, modif, numb, NOW(), price, price_or, $kod_dogovora_new, val, nds, $kod_user 
                 FROM parts
-                WHERE kod_dogovora=$kod_dogovora");
+                WHERE kod_dogovora=$kod_dogovora AND del=0");
 
         return $kod_dogovora_new;
     }
