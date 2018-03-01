@@ -675,8 +675,8 @@ class Part
             $price = func::clearNum($price);
             if (isset($_POST['nds_yn']))
                 if ($_POST['nds_yn'] == 1) {
-                    $nds = func::clearNum($nds)*100;
-                    $price = round($price * 100 / (100 + $nds), 2);
+                    $nds = func::clearNum($nds);
+                    $price = round($price * 100 / (100 + $nds*100), 2);
                 }
         }
 
