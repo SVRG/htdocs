@@ -447,6 +447,7 @@ class Part
      */
     public function AddRasch($summa, $data, $type_rascheta)
     {
+        $summa = func::clearNum($summa);
         $db = new Db();
         $data = func::Date_to_MySQL($data);
         $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$summa,'$data',$type_rascheta)");
@@ -500,8 +501,7 @@ class Part
      */
     public function AddPayToRas($summa, $kod_rascheta, $kod_plat)
     {
-        $summa = str_replace(' ', '', $summa);
-        $summa = doubleval($summa);
+        $summa = func::clearNum($summa);
         $db = new Db();
         $kod_user = func::kod_user();
 
@@ -670,6 +670,16 @@ class Part
             $E->kod_elem = (int)$kod_elem;
             $price = func::rnd($E->getPriceForQuantity((int)$numb)*100/(100+$nds*100));
         }
+        else
+        {
+            $price = func::clearNum($price);
+            if (isset($_POST['nds_yn']))
+                if ($_POST['nds_yn'] == 1) {
+                    $nds = func::clearNum($nds)*100;
+                    $price = round($price * 100 / (100 + $nds), 2);
+                }
+        }
+
         if ($price_or == "")
             $price_or = 0.;
 
@@ -1064,25 +1074,13 @@ class Part
 
         if (isset($_POST['AddPart']))
             if (isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'])) {
-                $price = round((double)$_POST['price'], 2);
-                if (isset($_POST['nds_yn']))
-                    if ($_POST['nds_yn'] == 1) {
-                        $nds = func::rnd($_POST['nds']) * 100;
-                        $price = round($price * 100 / (100 + $nds), 2);
-                    }
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'], $_POST['data_nach']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'], 1, $_POST['price_or'], $_POST['data_nach']);
                 $event = true;
             }
 
         if (isset($_POST['EditPart']))
             if (isset($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'])) {
-                $price = round((double)$_POST['price'], 2);
-                if (isset($_POST['nds_yn']))
-                    if ((int)$_POST['nds_yn'] == 1) {
-                        $nds = func::rnd($_POST['nds']) * 100;
-                        $price = round($price * 100 / (100 + $nds), 2);
-                    }
-                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $price, $_POST['modif'], $_POST['nds'], $_POST['val'], 0, $_POST['price_or'], $_POST['data_nach']);
+                $this->AddEdit($_POST['kod_elem'], $_POST['numb'], $_POST['data_postav'], $_POST['price'], $_POST['modif'], $_POST['nds'], $_POST['val'], 0, $_POST['price_or'], $_POST['data_nach']);
                 $event = true;
             }
 

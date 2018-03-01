@@ -632,15 +632,15 @@ class Elem
         if ($kod_elem == $this->kod_elem) // Самого в себя нельзя добавить
             return;
         // todo - возможно потребуется проверка вложений, нет ли вхождений в подчиненные элементы
-
         $db = new Db();
-
-        $kod_user = func::kod_user();
         // Проверка - может элемент уже есть в спецификации
         $db->rows("SELECT * FROM specs WHERE kod_elem_base=$this->kod_elem AND kod_elem_sub=$kod_elem");
         if ($db->cnt > 0)
             return;
 
+        $quantity = func::clearNum($quantity);
+
+        $kod_user = func::kod_user();
         $db->query("INSERT INTO specs (kod_elem_base,kod_elem_sub,quantity,type,kod_user) VALUES($this->kod_elem,$kod_elem,$quantity,$type,$kod_user)");
     }
 
@@ -825,7 +825,7 @@ class Elem
     {
         $kod_elem = $this->kod_elem;
         $db = new Db();
-        $price = func::rnd($price);
+        $price = func::clearNum($price);
         if($price<=0.01 or (int)$quantity<=0)
             return;
         $quantity = (int)$quantity;
