@@ -139,19 +139,21 @@ echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " . $adres;
 echo $dogovor_nomer;
 echo "<table border='1' cellspacing='0' cellpadding='3'>";
-echo "<tr>
-            <td>№</td>
-            <td>Наименование</td>
-            <td>Ед. изм.</td>
-            <td>Кол-во</td>
-            <td>Цена с НДС</td>
-            <td>Сумма с НДС</td>
-          </tr>";
+
 $total_nds = 0;
 $total_summ = 0;
 $total_summ_with_nds = 0;
 
 if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставлен по договору
+
+    echo "<tr bgcolor='#f5f5f5'>
+            <td width='30'>№</td>
+            <td>Наименование</td>
+            <td width='30'>Ед. изм.</td>
+            <td width='70'>Кол-во</td>
+            <td>Цена с НДС</td>
+            <td>Сумма с НДС</td>
+          </tr>";
 
     $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
     $cnt = $db->cnt;
@@ -198,9 +200,24 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     $total_summ_with_nds = func::Rub($total_summ_with_nds);
     $total_nds_text = func::num2str($total_nds);
     $total_nds = func::Rub($total_nds);
+
+    echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
+    echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
+    echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
+    echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
+    if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
+        echo "<tr><th colspan='6' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
+    echo "</table>";
+    echo "<br>";
 } else {
+
+    echo "<tr bgcolor='#f5f5f5'>
+            <td width='30'>№</td>
+            <td>Наименование</td>
+            <td width='150'>Сумма с НДС</td>
+          </tr>";
+
     $name = $schet_data['prim'];
-    $numb = 1;
     $summ_with_nds = $schet_data['summa'];                  // Сумма с НДС
     $nds = func::rnd($summ_with_nds * 18 / 118);     // Сумма НДС
 
@@ -211,9 +228,6 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     echo "<tr>
             <td align='center'>1</td>
             <td align='left'>$name</td>
-            <td>шт.</td>
-            <td align='center'>$numb</td>
-            <td align='right' nowrap>$price_str</td>
             <td align='right' nowrap>$summ_with_nds_str</td>
           </tr>";
 
@@ -221,17 +235,17 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     $total_summ_with_nds = func::Rub($schet_data['summa']);
     $total_nds_text = func::num2str($nds);
     $total_nds = func::Rub($nds);
+
+    echo "<tr><th colspan='2' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
+    echo "<tr><th colspan='3' align='right'>$total_summ_with_nds_text</th></tr>";
+    echo "<tr><th colspan='2' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
+    echo "<tr><th colspan='3' align='right'>$total_nds_text</th></tr>";
+    if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
+        echo "<tr><th colspan='3' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
+    echo "</table>";
+    echo "<br>";
 }
 
-
-echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
-echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
-echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
-echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
-if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
-    echo "<tr><th colspan='6' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
-echo "</table>";
-echo "<br>";
 
 if (isset($_GET['p']) and $D->Data['kod_ispolnit'] == config::$kod_org_main) {
 
