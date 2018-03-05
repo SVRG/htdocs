@@ -119,13 +119,17 @@ class Org
                     <td bgcolor="#CCCCCC" width="50">ИНН</td><td width="250">' . $row['inn'] . '</td>
                     <td width="50" bgcolor="#CCCCCC">КПП</td><td  width="250">' . $row['kpp'] . '</td>
                 </tr>
+                <tr>
+                    <td bgcolor="#CCCCCC" width="50">ОГРН</td><td width="250">' . $row['ogrn'] . '</td>
+                    <td width="50" bgcolor="#CCCCCC"></td><td  width="250"></td>
+                </tr>
 			    <tr>
 			        <td bgcolor="#CCCCCC">Р/сч</td><td>' . $row['r_sch'] . '</td>
 			        <td bgcolor="#CCCCCC">К/сч</td><td>' . $row['k_sch'] . '</td>
 			    </tr>
 			    <tr>
-			        <td bgcolor="#CCCCCC">Банк Р/сч</td><td>' . $row['bank_rs'] . '</td>
-			        <td bgcolor="#CCCCCC">Банк К/сч</td><td>' . $row['bank_ks'] . '</td>
+			        <td bgcolor="#CCCCCC">Банк</td><td>' . $row['bank_rs'] . '</td>
+			        <td bgcolor="#CCCCCC"></td><td></td>
 			    </tr>
 			    <tr>
 			        <td bgcolor="#CCCCCC">БИК</td><td>' . $row['bik'] . '</td>
@@ -150,12 +154,16 @@ class Org
                   <td bgcolor="#CCCCCC">КПП</td><td  width="250" ><input  name="kpp" id="kpp" value="' . $row['kpp'] . '" /></td>
 			  </tr>
 			  <tr>
+                  <td bgcolor="#CCCCCC">ОГРН</td><td width="250"><input  name="ogrn" id="ogrn" value="' . $row['ogrn'] . '"/></td>
+                  <td bgcolor="#CCCCCC"></td><td  width="250" ></td>
+			  </tr>
+			  <tr>
                   <td bgcolor="#CCCCCC">Р/сч</td><td><input  name="r_sch" id="r_sch" value="' . $row['r_sch'] . '" /></td>
                   <td bgcolor="#CCCCCC">К/сч</td><td><input  name="k_sch" id="k_sch" value="' . $row['k_sch'] . '" /></td>
 			  </tr>
 			  <tr>
-                  <td bgcolor="#CCCCCC">Банк Р/сч</td><td><textarea rows=3 name="bank_rs" id="bank_rs">' . $row['bank_rs'] . '</textarea></td>                  
-                  <td bgcolor="#CCCCCC">Банк К/сч</td><td><textarea rows=3 name="bank_ks" id="bank_ks">' . $row['bank_ks'] . '</textarea></td>
+                  <td bgcolor="#CCCCCC">Банк</td><td><textarea rows=3 name="bank_rs" id="bank_rs">' . $row['bank_rs'] . '</textarea></td>                  
+                  <td bgcolor="#CCCCCC"></td><td></td>
 			  </tr>
 			  <tr>
                   <td bgcolor="#CCCCCC">БИК</td><td><input  name="bik" id="bik" value="' . $row['bik'] . '" /></td>
@@ -532,6 +540,7 @@ class Org
      * Добавить Реквизиты
      * @param string $inn
      * @param string $kpp
+     * @param string $ogrn
      * @param string $r_sch
      * @param string $bank_rs
      * @param string $k_sch
@@ -542,12 +551,12 @@ class Org
      * @param string $www
      * @param string $e_mail
      */
-    public function SetRecv($inn = '', $kpp = '', $r_sch = '', $bank_rs = '', $k_sch = '', $bank_ks = '', $bik = '', $okpo = '', $okonh = '', $www = '', $e_mail = '')
+    public function SetRecv($inn = '', $kpp = '', $ogrn = '', $r_sch = '', $bank_rs = '', $k_sch = '', $bank_ks = '', $bik = '', $okpo = '', $okonh = '', $www = '', $e_mail = '')
     {
         $db = new DB();
         $kod_org = $this->kod_org;
 
-        $db->query("UPDATE org SET inn = '$inn', kpp = '$kpp', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
+        $db->query("UPDATE org SET inn = '$inn', kpp = '$kpp', ogrn='$ogrn', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
                     bik = '$bik', okpo = '$okpo', okonh = '$okonh', www = '$www', e_mail = '$e_mail' WHERE kod_org =$kod_org");
 
     }
@@ -847,7 +856,7 @@ class Org
         }
 
         if (isset($_POST['AddRecvForm'])) {
-            $this->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);
+            $this->SetRecv($_POST['inn'], $_POST['kpp'], $_POST['ogrn'], $_POST['r_sch'], $_POST['bank_rs'], $_POST['k_sch'], $_POST['bank_ks'], $_POST['bik'], $_POST['okpo'], $_POST['okonh'], $_POST['www'], $_POST['e_mail']);
             $event = true;
         }
 
