@@ -324,9 +324,8 @@ class Doc
             $numb = (int)$row['numb']; // Количество
             $numb_ostat = (int)$row['numb_ostat']; // Осталось отгрузить
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
-            $price = Part::getPrice($row); // Цена
             $val = ""; // Валюта
-            $price_nds = round($price * (1 + (double)$row['nds']), 2); // Цена с НДС
+            $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
             $part_summa = Part::getPartSumma($row); // Сумма партии
             $nds = ""; // НДС
 
@@ -429,12 +428,7 @@ class Doc
     {
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT
-                                    kod_dogovora,
-                                    numb,
-                                    price,
-                                    price_or,
-                                    nds
+            "SELECT *
                                   FROM view_rplan
                                   WHERE kod_dogovora=$kod_dogovora
                                   ");
@@ -740,7 +734,7 @@ class Doc
                 $order_by = "data_postav ASC";
             }
 
-        if ($VN == 0) //Если договор поставки
+        if ($VN == 0) //Если договора поставки
             $sql = /** @lang SQL */
                 "SELECT 
                     * 
@@ -752,14 +746,11 @@ class Doc
                       shifr ASC,
                       $order_by";
 
-        else // Если внешних договор
+        else // Если внешние договора
             $sql = /** @lang SQL */
-                "SELECT 
-                    * 
-                    FROM 
-                      view_rplan 
-                    WHERE 
-                      kod_org=$kod_org_main AND zakryt<>1 AND numb_ostat>0
+                "SELECT * FROM view_rplan
+                    LEFT JOIN view_sklad_summ_postup ON view_rplan.kod_part=view_sklad_summ_postup.kod_part
+                    WHERE numb>view_sklad_summ_postup.summ_postup
                     ORDER BY 
                       shifr ASC, 
                       $order_by";
@@ -800,6 +791,7 @@ class Doc
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
+                      view_rplan.price_it,
                       view_rplan.kod_elem,
                       view_rplan.obozn,
                       view_rplan.shifr,
@@ -855,6 +847,7 @@ class Doc
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
+                      view_rplan.price_it,
                       view_rplan.kod_elem,
                       view_rplan.obozn,
                       view_rplan.shifr,
@@ -950,9 +943,8 @@ class Doc
             $val = (int)$row['val']; // Валюта
             $nds = round((double)$row['nds'], 2); // НДС
             $data_postav = $row['data_postav']; // Дата поставки
-            $price = Part::getPrice($row);
-            $price_nds = round($price * (1 + $nds), 2); // Цена с НДС
-            $part_summa = Part::getPartSumma($row); // Сумма остатка партии
+            $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
+            $part_summa = Part::getPartSumma($row); // Сумма партии
 
             $modif_str = '';            // Модификация
             if ($modif != '')
@@ -1002,7 +994,7 @@ class Doc
             $itog_numb_ostat += $numb_ostat;
             $itog_summ += $part_summa;// Итоговая Сумма по всем партиям
 
-            $part_summa_str = Func::Rub($part_summa);// Сумма партии
+            $part_summa_str = Func::Rub($part_summa);// Строка - Сумма партии
 
             // Если предыдущий элемент другой то создаем заголовок + Итоги
             if ($kod_elem != $kod_elem_pred) {
@@ -2042,8 +2034,8 @@ class Doc
         $kod_dogovora_new = $db->last_id;
 
         $db->query(/** @lang SQL */
-            "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, kod_dogovora, val, nds, kod_user) 
-                SELECT kod_elem, modif, numb, NOW(), price, price_or, $kod_dogovora_new, val, nds, $kod_user 
+            "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, price_it, kod_dogovora, val, nds, kod_user) 
+                SELECT kod_elem, modif, numb, NOW(), price, price_or, price_it, $kod_dogovora_new, val, nds, $kod_user 
                 FROM parts
                 WHERE kod_dogovora=$kod_dogovora AND del=0");
 
@@ -2608,6 +2600,7 @@ class Doc
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
+                      view_rplan.price_it,
                       view_rplan.kod_elem,
                       view_rplan.obozn,
                       view_rplan.shifr,

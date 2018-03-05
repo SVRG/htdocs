@@ -232,11 +232,10 @@ class Part
                 // Форма отметки о получении накладной
                 if ((int)$row['poluch'] <> 1)
                     $btn_poluch = Func::ActButton2('', "Получено", 'PoluchNaklad', 'kod_oborota_poluch', $kod_oborota);
-            }
-            elseif ($row['kod_oper'] == 3) // Акт
+            } elseif ($row['kod_oper'] == 3) // Акт
                 $res .= '<br>По Акту:' . $naklad;
             elseif ($row['kod_oper'] == 4) // Возврат
-                    $res .= '<br>Возврат:' . $naklad;
+                $res .= '<br>Возврат:' . $naklad;
 
             // todo - Права доступа
             $btn_del = Func::ActButton2('', "Удалить", 'DelNaklad', 'kod_oborota_del', $kod_oborota);
@@ -641,16 +640,16 @@ class Part
 
     /**
      * Добавление или редактирование
-     * @param $kod_elem
-     * @param int $numb
-     * @param $data_postav
-     * @param float $price
-     * @param string $modif
-     * @param float $nds
-     * @param int $val
+     * @param $kod_elem - номенклатура
+     * @param int $numb - количество
+     * @param $data_postav - дата поставки
+     * @param float $price - цена без НДС
+     * @param string $modif - модификация
+     * @param float $nds - НДС
+     * @param int $val - валюта
      * @param int $Add
-     * @param float $price_or
-     * @param string $data_nach
+     * @param float $price_or - ориентировочная цена
+     * @param string $data_nach - дата начала этапа
      */
     public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 0.18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
@@ -664,19 +663,17 @@ class Part
 
         $kod_user = func::kod_user();
 
-        if ($price == "")
-        {
+        $price_it = 0;
+        if ($price == "") {
             $E = new Elem();
             $E->kod_elem = (int)$kod_elem;
-            $price = func::rnd($E->getPriceForQuantity((int)$numb)*100/(100+$nds*100));
-        }
-        else
-        {
+            $price_it = func::rnd($E->getPriceForQuantity((int)$numb));
+        } else {
             $price = func::clearNum($price);
             if (isset($_POST['nds_yn']))
                 if ($_POST['nds_yn'] == 1) {
-                    $nds = func::clearNum($nds);
-                    $price = round($price * 100 / (100 + $nds*100), 2);
+                    $price_it = func::clearNum($price);
+                    $price = 0;
                 }
         }
 
@@ -684,9 +681,9 @@ class Part
             $price_or = 0.;
 
         if ($Add == 1)
-            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
+            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,$price_it,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
         else
-            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price,modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
+            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price, price_it=$price_it, modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
@@ -711,6 +708,7 @@ class Part
         $form_name = "AddPart";
         $price_or_str = "";
         $data_nach_str = "";
+        $price_it = 0;
 
         $E = new Elem();
 
@@ -745,10 +743,11 @@ class Part
             $modif = $row['modif'];
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
             $numb = $row['numb'];
-            $price = $row['price'];
-            $price_or = $row['price_or'];
+            $price = $row['price']; // Цена без НДС
+            $price_or = $row['price_or']; // Цена ориентировочная
+            $price_it = $row['price_it']; // Цена с НДС
             $val = (int)$row['val'];
-            $nds = (double)$row['nds'];
+            $nds = func::rnd($row['nds']);
             $data_nach_str = "";
 
             $nds_0 = "";
@@ -788,6 +787,17 @@ class Part
             $E->kod_elem = $kod_elem;
         }
 
+        $nds_ex_checked = "checked"; // галочка "без НДС"
+        $nds_inc_checked = "";       // галочка "вкл. НДС"
+        if($price_it > 0)
+        {
+            $nds_ex_checked = "";
+            $nds_inc_checked = "checked";
+            $price = $price_it;
+        }
+
+        $price_str = func::Rub($price);
+
         $res = /** @lang HTML */
             "<form id='form1' name='form1' method='post' action=''>
                 <table border='0' cellspacing='0' width='100%'>
@@ -813,10 +823,10 @@ class Part
                   $price_or_str
                   <tr>
                     <td>Цена</td>
-                    <td  width='100'><input  name='price' id='price' value='$price' /></td>
+                    <td  width='100'><input  name='price' id='price' value='$price_str' /></td>
                     <td>
-                            <input type='radio' name='nds_yn' value='0' checked>без НДС<br>
-                            <input type='radio' name='nds_yn' value='1'>вкл. НДС<br>
+                            <input type='radio' name='nds_yn' value='0' $nds_ex_checked>без НДС<br>
+                            <input type='radio' name='nds_yn' value='1' $nds_inc_checked>вкл. НДС<br>
                     </td>                    
                   </tr>
                   <tr>
@@ -964,15 +974,18 @@ class Part
 //-------------------------------------------------------------------------
 
     /**
-     * Цена
+     * Цена без НДС
      * @param $rplan_row
      * @return float
      */
     public static function getPrice($rplan_row)
     {
         $price = func::rnd($rplan_row['price']);
-        if ($price == 0. and config::$price_or==1) // Берем ориентировочную
+        if ($price == 0. and config::$price_or == 1) // Берем ориентировочную
             $price = func::rnd($rplan_row['price_or']);
+        elseif($rplan_row['price_it']>0)
+            $price = func::rnd($rplan_row['price_it']*100/118);
+
         return $price;
     }
 //-------------------------------------------------------------------------
@@ -984,11 +997,15 @@ class Part
      */
     public static function getPriceWithNDS($rplan_row)
     {
+        $price_it = func::rnd($rplan_row['price_it']);
+        if ($price_it > 0)
+            return $price_it;
+
         $price = self::getPrice($rplan_row);
         $nds = func::rnd($rplan_row['nds']);
         $summ_nds = 0;
-        if($nds>0)
-            $summ_nds = func::rnd($price*$nds);
+        if ($nds > 0)
+            $summ_nds = func::rnd($price * $nds);
 
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
@@ -1247,7 +1264,7 @@ class Part
      */
     public static function formPrice($rplan_row)
     {
-        $price = func::rnd($rplan_row['price']);
+        $price = self::getPrice($rplan_row);
         $price_str = func::Rub($price);
 
         if ($price == 0)
