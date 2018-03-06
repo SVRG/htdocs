@@ -205,10 +205,9 @@ class Org
 //
     /**
      * Вывод списка Адресов по Организации (юр/факт/почт)
-     * @param int $Add
      * @return string
      */
-    public function formAdress($Add = 0)
+    public function formAdress()
     {
 
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddOrgAdr');
@@ -365,12 +364,20 @@ class Org
             if ($nazv_krat != $nazv_poln)
                 $nazv_poln_str = $nazv_poln;
 
+            $inn = "";
+            if($row['inn']!="")
+                $inn = " ИНН ".$row['inn'];
+
+            $ogrn = "";
+            if($row['ogrn']!="")
+                $ogrn = " ОГРН ".$row['ogrn'];
+
             $tab_row = /** @lang HTML */
                 "<tr>
                       <td></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$poisk</a></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_krat</a></td>
-                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str</a></td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str $inn $ogrn</a></td>
                       <td> $www </td>
 		            </tr>";
             if ($echo)
@@ -555,6 +562,13 @@ class Org
     {
         $db = new DB();
         $kod_org = $this->kod_org;
+
+        $inn = func::clearNum($inn);
+        $kpp = func::clearNum($kpp);
+        $ogrn = func::clearNum($ogrn);
+        $r_sch = func::clearNum($r_sch);
+        $k_sch = func::clearNum($k_sch);
+        $bik = func::clearNum($bik);
 
         $db->query("UPDATE org SET inn = '$inn', kpp = '$kpp', ogrn='$ogrn', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
                     bik = '$bik', okpo = '$okpo', okonh = '$okonh', www = '$www', e_mail = '$e_mail' WHERE kod_org =$kod_org");
