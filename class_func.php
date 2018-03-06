@@ -57,12 +57,11 @@ class Func
 
     public static function clearNum($num_str)
     {
-        $res = preg_replace('/\s+/', '', $num_str);
-        $res = str_replace(",",".",$res);
+        $res = str_replace(",",".",$num_str);
+        $res = preg_replace("/[^0-9.]/", "", $res);
 
-        return self::rnd($res);
+        return $res;
     }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 //
