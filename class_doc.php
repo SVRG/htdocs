@@ -617,7 +617,7 @@ class Doc
         $zakup_checked = "";
 
         if ($Edit == 1) {
-            if(!isset($this->Data))
+            if (!isset($this->Data))
                 $this->getData();
 
             $nomer = $this->Data['nomer'];
@@ -1144,7 +1144,7 @@ class Doc
 
             $btn_del = "";
 
-            if(func::user_group()=="admin")
+            if (func::user_group() == "admin")
                 $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
             $nomer = "<div class='btn'>
                     <div><b>" . $row['nomer'] . "</b></div>
@@ -1249,7 +1249,6 @@ class Doc
                 view_rplan.name ASC";
 
         $rows = $db->rows($sql);
-
 
         if (count($rows) > 0)
             return $this->formRPlan_by_Doc($rows);
@@ -1526,16 +1525,13 @@ class Doc
             $status = (int)$row['status'];
             $status_str = "";
             $delivery_color = "";
-            if($status==1)
-            {
+            if ($status == 1) {
                 $btn_submit = func::ActButton2("", "Подтвердить доставку", "SubmitDelivery", "kod_prim_status", $kod_prim);
                 $status_str = "<div class='btn'><div>Доставка</div><div>$btn_submit</div></div>";
                 $yellow = func::$yellow;
                 $delivery_color = /** @lang HTML */
                     " bgcolor='$yellow' ";
-            }
-            elseif ($status==2)
-            {
+            } elseif ($status == 2) {
                 $status_str = "Доставлено<br>";
                 $green = func::$green;
                 $delivery_color = /** @lang HTML */
@@ -1543,18 +1539,18 @@ class Doc
             }
 
             $btn_set_stat1 = "";
-            if($status==0)
-                $btn_set_stat1 = "<div>".func::ActButton2("", "Доставка", "SetPrimStatus1", "kod_prim_status", $kod_prim)."</div>";
+            if ($status == 0)
+                $btn_set_stat1 = "<div>" . func::ActButton2("", "Доставка", "SetPrimStatus1", "kod_prim_status", $kod_prim) . "</div>";
 
             $res .= /** @lang HTML */
-                '<tr'.$delivery_color.'>
+                '<tr' . $delivery_color . '>
                         <td>
                             <div class="btn">
-                                <div>' . Func::Date_from_MySQL($row['time_stamp'])."</div>
+                                <div>' . Func::Date_from_MySQL($row['time_stamp']) . "</div>
                                 <div>$btn_del</div>
                                 $btn_set_stat1
-                            </div>". $user .
-                       '</td>
+                            </div>" . $user .
+                '</td>
                         <td>' . $status_str . $row['text'] . '</td>
                      </tr>';
         }
@@ -2161,13 +2157,11 @@ class Doc
             } elseif ($_POST['Flag'] == 'DelAttr' and isset($_POST['kod_attr_del'])) {
                 $this->DelAttr($_POST['kod_attr_del']);
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'SubmitDelivery' and isset($_POST['kod_prim_status'])) {
-                $this->setPrimStatus($_POST['kod_prim_status'],2);
+            } elseif ($_POST['Flag'] == 'SubmitDelivery' and isset($_POST['kod_prim_status'])) {
+                $this->setPrimStatus($_POST['kod_prim_status'], 2);
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'SetPrimStatus1' and isset($_POST['kod_prim_status'])) {
-                $this->setPrimStatus($_POST['kod_prim_status'],1);
+            } elseif ($_POST['Flag'] == 'SetPrimStatus1' and isset($_POST['kod_prim_status'])) {
+                $this->setPrimStatus($_POST['kod_prim_status'], 1);
                 $event = true;
             }
         }
@@ -2310,8 +2304,7 @@ class Doc
             $kod_part = $_POST['kod_part'];
 
         $status = 0;
-        if(isset($_POST['status']))
-        {
+        if (isset($_POST['status'])) {
             $status = (int)$_POST['status'];
         }
 
@@ -2396,13 +2389,14 @@ class Doc
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
+
 //----------------------------------------------------------------------------------------------------------------------
     public function setPrimStatus($kod_prim, $status = 0)
     {
         $db = new Db();
         $kod_user = func::kod_user();
 
-        if(!isset($kod_prim))
+        if (!isset($kod_prim))
             return;
 
         $db->query("UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1 WHERE kod_prim=$kod_prim");
