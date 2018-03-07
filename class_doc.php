@@ -59,8 +59,7 @@ class Doc
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
         $res = Doc::formRPlan_by_Elem($rows);
         // Закрытые
-        $res .= func::ActButton2("", "Закрытые", "close", "close", 1);
-        if (isset($_POST['close']) or isset($_POST['in_close'])) {
+        if (isset($_POST['close']) or isset($_POST['in_open']) or isset($_POST['in_close'])) {
             $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
@@ -68,9 +67,10 @@ class Doc
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
             $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
+        else
+            $res .= func::ActButton2("", "Закрытые", "close", "close", 1);
 
         // Внешние открытые
-        $res .= func::ActButton2("", "Внешние открытые", "in_open", "in_open", 1);
         if (isset($_POST['in_open']) or isset($_POST['in_close'])) {
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
@@ -86,6 +86,7 @@ class Doc
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
                                     `trin`.`parts`.`price_or`                                                                            AS `price_or`,
+                                    `trin`.`parts`.`price_it`                                                                            AS `price_it`,                                    
                                     `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
                                     `trin`.`elem`.`obozn`                                                                                AS `obozn`,
                                     `trin`.`elem`.`shifr`                                                                                AS `shifr`,
@@ -107,9 +108,10 @@ class Doc
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
             $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
+        else
+            $res .= func::ActButton2("", "Внешние открытые", "in_open", "in_open", 1);
 
         // Внешние закрытые
-        $res .= func::ActButton2("", "Внешние закрытые", "in_close", "in_close", 1);
         if (isset($_POST['in_close'])) {
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
@@ -125,6 +127,7 @@ class Doc
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
                                     `trin`.`parts`.`price_or`                                                                            AS `price_or`,
+                                    `trin`.`parts`.`price_it`                                                                            AS `price_it`,
                                     `trin`.`elem`.`kod_elem`                                                                             AS `kod_elem`,
                                     `trin`.`elem`.`obozn`                                                                                AS `obozn`,
                                     `trin`.`elem`.`shifr`                                                                                AS `shifr`,
@@ -146,6 +149,9 @@ class Doc
                                   ORDER BY kod_dogovora DESC;");
             $res .= "<b>Входящие Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
+        else
+            $res .= func::ActButton2("", "Внешние закрытые", "in_close", "in_close", 1);
+
         return $res;
     }
 //-----------------------------------------------------------------
