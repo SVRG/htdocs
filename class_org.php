@@ -366,11 +366,11 @@ class Org
 
             $inn = "";
             if($row['inn']!="")
-                $inn = " ИНН ".$row['inn'];
+                $inn = " ИНН ".func::clearNum($row['inn']);
 
             $ogrn = "";
             if($row['ogrn']!="")
-                $ogrn = " ОГРН ".$row['ogrn'];
+                $ogrn = " ОГРН ".func::clearNum($row['ogrn']);
 
             $tab_row = /** @lang HTML */
                 "<tr>
