@@ -664,14 +664,15 @@ class Part
         $kod_user = func::kod_user();
 
         $price_it = 0;
-        if ($price == "") {
+        $price = func::clearNum($price);
+        $price = func::rnd($price);
+        if ($price==0) {
             $E = new Elem();
             $E->kod_elem = (int)$kod_elem;
             $price_it = func::rnd($E->getPriceForQuantity((int)$numb));
         } else {
-            $price = func::clearNum($price);
             if (isset($_POST['nds_yn']))
-                if ($_POST['nds_yn'] == 1) {
+                if ((int)$_POST['nds_yn'] == 1) {
                     $price_it = func::clearNum($price);
                     $price = 0;
                 }
@@ -980,11 +981,13 @@ class Part
      */
     public static function getPrice($rplan_row)
     {
+        $price_it = func::rnd($rplan_row['price_it']);
+        if($price_it>0) // Если указана цена с НДС то берем ее
+            return func::rnd($price_it*100/(100+func::rnd($rplan_row['nds']*100)));
+
         $price = func::rnd($rplan_row['price']);
         if ($price == 0. and config::$price_or == 1) // Берем ориентировочную
             $price = func::rnd($rplan_row['price_or']);
-        elseif($rplan_row['price_it']>0)
-            $price = func::rnd($rplan_row['price_it']*100/118);
 
         return $price;
     }
