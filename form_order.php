@@ -52,9 +52,7 @@ echo "<tr>
             <td>№</td>
             <td>Наименование</td>
             <td>Кол-во</td>
-            <td width='150'>Цена без НДС</td>
-            <td width='150'>Сумма</td>  
-            <td width='10'>НДС</td>     
+            <td width='150'>Цена c НДС</td>
             <td width='150'>Сумма с НДС</td>
           </tr>";
 $total_nds = 0;
@@ -75,15 +73,13 @@ for ($i = 0; $i < $cnt; $i++) {
     $n = $i + 1;
     echo "<tr>
             <td align='center'>$n</td>
-            <td align='left'>$name</td>
+            <td align='left'>$name $modif</td>
             <td align='center'>$numb</td>
-            <td align='right'></td>
-            <td align='right'></td>  
-            <td align='center'></td>     
-            <td align='right'></td>
+            <td></td>     
+            <td></td>
           </tr>";
 }
 
 echo "</table>";
 
-echo "<br><br>Генеральный директор _______________ С.А. Тихомиров";
+echo "<br><br>Генеральный директор _______________".config::$invoice_sign_gd;
