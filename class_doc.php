@@ -2452,7 +2452,7 @@ class Doc
         $nomer = "NEXT";
         $summa = self::getSummaDogovora($this->kod_dogovora);
         $this->getData();
-        $prim = "Оплата по договору/счету №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
+        $prim = "Оплата по договору №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
         $res = /** @lang HTML */
             '<form id="form1" name="form1" method="post" action="">
                               <table width="434" border="0">
