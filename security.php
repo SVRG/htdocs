@@ -11,6 +11,13 @@ if (!isset($_SESSION)) {
 }
 
 // *** Restrict Access To Page: Grant or deny access to this page
+/**
+ * @param $strUsers
+ * @param $strGroups
+ * @param $UserName
+ * @param $UserGroup
+ * @return bool
+ */
 function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup)
 {
     // For security, start by assuming the visitor is NOT authorized.

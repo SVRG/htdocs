@@ -1194,15 +1194,16 @@ class Doc
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
         if (!isset($_POST['dogovory_all'])) {
 
-            $sql = "SELECT 
+            $sql = /** @lang MySQL */
+                "SELECT 
                 * 
                 FROM 
                     view_rplan 
                 WHERE 
                     (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0 $where
                 ORDER BY 
-                kod_dogovora DESC,
-                view_rplan.name ASC";
+                kod_dogovora DESC, 
+                view_rplan.name ASC;";
 
             $rows = $db->rows($sql);
             if (count($rows) > 0)

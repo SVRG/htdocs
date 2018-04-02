@@ -1071,7 +1071,7 @@ class Org
                                     WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND DATE(plat.`data`) < DATE('$year_next-01-01')
                                           AND kod_org<>$kod_org_main AND plat.del=0 $w_kod_org
                                     GROUP BY view_dogovory_nvs.kod_org
-                                    ORDER BY summ DESC");
+                                    ORDER BY summ DESC;");
         $year_p = $year - 1;
         $res = /** @lang HTML */
             "<a href='form_orglist.php?pays&y=$year_p'>$year_p</a>
