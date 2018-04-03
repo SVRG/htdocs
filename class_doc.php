@@ -1901,7 +1901,7 @@ class Doc
             $kod_plat = (int)$row['kod_plat']; // Код платежа
             $nomer = $row['nomer']; // Номер платежа
             $data = Func::Date_from_MySQL($row['data']); // Дата платежа
-            $ostat = $summa - $summa_raspred; // Остаток платежа который можно распределить
+            $ostat = func::rnd($summa - $summa_raspred); // Остаток платежа который можно распределить
 
             if (($ostat) > 0) {
                 $ostat_str = func::Rub($ostat) . " р"; // todo - сделать универсально для всех валют

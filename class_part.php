@@ -501,6 +501,7 @@ class Part
     public function AddPayToRas($summa, $kod_rascheta, $kod_plat)
     {
         $summa = func::clearNum($summa);
+        $summa = func::rnd($summa);
         $db = new Db();
         $kod_user = func::kod_user();
 
