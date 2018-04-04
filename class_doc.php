@@ -539,12 +539,17 @@ class Doc
             }
 
             $ISP = '';
+            $po_btn = "";
+            $rfq_btn = "";
             $kod_org_main = config::$kod_org_main;
             if ($this->kod_org == $kod_org_main) {
                 $ISP = '<tr>
                             <th >Исполнитель</th>
                             <td><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                             </tr>';
+
+                $rfq_btn = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img title="RFQ" src="img/rfq.png"></a></div>';
+                $po_btn = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="PO" src="img/po.png"></a></div>';
             }
 
             $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
@@ -574,7 +579,7 @@ class Doc
                             <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
                             <div>' . $form_print . '</div>
                             <div>' . $edit_btn . '</div>
-                            <div>' . $copy_btn . '</div>
+                            <div>' . $copy_btn . '</div>'.$rfq_btn.$po_btn.'
                         </div>
                        </td>
                       </tr>
