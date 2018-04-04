@@ -539,8 +539,8 @@ class Doc
             }
 
             $ISP = '';
-            $po_btn = "";
-            $rfq_btn = "";
+            $btn_po = "";
+            $btn_rfq = "";
             $kod_org_main = config::$kod_org_main;
             if ($this->kod_org == $kod_org_main) {
                 $ISP = '<tr>
@@ -548,8 +548,8 @@ class Doc
                             <td><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                             </tr>';
 
-                $rfq_btn = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img title="RFQ" src="img/rfq.png"></a></div>';
-                $po_btn = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="PO" src="img/po.png"></a></div>';
+                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img title="RFQ" src="img/rfq.png"></a></div>';
+                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="PO" src="img/po.png"></a></div>';
             }
 
             $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
@@ -567,8 +567,8 @@ class Doc
             $form_print = "";
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
                 $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="Форма для печати" src="img/printer.png"></a>';
-            $edit_btn = Func::ActButton('', 'Изменить', 'DocEditForm');
-            $copy_btn = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
+            $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
+            $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
             echo // todo - Валюта - пока только руб.
                 '<table border="0">
@@ -578,8 +578,8 @@ class Doc
                         <div class="btn">
                             <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
                             <div>' . $form_print . '</div>
-                            <div>' . $edit_btn . '</div>
-                            <div>' . $copy_btn . '</div>'.$rfq_btn.$po_btn.'
+                            <div>' . $btn_edit . '</div>
+                            <div>' . $btn_copy . '</div>'.$btn_rfq.$btn_po.'
                         </div>
                        </td>
                       </tr>
