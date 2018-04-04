@@ -169,8 +169,15 @@ class Part
             $prim = $this->formPrim();
 
             // Кнопка редактирования партии
-            $btn = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
+            $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
             $btn_del = "";
+            $btn_po = "";
+            $btn_rfq = "";
+            $kod_org_main = config::$kod_org_main;
+            if ($row['kod_org'] == $kod_org_main) {
+                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '&kod_part='.$row['kod_part'].'"><img title="RFQ" src="img/rfq.png"></a></div>';
+                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '&kod_part='.$row['kod_part']. '"><img title="PO" src="img/po.png"></a></div>';
+            }
 
             // todo - Придумать глобальные права
             if (isset($_GET['del']))
@@ -178,9 +185,9 @@ class Part
 
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
-                    <div>$btn</div>
+                    <div>$btn_edit</div>
                     <div>$prim</div>
-                    $btn_del
+                    $btn_del $btn_rfq $btn_po
             </div>";
 
             $res .=
