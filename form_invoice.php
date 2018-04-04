@@ -29,46 +29,8 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="menu/print.css">
     <title><?php $nomer_str = str_replace('/','_',$nomer); echo "Счет N$nomer_str от $data_sost"; ?></title>
-    <style type="text/css">
-        TABLE {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
-            font-size: medium;
-        }
-
-        body {
-            font-family: Arial, arial, sans-serif;
-            font-size: medium;
-            width: 790px;
-        }
-
-        @media print {
-            body {
-                font-family: Arial, arial, sans-serif;
-                font-size: medium;
-                alignment: center;
-            }
-
-            @page {
-                size: A4;
-                margin: 0 5mm 0 15mm; <!-- Отступы при печати top right bottom left -->
-            }
-
-            table {
-                border-collapse: collapse;
-            <!-- Убираем двойные линии между ячейками --> font-size: medium;
-                width: 100%;
-            }
-
-            header {
-
-            }
-
-            th {
-                font-style: normal;
-            }
-        }
-    </style>
 </head>
 <body>
 <br>
