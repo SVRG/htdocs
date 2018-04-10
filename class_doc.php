@@ -2237,6 +2237,19 @@ class Doc
         if ($nomer === "NEXT")
             $nomer = doc::getNextSchetNomer();
 
+        if(strpos($summa,"%")!==false)
+        {
+            $dogovor_summa = self::getSummaDogovora($kod_dogovora);
+            $proc = func::clearNum($summa);
+            $summa = func::rnd($dogovor_summa*$proc/100);
+        }
+        elseif(strpos(strtoupper($summa),"OK")!==false)
+        {
+            $dogovor_summa = self::getSummaDogovora($kod_dogovora);
+            $summ_pays = self::getSummaPlat($kod_dogovora);
+            $summa = $dogovor_summa - $summ_pays;
+        }
+
         $db = new Db();
         $data = func::Date_to_MySQL($data);
         $kod_user = func::kod_user();

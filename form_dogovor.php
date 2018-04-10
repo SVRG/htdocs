@@ -169,7 +169,7 @@ else
     <!--
     var sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
     var sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
-    var sprytextfield4 = new Spry.Widget.ValidationTextField("SSummR", "currency");
+    //var sprytextfield4 = new Spry.Widget.ValidationTextField("SSummR", "currency");
     var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {
         format: "dd.mm.yyyy",
         isRequired: false
