@@ -2477,7 +2477,12 @@ class Doc
     public function formAddSchet()
     {
         $nomer = "NEXT";
-        $summa = self::getSummaDogovora($this->kod_dogovora);
+        $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
+        $summa = $summa_dogovora;
+        $summ_pays = self::getSummaPlat($this->kod_dogovora);
+        if($summ_pays > 0)
+            $summa -= $summ_pays;
+
         $this->getData();
         $prim = "Оплата по договору №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
         $res = /** @lang HTML */
