@@ -409,9 +409,13 @@ class Doc
                 $res .= /** @lang HTML */
                     "<tr $ind_row>";
 
+            $filter_link = "";
+            if(!isset($_GET['kod_elem']))
+                $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=".$kod_elem."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+
             $res .= /** @lang HTML */
                 "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
-                                       <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod</a></td>
+                                       <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_link</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
@@ -1050,6 +1054,10 @@ class Doc
                     $zebra = "#F18585"; // Если не все отгружено то в красный
             }
 
+            $filter_link = "";
+            if(!isset($_GET['kod_org']))
+                $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+
             // Формируем строку плана
             $row_str = /** @lang HTML */
                 "<tr bgcolor='$zebra'>
@@ -1057,7 +1065,7 @@ class Doc
                                 <td align='right'><a href='$form_part_link'>" . $numb . $numb_ostat_str . "</a></td>
                                 <td align='right'><a href='$form_part_link'>" . $proc_str . "</a></td>
                                 <td align='right'><a href='$form_dogovor_link'>" . $nomer . "</a></td>
-                                <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . "</a></td>
+                                <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . $filter_link . "</a></td>
                                 <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
                                 <td align='right'>" . func::Rub($price_nds) . "</td>
                                 <td align='right'>" . $part_summa_str . $val_str . $nds_str . "</td>
