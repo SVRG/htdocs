@@ -748,6 +748,10 @@ class Doc
             if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
             }
+        $where = "";
+        if (isset($_GET['kod_org'])){
+                $where = " AND kod_org=".(int)$_GET['kod_org'];
+            }
 
         if ($VN == 0) //Если договора поставки
             $sql = /** @lang SQL */
@@ -756,7 +760,7 @@ class Doc
                     FROM 
                       view_rplan 
                     WHERE 
-                      kod_ispolnit=$kod_org_main AND zakryt<>1 AND numb_ostat>0
+                      kod_ispolnit=$kod_org_main AND zakryt<>1 AND numb_ostat>0 $where
                     ORDER BY 
                       shifr ASC,
                       $order_by";
@@ -765,7 +769,7 @@ class Doc
             $sql = /** @lang SQL */
                 "SELECT * FROM view_rplan
                     LEFT JOIN view_sklad_summ_postup ON view_rplan.kod_part=view_sklad_summ_postup.kod_part
-                    WHERE numb>view_sklad_summ_postup.summ_postup
+                    WHERE numb>view_sklad_summ_postup.summ_postup $where
                     ORDER BY 
                       shifr ASC, 
                       $order_by";
@@ -1056,7 +1060,12 @@ class Doc
 
             $filter_link = "";
             if(!isset($_GET['kod_org']))
-                $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+            {
+                if(strpos($_SERVER['REQUEST_URI'],"?")!==false)
+                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+                else
+                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."?kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+            }
 
             // Формируем строку плана
             $row_str = /** @lang HTML */
