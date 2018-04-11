@@ -2260,7 +2260,7 @@ class Doc
             $proc = func::clearNum($summa);
             $summa = func::rnd($dogovor_summa*$proc/100);
         }
-        elseif(strpos(strtoupper($summa),"OK")!==false)
+        elseif((strpos(strtoupper($summa),"OK")!==false) or (strpos(strtoupper($summa),"ОК")!==false))
         {
             $dogovor_summa = self::getSummaDogovora($kod_dogovora);
             $summ_pays = self::getSummaPlat($kod_dogovora);
