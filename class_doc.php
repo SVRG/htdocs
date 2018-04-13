@@ -393,12 +393,18 @@ class Doc
             // Нет контаката по договору
             $no_contact = self::formNoContact($kod_dogovora);
 
+            // Фильтр по организации
+            $filter_kod_org = "";
+            if(!isset($_GET['kod_org']))
+                $filter_kod_org = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+
+
             // Формируем строку
             if ($i == 0 and $cnt > 1) { // Когда требуется объединение строк
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
                                 <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
-                                <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
+                                <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_kod_org</a></td>";
             } elseif ($cnt == 1) // Когда объединение строк не требуется
             {
                 $res .= /** @lang HTML */
@@ -409,13 +415,14 @@ class Doc
                 $res .= /** @lang HTML */
                     "<tr $ind_row>";
 
-            $filter_link = "";
+            // Фильтры
+            $filter_kod_elem = "";
             if(!isset($_GET['kod_elem']))
-                $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=".$kod_elem."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+                $filter_kod_elem = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=".$kod_elem."'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
 
             $res .= /** @lang HTML */
                 "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
-                                       <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_link</a></td>
+                                       <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_kod_elem</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
@@ -1062,9 +1069,9 @@ class Doc
             if(!isset($_GET['kod_org']))
             {
                 if(strpos($_SERVER['REQUEST_URI'],"?")!==false)
-                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
                 else
-                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."?kod_org=".$kod_org."'><img title=\"RFQ\" src=\"img/filter.png\"></a>";
+                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."?kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
             }
 
             // Формируем строку плана
@@ -1266,6 +1273,12 @@ class Doc
         $and = "kod_ispolnit=$kod_org_main";
         if ($VN == 1)
             $and = "kod_org=$kod_org_main";
+
+        if(isset($_GET['kod_elem']))
+            $and .= " AND kod_elem=".(int)$_GET['kod_elem'];
+
+        if(isset($_GET['kod_org']))
+            $and .= " AND kod_org=".(int)$_GET['kod_org'];
 
         $sql = "SELECT 
                 * 
