@@ -151,6 +151,14 @@ for ($i = 0; $i < $cnt; $i++) {
     $row = $rows[$i];
     $name = $row['name'];
     $modif = $row['modif'];
+
+    // Если комплектующие
+    if((int)$row['kod_elem']==config::$kod_elem_kompl)
+    {
+        $name = $modif;
+        $modif = "";
+    }
+    
     if ($modif !== "")
         $modif = "($modif)";
     else
