@@ -158,7 +158,7 @@ for ($i = 0; $i < $cnt; $i++) {
         $name = $modif;
         $modif = "";
     }
-    
+
     if ($modif !== "")
         $modif = "($modif)";
     else
