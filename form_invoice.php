@@ -23,6 +23,21 @@ $D->kod_dogovora = (int)$_GET['kod_dogovora'];
 $D->getData();
 $nomer = $D->Data['nomer'];
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
+
+$schet_data = array();
+if (isset($_GET['kod_scheta'])) {
+    $db = new Db();
+    $kod_sceta = (int)$_GET['kod_scheta'];
+    $rows = $db->rows(/** @lang MySQL */
+        "SELECT * FROM scheta WHERE kod_scheta=$kod_sceta");
+
+    if ($db->cnt > 0) {
+        $schet_data = $rows[0];
+        $nomer = $schet_data['nomer'];
+        $data_sost = func::Date_from_MySQL($schet_data['data']);
+    }
+}
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -44,20 +59,8 @@ echo "<b>Поставщик: " . $D->Data['ispolnit_nazv_krat'] . "</b>";
 $Isp->getData();
 
 $dogovor_nomer = "";
-$schet_data = array();
-if (isset($_GET['kod_scheta'])) {
-    $db = new Db();
-    $kod_sceta = (int)$_GET['kod_scheta'];
-    $rows = $db->rows(/** @lang MySQL */
-        "SELECT * FROM scheta WHERE kod_scheta=$kod_sceta");
-
-    if ($db->cnt > 0) {
-        $schet_data = $rows[0];
-        $nomer = $schet_data['nomer'];
-        $data_sost = func::Date_from_MySQL($schet_data['data']);
-        $dogovor_nomer = '<br>Договор: №' . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']);
-    }
-}
+if (isset($_GET['kod_scheta']))
+    $dogovor_nomer = '<br>Договор: №' . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']);
 
 echo "<br><b>ИНН" . $Isp->Data['inn'] . " КПП" . $Isp->Data['kpp'] . "</b><br>";
 
