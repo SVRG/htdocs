@@ -399,12 +399,12 @@ class Part
             return $res;
         }
 
-        $res = '<table border=0 cellspacing=0 cellpadding=0 width="400">
+        $res = '<table border=0 cellspacing=0 cellpadding=0 width="100%">
                     <tr bgcolor="#CCCCCC">
+                        <td width="100">Сумма</td>
+                        <td width="80">Номер ПП</td>
                         <td width="80">Дата</td>
-                        <td>Сумма</td>
-                        <td width="80">№</td>
-                        <td width="150">Примечание</td>
+                        <td>Примечание</td>
                     </tr>';
 
         $sum = 0.; // Сумма платежей по расчету
@@ -424,9 +424,9 @@ class Part
             $sum += $summa_raspred;
 
             $res .= '<tr>
-                        <td>' . $data_plat . '</td>
                         <td>' . $summa_plat_str . '</td>
-                        <td>№' . $nomer . '</td>
+                        <td>' . $nomer . '</td>
+                        <td>' . $data_plat . '</td>
                         <td>' . $prim . '</td>
                      </tr>';
         }
