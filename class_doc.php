@@ -410,7 +410,7 @@ class Doc
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
                                     <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
-                                    <td width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>";
+                                    <td width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_kod_org</a></td>";
             } else
                 $res .= /** @lang HTML */
                     "<tr $ind_row>";
@@ -2226,6 +2226,7 @@ class Doc
         $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
         $data = func::Date_to_MySQL($data);
+        $summa = func::clearNum($summa);
 
         $user = func::user();
         $kod_user = func::kod_user();
