@@ -744,7 +744,7 @@ class Elem
      */
     public function delSpec($kod_spec)
     {
-        if(func::user_group()!=="amin") // todo - Придумать глобальные права
+        if(func::user_group()!=="admin") // todo - Придумать глобальные права
             return;
 
         $db = new Db();

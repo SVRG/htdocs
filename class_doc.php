@@ -1113,6 +1113,7 @@ class Doc
             $res .= "Итого (отгружено): $itog_otgruz<br>";
         if($itog_numb_ostat > 0)
             $res .= "Итого (не отгружено): $itog_numb_ostat<br>";
+        $res.="<br>";
         // Выводим сумму по всем партиям
         //$res .= "Сумма: " . Func::Rub($itog_summ)."<br><br>";
 
