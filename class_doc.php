@@ -1098,18 +1098,23 @@ class Doc
                 if ($summ_numb_payed == 0)
                     $summ_numb_payed = "";
 
-                $res .= "<tr><td align='right'><b>Итого:</b></td>
-                             <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th></tr>";
+                $res .= "<tr>
+                             <td align='right'><b>Итого:</b></td>
+                             <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th>
+                         </tr>";
             }
         }
 
         $res .= '</table>';
 
-        // Выводим сумму по всем партиям
-        $res .= "<br>Итого: " . Func::Rub($itog_summ) . "<br>";
-
         // Выводим количесто по всем партиям
-        $res .= "<br>Итого отгрузить: $itog_numb_ostat<br>";
+        $itog_otgruz = $summ_total-$itog_numb_ostat;
+        if($itog_otgruz > 0)
+            $res .= "Итого (отгружено): $itog_otgruz<br>";
+        if($itog_numb_ostat > 0)
+            $res .= "Итого (не отгружено): $itog_numb_ostat<br>";
+        // Выводим сумму по всем партиям
+        //$res .= "Сумма: " . Func::Rub($itog_summ)."<br><br>";
 
         return $res;
     }
