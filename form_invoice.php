@@ -130,8 +130,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $name = $row['name'];
         $modif = $row['modif'];
 
-        // Если комплектующие
-        if((int)$row['kod_elem']==config::$kod_elem_kompl)
+        // Если комплектующие или услуги
+        if(((int)$row['kod_elem']==config::$kod_elem_kompl) or ((int)$row['kod_elem']==config::$kod_elem_service))
         {
             $name = $modif;
             $modif = "";
