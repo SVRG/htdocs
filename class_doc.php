@@ -774,9 +774,8 @@ class Doc
 
         else // Если внешние договора
             $sql = /** @lang SQL */
-                "SELECT * FROM view_rplan
-                    LEFT JOIN view_sklad_summ_postup ON view_rplan.kod_part=view_sklad_summ_postup.kod_part
-                    WHERE numb>view_sklad_summ_postup.summ_postup $where
+                "SELECT * FROM view_pplan
+                    WHERE kod_org=$kod_org_main AND numb_ostat>0 AND zakryt<>1 $where
                     ORDER BY 
                       shifr ASC, 
                       $order_by";
