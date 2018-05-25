@@ -757,8 +757,11 @@ class Doc
             }
         $where = "";
         if (isset($_GET['kod_org'])){
-                $where = " AND kod_org=".(int)$_GET['kod_org'];
-            }
+                if($VN==0)
+                    $where = " AND kod_org=".(int)$_GET['kod_org'];
+                else
+                    $where = " AND kod_ispolnit=".(int)$_GET['kod_org'];
+        }
 
         if ($VN == 0) //Если договора поставки
             $sql = /** @lang SQL */
