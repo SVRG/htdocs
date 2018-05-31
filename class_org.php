@@ -63,7 +63,7 @@ class Org
     {
         $db = new Db();
 
-        $sql = "SELECT * FROM org ORDER BY poisk";
+        $sql = "SELECT * FROM org WHERE del=0 ORDER BY poisk";
 
         $rows = $db->rows($sql);
 
