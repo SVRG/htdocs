@@ -1828,9 +1828,10 @@ class Doc
     /**
      * Список платежей в выбранном месяце.
      * @param int $Month - месяц текущего года
+     * @param bool $VN - оплата контрагентам
      * @return string - таблица платежей
      */
-    public function formCurrentMonthPays($Month = 0)
+    public function formCurrentMonthPays($Month = 0, $VN = false)
     {
         $start_data = date('Y-m-01');
 
@@ -1847,8 +1848,10 @@ class Doc
 
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
-
-        $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
+        if(!$VN)
+            $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
+        else
+            $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
 
         $cnt = $db->cnt;
 
@@ -1885,12 +1888,21 @@ class Doc
             else
                 $col = '';
 
+            $nazv_krat = $row['nazv_krat'];
+            $kod_org = $row['kod_org'];
+            if($VN)
+            {
+                $nazv_krat = $row['ispolnit_nazv_krat'];
+                $kod_org = $row['kod_ispolnit'];
+            }
+
+
             $res .= '<tr><td>' . $row['nomer'] . '</td>
                           <td  align="right">' . Func::Rub($row['summa']) . '</td>
                           <td  align="center">' . $d . '</td>
                           <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
                           <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
-                          <td>' . $row['nazv_krat'] . '</td>
+                          <td><a href="form_org.php?kod_org='.$kod_org.'">' . $nazv_krat . '</a></td>
                           <td>' . $row['prim'] . '</td>
                         </tr>';
 

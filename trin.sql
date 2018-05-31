@@ -1,5 +1,3 @@
-CREATE DATABASE `trin` DEFAULT CHARACTER SET latin1;
-
 create table adresa
 (
   kod_adresa int auto_increment
@@ -598,16 +596,18 @@ create view view_phones_kontakts as
 
 create view view_plat as
   select
-    `trin`.`plat`.`nomer`               AS `nomer`,
-    `trin`.`plat`.`summa`               AS `summa`,
-    `trin`.`plat`.`data`                AS `data`,
-    `trin`.`plat`.`prim`                AS `prim`,
-    `trin`.`plat`.`kod_plat`            AS `kod_plat`,
-    `view_dogovory_nvs`.`kod_dogovora`  AS `kod_dogovora`,
-    `view_dogovory_nvs`.`nomer`         AS `nomer_dogovora`,
-    `view_dogovory_nvs`.`kod_org`       AS `kod_org`,
-    `view_dogovory_nvs`.`nazv_krat`     AS `nazv_krat`,
-    `view_plat_raspred`.`summa_raspred` AS `summa_raspred`
+    `trin`.`plat`.`nomer`                    AS `nomer`,
+    `trin`.`plat`.`summa`                    AS `summa`,
+    `trin`.`plat`.`data`                     AS `data`,
+    `trin`.`plat`.`prim`                     AS `prim`,
+    `trin`.`plat`.`kod_plat`                 AS `kod_plat`,
+    `view_dogovory_nvs`.`kod_dogovora`       AS `kod_dogovora`,
+    `view_dogovory_nvs`.`nomer`              AS `nomer_dogovora`,
+    `view_dogovory_nvs`.`kod_org`            AS `kod_org`,
+    `view_dogovory_nvs`.`nazv_krat`          AS `nazv_krat`,
+    `view_dogovory_nvs`.`kod_ispolnit`       AS `kod_ispolnit`,
+    `view_dogovory_nvs`.`ispolnit_nazv_krat` AS `ispolnit_nazv_krat`,
+    `view_plat_raspred`.`summa_raspred`      AS `summa_raspred`
   from ((`trin`.`plat`
     join `trin`.`view_dogovory_nvs` on ((`trin`.`plat`.`kod_dogovora` = `view_dogovory_nvs`.`kod_dogovora`))) left join
     `trin`.`view_plat_raspred` on ((`trin`.`plat`.`kod_plat` = `view_plat_raspred`.`kod_plat`)))
@@ -818,4 +818,3 @@ create view view_sklad_summ_postup as
     sum(`view_sklad_postuplenie`.`numb`) AS `summ_postup`
   from `trin`.`view_sklad_postuplenie`
   group by `view_sklad_postuplenie`.`kod_part`;
-

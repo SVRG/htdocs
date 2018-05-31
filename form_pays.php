@@ -27,9 +27,19 @@ include_once "security.php";
 
         if (isset($_GET['m'])) {
             if ((int)$_GET['m'] > 0 and (int)$_GET['m'] <= 12)
-                echo $D->formCurrentMonthPays((int)$_GET['m']);
+            {
+                if(isset($_GET['VN']))
+                    echo $D->formCurrentMonthPays((int)$_GET['m'],true);
+                else
+                    echo $D->formCurrentMonthPays((int)$_GET['m']);
+            }
         } else
-            echo $D->formCurrentMonthPays();
+        {
+            if(isset($_GET['VN']))
+                echo $D->formCurrentMonthPays(0,true);
+            else
+                echo $D->formCurrentMonthPays(0);
+        }
 
         echo 'begin:' . $t . ' end:' . date('H:i:s');
         ?>
