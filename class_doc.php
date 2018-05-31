@@ -2359,10 +2359,6 @@ class Doc
             return;
         }
 
-        $P = nl2br($text); // Вставялем <br> вместо перевода строки
-        $user = func::user();
-        $kod_user = func::kod_user();
-
         $kod_part = "NULL";
         if (isset($_POST['kod_part']))
             $kod_part = $_POST['kod_part'];
@@ -2371,8 +2367,12 @@ class Doc
         if (isset($_POST['status'])) {
             $status = (int)$_POST['status'];
         }
+        $user = func::user();
+        $kod_user = func::kod_user();
 
         $db = new Db();
+        $P = nl2br($text); // Вставялем <br> вместо перевода строки
+        $P = $db->real_escape_string($P);
         $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$P','$user',$kod_user,$kod_part,$status)");
     }
 //----------------------------------------------------------------------------------------------------------------------

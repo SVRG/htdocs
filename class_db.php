@@ -82,7 +82,10 @@ class Db
             $this->cnt = $result->field_count;
 
         if($echo==1)
+        {
             echo $query;
+            exit("");
+        }
 
         // Если обновление или добавление то записываем в Лог
         if ((strpos($query, 'UPDATE') !== false) or (strpos($query, 'INSERT') !== false)) {
@@ -145,10 +148,10 @@ class Db
      * @param string $value The value to be quoted and escaped
      * @return string The quoted and escaped string
      */
-    public function quote($value)
+    public function real_escape_string($value)
     {
         $connection = $this->connect();
-        return "'" . $connection->real_escape_string($value) . "'";
+        return $connection->real_escape_string($value);
     }
 
 //----------------------------------------------------------------------------------------------------------------------
