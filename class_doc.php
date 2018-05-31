@@ -1846,8 +1846,9 @@ class Doc
         }
 
         $db = new Db();
+        $kod_org_main = config::$kod_org_main;
 
-        $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' ORDER BY view_plat.data DESC");
+        $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
 
         $cnt = $db->cnt;
 
