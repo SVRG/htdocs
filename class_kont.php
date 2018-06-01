@@ -128,6 +128,16 @@ class Kontakt
 
         $rows = $db->rows("SELECT * FROM kontakty_data WHERE kod_kontakta=$kod_kontakta AND del=0");
 
+        $dogovor = "";
+        if(isset($_GET['kod_dogovora']))
+        {
+            $d = new Doc();
+            $d->getData((int)$_GET['kod_dogovora']);
+            $nomer = $d->Data['nomer'];
+            $data_sost = func::Date_from_MySQL($d->Data['data_sost']);
+            $dogovor = "Счет №$nomer от $data_sost";
+        }
+
         // Формируем таблицу телефонов/адресов/...
         $res = '<table border=0 cellspacing=0 cellpadding=0>';
 
@@ -140,7 +150,7 @@ class Kontakt
             if (strpos($row['data'], '@')) {
                 $res .= '<tr>
                             <td>
-                                <a href="mailto:' . $row['data'] . '?subject=НВС -&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
+                                <a href="mailto:' . $row['data'] . '?subject=НВС - '.$dogovor.'&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
                     . $row['data'] .
                     '</a>
                             </td>';
