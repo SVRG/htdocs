@@ -12,28 +12,36 @@ include_once("class_doc.php");
 
 // todo - переделаль в нормальный вид
 $kod_part = 0;
+$kod_dogovora = 0;
+$Dogovor = new Doc();
+$Part = new Part();
+
 if (!isset($_GET['kod_part'])) {
     if (!isset($_GET['kod_dogovora']))
-        exit("Не задан Код партии и договора");
+        exit("Не задан Код партии и Код договора");
     else {
-        $kod_part = Part::getFirstPartKod($_GET['kod_dogovora']);
+        $kod_dogovora = (int)$_GET['kod_dogovora'];
+        $kod_part = Part::getFirstPartKod($kod_dogovora);
     }
-} else
+} else {
     $kod_part = $_GET['kod_part'];
+    if (!isset($_GET['kod_dogovora'])) {
+        $p_data = $Part->getData($kod_part);
+        $kod_dogovora = $p_data['kod_dogovora'];
+    }
+}
 
-// Если код передан в форме
+// Если код передан в форме POST
 if (isset($_POST['kod_part'])) {
     if ($_POST['kod_part'] != 0)
         $kod_part = $_POST['kod_part'];
 }
 
-$Dogovor = new Doc();
-$Dogovor->kod_dogovora = (int)$_GET['kod_dogovora'];
+$Dogovor->kod_dogovora = $kod_dogovora;
 $Dogovor->Events();
 
-$Part = new Part();
 $Part->kod_part = $kod_part;
-$Part->kod_dogovora = (int)$_GET['kod_dogovora'];
+$Part->kod_dogovora = $kod_dogovora;
 $Part->Events();
 ?>
 <!DOCTYPE html>
