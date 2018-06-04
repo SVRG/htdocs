@@ -29,6 +29,8 @@ if (!isset($_GET['kod_part'])) {
         $p_data = $Part->getData($kod_part);
         $kod_dogovora = $p_data['kod_dogovora'];
     }
+    else
+        $kod_dogovora = (int)$_GET['kod_dogovora'];
 }
 
 // Если код передан в форме POST
