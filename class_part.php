@@ -169,6 +169,7 @@ class Part
             $prim = $this->formPrim();
 
             // Кнопка редактирования партии
+            // todo - Придумать ограничение на редактирование/удаление если была оплата (не выводить кнопку редактирования)
             $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
             $btn_del = "";
             $btn_po = "";

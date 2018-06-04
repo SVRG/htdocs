@@ -16,15 +16,19 @@ $kod_dogovora = 0;
 $Dogovor = new Doc();
 $Part = new Part();
 
-if (!isset($_GET['kod_part'])) {
-    if (!isset($_GET['kod_dogovora']))
-        exit("Не задан Код партии и Код договора");
-    else {
-        $kod_dogovora = (int)$_GET['kod_dogovora'];
-        $kod_part = Part::getFirstPartKod($kod_dogovora);
+// Если код партии передан в форме POST
+if (isset($_POST['kod_part'])) {
+    if ($_POST['kod_part'] != 0)
+    {
+        $kod_part = (int)$_POST['kod_part'];
+        $p_data = $Part->getData($kod_part);
+        $kod_dogovora = $p_data['kod_dogovora'];
     }
-} else {
-    $kod_part = $_GET['kod_part'];
+}
+// Если код партии передан в запросе GET
+elseif(isset($_GET['kod_part']))
+{
+    $kod_part = (int)$_GET['kod_part'];
     if (!isset($_GET['kod_dogovora'])) {
         $p_data = $Part->getData($kod_part);
         $kod_dogovora = $p_data['kod_dogovora'];
@@ -32,12 +36,14 @@ if (!isset($_GET['kod_part'])) {
     else
         $kod_dogovora = (int)$_GET['kod_dogovora'];
 }
-
-// Если код передан в форме POST
-if (isset($_POST['kod_part'])) {
-    if ($_POST['kod_part'] != 0)
-        $kod_part = $_POST['kod_part'];
+// Если код договора передан в запросе GET
+elseif(isset($_GET['kod_dogovora']))
+{
+    $kod_dogovora = (int)$_GET['kod_dogovora'];
+    $kod_part = Part::getFirstPartKod($kod_dogovora);
 }
+else
+    exit("Не задан Код партии и Код договора");
 
 $Dogovor->kod_dogovora = $kod_dogovora;
 $Dogovor->Events();
