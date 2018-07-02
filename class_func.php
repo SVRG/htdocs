@@ -58,7 +58,7 @@ class Func
     public static function clearNum($num_str)
     {
         $res = str_replace(",",".",$num_str);
-        $res = preg_replace("/[^0-9.]/", "", $res);
+        $res = preg_replace("/[^0-9.-]/", "", $res);
 
         return $res;
     }
