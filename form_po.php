@@ -125,6 +125,18 @@ for ($i = 0; $i < $cnt; $i++) {
     else
         $modif = "";
 
+    // Если комплектующие или услуги
+    if(((int)$row['kod_elem']==config::$kod_elem_kompl) or ((int)$row['kod_elem']==config::$kod_elem_service))
+    {
+        $name = $modif;
+        $modif = "";
+    }
+
+    if ($modif !== "")
+        $modif = "($modif)";
+    else
+        $modif = "";
+
     $numb = $row['numb']; // Общее количество
 
     $price = Part::getPriceWithNDS($row);
