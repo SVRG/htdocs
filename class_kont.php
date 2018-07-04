@@ -20,7 +20,7 @@ class Kontakt
 
     }
 
-    //------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
     /**
      * Формирует массив контактов договора или организации
@@ -32,13 +32,15 @@ class Kontakt
         $db = new Db();
 
         if ($Doc_Org == "Doc")
-            $this->KontArray = $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora ORDER BY kod_kontakta DESC");
+            $this->KontArray = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$this->kod_dogovora ORDER BY kod_kontakta DESC");
         else
-            $this->KontArray = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org AND del=0  ORDER BY kod_kontakta DESC");
+            $this->KontArray = $db->rows(/** @lang MySQL */
+                "SELECT * FROM kontakty WHERE kod_org=$this->kod_org AND del=0  ORDER BY kod_kontakta DESC");
 
         return $db->cnt;
     }
-    //------------------------------------------------------------------------
+//------------------------------------------------------------------------
 
     /**
      * Форма со списком контактов по Договору или Организации
@@ -121,22 +123,14 @@ class Kontakt
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$kod_kontakta AND del=0");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM kontakty WHERE kod_kontakta=$kod_kontakta AND del=0");
         if (count($rows) == 0)
             return "";
         $kontakt_data = $rows[0];
 
-        $rows = $db->rows("SELECT * FROM kontakty_data WHERE kod_kontakta=$kod_kontakta AND del=0");
-
-        $dogovor = "";
-        if(isset($_GET['kod_dogovora']))
-        {
-            $d = new Doc();
-            $d->getData((int)$_GET['kod_dogovora']);
-            $nomer = $d->Data['nomer'];
-            $data_sost = func::Date_from_MySQL($d->Data['data_sost']);
-            $dogovor = "Счет №$nomer от $data_sost";
-        }
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM kontakty_data WHERE kod_kontakta=$kod_kontakta AND del=0");
 
         // Формируем таблицу телефонов/адресов/...
         $res = '<table border=0 cellspacing=0 cellpadding=0>';
@@ -148,6 +142,17 @@ class Kontakt
 
             // Если это e-mail
             if (strpos($row['data'], '@')) {
+
+                $dogovor = "";
+                if(isset($_GET['kod_dogovora']))
+                {
+                    $d = new Doc();
+                    $d->getData((int)$_GET['kod_dogovora']);
+                    $nomer = $d->Data['nomer'];
+                    $data_sost = func::Date_from_MySQL($d->Data['data_sost']);
+                    $dogovor = "Счет №$nomer от $data_sost";
+                }
+
                 $res .= '<tr>
                             <td>
                                 <a href="mailto:' . $row['data'] . '?subject=НВС - '.$dogovor.'&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
@@ -193,6 +198,16 @@ class Kontakt
 
         $kod_dogovora = $this->kod_dogovora;
         $kod_org = $this->kod_org;
+        if($kod_org == 0) // Если не задан код организации то берем из договора
+        {
+            $D = new Doc();
+            $D->kod_dogovora = $kod_dogovora;
+            $D->getData();
+            if($D->Data['kod_ispolnit']==config::$kod_org_main) // Если исполнитель - основная компания
+                $kod_org = $D->Data['kod_org'];
+            else
+                $kod_org = $D->Data['kod_ispolnit'];
+        }
 
         if (!isset($FName) and !isset($name)) return;
 
@@ -203,14 +218,14 @@ class Kontakt
         $kod_user = func::kod_user();
 
         $db = new Db();
-        $db->query(/** @lang SQL */
+        $db->query(/** @lang MySQL */
             "INSERT INTO 
                       kontakty (kod_org,dolg,famil,name,otch,kod_user)
                     VALUES ($kod_org,'$dolg','$famil','$name','$otch',$kod_user)");
         $last_id = $db->last_id;
 
         if ($kod_dogovora > 0)
-            $db->query(/** @lang SQL */
+            $db->query(/** @lang MySQL */
                 "INSERT INTO 
                           kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user)
                         VALUES($last_id,$kod_dogovora,$kod_user)");
@@ -230,13 +245,14 @@ class Kontakt
         if (!isset($phone) or $phone == "") return;
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
+        $db->query(/** @lang MySQL */
+            "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
                     VALUES($kod_kontakta,'$phone',$kod_user)");
     }
-    //-----------------------------------------------------------------
-    //
+//----------------------------------------------------------------------------------------------------------------------
+//
     /**
-     * Загрузка данных. Проверить необходимость!
+     * Загрузка данных. todo - Проверить необходимость!
      * @param int $kod_kontakta
      */
     public function getData($kod_kontakta)
@@ -244,7 +260,7 @@ class Kontakt
         $db = new Db();
         $this->kod_kontakta = $kod_kontakta;
 
-        $rows = $db->rows(/** @lang SQL */
+        $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta  AND del=0");
 
         $row = $rows[0];
@@ -260,8 +276,8 @@ class Kontakt
         }
 
     }
-    //------------------------------------------------------------------------
-    //
+//----------------------------------------------------------------------------------------------------------------------
+//
     /**
      * Выпадающий Список контактов по организации
      * @return string
@@ -270,7 +286,8 @@ class Kontakt
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM kontakty WHERE kod_org=$this->kod_org  AND del=0 ORDER BY kod_kontakta DESC");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM kontakty WHERE kod_org=$this->kod_org  AND del=0 ORDER BY kod_kontakta DESC");
 
         $cnt = $db->cnt; // количество записей
 
@@ -320,8 +337,8 @@ class Kontakt
 
         return $res;
     }
-    //------------------------------------------------------------------------
-    //
+//----------------------------------------------------------------------------------------------------------------------
+//
     /**
      * Добавление контакта в договор (из Sel List)
      * @param int $kod_dogovora
@@ -331,11 +348,12 @@ class Kontakt
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user) VALUES($this->kod_kontakta,$kod_dogovora,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user) VALUES($this->kod_kontakta,$kod_dogovora,$kod_user)");
     }
 
-    //------------------------------------------------------------------------
-    // Save
+//----------------------------------------------------------------------------------------------------------------------
+// Save
     /**
      * Обновление данных контакта
      * @param string $dolg
@@ -349,10 +367,11 @@ class Kontakt
         $kod_user = func::kod_user();
 
         // Не обновляется код организации
-        $db->query("UPDATE kontakty SET dolg = '$dolg', famil = '$famil', name = '$name', otch = '$otch',kod_user=$kod_user WHERE kod_kontakta =$this->kod_kontakta");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty SET dolg = '$dolg', famil = '$famil', name = '$name', otch = '$otch',kod_user=$kod_user WHERE kod_kontakta =$this->kod_kontakta");
     }
-    //------------------------------------------------------------------------
-    //
+//----------------------------------------------------------------------------------------------------------------------
+//
     /**
      * Форма - добавления и редактирования
      * @param int $Edit
@@ -369,7 +388,8 @@ class Kontakt
 
         if ($Edit == 1) {
             $db = new Db();
-            $rows = $db->rows("SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta AND del=0");
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM kontakty WHERE kod_kontakta=$this->kod_kontakta AND del=0");
 
             $row = $rows[0];
 
@@ -413,7 +433,7 @@ class Kontakt
         return $res;
     }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
     /**
      * Список всех Контактов с телефонами / организацией
@@ -424,7 +444,8 @@ class Kontakt
     {
         $db = new Db();
         if ($query == "")
-            $query = "SELECT
+            $query = /** @lang MySQL */
+                "SELECT
                                     kontakty.kod_kontakta,
                                     kontakty.kod_org,
                                     kontakty.dolg,
@@ -547,9 +568,12 @@ class Kontakt
             $kod_kontakta = $this->kod_kontakta;
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
-        $db->query("UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
-        $db->query("UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kontakta=$kod_kontakta");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -563,7 +587,8 @@ class Kontakt
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kont_dog=$kod_kont_dog");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty_dogovora SET del=1,kod_user=$kod_user WHERE kod_kont_dog=$kod_kont_dog");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -576,9 +601,11 @@ class Kontakt
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_dat=$kod_dat");
+        $db->query(/** @lang MySQL */
+            "UPDATE kontakty_data SET del=1,kod_user=$kod_user WHERE kod_dat=$kod_dat");
     }
 //----------------------------------------------------------------------------------------------------------------------
+//
 
 
 }

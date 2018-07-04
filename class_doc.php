@@ -12,8 +12,9 @@ class Doc
     public $Data;   // строка запроса - row['']
 
     // Поля
-    public $kod_dogovora = '';  // код_договора
-    public $kod_org = '';       // код_организации (Заказчик)
+    public $kod_dogovora = 0;  // код_договора
+    public $kod_org = 0;       // код_организации (Заказчик)
+    public $kod_ispolnit = 0;  // код_организации (Исполнитель)
     public $nazv_krat = '';     // краткое название организации из расшиернного запроса
     private $mail = 1;
 
@@ -718,6 +719,7 @@ class Doc
 
         $this->Data = $rows[0];
         $this->kod_org = $this->Data['kod_org'];
+        $this->kod_ispolnit = $this->Data['kod_ispolnit'];
         $this->nazv_krat = $this->Data['nazv_krat'];
 
         return $this->Data;
@@ -2160,9 +2162,6 @@ class Doc
                 // переходим в форму договору
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
-            } elseif (isset($_POST['famil'], $_POST['name'])) {
-                $this->AddKontakt($_POST['dolg'], $_POST['famil'], $_POST['name'], $_POST['otch']);
-                $event = true;
             }
         } elseif (isset($_POST['formAddPP'])) {
             if (isset($_POST['nomer'], $_POST['summa'], $_POST['data'])) {
