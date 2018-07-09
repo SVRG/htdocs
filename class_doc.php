@@ -2264,8 +2264,16 @@ class Doc
             $host = $_SERVER['HTTP_HOST'];
             $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
             $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
+
+            $kod_ispolnit = $data['kod_ispolnit'];
+            if($kod_ispolnit != config::$kod_org_main)
+            {
+                $ispolnit_nazv_krat = $data['ispolnit_nazv_krat'];
+                $body .= "Исполнитель: <a href='http://$host/form_org.php?kod_org=$kod_ispolnit'>$ispolnit_nazv_krat</a><br>";
+                $nazv_krat = $ispolnit_nazv_krat;
+            }
             $body .= "Сумма: $summa_str<br>";
-            $body .= "Примечание: $prim";
+            $body .= "Примечание: $prim<br>";
             $mail->send_mail($body, "Оплата: $dog_nomer - $nazv_krat - $summa_str");
         }
     }
