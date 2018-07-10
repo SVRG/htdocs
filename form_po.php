@@ -118,12 +118,7 @@ $total_summ = 0;
 for ($i = 0; $i < $cnt; $i++) {
     $row = $rows[$i];
     $name = $row['name'];
-
     $modif = $row['modif'];
-    if ($modif != '')
-        $modif = "($modif)";
-    else
-        $modif = "";
 
     // Если комплектующие или услуги
     if(((int)$row['kod_elem']==config::$kod_elem_kompl) or ((int)$row['kod_elem']==config::$kod_elem_service))
