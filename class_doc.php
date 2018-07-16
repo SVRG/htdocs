@@ -393,6 +393,8 @@ class Doc
 
             // Нет контаката по договору
             $no_contact = self::formNoContact($kod_dogovora);
+            $no_comment = self::formNoComment($kod_dogovora);
+            $no_contact.=$no_comment;
 
             // Фильтр по организации
             $filter_kod_org = "";
@@ -2649,14 +2651,41 @@ class Doc
      * @param $kod_dogovora
      * @return string
      */
-    public static function formNoContact($kod_dogovora)
+    public static function formNoContact($kod_dogovora=0)
     {
         $db = new Db();
+        $kod_dogovora = (int)$kod_dogovora;
         $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$kod_dogovora");
 
         if ($db->cnt == 0)
-            return "<img src='img/sign_pr.gif' width='15'>";
+            return "<img title='Не указан контакт' src='img/sign_pr.gif' width='15'>";
 
+        return "";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Индикатор отсутствия активности более 7 дней
+     * @param $kod_dogovora
+     * @return string
+     */
+    public static function formNoComment($kod_dogovora)
+    {
+        $db = new Db();
+        $kod_dogovora = (int)$kod_dogovora;
+        $rows = $db->rows("SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
+
+        if ($db->cnt == 0)
+            return "<img title='Необходимо связаться и обновить статус' src='img/sign_pr.gif' width='15'>";
+
+        $row = $rows[0];
+        $datetime1 = date_create($row['time_stamp']);
+        $datetime2 = date_create(date("Y-m-d"));
+        $interval = date_diff($datetime2, $datetime1);
+        if((int)$interval->days > 7)
+            {
+                return "<img title='Необходимо связаться и обновить статус' src='img/sign_pr.gif' width='15'>";
+            }
         return "";
     }
 //----------------------------------------------------------------------------------------------------------------------
