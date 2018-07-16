@@ -19,20 +19,28 @@ $E->Events();
 <div class="style1" id="pagecell1">
     <?php
 
-    $UserG = array('admin', 'oper');
+    if(isset($_GET['modif']))
+        echo $E->formNomenDocs($_GET['modif']);
 
-    $add = false;
-    if (isset($_POST['Flag']))
-        if ($_POST['Flag'] == 'formAdd') {
-            echo $E->formAddEdit();
-            $add = true;
-        }
+    if (isset($_GET['kod_elem'])) {
+        echo $E->formNomenModif((int)$_GET['kod_elem']);
+    } else {
+        $add = false;
 
-    if (!$add)
-        if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-            echo Func::ActButton('', 'Добавить Элемент', 'formAdd');
-            echo $E->formNomen();
+        if (isset($_POST['Flag']))
+            if ($_POST['Flag'] == 'formAdd') {
+                echo $E->formAddEdit();
+                $add = true;
+            }
+
+        if (!$add) {
+            $UserG = array('admin', 'oper');
+            if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+                echo Func::ActButton('', 'Добавить Элемент', 'formAdd');
+                echo $E->formNomen();
+            }
         }
+    }
     ?>
 </div>
 </body>

@@ -143,6 +143,8 @@ class Elem
             $shifr = $row['shifr'];
             $img = "";
             $link = "form_elem.php?kod_elem=$kod_elem";
+            $link_modif = "<a href='form_nomen.php?kod_elem=$kod_elem'><img title='Посмотреть модификации' src='img/view_properties.png'></a>";
+
             if (isset($row['path'])) {
                 $path = $row['path'];
                 $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
@@ -155,7 +157,7 @@ class Elem
                 $name = $row['elem_name'];
 
             $row_nomen = "<tr>
-                            <td align='left' valign='top'>$img</td>
+                            <td align='left' valign='top'>$img $link_modif</td>
                             <td valign='top'><a href='$link'><h1> $shifr </h1> $name </a></td>
                          </tr>";
 
@@ -963,5 +965,69 @@ class Elem
         $res.="</table>";
 
         return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Форма Комплектация - элементы неосновной номенклатуры
+     * @param int $kod_elem
+     * @return string
+     */
+    public function formNomenModif($kod_elem=1001)
+    {
+        $kod_elem = (int)$kod_elem;
+
+        $db = new Db();
+        if($kod_elem>0)
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM parts where kod_elem=$kod_elem and del=0 group by modif order by modif;");
+        else
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM parts where del=0 group by modif order by modif;");
+
+        $cnt = $db->cnt;
+
+        if ($cnt == 0)
+            return "Нет данных по коду $kod_elem";
+
+        $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below" width="100%">
+                 <tr bgcolor="#CCCCCC">
+                     <td align="center">Наименование</td>
+                 </tr>';
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $kod_part = $row['kod_part'];
+            $kod_elem = $row['kod_elem'];
+            $modif = $row['modif'];
+            $link = "form_part.php?kod_part=$kod_part";
+            //$link2 = "<a href='form_nomen.php?kod_elem=$kod_elem&modif=$modif'></a>";
+            $link2 = "";
+
+            $res .= "<tr>
+                            <td valign='top'><a href='$link'>$modif</a>$link2</td>
+                         </tr>";
+        }
+        $res .= '</table>';
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    public function formNomenDocs($modif="")
+    {
+        if($modif=="")
+            return "";
+
+        $db = new Db();
+        $modif = $db->real_escape_string($modif);
+        $sql = /** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_elem=1001 and modif='$modif' order by view_rplan.data_postav;";
+        $rows = $db->rows($sql);
+
+        if($db->cnt == 0)
+            return "";
+
+        return Doc::formRPlan_by_Doc($rows);
     }
 }
