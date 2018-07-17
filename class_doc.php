@@ -399,7 +399,7 @@ class Doc
             // Фильтр по организации
             $filter_kod_org = "";
             if(!isset($_GET['kod_org']))
-                $filter_kod_org = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+                $filter_kod_org = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
 
 
             // Формируем строку
@@ -421,7 +421,7 @@ class Doc
             // Фильтры
             $filter_kod_elem = "";
             if(!isset($_GET['kod_elem']))
-                $filter_kod_elem = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=".$kod_elem."'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
+                $filter_kod_elem = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=$kod_elem'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
 
             $res .= /** @lang HTML */
                 "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
@@ -751,38 +751,29 @@ class Doc
      */
     public function formRPlan($VN = 0)
     {
-
+        $where = "numb_ostat>0 AND zakryt<>1";
         $kod_org_main = config::$kod_org_main;
-        $order_by = "numb DESC";
+        if ($VN == 0) //Если договора поставки
+            $where .= " AND kod_ispolnit=$kod_org_main";
+        else // Если внешние договора
+            $where .= " AND kod_org=$kod_org_main";
 
+        if (isset($_GET['kod_org'])){
+            if($VN==0)
+                $where .=" AND kod_org=".(int)$_GET['kod_org'];
+            else
+                $where .= " AND kod_ispolnit=".(int)$_GET['kod_org'];
+        }
+
+        $order_by = "numb DESC";
         if (isset($_GET['order']))
             if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
             }
-        $where = "";
-        if (isset($_GET['kod_org'])){
-                if($VN==0)
-                    $where = " AND kod_org=".(int)$_GET['kod_org'];
-                else
-                    $where = " AND kod_ispolnit=".(int)$_GET['kod_org'];
-        }
 
-        if ($VN == 0) //Если договора поставки
-            $sql = /** @lang SQL */
-                "SELECT 
-                    * 
-                    FROM 
-                      view_rplan 
-                    WHERE 
-                      kod_ispolnit=$kod_org_main AND zakryt<>1 AND numb_ostat>0 $where
-                    ORDER BY 
-                      shifr ASC,
-                      $order_by";
-
-        else // Если внешние договора
-            $sql = /** @lang SQL */
-                "SELECT * FROM view_pplan
-                    WHERE kod_org=$kod_org_main AND numb_ostat>0 AND zakryt<>1 $where
+        $sql = /** @lang MySQL */
+            "SELECT * FROM view_pplan
+                    WHERE $where
                     ORDER BY 
                       shifr ASC, 
                       $order_by";
@@ -1220,11 +1211,11 @@ class Doc
     {
         $db = new Db();
 
-        $where = ""; // Фильтры
+        $where = "(kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org)"; // Фильтры
         if (isset($_GET['y'])) {
             $data_s = (int)$_GET['y'] . "-01-01";
             $data_e = ((int)$_GET['y'] + 1) . "-01-01";
-            $where = " AND (data_postav>='$data_s' AND data_postav<'$data_e')";
+            $where .= " AND (data_postav>='$data_s' AND data_postav<'$data_e')";
         }
 
         if (isset($_GET['kod_elem'])) {
@@ -1233,16 +1224,17 @@ class Doc
         }
 
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
+
         if (!isset($_POST['dogovory_all'])) {
 
             $sql = /** @lang MySQL */
                 "SELECT 
                 * 
-                FROM 
+                FROM
                     view_rplan 
-                WHERE 
-                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) AND zakryt=0 $where
-                ORDER BY 
+                WHERE
+                     $where AND zakryt=0
+                ORDER BY
                 kod_dogovora DESC, 
                 view_rplan.name ASC;";
 
@@ -1251,12 +1243,13 @@ class Doc
                 return ($res . $this->formRPlan_by_Doc($rows));
         }
 
-        $sql = "SELECT 
+        $sql = /** @lang MySQL */
+            "SELECT
                 * 
-                FROM 
+                FROM
                     view_rplan 
                 WHERE 
-                    (kod_org=$this->kod_org OR kod_ispolnit=$this->kod_org) $where
+                    $where
                 ORDER BY 
                 kod_dogovora DESC,
                 view_rplan.name ASC";
