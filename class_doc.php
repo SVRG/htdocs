@@ -752,11 +752,15 @@ class Doc
     public function formRPlan($VN = 0)
     {
         $where = "numb_ostat>0 AND zakryt<>1";
+        $table = "view_rplan";
         $kod_org_main = config::$kod_org_main;
         if ($VN == 0) //Если договора поставки
             $where .= " AND kod_ispolnit=$kod_org_main";
         else // Если внешние договора
+        {
             $where .= " AND kod_org=$kod_org_main";
+            $table = "view_pplan";
+        }
 
         if (isset($_GET['kod_org'])){
             if($VN==0)
@@ -772,14 +776,14 @@ class Doc
             }
 
         $sql = /** @lang MySQL */
-            "SELECT * FROM view_pplan
+            "SELECT * FROM $table
                     WHERE $where
                     ORDER BY 
                       shifr ASC, 
                       $order_by";
 
         $db = new Db();
-        $rows = $db->rows($sql); // Массив данных
+        $rows = $db->rows($sql,1); // Массив данных
 
         return $this->formRPlan_by_Elem($rows);
     }
