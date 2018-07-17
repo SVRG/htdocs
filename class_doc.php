@@ -783,7 +783,7 @@ class Doc
                       $order_by";
 
         $db = new Db();
-        $rows = $db->rows($sql,1); // Массив данных
+        $rows = $db->rows($sql); // Массив данных
 
         return $this->formRPlan_by_Elem($rows);
     }
