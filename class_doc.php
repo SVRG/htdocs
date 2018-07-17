@@ -391,10 +391,13 @@ class Doc
             if ($mod != "")
                 $mod = " ($mod)";
 
-            // Нет контаката по договору
-            $no_contact = self::formNoContact($kod_dogovora);
-            $no_comment = self::formNoComment($kod_dogovora);
-            $no_contact.=$no_comment;
+            // Нет контаката по договору и не обновлялись комментарии
+            $no_contact = "";
+            if ((int)$zakryt <> 1) {
+                $no_contact = self::formNoContact($kod_dogovora);
+                $no_comment = self::formNoComment($kod_dogovora);
+                $no_contact .= $no_comment;
+            }
 
             // Фильтр по организации
             $filter_kod_org = "";
