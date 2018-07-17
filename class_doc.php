@@ -406,13 +406,13 @@ class Doc
             if ($i == 0 and $cnt > 1) { // Когда требуется объединение строк
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
-                                <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
+                                <td $rowspan width='100'><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$no_contact$annulir</a></td>
                                 <td $rowspan><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_kod_org</a></td>";
             } elseif ($cnt == 1) // Когда объединение строк не требуется
             {
                 $res .= /** @lang HTML */
                     "<tr $ind_row>
-                                    <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$no_contact$nomer<br>$annulir</a></td>
+                                    <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer<br>$no_contact$annulir</a></td>
                                     <td width='150'><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_kod_org</a></td>";
             } else
                 $res .= /** @lang HTML */
@@ -2655,10 +2655,11 @@ class Doc
     {
         $db = new Db();
         $kod_dogovora = (int)$kod_dogovora;
-        $db->rows("SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$kod_dogovora");
+        $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$kod_dogovora");
 
         if ($db->cnt == 0)
-            return "<img title='Не указан контакт' src='img/sign_pr.gif' width='15'>";
+            return "<img title='Не указан контакт' src='img/no_contact.png'>";
 
         return "";
     }
@@ -2673,19 +2674,20 @@ class Doc
     {
         $db = new Db();
         $kod_dogovora = (int)$kod_dogovora;
-        $rows = $db->rows("SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
+        $img =  "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
 
         if ($db->cnt == 0)
-            return "<img title='Необходимо связаться и обновить статус' src='img/sign_pr.gif' width='15'>";
+            return $img;
 
         $row = $rows[0];
         $datetime1 = date_create($row['time_stamp']);
         $datetime2 = date_create(date("Y-m-d"));
         $interval = date_diff($datetime2, $datetime1);
         if((int)$interval->days > 7)
-            {
-                return "<img title='Необходимо связаться и обновить статус' src='img/sign_pr.gif' width='15'>";
-            }
+                return $img;
+
         return "";
     }
 //----------------------------------------------------------------------------------------------------------------------
