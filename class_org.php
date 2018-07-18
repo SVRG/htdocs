@@ -1058,20 +1058,20 @@ class Org
         }
         $year_next = $year + 1;
 
-        $w_kod_org = "";
+        $w_kod_org = "kod_org<>$kod_org_main AND plat.del=0";
         if (isset($_GET['kod_org'])) {
             $kod_org = (int)$_GET['kod_org'];
-            $w_kod_org = " AND view_dogovory_nvs.kod_org=$kod_org ";
+            $w_kod_org .= " AND view_dogovory_nvs.kod_org=$kod_org ";
         }
 
         $rows = $db->rows("SELECT sum(plat.summa) AS summ, 
                                         view_dogovory_nvs.nazv_krat,
                                         kod_org
-                                    FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
-                                    WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND DATE(plat.`data`) < DATE('$year_next-01-01')
-                                          AND kod_org<>$kod_org_main AND plat.del=0 $w_kod_org
-                                    GROUP BY view_dogovory_nvs.kod_org
-                                    ORDER BY summ DESC;");
+                                  FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
+                                  WHERE DATE(plat.`data`) >= DATE('$year-01-01') AND DATE(plat.`data`) < DATE('$year_next-01-01')
+                                          AND $w_kod_org
+                                  GROUP BY view_dogovory_nvs.kod_org
+                                  ORDER BY summ DESC;");
         $year_p = $year - 1;
         $res = /** @lang HTML */
             "<a href='form_orglist.php?pays&y=$year_p'>$year_p</a>

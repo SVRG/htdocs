@@ -998,14 +998,11 @@ class Elem
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $kod_part = $row['kod_part'];
-            $kod_elem = $row['kod_elem'];
             $modif = $row['modif'];
             $link = "form_part.php?kod_part=$kod_part";
-            //$link2 = "<a href='form_nomen.php?kod_elem=$kod_elem&modif=$modif'></a>";
-            $link2 = "";
 
             $res .= "<tr>
-                            <td valign='top'><a href='$link'>$modif</a>$link2</td>
+                            <td valign='top'><a href='$link'>$modif</a></td>
                          </tr>";
         }
         $res .= '</table>';

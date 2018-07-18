@@ -39,6 +39,7 @@ class Mail
      * @param string $Body
      * @param string $subject
      * @return bool
+     * @throws phpmailerException
      */
     public function send_mail($Body = '', $subject = "НВС Навигационные Технологии")
     {
@@ -94,7 +95,13 @@ class Mail
         $mail->Password = $this->yandex_pass;
 
         //Set who the message is to be sent from
-        $mail->setFrom($this->from_adress, $this->from_name);
+        try {
+            $mail->setFrom($this->from_adress, $this->from_name);
+        } catch (phpmailerException $e) {
+            echo $e->errorMessage(); //Pretty error messages from PHPMailer
+        } catch (Exception $e) {
+            echo $e->getMessage(); //Boring error messages from anything else!
+        }
 
         //Set who the message is to be sent to
         for ($i = 0; $i < $cnt; $i++)

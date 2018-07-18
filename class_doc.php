@@ -2167,7 +2167,13 @@ class Doc
             }
         } elseif (isset($_POST['formAddPP'])) {
             if (isset($_POST['nomer'], $_POST['summa'], $_POST['data'])) {
-                $this->AddPay($_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
+                try{
+                    $this->AddPay($_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
+                } catch (phpmailerException $e) {
+                    echo $e->errorMessage(); //Pretty error messages from PHPMailer
+                } catch (Exception $e) {
+                    echo $e->getMessage(); //Boring error messages from anything else!
+                }
                 $event = true;
             }
         } elseif (isset($_POST['AddInv'])) {
@@ -2242,6 +2248,7 @@ class Doc
      * @param $summa - сумма
      * @param $data - дата
      * @param $prim - примечание
+     * @throws phpmailerException
      */
     public function AddPay($nomer, $summa, $data, $prim)
     {
@@ -2583,6 +2590,15 @@ class Doc
      */
     public function formAddPP()
     {
+        $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
+        $summa_plat = self::getSummaPlat($this->kod_dogovora);
+        $ostatok = $summa_dogovora - $summa_plat;
+        $ostatok = func::Rub($ostatok);
+
+        $this->getData();
+        $nomer = $this->Data['nomer'];
+        $data_sost = func::Date_from_MySQL($this->Data['data_sost']);
+
         $date = date('d.m.Y');
         $res = /** @lang HTML */
             "               <form name='form1' method='post' action=''>
@@ -2604,14 +2620,14 @@ class Doc
                                     <tr>
                                       <td>Сумма</td>
                                       <td><span id='SSummR'>
-                                      <input name='summa' id='summa' />
+                                      <input name='summa' id='summa' value='$ostatok' />
                                       <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                       format.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Примечание</td>
                                       <td><span id='STextNR'>
-                                        <input name='prim' id='prim' />
+                                        <input name='prim' id='prim' value='№$nomer от $data_sost' />
                                       </span></td>
                                     </tr>
                                   </table>
