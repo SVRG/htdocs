@@ -1166,7 +1166,7 @@ class Doc
                     <div>$btn_add</div>
                 </div>";
 
-        if (func::issetFlag("AddPP"))
+        if (func::issetFlag("AddPP") or func::issetFlag("EditPP"))
             $res .= $this->formAddPP();
 
         $db = new Db();
@@ -1188,12 +1188,16 @@ class Doc
             $kod_plat = $row['kod_plat'];
 
             $btn_del = "";
-
+            $btn_edit = "";
             if (func::user_group() == "admin")
+            {
                 $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
+                $btn_edit = func::ActButton2("", "Изменить", "EditPP", "kod_plat_edit", $kod_plat);
+            }
             $nomer = "<div class='btn'>
                     <div><b>" . $row['nomer'] . "</b></div>
                     <div>$btn_del</div>
+                    <div>$btn_edit</div>
                 </div>";
 
             $res .= '<tr>
@@ -2234,6 +2238,10 @@ class Doc
                 $this->setPrimStatus($_POST['kod_prim_status'], 1);
                 $event = true;
             }
+            elseif ($_POST['Flag'] == 'formEditPP' and isset($_POST['kod_plat_edit'])) {
+                $this->setPP($_POST['kod_plat_edit'],$_POST['nomer'],$_POST['summa'],$_POST['data'],$_POST['prim']);
+                $event = true;
+            }
         }
 
         if ($event)
@@ -2265,19 +2273,19 @@ class Doc
         // Информирование по e-mail
         if ($this->mail == 1) {
             $mail = new Mail();
-            $data = $this->getData($kod_dogovora);
-            $dog_nomer = $data['nomer'];
-            $kod_org = $data['kod_org'];
-            $nazv_krat = $data['nazv_krat'];
+            $row = $this->getData($kod_dogovora);
+            $dog_nomer = $row['nomer'];
+            $kod_org = $row['kod_org'];
+            $nazv_krat = $row['nazv_krat'];
             $summa_str = func::Rub($summa);
             $host = $_SERVER['HTTP_HOST'];
             $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
             $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
 
-            $kod_ispolnit = $data['kod_ispolnit'];
+            $kod_ispolnit = $row['kod_ispolnit'];
             if($kod_ispolnit != config::$kod_org_main)
             {
-                $ispolnit_nazv_krat = $data['ispolnit_nazv_krat'];
+                $ispolnit_nazv_krat = $row['ispolnit_nazv_krat'];
                 $body .= "Исполнитель: <a href='http://$host/form_org.php?kod_org=$kod_ispolnit'>$ispolnit_nazv_krat</a><br>";
                 $nazv_krat = $ispolnit_nazv_krat;
             }
@@ -2482,7 +2490,19 @@ class Doc
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
+//----------------------------------------------------------------------------------------------------------------------
+    public function setPP($kod_plat, $nomer, $summa, $data, $prim)
+    {
+        $db = new Db();
+        $kod_user = func::kod_user();
+        $summa = func::clearNum($summa);
+        $data = func::Date_to_MySQL($data);
 
+        if (!isset($kod_plat))
+            return;
+
+        $db->query("UPDATE plat SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_plat=$kod_plat");
+    }
 //----------------------------------------------------------------------------------------------------------------------
     public function setPrimStatus($kod_prim, $status = 0)
     {
@@ -2590,49 +2610,71 @@ class Doc
      */
     public function formAddPP()
     {
-        $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
-        $summa_plat = self::getSummaPlat($this->kod_dogovora);
-        $ostatok = $summa_dogovora - $summa_plat;
-        $ostatok = func::Rub($ostatok);
+        $hidden = "<input type='hidden' name='formAddPP' value='formAddPP' />";
+        $btn = "<input type='submit' name='button' id='button' value='Добавить' />";
+        if(isset($_POST['kod_plat_edit']))
+        {
+            $db = new Db();
+            $kod_plat_edit = (int)$_POST['kod_plat_edit'];
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM plat WHERE kod_plat=$kod_plat_edit;");
+            if($db->cnt == 0)
+                return "Платеж отсутствует";
+            $row = $rows[0];
+            $pp_nomer = $row['nomer'];
+            $data = func::Date_from_MySQL($row['data']);
+            $summa = $row['summa'];
+            $prim = $row['prim'];
+            $hidden = "<input type='hidden' name='Flag' value='formEditPP' />
+                       <input type='hidden' name='kod_plat_edit' value='$kod_plat_edit'>";
+            $btn = "<input type='submit' name='button' id='button' value='Сохранить' />";
+        }
+        else {
+            $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
+            $summa_plat = self::getSummaPlat($this->kod_dogovora);
+            $summa = $summa_dogovora - $summa_plat;
+            $summa = func::Rub($summa);
 
-        $this->getData();
-        $nomer = $this->Data['nomer'];
-        $data_sost = func::Date_from_MySQL($this->Data['data_sost']);
-
-        $date = date('d.m.Y');
+            $this->getData();
+            $pp_nomer = "";
+            $dogovor_nomer = $this->Data['nomer'];
+            $data_sost = func::Date_from_MySQL($this->Data['data_sost']);
+            $data = date('d.m.Y');
+            $prim = "№$dogovor_nomer от $data_sost";
+        }
         $res = /** @lang HTML */
             "               <form name='form1' method='post' action=''>
                                   <table width='434' border='0'>
                                     <tr>
                                       <td width='126'>Номер ПП</td>
                                       <td width='292'><span id='SNumR'>
-                                      <input name='nomer' id='nomer' />
+                                      <input name='nomer' id='nomer' value='$pp_nomer' />
                                       <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldMinCharsMsg'>Minimum
                                       number of characters not met.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Дата</td>
                                       <td><span id='SDateR'>
-                                      <input name='data' id='data' value='$date'/>
+                                      <input name='data' id='data' value='$data'/>
                                       <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                       format.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Сумма</td>
                                       <td><span id='SSummR'>
-                                      <input name='summa' id='summa' value='$ostatok' />
+                                      <input name='summa' id='summa' value='$summa' />
                                       <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                       format.</span></span></td>
                                     </tr>
                                     <tr>
                                       <td>Примечание</td>
                                       <td><span id='STextNR'>
-                                        <input name='prim' id='prim' value='№$nomer от $data_sost' />
+                                        <input name='prim' id='prim' value='$prim' />
                                       </span></td>
                                     </tr>
                                   </table>
-                                    <input type='submit' name='button' id='button' value='Добавить' />
-                                    <input type='hidden' name='formAddPP' value='formAddPP' />
+                                    $btn
+                                    $hidden
                                 </form>";
         $res .= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', '');
         return $res;
