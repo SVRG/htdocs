@@ -44,7 +44,10 @@ class Part
         if ($this->kod_part != 0)
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
         else
-            $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
+        {
+            if(func::user_group()=="admin")
+                $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
+        }
 
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPartForm');
 
