@@ -1330,7 +1330,7 @@ class Doc
                     <div>$btn_add</div>
                 </div>";
 
-        if (func::issetFlag("AddInvoice"))
+        if (func::issetFlag("AddInvoice") or func::issetFlag("EditSchet"))
             $res .= $this->formAddSchet();
 
         $db = new Db();
@@ -1354,9 +1354,12 @@ class Doc
             $kod_dogovora = $row['kod_dogovora'];
             $kod_scheta = $row['kod_scheta'];
             $btn_del = Func::ActButton2('', 'Удалить', 'DelInv', "kod_scheta_del", $row['kod_scheta']);
+            $btn_edit = func::ActButton2("", "Изменить", "EditSchet", "kod_scheta_edit", $kod_scheta);
+
             $nomer = "<div class='btn'>
                     <div><b><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&kod_scheta=$kod_scheta'>" . $row['nomer'] . "</a></b></div>
                     <div>$btn_del</div>
+                    <div>$btn_edit</div>
                 </div>";
 
             $res .= "<tr>
@@ -2181,8 +2184,8 @@ class Doc
                 $event = true;
             }
         } elseif (isset($_POST['AddInv'])) {
-            if (isset($_POST['InvNum']) and isset($_POST['InvSumm']) and isset($_POST['InvDate'])) {
-                $this->AddInvoice($_POST['InvNum'], $_POST['InvSumm'], $_POST['InvDate'], $_POST['InvPrim']);
+            if (isset($_POST['nomer']) and isset($_POST['summa']) and isset($_POST['data'])) {
+                $this->AddInvoice($_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 $event = true;
             }
         } elseif (isset($_POST['AddPrim'])) {
@@ -2240,6 +2243,10 @@ class Doc
             }
             elseif ($_POST['Flag'] == 'formEditPP' and isset($_POST['kod_plat_edit'])) {
                 $this->setPP($_POST['kod_plat_edit'],$_POST['nomer'],$_POST['summa'],$_POST['data'],$_POST['prim']);
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'formEditSchet' and isset($_POST['kod_scheta_edit'])) {
+                $this->setSchet($_POST['kod_scheta_edit'],$_POST['nomer'],$_POST['summa'],$_POST['data'],$_POST['prim']);
                 $event = true;
             }
         }
@@ -2501,7 +2508,22 @@ class Doc
         if (!isset($kod_plat))
             return;
 
-        $db->query("UPDATE plat SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_plat=$kod_plat");
+        $db->query(/** @lang MySQL */
+            "UPDATE plat SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_plat=$kod_plat");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    public function setSchet($kod_scheta, $nomer, $summa, $data, $prim)
+    {
+        $db = new Db();
+        $kod_user = func::kod_user();
+        $summa = func::clearNum($summa);
+        $data = func::Date_to_MySQL($data);
+
+        if (!isset($kod_scheta))
+            return;
+
+        $db->query(/** @lang MySQL */
+            "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
     }
 //----------------------------------------------------------------------------------------------------------------------
     public function setPrimStatus($kod_prim, $status = 0)
@@ -2556,49 +2578,71 @@ class Doc
      */
     public function formAddSchet()
     {
-        $nomer = "NEXT";
-        $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
-        $summa = $summa_dogovora;
-        $summ_pays = self::getSummaPlat($this->kod_dogovora);
-        if($summ_pays > 0)
-            $summa -= $summ_pays;
+        $hidden = "<input type='hidden' name='AddInv' value='1' />";
+        $btn = "<input type='submit' name='button' id='button' value='Добавить' />";
 
-        $this->getData();
-        $prim = "Оплата по договору №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
+        if(isset($_POST['kod_scheta_edit']))
+        {
+            $db = new Db();
+            $kod_scheta_edit = (int)$_POST['kod_scheta_edit'];
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM scheta WHERE kod_scheta=$kod_scheta_edit;");
+            if($db->cnt == 0)
+                return "Счет отсутствует";
+            $row = $rows[0];
+            $nomer = $row['nomer'];
+            $data = func::Date_from_MySQL($row['data']);
+            $summa = func::Rub($row['summa']);
+            $prim = $row['prim'];
+            $hidden = "<input type='hidden' name='Flag' value='formEditSchet' />
+                       <input type='hidden' name='kod_scheta_edit' value='$kod_scheta_edit'>";
+            $btn = "<input type='submit' name='button' id='button' value='Сохранить' />";
+        }
+        else {
+            $nomer = "NEXT";
+            $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
+            $summa = $summa_dogovora;
+            $summ_pays = self::getSummaPlat($this->kod_dogovora);
+            if ($summ_pays > 0)
+                $summa -= $summ_pays;
+            $data = date('d.m.Y');
+            $this->getData();
+            $prim = "Оплата по договору №" . $this->Data['nomer'] . " от " . func::Date_from_MySQL($this->Data['data_sost']);
+        }
         $res = /** @lang HTML */
-            '<form id="form1" name="form1" method="post" action="">
-                              <table width="434" border="0">
+            "<form id='form1' name='form1' method='post' action=''>
+                              <table width='434' border='0'>
                                 <tr>
-                                  <td width="126">Номер</td>
-                                  <td width="292"><span id="SNumR">
-                                  <input  name="InvNum" id="InvNum" value="' . $nomer . '" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldMinCharsMsg">Minimum
+                                  <td width='126'>Номер</td>
+                                  <td width='292'><span id='SNumR'>
+                                  <input  name='nomer' id='nomer' value='$nomer' />
+                                  <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldMinCharsMsg'>Minimum
                                   number of characters not met.</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Дата</td>
-                                  <td><span id="SDateR">
-                                  <input  name="InvDate" id="InvDate" value="' . date('d.m.Y') . '" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span></span></td>
+                                  <td><span id='SDateR'>
+                                  <input  name='data' id='data' value='$data' />
+                                  <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Неправильный формат даты. Пример - 01.01.2001</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Сумма</td>
-                                  <td><span id="SSummR">
-                                  <input  name="InvSumm" id="InvSumm" value="' . $summa . '" />
-                                  <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid
+                                  <td><span id='SSummR'>
+                                  <input  name='summa' id='summa' value='$summa' />
+                                  <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldInvalidFormatMsg'>Invalid
                                   format.</span></span></td>
                                 </tr>
                                 <tr>
                                   <td>Примечание</td>
-                                  <td><span id="STextNR">
-                                    <input  name="InvPrim" id="InvPrim" value="' . $prim . '" />
-                                      <span class="textfieldRequiredMsg">Необходимо ввести значение.</span></span></td>
+                                  <td><span id='STextNR'>
+                                    <input  name='prim' id='prim' value='$prim' />
+                                      <span class='textfieldRequiredMsg'>Необходимо ввести значение.</span></span></td>
                                   </span></td>
                                 </tr>
                               </table>
-                                <input type="submit" name="button" id="button" value="Добавить" />
-                                <input type="hidden" name="AddInv" id="button" value="1" />
-                            </form>';
+                               $hidden
+                               $btn
+                            </form>";
         $res .= func::Cansel();
         return $res;
     }
@@ -2623,7 +2667,7 @@ class Doc
             $row = $rows[0];
             $pp_nomer = $row['nomer'];
             $data = func::Date_from_MySQL($row['data']);
-            $summa = $row['summa'];
+            $summa = func::Rub($row['summa']);
             $prim = $row['prim'];
             $hidden = "<input type='hidden' name='Flag' value='formEditPP' />
                        <input type='hidden' name='kod_plat_edit' value='$kod_plat_edit'>";
