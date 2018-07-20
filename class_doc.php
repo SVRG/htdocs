@@ -67,8 +67,7 @@ class Doc
                                     WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
             $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
-        }
-        else
+        } else
             $res .= func::ActButton2("", "Закрытые", "close", "close", 1);
 
         // Внешние открытые
@@ -108,8 +107,7 @@ class Doc
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
             $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
-        }
-        else
+        } else
             $res .= func::ActButton2("", "Внешние открытые", "in_open", "in_open", 1);
 
         // Внешние закрытые
@@ -149,8 +147,7 @@ class Doc
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;");
             $res .= "<b>Входящие Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
-        }
-        else
+        } else
             $res .= func::ActButton2("", "Внешние закрытые", "in_close", "in_close", 1);
 
         return $res;
@@ -401,8 +398,8 @@ class Doc
 
             // Фильтр по организации
             $filter_kod_org = "";
-            if(!isset($_GET['kod_org']))
-                $filter_kod_org = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+            if (!isset($_GET['kod_org']))
+                $filter_kod_org = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
 
 
             // Формируем строку
@@ -423,8 +420,8 @@ class Doc
 
             // Фильтры
             $filter_kod_elem = "";
-            if(!isset($_GET['kod_elem']))
-                $filter_kod_elem = "<a href='".$_SERVER['REQUEST_URI']."&kod_elem=$kod_elem'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
+            if (!isset($_GET['kod_elem']))
+                $filter_kod_elem = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_elem=$kod_elem'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
 
             $res .= /** @lang HTML */
                 "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
@@ -596,7 +593,7 @@ class Doc
                             <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
                             <div>' . $form_print . '</div>
                             <div>' . $btn_edit . '</div>
-                            <div>' . $btn_copy . '</div>'.$btn_rfq.$btn_po.'
+                            <div>' . $btn_copy . '</div>' . $btn_rfq . $btn_po . '
                         </div>
                        </td>
                       </tr>
@@ -765,14 +762,14 @@ class Doc
             $table = "view_pplan";
         }
 
-        if (isset($_GET['kod_org'])){
-            if($VN==0)
-                $where .=" AND kod_org=".(int)$_GET['kod_org'];
+        if (isset($_GET['kod_org'])) {
+            if ($VN == 0)
+                $where .= " AND kod_org=" . (int)$_GET['kod_org'];
             else
-                $where .= " AND kod_ispolnit=".(int)$_GET['kod_org'];
+                $where .= " AND kod_ispolnit=" . (int)$_GET['kod_org'];
         }
 
-        $order_by = "numb DESC";
+        $order_by = "shifr ASC, numb DESC";
         if (isset($_GET['order']))
             if ($_GET['order'] == 'data') {
                 $order_by = "data_postav ASC";
@@ -782,7 +779,6 @@ class Doc
             "SELECT * FROM $table
                     WHERE $where
                     ORDER BY 
-                      shifr ASC, 
                       $order_by";
 
         $db = new Db();
@@ -806,6 +802,10 @@ class Doc
             }
 
         $kod_org_main = config::$kod_org_main;
+
+        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0";
+        if (isset($_GET['kod_org']))
+            $where .= " AND kod_org=" . (int)$_GET['kod_org'];
 
         $sql = /** @lang SQL */
             "SELECT
@@ -836,7 +836,7 @@ class Doc
                       view_rplan
                       LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0
+                      $where
                     ORDER BY
                       shifr ASC,
                       $order_by";
@@ -863,6 +863,10 @@ class Doc
             }
 
         $kod_org_main = config::$kod_org_main;
+        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)";
+        if (isset($_GET['kod_org']))
+            $where .= " AND kod_org=" . (int)$_GET['kod_org'];
+
         $sql = /** @lang SQL */
             "SELECT
                       view_rplan.kod_dogovora,
@@ -892,7 +896,7 @@ class Doc
                       view_rplan
                       LEFT JOIN view_dogovor_summa_plat ON view_dogovor_summa_plat.kod_dogovora=view_rplan.kod_dogovora
                     WHERE
-                      view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)
+                      $where
                     ORDER BY
                       shifr ASC,
                       $order_by";
@@ -1038,7 +1042,7 @@ class Doc
                 if ($summ_cnt > 1)
                     $res .= "<tr>
                                 <td align='right'><b>Итого:</b></td>
-                                <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th></tr>";
+                                <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><span style='color: #006400'>$summ_numb_payed</span></abbr></b></td><th colspan='6'></th></tr>";
                 $res .= "<tr><th colspan='8' align='left' bgcolor='#faebd7'><a href='form_elem.php?kod_elem=$kod_elem'>$shifr</a></th></tr>";
                 $summ_numb_ostat = 0;
                 $summ_numb_payed = 0;
@@ -1070,12 +1074,11 @@ class Doc
             }
 
             $filter_link = "";
-            if(!isset($_GET['kod_org']))
-            {
-                if(strpos($_SERVER['REQUEST_URI'],"?")!==false)
-                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."&kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+            if (!isset($_GET['kod_org'])) {
+                if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
+                    $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
                 else
-                    $filter_link = "<a href='".$_SERVER['REQUEST_URI']."?kod_org=".$kod_org."'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+                    $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . "?kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
             }
 
             // Формируем строку плана
@@ -1104,7 +1107,7 @@ class Doc
 
                 $res .= "<tr>
                              <td align='right'><b>Итого:</b></td>
-                             <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><font color='#006400'>$summ_numb_payed</font></abbr></b></td><th colspan='6'></th>
+                             <td align='right'>$summ_total <b><abbr title=\"Осталось $otgruz_poluch $summ_numb_ostat\">$summ_numb_ostat</abbr> <abbr title=\"Оплачено $summ_numb_payed\"><span style='color: #006400'>$summ_numb_payed</span></abbr></b></td><th colspan='6'></th>
                          </tr>";
             }
         }
@@ -1112,12 +1115,12 @@ class Doc
         $res .= '</table>';
 
         // Выводим количесто по всем партиям
-        $itog_otgruz = $summ_total-$itog_numb_ostat;
-        if($itog_otgruz > 0)
+        $itog_otgruz = $summ_total - $itog_numb_ostat;
+        if ($itog_otgruz > 0)
             $res .= "Итого (отгружено): $itog_otgruz<br>";
-        if($itog_numb_ostat > 0)
+        if ($itog_numb_ostat > 0)
             $res .= "Итого (не отгружено): $itog_numb_ostat<br>";
-        $res.="<br>";
+        $res .= "<br>";
         // Выводим сумму по всем партиям
         //$res .= "Сумма: " . Func::Rub($itog_summ)."<br><br>";
 
@@ -1189,8 +1192,7 @@ class Doc
 
             $btn_del = "";
             $btn_edit = "";
-            if (func::user_group() == "admin")
-            {
+            if (func::user_group() == "admin") {
                 $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
                 $btn_edit = func::ActButton2("", "Изменить", "EditPP", "kod_plat_edit", $kod_plat);
             }
@@ -1290,11 +1292,11 @@ class Doc
         if ($VN == 1)
             $and = "kod_org=$kod_org_main";
 
-        if(isset($_GET['kod_elem']))
-            $and .= " AND kod_elem=".(int)$_GET['kod_elem'];
+        if (isset($_GET['kod_elem']))
+            $and .= " AND kod_elem=" . (int)$_GET['kod_elem'];
 
-        if(isset($_GET['kod_org']))
-            $and .= " AND kod_org=".(int)$_GET['kod_org'];
+        if (isset($_GET['kod_org']))
+            $and .= " AND kod_org=" . (int)$_GET['kod_org'];
 
         $sql = "SELECT 
                 * 
@@ -1859,7 +1861,7 @@ class Doc
 
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
-        if(!$VN)
+        if (!$VN)
             $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
         else
             $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
@@ -1901,8 +1903,7 @@ class Doc
 
             $nazv_krat = $row['nazv_krat'];
             $kod_org = $row['kod_org'];
-            if($VN)
-            {
+            if ($VN) {
                 $nazv_krat = $row['ispolnit_nazv_krat'];
                 $kod_org = $row['kod_ispolnit'];
             }
@@ -1913,7 +1914,7 @@ class Doc
                           <td  align="center">' . $d . '</td>
                           <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
                           <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
-                          <td><a href="form_org.php?kod_org='.$kod_org.'">' . $nazv_krat . '</a></td>
+                          <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $nazv_krat . '</a></td>
                           <td>' . $row['prim'] . '</td>
                         </tr>';
 
@@ -2174,7 +2175,7 @@ class Doc
             }
         } elseif (isset($_POST['formAddPP'])) {
             if (isset($_POST['nomer'], $_POST['summa'], $_POST['data'])) {
-                try{
+                try {
                     $this->AddPay($_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 } catch (phpmailerException $e) {
                     echo $e->errorMessage(); //Pretty error messages from PHPMailer
@@ -2240,13 +2241,11 @@ class Doc
             } elseif ($_POST['Flag'] == 'SetPrimStatus1' and isset($_POST['kod_prim_status'])) {
                 $this->setPrimStatus($_POST['kod_prim_status'], 1);
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'formEditPP' and isset($_POST['kod_plat_edit'])) {
-                $this->setPP($_POST['kod_plat_edit'],$_POST['nomer'],$_POST['summa'],$_POST['data'],$_POST['prim']);
+            } elseif ($_POST['Flag'] == 'formEditPP' and isset($_POST['kod_plat_edit'])) {
+                $this->setPP($_POST['kod_plat_edit'], $_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 $event = true;
-            }
-            elseif ($_POST['Flag'] == 'formEditSchet' and isset($_POST['kod_scheta_edit'])) {
-                $this->setSchet($_POST['kod_scheta_edit'],$_POST['nomer'],$_POST['summa'],$_POST['data'],$_POST['prim']);
+            } elseif ($_POST['Flag'] == 'formEditSchet' and isset($_POST['kod_scheta_edit'])) {
+                $this->setSchet($_POST['kod_scheta_edit'], $_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 $event = true;
             }
         }
@@ -2290,8 +2289,7 @@ class Doc
             $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
 
             $kod_ispolnit = $row['kod_ispolnit'];
-            if($kod_ispolnit != config::$kod_org_main)
-            {
+            if ($kod_ispolnit != config::$kod_org_main) {
                 $ispolnit_nazv_krat = $row['ispolnit_nazv_krat'];
                 $body .= "Исполнитель: <a href='http://$host/form_org.php?kod_org=$kod_ispolnit'>$ispolnit_nazv_krat</a><br>";
                 $nazv_krat = $ispolnit_nazv_krat;
@@ -2320,14 +2318,11 @@ class Doc
         if ($nomer === "NEXT")
             $nomer = doc::getNextSchetNomer();
 
-        if(strpos($summa,"%")!==false)
-        {
+        if (strpos($summa, "%") !== false) {
             $dogovor_summa = self::getSummaDogovora($kod_dogovora);
             $proc = func::clearNum($summa);
-            $summa = func::rnd($dogovor_summa*$proc/100);
-        }
-        elseif((strpos(strtoupper($summa),"OK")!==false) or (strpos(strtoupper($summa),"ОК")!==false))
-        {
+            $summa = func::rnd($dogovor_summa * $proc / 100);
+        } elseif ((strpos(strtoupper($summa), "OK") !== false) or (strpos(strtoupper($summa), "ОК") !== false)) {
             $dogovor_summa = self::getSummaDogovora($kod_dogovora);
             $summ_pays = self::getSummaPlat($kod_dogovora);
             $summa = $dogovor_summa - $summ_pays;
@@ -2497,6 +2492,7 @@ class Doc
 
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
+
 //----------------------------------------------------------------------------------------------------------------------
     public function setPP($kod_plat, $nomer, $summa, $data, $prim)
     {
@@ -2511,6 +2507,7 @@ class Doc
         $db->query(/** @lang MySQL */
             "UPDATE plat SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_plat=$kod_plat");
     }
+
 //----------------------------------------------------------------------------------------------------------------------
     public function setSchet($kod_scheta, $nomer, $summa, $data, $prim)
     {
@@ -2525,6 +2522,7 @@ class Doc
         $db->query(/** @lang MySQL */
             "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
     }
+
 //----------------------------------------------------------------------------------------------------------------------
     public function setPrimStatus($kod_prim, $status = 0)
     {
@@ -2581,13 +2579,12 @@ class Doc
         $hidden = "<input type='hidden' name='AddInv' value='1' />";
         $btn = "<input type='submit' name='button' id='button' value='Добавить' />";
 
-        if(isset($_POST['kod_scheta_edit']))
-        {
+        if (isset($_POST['kod_scheta_edit'])) {
             $db = new Db();
             $kod_scheta_edit = (int)$_POST['kod_scheta_edit'];
             $rows = $db->rows(/** @lang MySQL */
                 "SELECT * FROM scheta WHERE kod_scheta=$kod_scheta_edit;");
-            if($db->cnt == 0)
+            if ($db->cnt == 0)
                 return "Счет отсутствует";
             $row = $rows[0];
             $nomer = $row['nomer'];
@@ -2597,8 +2594,7 @@ class Doc
             $hidden = "<input type='hidden' name='Flag' value='formEditSchet' />
                        <input type='hidden' name='kod_scheta_edit' value='$kod_scheta_edit'>";
             $btn = "<input type='submit' name='button' id='button' value='Сохранить' />";
-        }
-        else {
+        } else {
             $nomer = "NEXT";
             $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
             $summa = $summa_dogovora;
@@ -2656,13 +2652,12 @@ class Doc
     {
         $hidden = "<input type='hidden' name='formAddPP' value='formAddPP' />";
         $btn = "<input type='submit' name='button' id='button' value='Добавить' />";
-        if(isset($_POST['kod_plat_edit']))
-        {
+        if (isset($_POST['kod_plat_edit'])) {
             $db = new Db();
             $kod_plat_edit = (int)$_POST['kod_plat_edit'];
             $rows = $db->rows(/** @lang MySQL */
                 "SELECT * FROM plat WHERE kod_plat=$kod_plat_edit;");
-            if($db->cnt == 0)
+            if ($db->cnt == 0)
                 return "Платеж отсутствует";
             $row = $rows[0];
             $pp_nomer = $row['nomer'];
@@ -2672,8 +2667,7 @@ class Doc
             $hidden = "<input type='hidden' name='Flag' value='formEditPP' />
                        <input type='hidden' name='kod_plat_edit' value='$kod_plat_edit'>";
             $btn = "<input type='submit' name='button' id='button' value='Сохранить' />";
-        }
-        else {
+        } else {
             $summa_dogovora = self::getSummaDogovora($this->kod_dogovora);
             $summa_plat = self::getSummaPlat($this->kod_dogovora);
             $summa = $summa_dogovora - $summa_plat;
@@ -2683,7 +2677,7 @@ class Doc
             $pp_nomer = "";
             $dogovor_nomer = $this->Data['nomer'];
             $data_sost = func::Date_from_MySQL($this->Data['data_sost']);
-            $data = date('d.m.Y', strtotime( '-1 days' ));
+            $data = date('d.m.Y', strtotime('-1 days'));
             $prim = "№$dogovor_nomer от $data_sost";
         }
         $res = /** @lang HTML */
@@ -2753,7 +2747,7 @@ class Doc
      * @param $kod_dogovora
      * @return string
      */
-    public static function formNoContact($kod_dogovora=0)
+    public static function formNoContact($kod_dogovora = 0)
     {
         $db = new Db();
         $kod_dogovora = (int)$kod_dogovora;
@@ -2778,7 +2772,7 @@ class Doc
         $kod_dogovora = (int)$kod_dogovora;
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
-        $img =  "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
+        $img = "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
 
         if ($db->cnt == 0)
             return $img;
@@ -2787,8 +2781,8 @@ class Doc
         $datetime1 = date_create($row['time_stamp']);
         $datetime2 = date_create(date("Y-m-d"));
         $interval = date_diff($datetime2, $datetime1);
-        if((int)$interval->days > 7)
-                return $img;
+        if ((int)$interval->days > 7)
+            return $img;
 
         return "";
     }
