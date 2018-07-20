@@ -2683,7 +2683,7 @@ class Doc
             $pp_nomer = "";
             $dogovor_nomer = $this->Data['nomer'];
             $data_sost = func::Date_from_MySQL($this->Data['data_sost']);
-            $data = date('d.m.Y');
+            $data = date('d.m.Y', strtotime( '-1 days' ));
             $prim = "№$dogovor_nomer от $data_sost";
         }
         $res = /** @lang HTML */
