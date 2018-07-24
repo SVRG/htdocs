@@ -11,7 +11,7 @@ if (isset($_GET['accesscheck'])) {
     $_SESSION['PrevUrl'] = $_GET['accesscheck'];
 }
 
-if (isset($_POST['login'],$_POST['password'])) {
+if (isset($_POST['login'], $_POST['password'])) {
     $loginUsername = $_POST['login'];
     $password = $_POST['password'];
     $MM_fldUserAuthorization = "";
@@ -20,24 +20,29 @@ if (isset($_POST['login'],$_POST['password'])) {
     $MM_redirecttoReferrer = false;
 
     $db = new Db();
-    $rows = $db->rows("SELECT users.salt FROM users WHERE users.login='$loginUsername'");
+    $rows = $db->rows(/** @lang MySQL */
+        "SELECT users.salt FROM users WHERE users.login='$loginUsername'");
     $row = $rows[0];
+
+    if ($db->cnt == 0)
+        header("Location: " . $MM_redirectLoginFailed);
+
     $salt = $row['salt'];
 
-    /*
-        if($salt=="")// todo - при первом входе обновить пароли! Придумать как сдалать через админку
-            {
-                //generate a random salt to use for this account
-                //$salt = bin2hex(mcrypt_create_iv(16)); // для старых версий PHP
-                $salt = bin2hex(random_bytes(16));
-                $saltedPW =  $password . $salt;
-                $hashedPW = hash('sha256', $saltedPW);
-                $query =
-                    "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
-                $db->query($query);
-            }
-    */
-    $saltedPW =  $password . $salt;
+/*
+    if ($salt == "")// todo - при первом входе обновить пароли! Придумать как сдалать через админку
+    {
+        //generate a random salt to use for this account
+        //$salt = bin2hex(mcrypt_create_iv(16)); // для старых версий PHP
+        $salt = bin2hex(random_bytes(16));
+        $saltedPW = $password . $salt;
+        $hashedPW = hash('sha256', $saltedPW);
+        $query =
+            "UPDATE users SET users.password='$hashedPW', users.salt = '$salt' WHERE users.login='$loginUsername'";
+        $db->query($query);
+    }
+*/
+    $saltedPW = $password . $salt;
     $hashedPW = hash('sha256', $saltedPW);
     $query = /** @lang SQL */
         "SELECT * FROM users WHERE users.login='$loginUsername' AND users.password='$hashedPW'";
@@ -50,10 +55,8 @@ if (isset($_POST['login'],$_POST['password'])) {
         $loginStrGroup = $row['rt'];
         $kod_user = $row['kod_user'];
         $conf = new config();
-        if($_SERVER['HTTP_HOST']==config::$host and $kod_user!=1)
-        {
+        if ($_SERVER['HTTP_HOST'] == config::$host and $kod_user != 1) {
             header("Location: " . $MM_redirectLoginFailed);
-            exit("Fail");
         }
 
         //declare session variables and assign them
@@ -73,7 +76,7 @@ if (isset($_POST['login'],$_POST['password'])) {
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
