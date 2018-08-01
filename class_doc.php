@@ -2509,18 +2509,54 @@ class Doc
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @param $kod_scheta
+     * @param $nomer
+     * @param $summa
+     * @param $data
+     * @param $prim
+     */
     public function setSchet($kod_scheta, $nomer, $summa, $data, $prim)
     {
-        $db = new Db();
-        $kod_user = func::kod_user();
-        $summa = func::clearNum($summa);
-        $data = func::Date_to_MySQL($data);
-
         if (!isset($kod_scheta))
             return;
 
+        $kod_user = func::kod_user();
+        $kod_scheta = (int)$kod_scheta;
+
+        if (!isset($prim)) $prim = '-';
+
+        if ($nomer === "NEXT")
+            $nomer = doc::getNextSchetNomer();
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM scheta WHERE kod_scheta=$kod_scheta");
+        if($db->cnt==0)
+            return;
+
+        $row = $rows[0];
+        $kod_dogovora = $row['kod_dogovora'];
+
+        if (strpos($summa, "%") !== false) {
+
+            $dogovor_summa = self::getSummaDogovora($kod_dogovora);
+            $proc = func::clearNum($summa);
+            $summa = func::rnd($dogovor_summa * $proc / 100);
+        } elseif (strpos(strtoupper($summa), "OK") !== false) {
+            $dogovor_summa = self::getSummaDogovora($kod_dogovora);
+            $summ_pays = self::getSummaPlat($kod_dogovora);
+            $summa = $dogovor_summa - $summ_pays;
+        }
+        else
+            $summa = func::clearNum($summa);
+
+        $data = func::Date_to_MySQL($data);
+        $prim = $db->real_escape_string(addslashes($prim));
+
         $db->query(/** @lang MySQL */
-            "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
+          "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
