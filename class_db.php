@@ -95,7 +95,7 @@ class Db
             // todo - Подумать как в INSERT / UPDATE запросах удалять пробелы в значениях '_VALUE_'
 
             $safe_str = addslashes($query);
-            $connection->query(/** @lang SQL */
+            $connection->query(/** @lang MySQL */
                 "INSERT INTO log(log,user) VALUES ('$safe_str','$user');");
         }
 
@@ -153,6 +153,51 @@ class Db
         $connection = $this->connect();
         return $connection->real_escape_string($value);
     }
+//----------------------------------------------------------------------------------------------------------------------
+    public static function getUndoString($table,$key_field,$key_value)
+    {
+        if(!isset($table,$key_field,$key_value))
+            return;
 
+        $key_value = (int)$key_value;
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM $table WHERE $key_field=$key_value;");
+
+        if($db->cnt == 0)
+            return;
+
+        $row = $rows[0];
+        $key_and_value = "";
+
+        $count = count($row);
+        $i = 1;
+
+        foreach($row as $key => $value) {
+
+            if($key == $key_field)
+            {
+                $i++;
+                continue;
+            }
+
+            if($key == "kod_user" and (int)$value==0)
+                $value = 1;
+
+            if(!is_numeric($value))
+                $value = "'$value'";
+
+            $key_and_value .= "$key=$value";
+
+            if($i<$count)
+                $key_and_value.=",";
+
+            $i++;
+        }
+
+        echo /** @lang MySQL */
+        "UPDATE $table SET $key_and_value WHERE $key_field=$key_value;";
+    }
 //----------------------------------------------------------------------------------------------------------------------
 }
