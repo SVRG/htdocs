@@ -2969,4 +2969,49 @@ class Doc
 
         return $where;
     }
+//----------------------------------------------------------------------
+//
+    /**
+     * Вывод списка-выбора
+     * @param $rows
+     * @param $kod_dogovora_selected
+     * @return string
+     */
+    public static function formSelList($rows, $kod_dogovora_selected)
+    {
+        $cnt = count($rows);
+
+        if ($cnt == 0)
+            return "";
+
+        $res = "<select id='kod_dogovora' name='kod_dogovora' placeholder=\"Выбрать договор...\">";
+
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $nomer = $row['nomer'];
+            $nazv_krat = "* ".$row['nazv_krat'];
+            if($row['kod_org']==config::$kod_org_main)
+                $nazv_krat = "*".$row['ispolnit_nazv_krat'];
+            $kod_dogovora = $rows[$i]['kod_dogovora'];
+
+            $selected = "";
+            if ($rows[$i]['kod_dogovora'] == $kod_dogovora_selected)
+                $selected = " selected='selected'";
+
+            $res .= "<option value='$kod_dogovora' $selected>$nomer $nazv_krat</option>\r\n";
+        }
+        $res .= '</select>
+                    <script type="text/javascript">
+                                    var kod_dogovora, $kod_dogovora;
+                
+                                    $kod_dogovora = $("#kod_dogovora").selectize({
+                                        onChange: function(value) {
+                        if (!value.length) return;
+                    }
+                                    });
+                        kod_dogovora = $kod_dogovora[0].selectize;
+                </script>';
+
+        return $res;
+    }
 }// END CLASS
