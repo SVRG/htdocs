@@ -166,7 +166,7 @@ class Part
                     $PRC = $prc;
             }
 
-            //$sn = ' s/n '. $row['kod_part']; // Идентификатор партии
+            $pn = '<br> p/n '. $row['kod_part']; // Идентификатор партии
 
             //Примечание партии
             $prim = $this->formPrim();
@@ -187,16 +187,19 @@ class Part
             if (isset($_GET['del']))
                 $btn_del = "<div>" . Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del', $this->kod_part) . "</div>";
 
+            $btn_copy_to_doc = $this->formCopyToDoc();
+            $form_copy_to_doc = $this->formCopyToDoc(false);
+
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
                     <div>$btn_edit</div>
                     <div>$prim</div>
-                    $btn_del $btn_rfq $btn_po
-            </div>";
+                    $btn_del $btn_rfq $btn_po $btn_copy_to_doc
+                </div>";
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif /*.  $sn*/ . '</a>' . $btn_panel . '</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif . '</a>' . $pn . $btn_panel . $form_copy_to_doc . '</td>
                       <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
@@ -533,7 +536,7 @@ class Part
      * @param float $AVPr - процент аванса
      * @param $AVDate - дата аванса
      */
-    public function setPayGraph($AVPr = 0.6, $AVDate)
+    public function setPayGraph($AVDate, $AVPr = 0.6)
     {
 
         $db = new Db();
@@ -663,15 +666,17 @@ class Part
      * @param float $price_or - ориентировочная цена
      * @param string $data_nach - дата начала этапа
      */
-    public function AddEdit($kod_elem, $numb = 1, $data_postav, $price = 0., $modif = '', $nds = 0.18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
+    public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = 0.18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
-        $db = new Db();
         $data_postav = func::Date_to_MySQL($data_postav);
 
         if ($data_nach != "")
             $data_nach = func::Date_to_MySQL($data_nach);
         else
             $data_nach = "null";
+
+        if(!isset($numb))
+            $numb = 1;
 
         $kod_user = func::kod_user();
 
@@ -693,6 +698,7 @@ class Part
         if ($price_or == "")
             $price_or = 0.;
 
+        $db = new Db();
         if ($Add == 1)
             $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,$price_it,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
         else
@@ -1145,6 +1151,9 @@ class Part
             } elseif ($_POST['Flag'] == 'DelPart' and isset($_POST['kod_part_del'])) {
                 $this->Delete($_POST['kod_part_del']);
                 $event = true;
+            } elseif ($_POST['Flag'] == 'CopyPartToDoc' and isset($_POST['kod_part_copy'], $_POST['kod_dogovora'])) {
+                self::copyToDoc((int)$_POST['kod_part_copy'],(int)$_POST['kod_dogovora']);
+                $event = true;
             }
         }
 
@@ -1158,7 +1167,7 @@ class Part
             $pr = round($pr / 100, 2);
 
             if ($pr > 0. and $pr <= 1.) {
-                $this->SetPayGraph($pr, $_POST['data']);
+                $this->SetPayGraph($_POST['data'],$pr);
                 $event = true;
             }
         }
@@ -1307,4 +1316,54 @@ class Part
 
         return $rows[0];
     }
+//-----------------------------------------------------------------------
+//
+    /**
+     * Копировать партию в договор
+     * @param $kod_part
+     * @param $kod_dogovora
+     */
+    public static function copyToDoc($kod_part, $kod_dogovora)
+    {
+        $kod_user = func::kod_user();
+        $kod_part = (int)$kod_part;
+        $kod_dogovora = (int)$kod_dogovora;
+        $data_postav = date("Y-m-d");
+
+        $db = new Db();
+        $db->query(/** @lang MySQL */
+            "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) 
+                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,modif,nds,val,$kod_user,price_or,data_nach 
+                              FROM parts WHERE kod_part=$kod_part;");
+    }
+//-----------------------------------------------------------------------
+//
+    public function formCopyToDoc($btb=true)
+    {
+        if(func::user_group()!=="admin")
+            return "";
+
+        if($btb)
+            return "<div>" . Func::ActButton2('', "Копировать", 'CopyPart', 'kod_part_copy', $this->kod_part) . "</div>";
+
+        $res = "";
+        if(isset($_POST['Flag'],$_POST['kod_part_copy']))
+            if($_POST['Flag']=="CopyPart" and (int)$_POST['kod_part_copy']==$this->kod_part)
+            {
+                $db_doc = new Db();
+                $rows_doc = $db_doc->rows(/** @lang MySQL */
+                    "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
+                $res = /** @lang HTML */
+                    "<div>
+                        <form method='post'>
+                        ". Doc::formSelList($rows_doc,0)."
+                        <input type='hidden' name='kod_part_copy' value='$this->kod_part'>
+                        <input type='hidden' name='Flag' value='CopyPartToDoc'>
+                        <input type='submit' value='Копировать'>
+                        </form>
+                    </div>";
+            }
+        return $res;
+    }
+
 }
