@@ -21,19 +21,20 @@ class Part
     /**
      * Формируем таблицу партий по договору. На входе rplan
      * @param int $sgp - вывод накладных о поступлении на склад и об отгрузке (1-вывод,0-не выводить)
-     * @param string $SQL - запрос. По умолчанию - "" = Empty
+     * @param string $sql - запрос. По умолчанию - "" = Empty
      * @param int $AddNacl
      * @return string
      */
-    public function formParts($sgp = 0, $SQL = "", $AddNacl = 0)
+    public function formParts($sgp = 0, $sql = "", $AddNacl = 0)
     {
         $db = new Db();
 
         // Если запрос не был передан в параметрах
-        if ($SQL == "")
-            $SQL = "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora ORDER BY data_postav ASC"; // Сначала старые партии
+        if ($sql == "")
+            $sql = /** @lang MySQL */
+                "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora ORDER BY data_postav ASC"; // Сначала старые партии
 
-        $rows = $db->rows($SQL);
+        $rows = $db->rows($sql);
         $cnt = $db->cnt;
 
         $btn_auto_ras = '';
@@ -43,9 +44,8 @@ class Part
         // Если вызов из формы Партия - выводим только Авторасчет
         if ($this->kod_part != 0)
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
-        else
-        {
-            if(func::user_group()=="admin")
+        else {
+            if (func::user_group() == "admin")
                 $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
         }
 
@@ -166,7 +166,7 @@ class Part
                     $PRC = $prc;
             }
 
-            $pn = '<br> p/n '. $row['kod_part']; // Идентификатор партии
+            $pn = '<br> p/n ' . $row['kod_part']; // Идентификатор партии
 
             //Примечание партии
             $prim = $this->formPrim();
@@ -179,8 +179,8 @@ class Part
             $btn_rfq = "";
             $kod_org_main = config::$kod_org_main;
             if ($row['kod_org'] == $kod_org_main) {
-                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '&kod_part='.$row['kod_part'].'"><img title="RFQ" src="img/rfq.png"></a></div>';
-                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '&kod_part='.$row['kod_part']. '"><img title="PO" src="img/po.png"></a></div>';
+                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '&kod_part=' . $row['kod_part'] . '"><img title="RFQ" src="img/rfq.png"></a></div>';
+                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '&kod_part=' . $row['kod_part'] . '"><img title="PO" src="img/po.png"></a></div>';
             }
 
             // todo - Придумать глобальные права
@@ -223,7 +223,8 @@ class Part
     {
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM sklad WHERE del=0 AND kod_part=$this->kod_part");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM sklad WHERE del=0 AND kod_part=$this->kod_part");
         $cnt = $db->cnt;
 
         $res = '';
@@ -273,7 +274,8 @@ class Part
     public function formPart($AddNacl = 0)
     {
         // Шапка
-        $res = $this->formParts(1, "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
+        $res = $this->formParts(1, /** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
         return $res;
     }
 //--------------------------------------------------------------
@@ -286,7 +288,8 @@ class Part
     public function formPayGraph($Edit = false)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschet WHERE del=0 AND kod_part=$this->kod_part ORDER BY data ASC"); //
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM raschet WHERE del=0 AND kod_part=$this->kod_part ORDER BY data ASC"); //
 
         $cnt = $db->cnt;
 
@@ -394,7 +397,8 @@ class Part
     public function formPPRascheta($kod_rascheta, $Edit = false, $Body = '')
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_raschety_plat WHERE kod_rascheta=$kod_rascheta");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_raschety_plat WHERE kod_rascheta=$kod_rascheta");
         $cnt = $db->cnt;
 
         $res = "";
@@ -463,7 +467,8 @@ class Part
         $summa = func::clearNum($summa);
         $db = new Db();
         $data = func::Date_to_MySQL($data);
-        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$summa,'$data',$type_rascheta)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$summa,'$data',$type_rascheta)");
     }
 //------------------------------------------------------------------------
 //
@@ -476,9 +481,11 @@ class Part
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
+        $db->query(/** @lang MySQL */
+            "UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
 
-        $db->query("UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
+        $db->query(/** @lang MySQL */
+            "UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_rascheta=$kod_rascheta");
     }
 //------------------------------------------------------------------------
 //
@@ -488,7 +495,8 @@ class Part
     public function AddRasch100()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora");
         $cnt = $db->cnt;
         $kod_user = func::kod_user();
 
@@ -499,7 +507,8 @@ class Part
             $data = Func::Date_to_MySQL($row['data_postav']); // Дата поставки
             $type = 2; //ОК- расчет
 
-            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($kod_part,$part_summa,'$data',$type,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($kod_part,$part_summa,'$data',$type,$kod_user)");
         }
 
         return;
@@ -519,7 +528,8 @@ class Part
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $rows = $db->rows("SELECT * FROM view_plat WHERE kod_plat=$kod_plat");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_plat WHERE kod_plat=$kod_plat");
         if ($db->cnt == 1) {
             $row = $rows[0];
             $ostat = ((double)$row['summa'] - (double)$row['summa_raspred']);
@@ -527,7 +537,8 @@ class Part
                 $summa = $ostat;
         }
 
-        $db->query("INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat,kod_user) VALUES($summa,$kod_rascheta,$kod_plat,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat,kod_user) VALUES($summa,$kod_rascheta,$kod_plat,$kod_user)");
     }
 //--------------------------------------------------------------
 //
@@ -540,7 +551,8 @@ class Part
     {
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$this->kod_part");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part");
 
         if ($db->cnt == 0)
             return;
@@ -552,7 +564,8 @@ class Part
         $AVDate = func::Date_to_MySQL($AVDate);
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$raschet_summa,'$AVDate',1,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$raschet_summa,'$AVDate',1,$kod_user)");
 
         $ostatok = $part_summa - $raschet_summa; // todo - при равенстве величин возвращает значение >0
 
@@ -563,7 +576,8 @@ class Part
                 if (func::validateDate($_POST['data_ok']))
                     $OKDate = func::Date_to_MySQL($_POST['data_ok']);
 
-            $db->query("INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO raschet (kod_part,summa,data,type_rascheta,kod_user) VALUES($this->kod_part,$ostatok,'$OKDate',2,$kod_user)");
         }
     }
 //--------------------------------------------------------------
@@ -583,7 +597,8 @@ class Part
         $user = func::user();
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper,kod_user) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$user',$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper,kod_user) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$user',$kod_user)");
 
         return;
     }
@@ -599,7 +614,8 @@ class Part
         $kod_user = func::kod_user();
 
         if (isset($kod_oborota)) {
-            $db->query("UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_oborota=$kod_oborota");
+            $db->query(/** @lang MySQL */
+                "UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_oborota=$kod_oborota");
 
         } else
             echo "Ошибка: Не задан ID накладной";
@@ -675,7 +691,7 @@ class Part
         else
             $data_nach = "null";
 
-        if(!isset($numb))
+        if (!isset($numb))
             $numb = 1;
 
         $kod_user = func::kod_user();
@@ -683,7 +699,7 @@ class Part
         $price_it = 0;
         $price = func::clearNum($price);
         $price = func::rnd($price);
-        if ($price==0) {
+        if ($price == 0) {
             $E = new Elem();
             $E->kod_elem = (int)$kod_elem;
             $price_it = func::rnd($E->getPriceForQuantity((int)$numb));
@@ -700,9 +716,11 @@ class Part
 
         $db = new Db();
         if ($Add == 1)
-            $db->query("INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,$price_it,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,$price_it,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
         else
-            $db->query("UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price, price_it=$price_it, modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
+            $db->query(/** @lang MySQL */
+                "UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price, price_it=$price_it, modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
     }
 //-----------------------------------------------------------------------
 //
@@ -754,7 +772,8 @@ class Part
         if ($Edit == 1) {
 
             $db = new Db();
-            $rows = $db->rows("SELECT * FROM parts WHERE del=0 AND kod_part=$this->kod_part");
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM parts WHERE del=0 AND kod_part=$this->kod_part");
 
             $row = $rows[0];//Данные
             $form_name = "EditPart";
@@ -808,8 +827,7 @@ class Part
 
         $nds_ex_checked = "checked"; // галочка "без НДС"
         $nds_inc_checked = "";       // галочка "вкл. НДС"
-        if($price_it > 0)
-        {
+        if ($price_it > 0) {
             $nds_ex_checked = "";
             $nds_inc_checked = "checked";
             $price = $price_it;
@@ -882,7 +900,8 @@ class Part
     {
         $db = new Db();
         $Date = date("Y-m-d");
-        $db->query("UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota");
+        $db->query(/** @lang MySQL */
+            "UPDATE sklad SET poluch=1, data_poluch='$Date' WHERE kod_oborota=$kod_oborota");
     }
 //-------------------------------------------------------------------------
 //
@@ -898,19 +917,23 @@ class Part
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE parts SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+        $db->query(/** @lang MySQL */
+            "UPDATE parts SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
 
-        $db->query("UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+        $db->query(/** @lang MySQL */
+            "UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
 
         //todo - проверить
-        $db->query("UPDATE
+        $db->query(/** @lang MySQL */
+            "UPDATE
                             raschety_plat
                            INNER JOIN raschet ON raschet.kod_rascheta = raschety_plat.kod_rascheta
                            SET raschety_plat.del=1,raschety_plat.kod_user=$kod_user
                            WHERE raschet.kod_part=$kod_part
                           ");
 
-        $db->query("UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+        $db->query(/** @lang MySQL */
+            "UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
     }
 
 //-------------------------------------------------------------------------
@@ -923,7 +946,8 @@ class Part
     public static function SummPlatByRasch($kod_rascheta)
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM raschety_plat WHERE del=0 AND kod_rascheta=$kod_rascheta");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM raschety_plat WHERE del=0 AND kod_rascheta=$kod_rascheta");
 
         $cnt = $db->cnt;
         if ($cnt == 0)
@@ -950,7 +974,8 @@ class Part
     public function getSummPlatByPart()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT 
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT 
                                 Sum(IFNULL(raschety_plat.summa,0)) AS summa_plat,
                                 raschet.kod_part
                             FROM
@@ -1000,8 +1025,8 @@ class Part
     public static function getPrice($rplan_row)
     {
         $price_it = func::rnd($rplan_row['price_it']);
-        if($price_it>0) // Если указана цена с НДС то берем ее
-            return func::rnd($price_it*100/(100+func::rnd($rplan_row['nds']*100)));
+        if ($price_it > 0) // Если указана цена с НДС то берем ее
+            return func::rnd($price_it * 100 / (100 + func::rnd($rplan_row['nds'] * 100)));
 
         $price = func::rnd($rplan_row['price']);
         if ($price == 0. and config::$price_or == 1) // Берем ориентировочную
@@ -1055,16 +1080,16 @@ class Part
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT
-                                      view_sklad_otgruzka.kod_part,
-                                      Sum(view_sklad_otgruzka.numb) AS summ_numb
-                                    FROM
-                                      view_sklad_otgruzka
-                                    WHERE
-                                      view_sklad_otgruzka.kod_part = $kod_part
-                                    GROUP BY
-                                      view_sklad_otgruzka.kod_part"
-        );
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
+                        view_sklad_otgruzka.kod_part,
+                        Sum(view_sklad_otgruzka.numb) AS summ_numb
+                    FROM
+                        view_sklad_otgruzka
+                    WHERE
+                        view_sklad_otgruzka.kod_part = $kod_part
+                    GROUP BY
+                        view_sklad_otgruzka.kod_part;");
         if ($db->cnt == 0)
             return 0;
 
@@ -1083,16 +1108,16 @@ class Part
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT
-                                      view_sklad_postuplenie.kod_part,
-                                      Sum(view_sklad_postuplenie.numb) AS summ_numb
-                                    FROM
-                                      view_sklad_postuplenie
-                                    WHERE
-                                      view_sklad_postuplenie.kod_part = $kod_part
-                                    GROUP BY
-                                      view_sklad_postuplenie.kod_part"
-        );
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
+                        view_sklad_postuplenie.kod_part,
+                        Sum(view_sklad_postuplenie.numb) AS summ_numb
+                    FROM
+                        view_sklad_postuplenie
+                    WHERE
+                        view_sklad_postuplenie.kod_part = $kod_part
+                    GROUP BY
+                        view_sklad_postuplenie.kod_part;");
 
         if ($db->cnt == 0)
             return 0;
@@ -1152,7 +1177,7 @@ class Part
                 $this->Delete($_POST['kod_part_del']);
                 $event = true;
             } elseif ($_POST['Flag'] == 'CopyPartToDoc' and isset($_POST['kod_part_copy'], $_POST['kod_dogovora'])) {
-                self::copyToDoc((int)$_POST['kod_part_copy'],(int)$_POST['kod_dogovora']);
+                self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora']);
                 $event = true;
             }
         }
@@ -1167,7 +1192,7 @@ class Part
             $pr = round($pr / 100, 2);
 
             if ($pr > 0. and $pr <= 1.) {
-                $this->SetPayGraph($_POST['data'],$pr);
+                $this->SetPayGraph($_POST['data'], $pr);
                 $event = true;
             }
         }
@@ -1186,7 +1211,7 @@ class Part
     {
         $db = new Db();
 
-        $rows = $db->rows(/** @lang SQL */
+        $rows = $db->rows(/** @lang MySQL */
             "SELECT kod_part FROM parts WHERE del=0 AND kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
         return $rows[0]['kod_part'];
     }
@@ -1234,7 +1259,8 @@ class Part
         } else
             $res = $btd_add;
 
-        $rows = $db->rows("SELECT * 
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * 
                                   FROM dogovor_prim 
                                   WHERE kod_part=$this->kod_part AND dogovor_prim.del=0 
                                   ORDER BY dogovor_prim.time_stamp DESC
@@ -1309,7 +1335,8 @@ class Part
     {
         $db = new Db();
         $kod_part = (int)$kod_part;
-        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$kod_part");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_part=$kod_part");
 
         if ($db->cnt == 0)
             return false;
@@ -1338,29 +1365,29 @@ class Part
     }
 //-----------------------------------------------------------------------
 //
-    public function formCopyToDoc($btb=true)
+    public function formCopyToDoc($btb = true)
     {
-        if(func::user_group()!=="admin")
+        if (func::user_group() !== "admin")
             return "";
 
-        if($btb)
+        if ($btb)
             return "<div>" . Func::ActButton2('', "Копировать", 'CopyPart', 'kod_part_copy', $this->kod_part) . "</div>";
 
         $res = "";
-        if(isset($_POST['Flag'],$_POST['kod_part_copy']))
-            if($_POST['Flag']=="CopyPart" and (int)$_POST['kod_part_copy']==$this->kod_part)
-            {
+        if (isset($_POST['Flag'], $_POST['kod_part_copy']))
+            if ($_POST['Flag'] == "CopyPart" and (int)$_POST['kod_part_copy'] == $this->kod_part) {
                 $db_doc = new Db();
                 $rows_doc = $db_doc->rows(/** @lang MySQL */
                     "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
                 $res = /** @lang HTML */
                     "<div>
                         <form method='post'>
-                        ". Doc::formSelList($rows_doc,0)."
+                        " . Doc::formSelList($rows_doc, 0) . "
                         <input type='hidden' name='kod_part_copy' value='$this->kod_part'>
                         <input type='hidden' name='Flag' value='CopyPartToDoc'>
                         <input type='submit' value='Копировать'>
                         </form>
+                        ".func::Cansel()."
                     </div>";
             }
         return $res;
