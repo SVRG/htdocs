@@ -191,7 +191,7 @@ class Func
         elseif ($ButtValue == "Удалить")
             $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Выбрать")
-            $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
         return $btn;
     }
 //----------------------------------------------------------------------------------------------------------------------

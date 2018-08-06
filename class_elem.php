@@ -998,15 +998,13 @@ class Elem
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
-            $kod_part = $row['kod_part'];
             $modif = $row['modif'];
-            $link = "form_part.php?kod_part=$kod_part";
 
             $btn = func::ActButton2("","Выбрать","Select","modif",$modif);
 
             $res .= /** @lang HTML */
                     "<tr>
-                            <td valign='top'><div class='btn'><div>$btn</div><div><a href='$link'>$modif</a></div></div></td>
+                            <td valign='top'><div class='btn'><div>$btn</div><div>$modif</div></div></td>
                      </tr>";
         }
         $res .= '</table>';
