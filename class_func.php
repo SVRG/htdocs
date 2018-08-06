@@ -190,6 +190,8 @@ class Func
             $btn = "<input title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Удалить")
             $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Выбрать")
+            $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
         return $btn;
     }
 //----------------------------------------------------------------------------------------------------------------------

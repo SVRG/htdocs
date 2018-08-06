@@ -129,10 +129,11 @@ class Elem
         if (isset($_GET['all']))
             $all = true;
 
-        $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
+        $res = /** @lang HTML */
+            '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
                  <tr bgcolor="#CCCCCC">
                      <td width="10%">Фото</td>
-                     <td align="center">Наименование</td>
+                     <td align="center">Наименование <a href="form_nomen.php?all">Показать все</a></td>
                  </tr>';
 
         $other = "";
@@ -1001,9 +1002,12 @@ class Elem
             $modif = $row['modif'];
             $link = "form_part.php?kod_part=$kod_part";
 
-            $res .= "<tr>
-                            <td valign='top'><a href='$link'>$modif</a></td>
-                         </tr>";
+            $btn = func::ActButton2("","Выбрать","Select","modif",$modif);
+
+            $res .= /** @lang HTML */
+                    "<tr>
+                            <td valign='top'><div class='btn'><div>$btn</div><div><a href='$link'>$modif</a></div></div></td>
+                     </tr>";
         }
         $res .= '</table>';
 
@@ -1011,15 +1015,17 @@ class Elem
     }
 //----------------------------------------------------------------------------------------------------------------------
 
-    public function formNomenDocs($modif="")
+    public function formNomenDocs($modif,$kod_elem)
     {
-        if($modif=="")
+        if(!isset($modif,$kod_elem))
             return "";
+
+        $kod_elem = (int)$kod_elem;
 
         $db = new Db();
         $modif = $db->real_escape_string($modif);
         $sql = /** @lang MySQL */
-            "SELECT * FROM view_rplan WHERE kod_elem=1001 and modif='$modif' order by view_rplan.data_postav;";
+            "SELECT * FROM view_rplan WHERE kod_elem=$kod_elem and modif='$modif' order by view_rplan.data_postav;";
         $rows = $db->rows($sql);
 
         if($db->cnt == 0)

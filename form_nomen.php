@@ -19,8 +19,8 @@ $E->Events();
 <div class="style1" id="pagecell1">
     <?php
 
-    if(isset($_GET['modif']))
-        echo $E->formNomenDocs($_GET['modif']);
+    if(isset($_POST['modif'],$_GET['kod_elem']))
+        echo $E->formNomenDocs($_POST['modif'],(int)$_GET['kod_elem']);
 
     if (isset($_GET['kod_elem'])) {
         echo $E->formNomenModif((int)$_GET['kod_elem']);
