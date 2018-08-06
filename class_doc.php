@@ -2774,7 +2774,8 @@ class Doc
         if ($show_org)
             $name .= ' ' . $Org->getFormLink();
 
-        return "<a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$name</a>";
+        return /** @lang HTML */
+            "<a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$name</a>";
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2791,7 +2792,8 @@ class Doc
             "SELECT * FROM view_kontakty_dogovora WHERE kod_dogovora=$kod_dogovora");
 
         if ($db->cnt == 0)
-            return "<img title='Не указан контакт' src='img/no_contact.png'>";
+            return /** @lang HTML */
+                "<img title='Не указан контакт' src='img/no_contact.png'>";
 
         return "";
     }
@@ -2808,7 +2810,8 @@ class Doc
         $kod_dogovora = (int)$kod_dogovora;
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
-        $img = "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
+        $img = /** @lang HTML */
+            "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
 
         if ($db->cnt == 0)
             return $img;
@@ -2832,7 +2835,7 @@ class Doc
     {
 
         $kod_org_main = config::$kod_org_main;
-        $sql = /** @lang SQL */
+        $sql = /** @lang MySQL */
             "SELECT
                       view_rplan.kod_dogovora,
                       view_rplan.nomer,
@@ -2902,7 +2905,8 @@ class Doc
      */
     public function formAttrebuteTypeSelList()
     {
-        $res = "<select name='kod_type_attr'>
+        $res = /** @lang HTML */
+            "<select name='kod_type_attr'>
                     <option value='1' selected>ИГК</option>
                     <option value='2' selected>Заказ</option>
                     <option value='3' selected>Приемка</option>
@@ -2919,7 +2923,8 @@ class Doc
     {
         $db = new Db();
         $year = date('Y');
-        $rows = $db->rows("SELECT MAX(value) AS value
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT MAX(value) AS value
                                     FROM indexes
                                     WHERE time_stamp>'$year-01-01'");
         if ($db->cnt == 0)
@@ -2984,7 +2989,8 @@ class Doc
         if ($cnt == 0)
             return "";
 
-        $res = "<select id='kod_dogovora' name='kod_dogovora' placeholder=\"Выбрать договор...\">";
+        $res = /** @lang HTML */
+            "<select id='kod_dogovora' name='kod_dogovora' placeholder=\"Выбрать договор...\">";
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
@@ -2998,9 +3004,11 @@ class Doc
             if ($rows[$i]['kod_dogovora'] == $kod_dogovora_selected)
                 $selected = " selected='selected'";
 
-            $res .= "<option value='$kod_dogovora' $selected>$nomer $nazv_krat</option>\r\n";
+            $res .= /** @lang HTML */
+                "<option value='$kod_dogovora' $selected>$nomer $nazv_krat</option>\r\n";
         }
-        $res .= '</select>
+        $res .= /** @lang HTML */
+            '</select>
                     <script type="text/javascript">
                                     var kod_dogovora, $kod_dogovora;
                 
