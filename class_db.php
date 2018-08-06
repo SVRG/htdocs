@@ -200,4 +200,29 @@ class Db
         "UPDATE $table SET $key_and_value WHERE $key_field=$key_value;";
     }
 //----------------------------------------------------------------------------------------------------------------------
+    public static function getHisrtoryString($table,$key_field,$key_value)
+    {
+        if(!isset($table,$key_field,$key_value))
+            return "";
+
+        $key_value = (int)$key_value;
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM $table WHERE $key_field=$key_value;");
+
+        if($db->cnt == 0)
+            return "";
+
+        $row = $rows[0];
+        $res = serialize($row);
+
+        $kod_user = func::kod_user();
+
+        $db->query(/** @lang MySQL */
+            "INSERT INTO hystory (table_name, key_field_name, key_field_value, ser_array, kod_user) VALUES('$table','$key_field',$key_value,'$res',$kod_user);");
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
 }
