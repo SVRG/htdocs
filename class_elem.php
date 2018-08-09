@@ -60,13 +60,16 @@ class Elem
 
         if ($db->cnt == 0)
             return "Элемент не найден";
-        $res = "";
-        $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
 
-        if (isset($_POST['Flag']))
-            if ($_POST['Flag'] == 'formAddEdit') {
-                return $this->formAddEdit(1);
-            }
+        $res = "";
+        $btn_edit = "";
+        if($_SESSION['MM_UserGroup'] == "admin") {
+            $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
+            if (isset($_POST['Flag']))
+                if ($_POST['Flag'] == 'formAddEdit') {
+                    return $this->formAddEdit(1);
+                }
+        }
 
         $row = $rows[0];
 
@@ -129,12 +132,16 @@ class Elem
         if (isset($_GET['all']))
             $all = true;
 
+        $btn = "";
+        if($_SESSION['MM_UserGroup'] == "admin")
+            $btn =  Func::ActButton('', 'Добавить Элемент', 'formAdd');
+
         $res = /** @lang HTML */
-            '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below">
-                 <tr bgcolor="#CCCCCC">
-                     <td width="10%">Фото</td>
-                     <td align="center">Наименование <a href="form_nomen.php?all">Показать все</a></td>
-                 </tr>';
+            "$btn<table border=0 cellspacing=5 cellpadding=10 rules=\"rows\" frame=\"below\">
+                 <tr bgcolor=\"#CCCCCC\">
+                     <td width=\"10%\">Фото</td>
+                     <td align=\"center\">Наименование <a href=\"form_nomen.php?all\">Показать все</a></td>
+                 </tr>";
 
         $other = "";
 
@@ -991,10 +998,11 @@ class Elem
         if ($cnt == 0)
             return "Нет данных по коду $kod_elem";
 
-        $res = '<table border=0 cellspacing=5 cellpadding=10 rules="rows" frame="below" width="100%">
-                 <tr bgcolor="#CCCCCC">
-                     <td align="center">Наименование</td>
-                 </tr>';
+        $res = /** @lang HTML */
+            "<table border=0 cellspacing=5 cellpadding=10 rules=\"rows\" frame=\"below\" width=\"100%\">
+                 <tr bgcolor=\"#CCCCCC\">
+                     <td align=\"center\">Наименование</td>
+                 </tr>";
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
@@ -1007,13 +1015,19 @@ class Elem
                             <td valign='top'><div class='btn'><div>$btn</div><div>$modif</div></div></td>
                      </tr>";
         }
-        $res .= '</table>';
+        $res .= /** @lang HTML */
+            "</table>";
 
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
-    public function formNomenDocs($modif,$kod_elem)
+    /**
+     * @param $modif
+     * @param $kod_elem
+     * @return string
+     */
+    public function formNomenDocs($modif, $kod_elem)
     {
         if(!isset($modif,$kod_elem))
             return "";

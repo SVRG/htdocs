@@ -36,7 +36,6 @@ $E->Events();
         if (!$add) {
             $UserG = array('admin', 'oper');
             if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-                echo Func::ActButton('', 'Добавить Элемент', 'formAdd');
                 echo $E->formNomen();
             }
         }
