@@ -719,8 +719,12 @@ class Part
             $db->query(/** @lang MySQL */
                 "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) VALUES($this->kod_dogovora,$kod_elem,$numb,'$data_postav',$price,$price_it,'$modif',$nds,$val,$kod_user,$price_or,'$data_nach')");
         else
+        {
+            Db::getHistoryString("parts","kod_part",$this->kod_part);
+
             $db->query(/** @lang MySQL */
                 "UPDATE parts SET kod_elem=$kod_elem, numb=$numb, data_postav='$data_postav',price=$price, price_it=$price_it, modif='$modif',nds=$nds,val=$val,edit=1,kod_user=$kod_user,price_or=$price_or,data_nach='$data_nach' WHERE kod_part=$this->kod_part");
+        }
     }
 //-----------------------------------------------------------------------
 //

@@ -2490,6 +2490,8 @@ class Doc
         if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
             $nomer = self::getNextSchetNomer();
 
+        $db::getHistoryString("dogovory","kod_dogovora",$this->kod_dogovora);
+
         $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
 

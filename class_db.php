@@ -200,7 +200,15 @@ class Db
         "UPDATE $table SET $key_and_value WHERE $key_field=$key_value;";
     }
 //----------------------------------------------------------------------------------------------------------------------
-    public static function getHisrtoryString($table,$key_field,$key_value)
+
+    /**
+     * Формирует строку array_string для выбранной записи
+     * @param $table
+     * @param $key_field
+     * @param $key_value
+     * @return string
+     */
+    public static function getHistoryString($table, $key_field, $key_value)
     {
         if(!isset($table,$key_field,$key_value))
             return "";
@@ -220,7 +228,7 @@ class Db
         $kod_user = func::kod_user();
 
         $db->query(/** @lang MySQL */
-            "INSERT INTO hystory (table_name, key_field_name, key_field_value, ser_array, kod_user) VALUES('$table','$key_field',$key_value,'$res',$kod_user);");
+            "INSERT INTO history (table_name, key_field_name, key_field_value, ser_array, kod_user) VALUES('$table','$key_field',$key_value,'$res',$kod_user);");
 
         return $res;
     }

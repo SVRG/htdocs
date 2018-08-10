@@ -349,13 +349,14 @@ class Elem
      */
     public function Save($obozn = '', $name = '', $shablon = '', $shifr = '')
     {
-        $db = new Db();
-
         $kod_elem = $this->kod_elem;
 
-        if ($obozn == '' or $name == '') return;
+        if ($obozn == '' or $name == '')
+            return;
         $kod_user = func::kod_user();
 
+        Db::getHistoryString("elem","kod_elem",$kod_elem);
+        $db = new Db();
         $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
 
     }

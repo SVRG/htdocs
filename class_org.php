@@ -523,9 +523,15 @@ class Org
      */
     public function Save($poisk, $nazv_krat, $nazv_poln)
     {
-        $db = new Db();
+        Db::getHistoryString("org","kod_org",$this->kod_org);
 
-        $db->query("UPDATE org SET poisk = '$poisk', nazv_krat='$nazv_krat', nazv_poln='$nazv_poln' WHERE kod_org=" . $this->kod_org);
+        $db = new Db();
+        $poisk = $db->real_escape_string($poisk);
+        $nazv_krat = $db->real_escape_string($nazv_krat);
+        $nazv_poln = $db->real_escape_string($nazv_poln);
+
+        $db->query(/** @lang MySQL */
+            "UPDATE org SET poisk = '$poisk', nazv_krat='$nazv_krat', nazv_poln='$nazv_poln' WHERE kod_org=$this->kod_org;");
     }
 //----------------------------------------------------------------------
 //
@@ -537,9 +543,16 @@ class Org
      */
     public function AddOrg($poisk, $nazv_krat, $nazv_poln)
     {
+        if(!isset($poisk,$nazv_krat))
+            return;
+
         $db = new Db();
+        $poisk = $db->real_escape_string($poisk);
+        $nazv_krat = $db->real_escape_string($nazv_krat);
+        $nazv_poln = $db->real_escape_string($nazv_poln);
         // todo - сделать проверку на наличие контрагента
-        $db->query("INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
     }
 //----------------------------------------------------------------------
 //
@@ -560,7 +573,7 @@ class Org
      */
     public function SetRecv($inn = '', $kpp = '', $ogrn = '', $r_sch = '', $bank_rs = '', $k_sch = '', $bank_ks = '', $bik = '', $okpo = '', $okonh = '', $www = '', $e_mail = '')
     {
-        $db = new DB();
+
         $kod_org = $this->kod_org;
 
         $inn = func::clearNum($inn);
@@ -570,6 +583,8 @@ class Org
         $k_sch = func::clearNum($k_sch);
         $bik = func::clearNum($bik);
 
+        Db::getHistoryString("org","kod_org",$kod_org);
+        $db = new DB();
         $db->query("UPDATE org SET inn = '$inn', kpp = '$kpp', ogrn='$ogrn', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
                     bik = '$bik', okpo = '$okpo', okonh = '$okonh', www = '$www', e_mail = '$e_mail' WHERE kod_org =$kod_org");
 
