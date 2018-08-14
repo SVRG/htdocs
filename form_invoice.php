@@ -130,17 +130,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $name = $row['name'];
         $modif = $row['modif'];
 
-        // Если комплектующие или услуги
-        if(((int)$row['kod_elem']==config::$kod_elem_kompl) or ((int)$row['kod_elem']==config::$kod_elem_service))
-        {
-            $name = $modif;
-            $modif = "";
-        }
-
         if ($modif !== "")
-            $modif = "($modif)";
-        else
-            $modif = "";
+            $name = elem::getNameForInvoice($row);
 
         $numb = func::rnd($row['numb']);                                // Количество
         $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
@@ -161,7 +152,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $n = $i + 1;
         echo "<tr>
             <td align='center'>$n</td>
-            <td align='left'>$name $modif</td>
+            <td align='left'>$name</td>
             <td>шт.</td>
             <td align='center'>$numb</td>
             <td align='right' nowrap>$price_str</td>

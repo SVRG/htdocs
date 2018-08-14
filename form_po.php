@@ -120,17 +120,8 @@ for ($i = 0; $i < $cnt; $i++) {
     $name = $row['name'];
     $modif = $row['modif'];
 
-    // Если комплектующие или услуги
-    if(((int)$row['kod_elem']==config::$kod_elem_kompl) or ((int)$row['kod_elem']==config::$kod_elem_service))
-    {
-        $name = $modif;
-        $modif = "";
-    }
-
     if ($modif !== "")
-        $modif = "($modif)";
-    else
-        $modif = "";
+        $name = elem::getNameForInvoice($row);
 
     $numb = $row['numb']; // Общее количество
 
