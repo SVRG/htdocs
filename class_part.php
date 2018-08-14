@@ -467,6 +467,7 @@ class Part
         $summa = func::clearNum($summa);
         $db = new Db();
         $data = func::Date_to_MySQL($data);
+        $type_rascheta = (int)$type_rascheta;
         $db->query(/** @lang MySQL */
             "INSERT INTO raschet (kod_part,summa,data,type_rascheta) VALUES($this->kod_part,$summa,'$data',$type_rascheta)");
     }
@@ -536,7 +537,8 @@ class Part
             if ($summa > $ostat)
                 $summa = $ostat;
         }
-
+        $kod_plat = (int)$kod_plat;
+        $kod_rascheta = (int)$kod_rascheta;
         $db->query(/** @lang MySQL */
             "INSERT INTO raschety_plat (summa,kod_rascheta,kod_plat,kod_user) VALUES($summa,$kod_rascheta,$kod_plat,$kod_user)");
     }
@@ -596,6 +598,8 @@ class Part
         $data = func::Date_to_MySQL($data);
         $user = func::user();
         $kod_user = func::kod_user();
+        $naklad = $db->real_escape_string($naklad);
+        $kod_oper = (int)$kod_oper;
 
         $db->query(/** @lang MySQL */
             "INSERT INTO sklad (kod_part,numb,naklad,data,kod_oper,oper,kod_user) VALUES($kod_part,$numb,'$naklad','$data',$kod_oper,'$user',$kod_user)");
@@ -693,6 +697,7 @@ class Part
 
         if (!isset($numb))
             $numb = 1;
+        $numb = func::clearNum($numb);
 
         $kod_user = func::kod_user();
 
@@ -713,6 +718,8 @@ class Part
 
         if ($price_or == "")
             $price_or = 0.;
+        $price_or = func::clearNum($price_or);
+        $price_or = func::rnd($price_or);
 
         $db = new Db();
         if ($Add == 1)

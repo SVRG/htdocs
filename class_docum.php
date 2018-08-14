@@ -152,6 +152,8 @@ class Docum
     {
         $kod_user = func::kod_user();
         $db = new Db();
+        $name = $db->real_escape_string($name);
+        $path = $db->real_escape_string($path);
         $db->query("INSERT INTO docum (name,path,kod_user) VALUES('$name','$path',$kod_user)");
         $last_id = $db->last_id;
 

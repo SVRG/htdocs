@@ -2096,7 +2096,7 @@ class Doc
         $nomer = $this->Data['nomer'] . " copy";
         if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false))
             $nomer = $this->getNextSchetNomer();
-
+        $nomer = $db->real_escape_string($nomer);
         $db->query(/** @lang SQL */
             "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user) 
                       SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
@@ -2133,6 +2133,8 @@ class Doc
 
         $data_sost = func::Date_to_MySQL($data_sost);
         $kod_user = func::kod_user();
+        $kod_org = (int)$kod_org;
+        $kod_ispolnit = (int)$kod_ispolnit;
         if (!isset($kod_ispolnit)) {
 
             $kod_ispolnit = config::$kod_org_main;
@@ -2140,6 +2142,8 @@ class Doc
 
         if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
             $nomer = self::getNextSchetNomer();
+
+        $nomer = $db->real_escape_string($nomer);
 
         $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user)";
 
@@ -2266,11 +2270,12 @@ class Doc
      */
     public function AddPay($nomer, $summa, $data, $prim)
     {
-        $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
         $data = func::Date_to_MySQL($data);
         $summa = func::clearNum($summa);
-
+        $db = new Db();
+        $nomer = $db->real_escape_string($nomer);
+        $prim = $db->real_escape_string($prim);
         $user = func::user();
         $kod_user = func::kod_user();
 
@@ -2330,6 +2335,8 @@ class Doc
 
         $db = new Db();
         $data = func::Date_to_MySQL($data);
+        $nomer = $db->real_escape_string($nomer);
+        $prim = $db->real_escape_string($prim);
         $kod_user = func::kod_user();
 
         $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user)");
@@ -2350,6 +2357,7 @@ class Doc
         if ($value == "" and $kod_attr == 0) return;
 
         $db = new Db();
+        $value = $db->real_escape_string($value);
         $kod_user = func::kod_user();
 
         if ($value != "") {
@@ -2410,9 +2418,9 @@ class Doc
         $kod_user = func::kod_user();
 
         $db = new Db();
-        $P = nl2br($text); // Вставялем <br> вместо перевода строки
-        $P = $db->real_escape_string($P);
-        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$P','$user',$kod_user,$kod_part,$status)");
+        $text = nl2br($text); // Вставялем <br> вместо перевода строки
+        $text = $db->real_escape_string($text);
+        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$text','$user',$kod_user,$kod_part,$status)");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2933,6 +2941,7 @@ class Doc
             return "1/" . date("y");
         $value = (int)$rows['0']['value'] + 1;
         $nomer = $value . "/" . date("y");
+        $nomer = $db->real_escape_string($nomer);
 
         $kod_user = func::kod_user();
 

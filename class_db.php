@@ -150,6 +150,8 @@ class Db
      */
     public function real_escape_string($value)
     {
+        $value = ltrim($value);
+        $value = rtrim($value);
         $connection = $this->connect();
         return $connection->real_escape_string($value);
     }

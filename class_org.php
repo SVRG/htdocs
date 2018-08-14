@@ -637,7 +637,8 @@ class Org
         $db = new DB();
         $kod_org = $this->kod_org;
         $kod_user = func::kod_user();
-
+        $adres = $db->real_escape_string($adres);
+        $type = (int)$type;
         $db->query("INSERT INTO adresa (adres,kod_org,type,kod_user) VALUES('$adres',$kod_org,$type,$kod_user)");
     }
 //----------------------------------------------------------------------
@@ -654,7 +655,7 @@ class Org
         $db = new DB();
         $kod_org = $this->kod_org;
         $kod_user = func::kod_user();
-
+        $phone = $db->real_escape_string($phone);
         $db->query("INSERT INTO org_data (data,kod_org,kod_user) VALUES('$phone',$kod_org,$kod_user)");
     }
 //----------------------------------------------------------------------
@@ -1023,7 +1024,7 @@ class Org
     {
         $db = new Db();
         $kod_user = func::kod_user();
-
+        $prim = $db->real_escape_string($prim);
         $db->query(/** @lang SQL */
             "INSERT INTO org_links (master, slave, prim,kod_user) VALUE ($kod_org_master,$kod_org_slave,'$prim',$kod_user)");
     }

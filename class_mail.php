@@ -126,6 +126,7 @@ class Mail
             $user = func::user();
             // Запись ошибок в log
             $db = new Db();
+            $err_log = $db->real_escape_string($err_log);
             $db->query(/** @lang MySQL */
                 "INSERT INTO log (log, user) VALUES ('$err_log','$user')");
             return false;

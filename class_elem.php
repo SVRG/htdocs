@@ -326,14 +326,18 @@ class Elem
      */
     public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon = '')
     {
-        $db = new Db();
-
         if($obozn==="" or $name==="")
             return;
 
         $obozn = ltrim($obozn);
         $name = ltrim($name);
         $kod_user = func::kod_user();
+        $db = new Db();
+        $obozn = $db->real_escape_string($obozn);
+        $name = $db->real_escape_string($name);
+        $shablon = $db->real_escape_string($shablon);
+        $shifr = $db->real_escape_string($shifr);
+        $nomen = (int)$nomen;
 
         $db->query("INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user)");
 
@@ -357,8 +361,12 @@ class Elem
 
         Db::getHistoryString("elem","kod_elem",$kod_elem);
         $db = new Db();
-        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
+        $obozn = $db->real_escape_string($obozn);
+        $name = $db->real_escape_string($name);
+        $shablon = $db->real_escape_string($shablon);
+        $shifr = $db->real_escape_string($shifr);
 
+        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
     }
 //------------------------------------------------------------------------
 //
@@ -1045,5 +1053,37 @@ class Elem
             return "";
 
         return Doc::formRPlan_by_Doc($rows);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Наименование для документов
+     * @param $rplan_row
+     * @return mixed|string
+     */
+    public static function getNameForInvoice($rplan_row)
+    {
+        if(!isset($rplan_row['kod_elem']))
+            return "";
+
+        $kod_elem = (int)$rplan_row['kod_elem'];
+
+        if($rplan_row['modif'] == "")
+            return $rplan_row['name'];
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM elem WHERE kod_elem=$kod_elem;");
+        if($db->cnt == 0)
+            return "";
+
+        $row = $rows[0];
+        if($row['shablon'] == "")
+            return $row['name']." (".$rplan_row['modif'].")";
+
+        if(strpos($row['shablon'], "[Mod]") === false)
+            return $row['name']." (".$rplan_row['modif'].")";
+
+        return str_replace("[Mod]",$rplan_row['modif'],$row['shablon']);
     }
 }

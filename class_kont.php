@@ -211,13 +211,12 @@ class Kontakt
 
         if (!isset($FName) and !isset($name)) return;
 
-        $dolg = Func::Mstr($dolg);
-        $famil = Func::Mstr($famil);
-        $name = Func::Mstr($name);
-        $otch = Func::Mstr($otch);
-        $kod_user = func::kod_user();
-
         $db = new Db();
+        $dolg = $db->real_escape_string(Func::Mstr($dolg));
+        $famil = $db->real_escape_string(Func::Mstr($famil));
+        $name = $db->real_escape_string(Func::Mstr($name));
+        $otch = $db->real_escape_string(Func::Mstr($otch));
+        $kod_user = func::kod_user();
         $db->query(/** @lang MySQL */
             "INSERT INTO 
                       kontakty (kod_org,dolg,famil,name,otch,kod_user)
@@ -244,7 +243,7 @@ class Kontakt
 
         if (!isset($phone) or $phone == "") return;
         $kod_user = func::kod_user();
-
+        $phone = $db->real_escape_string($phone);
         $db->query(/** @lang MySQL */
             "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
                     VALUES($kod_kontakta,'$phone',$kod_user)");
@@ -347,6 +346,7 @@ class Kontakt
     {
         $db = new Db();
         $kod_user = func::kod_user();
+        $kod_dogovora = (int)$kod_dogovora;
 
         $db->query(/** @lang MySQL */
             "INSERT INTO kontakty_dogovora (kod_kontakta,kod_dogovora,kod_user) VALUES($this->kod_kontakta,$kod_dogovora,$kod_user)");
