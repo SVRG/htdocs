@@ -55,7 +55,7 @@ if (isset($_POST['login'], $_POST['password'])) {
         $loginStrGroup = $row['rt'];
         $kod_user = $row['kod_user'];
         $conf = new config();
-        if ($_SERVER['HTTP_HOST'] == config::$host and $kod_user != 1) {
+        if ($_SERVER['HTTP_HOST'] == config::$admin_host and $kod_user != 1) {
             header("Location: " . $MM_redirectLoginFailed);
         }
 

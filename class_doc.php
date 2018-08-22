@@ -2289,7 +2289,7 @@ class Doc
             $kod_org = $row['kod_org'];
             $nazv_krat = $row['nazv_krat'];
             $summa_str = func::Rub($summa);
-            $host = $_SERVER['HTTP_HOST'];
+            $host = config::$mail_link_host;
             $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
             $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
 
