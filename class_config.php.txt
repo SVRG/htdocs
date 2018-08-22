@@ -19,8 +19,11 @@ class config
     public static $kod_org_main = 1234; // Код основной компании
     public static $invoice_sign_gd = "User 1"; // Подпись ГД
     public static $invoice_sign_gb = "User 2"; // Подпись ГБ
-    public static $host = "localhost"; // С этого адреса доступ только для admin
-    public static $dogovor_marker = "MyCompDoc"; // Эти символы должны быть в договоре
+    public static $dogovor_marker = "MyCompany"; // Эти символы должны быть в договоре
+    public static $admin_host = "localhost"; // С этого адреса доступ только для admin
+    public static $mail_link_host = "localhost"; // Для вставки ссылок в письма (например ссылка на договор)
     public static $logo_img = "img/logo.png"; // Логотип компании
     public static $comp_name_eng = "MyCompany"; // Название на английском
+    public static $price_or = 0; // Работа с ориентировочными ценами. Отображается в партии
+    public static $data_nach = 0; // Дата начала этапа. Отображается в партии
 }
