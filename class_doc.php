@@ -1057,21 +1057,28 @@ class Doc
                 if ($proc > 0)
                     $summ_numb_payed += $numb_ostat;
             }
-            $summ_total += $numb;
 
             $summ_cnt++;
 
             $form_part_link = "form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora";
             $form_dogovor_link = "form_dogovor.php?kod_dogovora=$kod_dogovora";
 
-            // Красим строку
+            // Красим строку + ставим флаг суммировать или нет
+            $add_to_summ = true;
             if ($zakryt == 1) // Если договор закрыт
             {
                 if ($numb_ostat == 0)
                     $zebra = "#85e085"; // Если все отгружено то красим в зеленый
                 else
-                    $zebra = "#F18585"; // Если не все отгружено то в красный
+                {
+                    $zebra = "#F18585";// Если не все отгружено то в красный
+                    $add_to_summ = false; // Не суммировать
+                }
             }
+
+            // Суммируем только то, что отгружено. Аннулированные договоры пропускаем.
+            if($add_to_summ)
+                $summ_total += $numb;
 
             $filter_link = "";
             if (!isset($_GET['kod_org'])) {
