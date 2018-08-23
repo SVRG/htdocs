@@ -20,6 +20,8 @@ if (isset($_POST['login'], $_POST['password'])) {
     $MM_redirecttoReferrer = false;
 
     $db = new Db();
+    $loginUsername = $db->real_escape_string($loginUsername);
+    $password = $db->real_escape_string($password);
     $rows = $db->rows(/** @lang MySQL */
         "SELECT users.salt FROM users WHERE users.login='$loginUsername'");
     $row = $rows[0];
