@@ -50,6 +50,9 @@ class Doc
             $where .= " AND (data_postav>='$data_s' AND data_postav<'$data_n') ";
         }
 
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
+
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         // Открытые
@@ -59,22 +62,34 @@ class Doc
                                     WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main $where
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
         $res = Doc::formRPlan_by_Elem($rows);
+
+        $res .= "<div class='btn'><div>" . func::ActButton2("", "Все", "all", "all", 1) . "</div>";
+
+        // Кнопки
+        if(!isset($_POST['close']))
+            $res .= "<div>" . func::ActButton2("", "Закрытые", "close", "close", 1) . "</div>";
+        if(!isset($_POST['in_open']))
+            $res .= "<div>" . func::ActButton2("", "Внешние открытые", "in_open", "in_open", 1) . "</div>";
+        if(!isset($_POST['in_close']))
+            $res .= "<div>" . func::ActButton2("", "Внешние закрытые", "in_close", "in_close", 1) . "</div>";
+
+        $res .= "</div>";
+
         // Закрытые
-        if (isset($_POST['close']) or isset($_POST['in_open']) or isset($_POST['in_close'])) {
+        if (isset($_POST['close']) or isset($_POST['all'])) {
             $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
                                     WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
             $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
-        } else
-            $res .= func::ActButton2("", "Закрытые", "close", "close", 1);
-
+        }
         // Внешние открытые
-        if (isset($_POST['in_open']) or isset($_POST['in_close'])) {
+        if (isset($_POST['in_open']) or isset($_POST['all'])) {
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
+                                    `trin`.`dogovory`.`doc_type`                                                                         AS `doc_type`,
                                     `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
                                     `trin`.`org`.`nazv_krat`                                                                             AS `nazv_krat`,
                                     `trin`.`parts`.`modif`                                                                               AS `modif`,
@@ -107,14 +122,13 @@ class Doc
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
             $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
-        } else
-            $res .= func::ActButton2("", "Внешние открытые", "in_open", "in_open", 1);
-
+        }
         // Внешние закрытые
-        if (isset($_POST['in_close'])) {
+        if (isset($_POST['in_close']) or isset($_POST['all'])) {
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
+                                    `trin`.`dogovory`.`doc_type`                                                                         AS `doc_type`,
                                     `trin`.`org`.`kod_org`                                                                               AS `kod_org`,
                                     `trin`.`org`.`nazv_krat`                                                                             AS `nazv_krat`,
                                     `trin`.`parts`.`modif`                                                                               AS `modif`,
@@ -147,8 +161,7 @@ class Doc
                                   WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
                                   ORDER BY kod_dogovora DESC;");
             $res .= "<b>Входящие Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
-        } else
-            $res .= func::ActButton2("", "Внешние закрытые", "in_close", "in_close", 1);
+        }
 
         return $res;
     }
@@ -315,6 +328,18 @@ class Doc
             $oplacheno = "";
 
         $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
+        $ind_row = "";
+        // Индикатор строки Если не поставочный договор
+        if((int)$rplan_rows[0]['doc_type']!=1)
+            $ind_row = "bgcolor='#E0FFFF'";
+
+       // Индикатор строки Если договор закрыт - зеленый. Нет - без цвета
+        if ((int)$zakryt == 1) {
+            if ($summa_plat > 0)
+                $ind_row = " bgcolor='#85e085'";
+            else
+                $ind_row = " bgcolor='#ffaaa0'";
+        }
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rplan_rows[$i];
@@ -336,14 +361,6 @@ class Doc
             // НДС
             if ((int)((double)$row['nds'] * 100) != 18)
                 $nds = "<br>НДС " . (int)((double)$row['nds'] * 100) . "%";
-
-            $ind_row = ""; // Индикатор строки Если договор закрыт - зеленый. Нет - без цвета
-            if ((int)$zakryt == 1) {
-                if ($summa_plat > 0)
-                    $ind_row = " bgcolor='#85e085'";
-                else
-                    $ind_row = " bgcolor='#ffaaa0'";
-            }
 
             $kod_org_main = config::$kod_org_main;
 
@@ -578,6 +595,8 @@ class Doc
                                 <td>$user</td>
                             </tr>";
 
+            $doc_type = self::formDocType($row['doc_type'],false);
+
             $form_print = "";
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
                 $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="Форма для печати" src="img/printer.png"></a>';
@@ -595,6 +614,7 @@ class Doc
                             <div>' . $btn_edit . '</div>
                             <div>' . $btn_copy . '</div>' . $btn_rfq . $btn_po . '
                         </div>
+                        '.$doc_type.'
                        </td>
                       </tr>
                       <tr>
@@ -621,7 +641,6 @@ class Doc
                         <td>' . Func::Rub($ostatok) . ' р.</td>
                       </tr>' . $row_user . $clr . '
                 </table>';
-
         }
     }
 //--------------------------------------------------------------
@@ -636,7 +655,7 @@ class Doc
     {
         $data_sost = Func::NowE();
         $kod_org = $this->kod_org;
-        $FormName = "formAdd";
+        $FormName = "formAddDoc";
 
         $posav_checked = "checked";
         $zakup_checked = "";
@@ -660,41 +679,46 @@ class Doc
         } else
             $nomer = "NEXT"; // Запрашиваем следующий номер
 
+        $doc_type = $this->Data['doc_type'];
         $res = /** @lang HTML */
-            '<form name="form1" method="post" action="">
-                    <table width="100%" border="0">
+            "<form name='form1' method='post' action=''>
+                    <table width='100%' border='0'>
                       <tr>
-                        <th width="202" >Номер</th>
-                        <td width="100%"><span id="SNumR">
-                                  <input  name="nomer" id="nomer" value="' . $nomer . '"/>
-                                  <span class="textfieldRequiredMsg">Нужно ввести значение.</span><span class="textfieldMinCharsMsg">Minimum
+                        <th width='202' >Номер</th>
+                        <td width='100%'><span id=\"SNumR\">
+                                  <input  name='nomer' id='nomer' value='$nomer' />
+                                  <span class='textfieldRequiredMsg'>Нужно ввести значение.</span><span class='textfieldMinCharsMsg'>Minimum
                                   number of characters not met.</span></span>
                          </td>
                       </tr>
                       <tr>
                         <th >Дата</th>
-                        <td><span id="SDateR">
-                                  <input  name="data_sost" id="data_sost" value="' . $data_sost . '" />
-                             <span class="textfieldRequiredMsg">Нужно ввести значение.</span>
-                             <span class="textfieldInvalidFormatMsg">Неправильный формат даты. Пример - 01.01.2001</span>
+                        <td><span id='SDateR'>
+                                  <input  name='data_sost' id='data_sost' value='$data_sost' />
+                             <span class='textfieldRequiredMsg'>Нужно ввести значение.</span>
+                             <span class='textfieldInvalidFormatMsg'>Неправильный формат даты. Пример - 01.01.2001</span>
                              </span>
                         </td>
                       </tr>
                       <tr>
                         <th >Контрагент</th>
-                        <td>' . Org::formSelList2($kod_org) . '</td>
+                        <td>".Org::formSelList2($kod_org)."</td>
                       </tr>
                       <tr>
-                        <th >Тип Догвора</th>
+                        <th >Тип Договора</th>
                             <td>     
-                                    <p><input name="doc_type" id="doc_type" type="radio" value="postav" ' . $posav_checked . '>Поставка</p>
-                                    <p><input name="doc_type" id="doc_type" type="radio" value="zakup" ' . $zakup_checked . '>Закупка</p>
+                                    <p><input name='zakup' type='radio' value='postav' $posav_checked>Поставка</p>
+                                    <p><input name='zakup' type='radio' value='zakup' $zakup_checked>Закупка</p>
                             </td>
                       </tr>
+                        <tr>
+                        <td>Тип Документа</td>
+                        <td>".self::formDocType($doc_type)."</td>
+                        </tr>
                     </table>
-                    <input id="' . $FormName . '" type="hidden" value="' . $FormName . '" name="' . $FormName . '"/>
-                    <input type="submit" value="Сохранить" />
-                </form>';
+                    <input id='$FormName' type='hidden' value='$FormName' name='$FormName'/>
+                    <input type='submit' value='Сохранить' />
+                </form>";
         return $res;
     }
 //--------------------------------------------------------------------
@@ -712,7 +736,7 @@ class Doc
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_dogovor_data WHERE kod_dogovora= $this->kod_dogovora");
+        $rows = $db->rows("SELECT * FROM view_dogovor_data WHERE kod_dogovora=$this->kod_dogovora");
 
         unset($this->Data);
 
@@ -769,6 +793,9 @@ class Doc
                 $where .= " AND kod_ispolnit=" . (int)$_GET['kod_org'];
         }
 
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
+
         $order_by = "shifr ASC, numb DESC";
         if (isset($_GET['order']))
             if ($_GET['order'] == 'data') {
@@ -803,9 +830,12 @@ class Doc
 
         $kod_org_main = config::$kod_org_main;
 
-        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0";
+        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND doc_type=1 AND numb_ostat>0 AND view_dogovor_summa_plat.summa_plat>0";
         if (isset($_GET['kod_org']))
             $where .= " AND kod_org=" . (int)$_GET['kod_org'];
+
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
 
         $sql = /** @lang SQL */
             "SELECT
@@ -863,9 +893,12 @@ class Doc
             }
 
         $kod_org_main = config::$kod_org_main;
-        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)";
+        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND doc_type=1 AND numb_ostat>0 AND ISNULL(view_dogovor_summa_plat.summa_plat)";
         if (isset($_GET['kod_org']))
             $where .= " AND kod_org=" . (int)$_GET['kod_org'];
+
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
 
         $sql = /** @lang SQL */
             "SELECT
@@ -1076,6 +1109,10 @@ class Doc
                 }
             }
 
+            // Если не поставочный договор
+            if((int)$row['doc_type']!=1)
+                $zebra = "#E0FFFF";
+
             // Суммируем только то, что отгружено. Аннулированные договоры пропускаем.
             if($add_to_summ)
                 $summ_total += $numb;
@@ -1243,6 +1280,9 @@ class Doc
             $where .= " AND kod_elem=$kod_elem";
         }
 
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
+
         $res = func::ActButton2("", "Все Договоры", "dogovory_all", "dogovory_all", 1);
 
         if (!isset($_POST['dogovory_all'])) {
@@ -1304,6 +1344,9 @@ class Doc
 
         if (isset($_GET['kod_org']))
             $and .= " AND kod_org=" . (int)$_GET['kod_org'];
+
+        if(isset($_GET['p']))
+            $and .= " AND doc_type=1";
 
         $sql = "SELECT 
                 * 
@@ -1423,7 +1466,7 @@ class Doc
     
                         $kod_attr = $("#kod_attr").selectize({
                             onChange: function(value) {
-                                if (!value.length) return;
+                                if (!value.length) return "";
                             }
                         });
                         kod_attr = $kod_attr[0].selectize;
@@ -1495,14 +1538,13 @@ class Doc
                                     <input type="hidden" name="AddAttr" value="1" /></form>';
             $res .= Func::Cansel();
         } else
-            $res = func::ActButton2("", "Добавить Аттрибут", "1", "formAddAttr", "1");
+            $res = "<div class='btn'><div><b>Атрибуты</b></div><div>" . func::ActButton2("", "Добавить", "1", "formAddAttr", "1"). "</div></div>";
 
         if ($cnt == 0)
             return $res;
 
         $res .= /** @lang HTML */
-            '<br>Атрибуты Договора<br>
-                <table border=1 cellspacing=0 cellpadding=0 width="100%">
+            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
                 <tr bgcolor="#CCCCCC" >
                     <td width="60">Тип</td>
                     <td>Значение</td>
@@ -2128,13 +2170,10 @@ class Doc
      * @param $data_sost
      * @param int $kod_org - Код организации Заказчика
      * @param int $kod_ispolnit
-     * @internal param int $VN - Внешний, Заказчик - НВС, Исполнитель - Код организации
-     * @internal param $Num - номер
-     * @internal param $DataCR - Дата создания договора
-     * @internal param $Priem - Приемка, не актуально
+     * @param int $doc_type
      * @return int
      */
-    public function Add($nomer, $data_sost, $kod_org, $kod_ispolnit)
+    public function Add($nomer, $data_sost, $kod_org, $kod_ispolnit, $doc_type = 1)
     {
         $db = new Db();
 
@@ -2142,6 +2181,7 @@ class Doc
         $kod_user = func::kod_user();
         $kod_org = (int)$kod_org;
         $kod_ispolnit = (int)$kod_ispolnit;
+        $doc_type = (int)$doc_type;
         if (!isset($kod_ispolnit)) {
 
             $kod_ispolnit = config::$kod_org_main;
@@ -2152,7 +2192,7 @@ class Doc
 
         $nomer = $db->real_escape_string($nomer);
 
-        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user)";
+        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user,doc_type) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user,$doc_type)";
 
         $db->query($sql);
 
@@ -2170,16 +2210,16 @@ class Doc
 
         $kod_org_main = config::$kod_org_main;
 
-        if (isset($_POST['formAdd'])) {
+        if (isset($_POST['formAddDoc'])) {
             if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['doc_type'])) {
                 $kod_ispolnit = $kod_org_main; // НВС - Поставщик
                 $kod_org = $_POST['kod_org']; // Заказчик
 
-                if ($_POST['doc_type'] == "zakup") {
+                if ($_POST['zakup'] == "zakup") {
                     $kod_ispolnit = $_POST['kod_org']; // Поставщик
                     $kod_org = $kod_org_main; // НВС - Заказчик
                 }
-                $kod_dogovora = $this->Add($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
+                $kod_dogovora = $this->Add($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit,$_POST['doc_type']);
                 // переходим в форму договору
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
@@ -2208,6 +2248,7 @@ class Doc
         } elseif (isset($_POST['AddAttr'])) {
             if (isset($_POST['value']) or isset($_POST['kod_attr'])) {
                 $this->AddAttribute($_POST['kod_attr'], $_POST['value'], $_POST['kod_type_attr']);
+                $event = true;
             }
         } elseif (isset($_POST['formEdit'])) {
             if (isset($_POST['nomer'], $_POST['data_sost'], $_POST['kod_org'], $_POST['doc_type'])) {
@@ -2215,12 +2256,12 @@ class Doc
                 $kod_ispolnit = $kod_org_main; // НВС - Поставщик
                 $kod_org = $_POST['kod_org']; // Заказчик
 
-                if ($_POST['doc_type'] == "zakup") {
+                if ($_POST['zakup'] == "zakup") {
                     $kod_ispolnit = $_POST['kod_org']; // Поставщик
                     $kod_org = $kod_org_main; // НВС - Заказчик
                 }
 
-                $this->Edit($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit);
+                $this->Edit($_POST['nomer'], $_POST['data_sost'], $kod_org, $kod_ispolnit,$_POST['doc_type']);
                 $event = true;
             }
         } elseif (isset($_POST['Flag'])) {
@@ -2257,6 +2298,14 @@ class Doc
                 $event = true;
             } elseif ($_POST['Flag'] == 'formEditSchet' and isset($_POST['kod_scheta_edit'])) {
                 $this->setSchet($_POST['kod_scheta_edit'], $_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'AddDocLink' and isset($_POST['kod_dogovora'],$_POST['kod_dogovora_master'])) {
+                $this->addDocLink($_POST['kod_dogovora_master'],$_POST['kod_dogovora']);
+                $event = true;
+            }
+            elseif ($_POST['Flag'] == 'DelDocLink' and isset($_POST['kod_link_del'])) {
+                $this->delLink($_POST['kod_link_del']);
                 $event = true;
             }
         }
@@ -2490,12 +2539,16 @@ class Doc
      * @param $nomer - номер
      * @param $data_sost - дата
      * @param int $kod_org - код заказчика
-     * @param $kod_ispolnit - код исполнителя
+     * @param int $kod_ispolnit - код исполнителя
+     * @param int $doc_type
      */
-    public function Edit($nomer, $data_sost, $kod_org, $kod_ispolnit = 0)
+    public function Edit($nomer, $data_sost, $kod_org, $kod_ispolnit = 0, $doc_type = 1)
     {
         $data_sost = func::Date_to_MySQL($data_sost);
         $db = new Db();
+        $kod_org = (int)$kod_org;
+        $kod_ispolnit = (int)$kod_ispolnit;
+        $doc_type = (int)$doc_type;
         $kod_user = func::kod_user();
         if ($kod_ispolnit == 0) {
 
@@ -2505,9 +2558,12 @@ class Doc
         if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
             $nomer = self::getNextSchetNomer();
 
+        $nomer = $db->real_escape_string($nomer);
+
         $db::getHistoryString("dogovory","kod_dogovora",$this->kod_dogovora);
 
-        $db->query("UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
+        $db->query(/** @lang MySQL */
+            "UPDATE dogovory SET nomer = '$nomer', data_sost='$data_sost', kod_org=$kod_org, kod_ispolnit=$kod_ispolnit, kod_user=$kod_user, doc_type=$doc_type WHERE kod_dogovora=$this->kod_dogovora");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2517,6 +2573,7 @@ class Doc
         $kod_user = func::kod_user();
         $summa = func::clearNum($summa);
         $data = func::Date_to_MySQL($data);
+        $nomer = $db->real_escape_string($nomer);
 
         if (!isset($kod_plat))
             return;
@@ -2571,6 +2628,7 @@ class Doc
 
         $data = func::Date_to_MySQL($data);
         $prim = $db->real_escape_string(addslashes($prim));
+        $nomer = $db->real_escape_string($nomer);
 
         $db->query(/** @lang MySQL */
           "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
@@ -2604,6 +2662,23 @@ class Doc
 
         } else
             echo "Ошибка: Не задан ID Счета";
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление ссылки
+     * @param $kod_link
+     */
+    public function delLink($kod_link)
+    {
+        $db = new Db();
+
+        if (!isset($kod_link))
+            return;
+        $kod_link = (int)$kod_link;
+        $kod_user = func::kod_user();
+
+        $db->query("UPDATE doc_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2778,21 +2853,30 @@ class Doc
      * @param bool $show_org
      * @return string
      */
-    public function getFormLink($kod_dogovora = -1, $show_org = true)
+    public function getFormLink($kod_dogovora = 0, $show_org = true)
     {
-        if ($kod_dogovora == -1)
-            $kod_dogovora = $this->kod_dogovora;
+        $D = new Doc();
+        if ($kod_dogovora == 0)
+            $D->kod_dogovora = $this->kod_dogovora;
+        else
+            $D->kod_dogovora = $kod_dogovora;
 
-        $this->getData($kod_dogovora);
-        $Org = new Org();
-        $Org->kod_org = $this->Data['kod_org'];
-        $name = '№' . $this->Data['nomer'] . ' от ' . func::Date_from_MySQL($this->Data['data_sost']);
+        $D->getData();
+        $res = /** @lang HTML */
+            "<a href='form_dogovor.php?kod_dogovora=$D->kod_dogovora'>№" . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost'])."</a>";
 
         if ($show_org)
-            $name .= ' ' . $Org->getFormLink();
+        {
+            $Org = new Org();
+            $Org->kod_org = $D->Data['kod_org'];
 
-        return /** @lang HTML */
-            "<a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$name</a>";
+            if($Org->kod_org == config::$kod_org_main)
+                $Org->kod_org = $D->Data['kod_ispolnit'];
+
+            $res .= " - " . $Org->getFormLink();
+        }
+
+        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2850,8 +2934,12 @@ class Doc
      */
     public function formProduction($kod_elem_sub = 1002)
     {
-
         $kod_org_main = config::$kod_org_main;
+
+        $where = "view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND kod_elem_sub=$kod_elem_sub AND specs.del=0";
+        if(isset($_GET['p']))
+            $where .= " AND doc_type=1";
+
         $sql = /** @lang MySQL */
             "SELECT
                       view_rplan.kod_dogovora,
@@ -2881,7 +2969,7 @@ class Doc
                       view_rplan
                       INNER JOIN specs ON kod_elem_base=kod_elem
                     WHERE
-                      view_rplan.kod_org<>$kod_org_main AND zakryt<>1 AND numb_ostat>0 AND kod_elem_sub=$kod_elem_sub AND specs.del=0
+                      $where
                     ORDER BY
                       shifr ASC,
                       numb DESC";
@@ -2925,8 +3013,8 @@ class Doc
         $res = /** @lang HTML */
             "<select name='kod_type_attr'>
                     <option value='1' selected>ИГК</option>
-                    <option value='2' selected>Заказ</option>
-                    <option value='3' selected>Приемка</option>
+                    <option value='2'>Заказ</option>
+                    <option value='3'>Приемка</option>
                 </select>";
 
         return $res;
@@ -2996,13 +3084,21 @@ class Doc
 //
     /**
      * Вывод списка-выбора
-     * @param $rows
-     * @param $kod_dogovora_selected
+     * @param $rows array
+     * @param $kod_dogovora_selected int
      * @return string
      */
-    public static function formSelList($rows, $kod_dogovora_selected)
+    public static function formSelList($rows = [], $kod_dogovora_selected = 0)
     {
         $cnt = count($rows);
+
+        if($cnt == 0)
+        {
+            $db = new Db();
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
+            $cnt = $db->cnt;
+        }
 
         if ($cnt == 0)
             return "";
@@ -3013,9 +3109,9 @@ class Doc
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $nomer = $row['nomer'];
-            $nazv_krat = "* ".$row['nazv_krat'];
+            $nazv_krat = $row['nazv_krat'];
             if($row['kod_org']==config::$kod_org_main)
-                $nazv_krat = "*".$row['ispolnit_nazv_krat'];
+                $nazv_krat = "* ".$row['ispolnit_nazv_krat'];
             $kod_dogovora = $rows[$i]['kod_dogovora'];
 
             $selected = "";
@@ -3023,7 +3119,7 @@ class Doc
                 $selected = " selected='selected'";
 
             $res .= /** @lang HTML */
-                "<option value='$kod_dogovora' $selected>$nomer $nazv_krat</option>\r\n";
+                "<option value='$kod_dogovora' $selected>$nomer $nazv_krat $kod_dogovora</option>\r\n";
         }
         $res .= /** @lang HTML */
             '</select>
@@ -3032,7 +3128,7 @@ class Doc
                 
                                     $kod_dogovora = $("#kod_dogovora").selectize({
                                         onChange: function(value) {
-                        if (!value.length) return;
+                        if (!value.length) return "";
                     }
                                     });
                         kod_dogovora = $kod_dogovora[0].selectize;
@@ -3040,4 +3136,146 @@ class Doc
 
         return $res;
     }
+//----------------------------------------------------------------------
+//
+    /**
+     * Тип документа
+     * @param int $doc_type
+     * @param bool $sel_list
+     * @return string
+     */
+    public static function formDocType($doc_type = 1, $sel_list = true)
+    {
+        $doc_types = array(
+            0 => "Contract",
+            1 => "Order Confirmation",
+            2 => "PO",
+            3 => "Quotation",
+            4 => "RFQ"
+        );
+
+        if($doc_type > 5 and $doc_type < 1)
+            $doc_type = 1;
+
+        if(!$sel_list)
+            return $doc_types[$doc_type-1];
+
+        $selected = array();
+
+        for($i=0;$i<=4;$i++)
+        {
+            if(($i+1) == $doc_type)
+                $selected[$i] = " Selected";
+            else
+                $selected[$i] = "";
+        }
+        $res = /** @lang HTML */
+            "<select name='doc_type'>
+                <option value='1' $selected[0]>$doc_types[0]</option>
+                <option value='2' $selected[1]>$doc_types[1]</option>                
+                <option value='3' $selected[2]>$doc_types[2]</option>
+                <option value='4' $selected[3]>$doc_types[3]</option>
+                <option value='5' $selected[4]>$doc_types[4]</option>
+             </select>";
+        return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Изменить тип Документа
+     * @param int $doc_type
+     */
+    public function setDocType($doc_type = 1)
+    {
+        $db = new Db();
+        $doc_type = (int)$doc_type;
+        $kod_user = func::kod_user();
+
+        $db->query(/** @lang MySQL */
+            "UPDATE dogovory SET doc_type = $doc_type, edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Добавление связи договоров
+     * @param $kod_dogovora_master
+     * @param $kod_dogovora_slave
+     */
+    public function addDocLink($kod_dogovora_master, $kod_dogovora_slave)
+    {
+        $db = new Db();
+        $kod_dogovora_master = (int)$kod_dogovora_master;
+        $kod_dogovora_slave = (int)$kod_dogovora_slave;
+        $kod_user = func::kod_user();
+        $db->query(/** @lang MySQL */
+            "INSERT INTO doc_links(kod_doc_master, kod_doc_slave, kod_user) VALUES($kod_dogovora_master,$kod_dogovora_slave,$kod_user);");
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Форма добавления связи с договором
+     * @param $kod_dogovora_master
+     * @return string
+     */
+    public function formLinks($kod_dogovora_master = 0)
+    {
+        if($kod_dogovora_master == 0)
+            $kod_dogovora_master = $this->kod_dogovora;
+
+        if(isset($_POST['AddDocLink'])) {
+            $db = new Db();
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_dogovor_data WHERE zakryt=0 AND kod_dogovora<>$kod_dogovora_master ORDER BY nomer ASC;");
+
+            $sel_list = self::formSelList($rows);
+            $btn_cansel = func::Cansel();
+            $res = /** @lang HTML */
+                "<form action='' method='post'>
+                            $sel_list
+                            <input type='hidden' name='kod_dogovora_master' value='$kod_dogovora_master'>
+                            <input type='submit' name='OK' value='Добавить'>
+                            <input type='hidden' name='Flag' value='AddDocLink'>
+                        </form>
+                $btn_cansel";
+
+            return $res;
+        }
+
+        $btn_add = func::ActButton2("","Добавить","1","AddDocLink",1);
+
+        $res = /** @lang HTML */
+            "<div class='btn'><div><b>Связь</b></div><div>$btn_add</div></div>";
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+        "SELECT * FROM doc_links WHERE del=0 AND ((kod_doc_master=$kod_dogovora_master) OR (kod_doc_slave=$kod_dogovora_master));");
+
+        $cnt = $db->cnt;
+        if($cnt==0)
+            return $res;
+
+        $res .= /** @lang HTML */
+            "<table border='0' >";
+        for($i=0;$i<$cnt;$i++)
+        {
+            $row = $rows[$i];
+            $kod_link = $row['kod_link'];
+            if($kod_dogovora_master == $row['kod_doc_master'])
+                $kod_dogovora = $row['kod_doc_slave'];
+            else
+                $kod_dogovora = $row['kod_doc_master'];
+
+            $link = $this->getFormLink($kod_dogovora);
+            $btn_del = func::ActButton2("","Удалить","DelDocLink","kod_link_del",$kod_link);
+            $res .= /** @lang HTML */
+                "<tr>
+                    <td>$btn_del</td>
+                    <td>$link</td>
+                 </tr>";
+        }
+        $res .= /** @lang HTML */
+            "</table>";
+        return $res;
+    }
+
+
 }// END CLASS

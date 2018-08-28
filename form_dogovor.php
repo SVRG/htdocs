@@ -16,9 +16,9 @@ if (!isset($_GET['kod_dogovora']) and !isset($_POST['kod_dogovora']))
     exit("Не задан Договор");
 $Dogovor = new Doc();
 if (isset($_GET['kod_dogovora']))
-    $Dogovor->kod_dogovora = $_GET['kod_dogovora'];
+    $Dogovor->kod_dogovora = (int)$_GET['kod_dogovora'];
 else
-    $Dogovor->kod_dogovora = $_POST['kod_dogovora'];
+    $Dogovor->kod_dogovora = (int)$_POST['kod_dogovora'];
 $Dogovor->getData();
 $Dogovor->Events();
 
@@ -93,6 +93,7 @@ else
 
                 echo $Dogovor->formDocum(); // Документы договора
                 echo $Dogovor->formAttributes(); // Аттрибуты
+                echo $Dogovor->formLinks(); // Ссылки на другие договоры
 
                 ?>
             </td>

@@ -1045,8 +1045,11 @@ class Elem
 
         $db = new Db();
         $modif = $db->real_escape_string($modif);
+        $and = "";
+        if(isset($_GET['p']))
+            $and = " AND doc_type=1";
         $sql = /** @lang MySQL */
-            "SELECT * FROM view_rplan WHERE kod_elem=$kod_elem and modif='$modif' order by view_rplan.data_postav;";
+            "SELECT * FROM view_rplan WHERE kod_elem=$kod_elem and $and modif='$modif' order by view_rplan.data_postav;";
         $rows = $db->rows($sql);
 
         if($db->cnt == 0)
