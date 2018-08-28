@@ -20,7 +20,6 @@ class Docum
      */
     public static function formDocum($Type = 'Doc', $ID = 1)
     {
-
         $sql = '';
         if ($Type == 'Elem')
             $sql = "SELECT
@@ -64,18 +63,23 @@ class Docum
         if ($sql == '')
             return "";
 
+        $btn_add = "";
+        if ($Type == 'Doc')
+            $btn_add = Func::ActButton2('form_upload.php?Desc=IncludeToDoc&kod_dogovora=' . $ID, 'Добавить');
+        elseif ($Type == 'Elem')
+            $btn_add = Func::ActButton2('form_upload.php?Desc=IncludeToElem&kod_elem=' . $ID, 'Добавить');
+        elseif ($Type == 'Org')
+            $btn_add = Func::ActButton2('form_upload.php?Desc=IncludeToOrg&kod_org=' . $ID, 'Добавить');
+        elseif ($Type == 'Cont')
+            $btn_add = Func::ActButton2('form_upload.php?Desc=IncludeToCont&kod_kontakta=' . $ID, 'Добавить');
+
+        $res = "<div class='btn'>
+                <div><b>Файлы</b></div>
+                <div>$btn_add</div>
+                </div>";
+
         $db = new DB();
         $rows = $db->rows($sql);
-
-        $res = "";
-        if ($Type == 'Doc')
-            $res .= Func::ActButton('form_upload.php?Desc=IncludeToDoc&kod_dogovora=' . $ID, 'Прикрепить Файл');
-        elseif ($Type == 'Elem')
-            $res .= Func::ActButton('form_upload.php?Desc=IncludeToElem&kod_elem=' . $ID, 'Прикрепить Файл');
-        elseif ($Type == 'Org')
-            $res .= Func::ActButton('form_upload.php?Desc=IncludeToOrg&kod_org=' . $ID, 'Прикрепить Файл');
-        elseif ($Type == 'Cont')
-            $res .= Func::ActButton('form_upload.php?Desc=IncludeToCont&kod_kontakta=' . $ID, 'Прикрепить Файл');
 
         if ($db->cnt == 0)
             return $res;

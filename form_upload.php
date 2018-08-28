@@ -11,17 +11,17 @@ $Text = '';
 // Договор
 if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
     $d = new Doc();
-    $d->kod_dogovora = $_GET['kod_dogovora'];
+    $d->kod_dogovora = (int)$_GET['kod_dogovora'];
     $Text = $d->getFormLink();
 } // Элемент
 elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
     $E = new Elem();
-    $E->kod_elem = $_GET['kod_elem'];
+    $E->kod_elem = (int)$_GET['kod_elem'];
     $Text = $E->getFormLink();
 } // Организация
 elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
     $Org = new Org();
-    $Org->kod_org = $_GET['kod_org'];
+    $Org->kod_org = (int)$_GET['kod_org'];
     $Text = $Org->getFormLink();
 } else {
     exit("Err: Не задан объект");
@@ -90,7 +90,7 @@ if (isset($_FILES["filename"])) {
 
 <!-- end masthead -->
 <div class="style1" id="pagecell1">
-    Загрузить файл<br>
+    <h3>Загрузить файл</h3>
     <?php
     if (isset($Text))
         echo '<h1>' . $Text . '</h1>';
@@ -98,7 +98,7 @@ if (isset($_FILES["filename"])) {
     ?>
     <form action="<?php $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data">
         <br>
-        <table width="200" border="1">
+        <table width="200" border="0">
             <tr>
                 <td>Примечание</td>
                 <td><input title="prim" name="Type" value="<?php if (isset($Type)) echo (string)$Type; ?>"/>
@@ -113,9 +113,10 @@ if (isset($_FILES["filename"])) {
                 <td><input type="submit" value="Загрузить"/></td>
             </tr>
         </table>
+         <input type="hidden" name="FileAploadConfirm"/>
     </form>
     <?php
-    if (isset($_FILES["filename"]) and $CopyOK) {
+    if (isset($_FILES["filename"],$_POST['FileAploadConfirm']) and $CopyOK) {
         echo $btn;
         echo("Файл успешно загружен <br>");
         echo("Характеристики файла: <br>");
@@ -123,8 +124,23 @@ if (isset($_FILES["filename"])) {
         echo($_FILES["filename"]["name"]);
         echo("<br>Размер файла: ");
         echo($_FILES["filename"]["size"]);
-    } else
+    } elseif (isset($_POST['FileAploadConfirm']))
         echo("Ошибка загрузки файла");
+    else
+    {
+        // ------------------------------------------------------------------------------
+        if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
+            $btn = Func::ActButton('form_dogovor.php?kod_dogovora=' . $_GET['kod_dogovora'], 'Отмена');
+        } // ------------------------------------------------------------------------------
+        elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
+            $btn = Func::ActButton('form_elem.php?kod_elem=' . $_GET['kod_elem'], 'Отмена');
+        } // ------------------------------------------------------------------------------
+        elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
+            $btn = Func::ActButton('form_org.php?kod_org=' . $_GET['kod_org'], 'Отмена');
+        }
+
+        echo $btn;
+    }
     ?>
 </div>
 </body>
