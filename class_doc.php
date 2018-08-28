@@ -841,6 +841,7 @@ class Doc
             "SELECT
                       view_rplan.kod_dogovora,
                       view_rplan.nomer,
+                      view_rplan.doc_type,
                       view_rplan.kod_org,
                       view_rplan.nazv_krat,
                       view_rplan.modif,
@@ -904,6 +905,7 @@ class Doc
             "SELECT
                       view_rplan.kod_dogovora,
                       view_rplan.nomer,
+                      view_rplan.doc_type,
                       view_rplan.kod_org,
                       view_rplan.nazv_krat,
                       view_rplan.modif,
