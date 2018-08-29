@@ -2359,6 +2359,54 @@ class Doc
             }
             $body .= "Сумма: $summa_str<br>";
             $body .= "Примечание: $prim<br>";
+
+            $db = new Db();
+            $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$kod_dogovora");
+            $cnt = $db->cnt;
+
+            if ($cnt == 0)
+            {
+                $body .= "Нет партий";
+            }
+            else
+            {
+                $body .= /** @lang HTML */
+                    "<table border='1' cellspacing='0' cellpadding='3'>
+                            <tr bgcolor='#f5f5f5'>
+                            <td width='30'>№</td>
+                            <td>Наименование</td>
+                            <td width='30'>Ед. изм.</td>
+                            <td width='70'>Кол-во</td>
+                            <td>Цена с НДС</td>
+                            <td>Сумма с НДС</td>
+                          </tr>";
+                for ($i = 0; $i < $cnt; $i++) {
+                    $row = $rows[$i];
+                    $name = $row['name'];
+                    $modif = $row['modif'];
+
+                    if ($modif !== "")
+                        $name = elem::getNameForInvoice($row);
+
+                    $numb = func::rnd($row['numb']);                                // Количество
+                    $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
+                    $price = Part::getPriceWithNDS($row);
+                    $price_str = func::Rub($price);
+                    $summ_with_nds_str = func::Rub($summ_with_nds);
+
+                    $n = $i + 1;
+                    $body .= "<tr>
+                    <td align='center'>$n</td>
+                    <td align='left'>$name</td>
+                    <td>шт.</td>
+                    <td align='center'>$numb</td>
+                    <td align='right' nowrap>$price_str</td>
+                    <td align='right' nowrap>$summ_with_nds_str</td>
+                  </tr>";
+                }
+                $body .= "</table>";
+            }
+
             $mail->send_mail($body, "Оплата: $dog_nomer - $nazv_krat - $summa_str");
         }
     }
