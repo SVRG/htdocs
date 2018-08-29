@@ -1354,6 +1354,9 @@ class Doc
         if(isset($_GET['p']))
             $and .= " AND doc_type=1";
 
+        if(isset($_GET['ost']))
+            $and .= " AND numb_ostat>0";
+
         $sql = "SELECT 
                 * 
                 FROM 
