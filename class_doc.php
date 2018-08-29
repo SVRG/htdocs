@@ -325,7 +325,11 @@ class Doc
         if ($oplacheno > 0)
             $oplacheno .= "%";
         else
+        {
             $oplacheno = "";
+            if(isset($_GET['pd'])) // Фильтруем только оплаченные
+                return "";
+        }
 
         $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
         $ind_row = "";
@@ -1370,7 +1374,6 @@ class Doc
 
 //-----------------------------------------------------------------------
 //
-
     /**
      * Показать счета по Договору
      * @return string
