@@ -550,7 +550,16 @@ class Org
         $poisk = $db->real_escape_string($poisk);
         $nazv_krat = $db->real_escape_string($nazv_krat);
         $nazv_poln = $db->real_escape_string($nazv_poln);
-        // todo - сделать проверку на наличие контрагента
+
+        // Проверка на наличие контрагента
+        $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE (poisk='$poisk') OR (nazv_krat='$nazv_krat') OR (nazv_poln='$nazv_poln')");
+        if($db->cnt > 0)
+        {
+            $btn = func::ActButton2("form_orglist.php","Вернуться");
+            exit("Наименование '$poisk' уже существует в списке Контрагентов<br>$btn");
+        }
+
         $db->query(/** @lang MySQL */
             "INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
     }
