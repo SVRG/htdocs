@@ -10,7 +10,9 @@
         <li><a href="../form_doclist.php">Договоры</a>
             <ul>
                 <li><a href="../form_main.php?sgp=1">Исходящие</a></li>
+                <li><a href="../form_main.php?sgp=1&pd&ost">Исходящие $</a></li>
                 <li><a href="../form_main.php?sgp=7">Входящие</a></li>
+                <li><a href="../form_main.php?sgp=7&d&ost">Входящие $</a></li>
             </ul>
         </li>
         <li><a href="../form_orglist.php">Организации</a>
