@@ -21,7 +21,18 @@ if (!isset($_GET['kod_dogovora']))
 $D = new Doc();
 $D->kod_dogovora = (int)$_GET['kod_dogovora'];
 $D->getData();
-$nomer = $D->Data['nomer'];
+$doc_type = (int)$D->Data['doc_type'];
+if($doc_type==1)
+    $nomer = "Счет №".$D->Data['nomer'];
+elseif ($doc_type==2)
+    $nomer = "Подтверждение заказа №OC-".$D->kod_dogovora;
+elseif ($doc_type==3)
+    $nomer = "Заказ №PO-".$D->kod_dogovora;
+elseif ($doc_type==4)
+    $nomer = "Предложение №QT-".$D->kod_dogovora;
+elseif ($doc_type==5)
+    $nomer = "Запрос №RFQ-".$D->kod_dogovora;
+
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
 $schet_data = array();
@@ -33,7 +44,7 @@ if (isset($_GET['kod_scheta'])) {
 
     if ($db->cnt > 0) {
         $schet_data = $rows[0];
-        $nomer = $schet_data['nomer'];
+        $nomer = "Счет №".$schet_data['nomer'];
         $data_sost = func::Date_from_MySQL($schet_data['data']);
     }
 }
@@ -99,7 +110,7 @@ else {
 $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];
 
-echo "<h3>Счет №$nomer от $data_sost</h3>";
+echo "<h3>$nomer от $data_sost</h3>";
 echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " . $adres;
 echo $dogovor_nomer;
