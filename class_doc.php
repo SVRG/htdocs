@@ -1348,8 +1348,12 @@ class Doc
         if (isset($_GET['kod_elem']))
             $and .= " AND kod_elem=" . (int)$_GET['kod_elem'];
 
-        if (isset($_GET['kod_org']))
-            $and .= " AND kod_org=" . (int)$_GET['kod_org'];
+        if (isset($_GET['kod_org'])) {
+            if ($VN == 0)
+                $and .= " AND kod_org=" . (int)$_GET['kod_org'];
+            else
+                $and .= " AND kod_ispolnit=" . (int)$_GET['kod_org'];
+        }
 
         if(isset($_GET['p']))
             $and .= " AND doc_type=1";
