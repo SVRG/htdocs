@@ -56,7 +56,7 @@ if (isset($_GET['kod_scheta'])) {
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="menu/print.css">
-    <title><?php $nomer_str = str_replace('/','_',$nomer); echo "Счет N$nomer_str от $data_sost"; ?></title>
+    <title><?php $nomer_str = str_replace('/','_',$nomer); echo "$nomer_str от $data_sost"; ?></title>
 </head>
 <body>
 <br>
