@@ -333,16 +333,12 @@ class Doc
 
         $summa_plat = self::getSummaPlat($kod_dogovora);        // todo - медленные запросы, надо подумать как их ускорить.
         $ind_row = "";
-        // Индикатор строки Если не поставочный договор
-        if((int)$rplan_rows[0]['doc_type']!=1)
+        // Индикатор строки
+        if((int)$rplan_rows[0]['doc_type']!=1) // Если не поставочный договор
             $ind_row = "bgcolor='#E0FFFF'";
-
-       // Индикатор строки Если договор закрыт - зеленый. Нет - без цвета
-        if ((int)$zakryt == 1) {
+        elseif ((int)$zakryt == 1) {  // Индикатор строки Если договор закрыт - зеленый. Нет - без цвета
             if ($summa_plat > 0)
                 $ind_row = " bgcolor='#85e085'";
-            else
-                $ind_row = " bgcolor='#ffaaa0'";
         }
 
         for ($i = 0; $i < $cnt; $i++) {
