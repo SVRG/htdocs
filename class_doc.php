@@ -393,6 +393,7 @@ class Doc
             if ($numb_ostat == 0) {
                 $ind_part = /** @lang HTML */
                     " bgcolor='#85e085'";
+                $data = "<b>".Part::getLastNaklDate($kod_part)."</b>";
             }
 
             // Если договор внешний то надо Код организации указать как Код исполнителя
@@ -1012,7 +1013,8 @@ class Doc
             $val = (int)$row['val']; // Валюта
             $nds = round((double)$row['nds'], 2); // НДС
             $data_postav = $row['data_postav']; // Дата поставки
-            $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
+            $data_postav_str = Func::Date_from_MySQL($data_postav);
+            $price_nds_str = func::Rub(Part::getPriceWithNDS($row)); // Цена с НДС, Строка
             $part_summa = Part::getPartSumma($row); // Сумма партии
 
             $modif_str = '';            // Модификация
@@ -1021,7 +1023,7 @@ class Doc
 
             // НДС
             $nds_str = '';
-            if ($nds != 0.18)
+            if ((int)($nds*100) != (int)(config::$nds_main*100))
                 $nds_str = /** @lang HTML */
                     '<br>НДС ' . $nds * 100 . '%';
 
@@ -1051,7 +1053,10 @@ class Doc
                 elseif ($days_rem <= 30)
                     $ind_data = " bgcolor='#f4df42'"; // Менее 30-ти дней до отгрузки
             } elseif ($numb_ostat == 0)
+            {
                 $zebra = "#85e085"; // Красим в зеленый - отгружено
+                $data_postav_str = "<b>".Part::getLastNaklDate($kod_part)."</b>";
+            }
 
             $otgruz_poluch = "отгрузить";
             if ($input)
@@ -1130,14 +1135,14 @@ class Doc
             // Формируем строку плана
             $row_str = /** @lang HTML */
                 "<tr bgcolor='$zebra'>
-                                <td><a href='$form_part_link'>" . $shifr . $modif_str . "</a></td>
-                                <td align='right'><a href='$form_part_link'>" . $numb . $numb_ostat_str . "</a></td>
-                                <td align='right'><a href='$form_part_link'>" . $proc_str . "</a></td>
-                                <td align='right'><a href='$form_dogovor_link'>" . $nomer . "</a></td>
-                                <td><a href='form_org.php?kod_org=" . $kod_org . "'>" . $nazv_krat . $filter_link . "</a></td>
-                                <td align='right' $ind_data>" . Func::Date_from_MySQL($data_postav) . "</td>
-                                <td align='right'>" . func::Rub($price_nds) . "</td>
-                                <td align='right'>" . $part_summa_str . $val_str . $nds_str . "</td>
+                                <td><a href='$form_part_link'>$shifr $modif_str</a></td>
+                                <td align='right'><a href='$form_part_link'>$numb $numb_ostat_str</a></td>
+                                <td align='right'><a href='$form_part_link'>$proc_str</a></td>
+                                <td align='right'><a href='$form_dogovor_link'>$nomer</a></td>
+                                <td><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_link</a></td>
+                                <td align='right' $ind_data>$data_postav_str</td>
+                                <td align='right'>$price_nds_str</td>
+                                <td align='right'>$part_summa_str $val_str $nds_str</td>
                          </tr>";
 
             $res .= $row_str;

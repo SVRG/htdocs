@@ -45,7 +45,7 @@ class Part
         if ($this->kod_part != 0)
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
         else {
-            if (func::user_group() == "admin")
+            if (func::user_group() == "admin") // todo - Придумать глобальную политику прав
                 $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
         }
 
@@ -123,7 +123,10 @@ class Part
             // Окраска отруженных/полученных партий в зелёный
             $ind = '';// Индикатор окраски даты поставки
             if ($ost == 0)
-                $res .= '<tr bgcolor="#ADFAC2">';// Зеленый
+            {
+                $res .= '<tr bgcolor="#ADFAC2">';
+                $data_postav_str = "<b>".Part::getLastNaklDate($this->kod_part)."</b>";; // Дата последней отгрузки
+            }// Зеленый
             else {
                 $res .= '<tr>';
                 // Если отстаок не равен количеству партии то выводим
@@ -149,7 +152,7 @@ class Part
             // НДС
             $NDS = '';
 
-            if (round($row['nds'], 2) != 0.18)
+            if ((int)(round($row['nds'], 2)*100) != (int)(config::$nds_main*100))
                 $NDS = '<br>НДС ' . (int)($row['nds'] * 100) . '%';
 
             //--------------------------
@@ -701,7 +704,7 @@ class Part
 
         $kod_user = func::kod_user();
 
-        $price_it = 0;
+        $price_it = 0; // Цена с НДС
         $price = func::clearNum($price);
         $price = func::rnd($price);
         if ($price == 0) {
@@ -748,8 +751,10 @@ class Part
         $data_postav = func::NowE();
         $numb = 1;
         $price = "";
-        $nds_18 = "checked";
-        $nds_0 = "";
+        $nds_checked = "checked";
+        $nds_main = config::$nds_main;
+        $nds_str = (func::rnd($nds_main)*100) . "%";
+        $nds_0_checked = "";
         $rub_checked = "checked";
         $usd_checked = "";
         $euro_checked = "";
@@ -757,6 +762,7 @@ class Part
         $price_or_str = "";
         $data_nach_str = "";
         $price_it = 0;
+        $nds_part_input = ""; // Строка для ввода НДС партии, если он отличается от nds_main
 
         $E = new Elem();
 
@@ -796,13 +802,19 @@ class Part
             $price_or = $row['price_or']; // Цена ориентировочная
             $price_it = $row['price_it']; // Цена с НДС
             $val = (int)$row['val'];
-            $nds = func::rnd($row['nds']);
             $data_nach_str = "";
 
-            $nds_0 = "";
-            if ($nds == 0) {
-                $nds_0 = "checked";
-                $nds_18 = "";
+            $nds_part = func::rnd($row['nds']);
+            if((int)($nds_part*100)!=(int)($nds_main*100))
+            {
+                $nds_part_str = (int)($nds_part*100) . "%";
+                $nds_part_input = "<input type='radio' name='nds' value='$nds_part' checked> $nds_part_str<br>";
+            }
+
+            $nds_0_checked = "";
+            if ($nds_part == 0) {
+                $nds_0_checked = "checked";
+                $nds_checked = "";
             }
 
             if (config::$price_or == 1) // Форма Ориентировочной цены
@@ -880,8 +892,9 @@ class Part
                   <tr>
                        <td>НДС</td>
                        <td colspan='2'>
-                            <input type='radio' name='nds' value='0.18' $nds_18> 18%<br>
-                            <input type='radio' name='nds' value='0' $nds_0> 0%<br>
+                            <input type='radio' name='nds' value='$nds_main' $nds_checked> $nds_str<br>
+                            $nds_part_input
+                            <input type='radio' name='nds' value='0' $nds_0_checked> 0%<br>
                        </td>
                   </tr>
                   <tr>
@@ -1403,5 +1416,22 @@ class Part
             }
         return $res;
     }
+//-----------------------------------------------------------------------
+//
+    /**
+     * @param $kod_part
+     * @return string
+     */
+    public static function getLastNaklDate($kod_part)
+    {
+        $db = new Db();
+        $kod_part = (int)$kod_part;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM sklad WHERE kod_part=$kod_part order by data desc;");
 
+        if($db->cnt == 0)
+            return "NULL";
+        else
+            return func::Date_from_MySQL($rows[0]['data']);
+    }
 }
