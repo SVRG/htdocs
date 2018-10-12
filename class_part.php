@@ -152,8 +152,8 @@ class Part
             // НДС
             $NDS = '';
 
-            if ((int)(round($row['nds'], 2)*100) != (int)(config::$nds_main*100))
-                $NDS = '<br>НДС ' . (int)($row['nds'] * 100) . '%';
+            if ((int)$row['nds'] != (int)config::$nds_main)
+                $NDS = '<br>НДС ' . (int)$row['nds'] . '%';
 
             //--------------------------
             // Валюта
@@ -752,8 +752,8 @@ class Part
         $numb = 1;
         $price = "";
         $nds_checked = "checked";
-        $nds_main = config::$nds_main;
-        $nds_str = (func::rnd($nds_main)*100) . "%";
+        $nds_main = (int)config::$nds_main;
+        $nds_str = $nds_main . "%";
         $nds_0_checked = "";
         $rub_checked = "checked";
         $usd_checked = "";
@@ -804,10 +804,10 @@ class Part
             $val = (int)$row['val'];
             $data_nach_str = "";
 
-            $nds_part = func::rnd($row['nds']);
-            if((int)($nds_part*100)!=(int)($nds_main*100))
+            $nds_part = (int)$row['nds'];
+            if($nds_part!=(int)$nds_main)
             {
-                $nds_part_str = (int)($nds_part*100) . "%";
+                $nds_part_str = $nds_part . "%";
                 $nds_part_input = "<input type='radio' name='nds' value='$nds_part' checked> $nds_part_str<br>";
             }
 
@@ -900,9 +900,9 @@ class Part
                   <tr>
                    <td>Валюта</td>
                        <td colspan='2'>
-                           <input type='radio' name='val' value='1' $rub_checked> RUR<br>
-                           <input type='radio' name='val' value='2' $usd_checked> USD<br>
-                           <input type='radio' name='val' value='3' $euro_checked> EURO<br>
+                           <input type='radio' name='val' value='1' $rub_checked>RUR<br>
+                           <input type='radio' name='val' value='2' $usd_checked>USD<br>
+                           <input type='radio' name='val' value='3' $euro_checked>EURO<br>
                        </td>
                   </tr>
                 </table>
@@ -1046,14 +1046,14 @@ class Part
      * @param $rplan_row
      * @return float
      */
-    public static function getPrice($rplan_row)
+    public static function getPriceNoNDS($rplan_row)
     {
         $price_it = func::rnd($rplan_row['price_it']);
-        if ($price_it > 0) // Если указана цена с НДС то берем ее
-            return func::rnd($price_it * 100 / (100 + func::rnd($rplan_row['nds'] * 100)));
+        if ($price_it >= 0.01) // Если указана цена с НДС то берем ее и вычитаем НДС
+            return func::rnd($price_it * 100 / (100 + (int)$rplan_row['nds']));
 
         $price = func::rnd($rplan_row['price']);
-        if ($price == 0. and config::$price_or == 1) // Берем ориентировочную
+        if ($price < 0.01 and config::$price_or == 1) // Берем ориентировочную
             $price = func::rnd($rplan_row['price_or']);
 
         return $price;
@@ -1071,11 +1071,11 @@ class Part
         if ($price_it > 0)
             return $price_it;
 
-        $price = self::getPrice($rplan_row);
-        $nds = func::rnd($rplan_row['nds']);
+        $price = self::getPriceNoNDS($rplan_row);
+        $nds = (int)$rplan_row['nds'];
         $summ_nds = 0;
         if ($nds > 0)
-            $summ_nds = func::rnd($price * $nds);
+            $summ_nds = func::rnd($price * $nds / 100);
 
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
@@ -1338,7 +1338,7 @@ class Part
      */
     public static function formPrice($rplan_row)
     {
-        $price = self::getPrice($rplan_row);
+        $price = self::getPriceNoNDS($rplan_row);
         $price_str = func::Rub($price);
 
         if ($price == 0)

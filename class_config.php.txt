@@ -26,4 +26,5 @@ class config
     public static $comp_name_eng = "MyCompany"; // Название на английском
     public static $price_or = 0; // Работа с ориентировочными ценами. Отображается в партии
     public static $data_nach = 0; // Дата начала этапа. Отображается в партии
+    public static $nds_main = 18; // Базовый НДС
 }

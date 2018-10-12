@@ -39,10 +39,6 @@ class Doc
     static public function formDocByElem($kod_elem)
     {
         $where = ""; // Условия отбора в _GET
-        if (isset($_GET['kod_org'])) {
-            $where .= " AND kod_org=" . (int)$_GET['kod_org'];
-        }
-
         if (isset($_GET['y'])) {
             $y = (int)$_GET['y'];
             $data_s = "$y-01-01";
@@ -53,13 +49,18 @@ class Doc
         if(isset($_GET['p']))
             $where .= " AND doc_type=1";
 
+        $where_kod_org = ""; // Условия отбора организации в _GET
+        if (isset($_GET['kod_org'])) {
+            $where_kod_org .= " AND kod_org=" . (int)$_GET['kod_org'];
+        }
+
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         // Открытые
         $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
-                                    WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main $where
+                                    WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main $where $where_kod_org
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
         $res = Doc::formRPlan_by_Elem($rows);
 
@@ -80,12 +81,17 @@ class Doc
             $rows = $db->rows("SELECT
                                       *
                                     FROM view_rplan
-                                    WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where
+                                    WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where $where_kod_org
                                     ORDER BY kod_dogovora DESC"); // Код договора по убыванию
             $res .= "<b>Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
+
+        if(isset($_GET['kod_org']))
+            $where_kod_org = " AND kod_ispolnit=" . (int)$_GET['kod_org'];
+
         // Внешние открытые
         if (isset($_POST['in_open']) or isset($_POST['all'])) {
+
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
@@ -119,12 +125,13 @@ class Doc
                                       ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
                                       ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
-                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=0 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where $where_kod_org
                                   ORDER BY kod_dogovora DESC;"); // Код договора по убыванию
             $res .= "<b>Входящие</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
         // Внешние закрытые
         if (isset($_POST['in_close']) or isset($_POST['all'])) {
+
             $rows = $db->rows("SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
@@ -158,7 +165,7 @@ class Doc
                                       ON ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) JOIN `trin`.`org` `ispolnit`
                                       ON ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`))) LEFT JOIN `trin`.`view_sklad_summ_postup`
                                       ON ((`trin`.`parts`.`kod_part` = `view_sklad_summ_postup`.`kod_part`)))
-                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where
+                                  WHERE (`trin`.`parts`.`del` = 0) AND zakryt=1 AND parts.kod_elem=$kod_elem AND dogovory.kod_org=$kod_org_main $where $where_kod_org
                                   ORDER BY kod_dogovora DESC;");
             $res .= "<b>Входящие Закрытые</b><br>" . Doc::formRPlan_by_Elem($rows);
         }
@@ -359,8 +366,8 @@ class Doc
             $nds = ""; // НДС
 
             // НДС
-            if ((int)((double)$row['nds'] * 100) != 18)
-                $nds = "<br>НДС " . (int)((double)$row['nds'] * 100) . "%";
+            if ((int)$row['nds'] != config::$nds_main)
+                $nds = "<br>НДС " . (int)$row['nds'] . "%";
 
             $kod_org_main = config::$kod_org_main;
 
@@ -1011,7 +1018,6 @@ class Doc
             $modif = $row['modif']; // Модификация
             $numb = $row['numb'];   // Количество в партии
             $val = (int)$row['val']; // Валюта
-            $nds = round((double)$row['nds'], 2); // НДС
             $data_postav = $row['data_postav']; // Дата поставки
             $data_postav_str = Func::Date_from_MySQL($data_postav);
             $price_nds_str = func::Rub(Part::getPriceWithNDS($row)); // Цена с НДС, Строка
@@ -1023,9 +1029,9 @@ class Doc
 
             // НДС
             $nds_str = '';
-            if ((int)($nds*100) != (int)(config::$nds_main*100))
+            if ((int)$row['nds'] != (int)config::$nds_main)
                 $nds_str = /** @lang HTML */
-                    '<br>НДС ' . $nds * 100 . '%';
+                    '<br>НДС ' . (int)$row['nds'] . '%';
 
             // Валюта
             $val_str = ' ' . func::val_sign($val);
@@ -1126,10 +1132,11 @@ class Doc
 
             $filter_link = "";
             if (!isset($_GET['kod_org'])) {
+                $sign = "?";
                 if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
-                    $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
-                else
-                    $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . "?kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+                    $sign = "&";
+
+                $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
             }
 
             // Формируем строку плана

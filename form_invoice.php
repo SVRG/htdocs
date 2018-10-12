@@ -146,7 +146,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 
         $numb = func::rnd($row['numb']);                                // Количество
         $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
-        $nds = func::rnd($row['nds']) * 100;                            // Ставка НДС
+        $nds = func::rnd($row['nds']);                            // Ставка НДС
         $summ_nds = func::rnd($summ_with_nds*$nds/(100+$nds));   // Сумма НДС
         $summ = $summ_with_nds-$summ_nds;                               // Сумма без НДС
 
@@ -194,7 +194,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 
     $name = $schet_data['prim'];
     $summ_with_nds = $schet_data['summa'];                  // Сумма с НДС
-    $nds = func::rnd($summ_with_nds * 18 / 118);     // Сумма НДС
+    $nds = func::rnd($summ_with_nds * config::$nds_main / (100 + config::$nds_main));     // Сумма НДС
 
     $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']));
