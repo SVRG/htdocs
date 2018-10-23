@@ -35,6 +35,8 @@ elseif ($doc_type==5)
 
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
+$text = "В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены. Счет действителен до 29 декабря 2018 г. в связи с изменения нормативной базы по исчислению НДС с 2019 г.";
+
 $schet_data = array();
 if (isset($_GET['kod_scheta'])) {
     $db = new Db();
@@ -181,7 +183,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
     echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
     if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
-        echo "<tr><th colspan='6' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.</th></tr>";
+        echo "<tr><th colspan='6' align='left'>$text</th></tr>";
     echo "</table>";
     echo "<br>";
 } else {
@@ -216,7 +218,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     echo "<tr><th colspan='2' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
     echo "<tr><th colspan='3' align='right'>$total_nds_text</th></tr>";
     if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
-        echo "<tr><th colspan='3' align='left'>В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены. Счет действителен до 29 декабря 2018 г. в связи с изменения нормативной базы по исчислению НДС с 2019 г.</th></tr>";
+        echo "<tr><th colspan='3' align='left'>$text</th></tr>";
     echo "</table>";
     echo "<br>";
 }
