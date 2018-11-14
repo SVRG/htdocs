@@ -763,7 +763,7 @@ class Org
                 FROM
                     view_dogovor_summa
                 INNER JOIN dogovory ON view_dogovor_summa.kod_dogovora = dogovory.kod_dogovora
-                WHERE dogovory.kod_org=$this->kod_org AND dogovory.zakryt = 0
+                WHERE dogovory.kod_org=$this->kod_org AND dogovory.zakryt = 0 AND doc_type = 1
                 GROUP BY
                     dogovory.kod_org
                 ";
@@ -781,7 +781,7 @@ class Org
                 FROM
                   view_dogovor_summa_plat
                 INNER JOIN dogovory ON dogovory.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
-                WHERE dogovory.kod_org=$this->kod_org
+                WHERE dogovory.kod_org=$this->kod_org AND doc_type = 1
                 AND
                       dogovory.zakryt = 0
                 GROUP BY
@@ -820,6 +820,7 @@ class Org
                         zakryt <> 1
                     AND dogovor_ostat > 1
                     AND kod_org <> $kod_org_main
+                    AND doc_type = 1
                     GROUP BY
                     view_dogovor_data.kod_org,
                     view_dogovor_data.nazv_krat
