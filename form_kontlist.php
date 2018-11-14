@@ -29,7 +29,8 @@ $d = new Doc();
         $query = "";
         if (isset($_GET['kod_elem'])) {
             $kod_elem = $_GET['kod_elem'];
-            $query = "SELECT
+            $query = /** @lang MySQL */
+                "SELECT
                                     kontakty.kod_kontakta,
                                     kontakty.kod_org,
                                     kontakty.dolg,

@@ -12,14 +12,6 @@ class Kontakt
     public $OrgName;
     public $KontArray;// Массив контактов по Договору
 
-    /**
-     * Kontakt constructor.
-     */
-    public function __construct()
-    {
-
-    }
-
 //------------------------------------------------------------------------
 
     /**
