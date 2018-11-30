@@ -740,6 +740,34 @@ class Org
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
+     * @return float
+     */
+    public function getSummPlatByCurrentDocs()
+    {
+        // Сумма платежей по действующим договорам
+        $sql = "SELECT
+                    Sum(view_dogovor_summa_plat.summa_plat) AS summa_plat,
+                    dogovory.kod_org
+                FROM
+                  view_dogovor_summa_plat
+                INNER JOIN dogovory ON dogovory.kod_dogovora = view_dogovor_summa_plat.kod_dogovora
+                WHERE dogovory.kod_org=$this->kod_org AND doc_type = 1
+                AND
+                      dogovory.zakryt = 0
+                GROUP BY
+                  dogovory.kod_org
+                ";
+        $db = new Db();
+        $rows = $db->rows($sql);
+        if (count($rows) >= 1) {
+            $row = $rows[0];
+            return $summa_plat = (double)$row['summa_plat']; // Сумма платежей по действующим договорам
+        } else
+            return 0.;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
      * Документы Организации
      * @return string
      */
@@ -757,6 +785,8 @@ class Org
     public function getDolg()
     {
         $db = new DB();
+
+        // Сумма действующих договоров
         $sql = "SELECT
                     dogovory.kod_org,
                     Sum(view_dogovor_summa.dogovor_summa) AS summa_dogovorov
@@ -775,6 +805,7 @@ class Org
 
         $summa_dogovorov = (double)$row['summa_dogovorov']; // Сумма действующих договоров
 
+        // Сумма платежей по действующим договорам
         $sql = "SELECT
                     Sum(view_dogovor_summa_plat.summa_plat) AS summa_plat,
                     dogovory.kod_org
@@ -789,13 +820,54 @@ class Org
                 ";
 
         $rows = $db->rows($sql);
+
         if (count($rows) >= 1) {
             $row = $rows[0];
             $summa_plat = (double)$row['summa_plat']; // Сумма платежей по действующим договорам
         } else
             return Func::Rub($summa_dogovorov);
 
-        return $res = Func::Rub($summa_dogovorov - $summa_plat);
+        return $res = Func::Rub($summa_dogovorov - $summa_plat); // Возвращаем разницу между суммой договоров и суммой платежей
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Задолженность по отгруженному товару
+     * @return string
+     */
+    public function getDolgOtgruz()
+    {
+        $db = new Db();
+
+        $sql = /** @lang MySQL */
+            "SELECT * FROM view_rplan 
+            WHERE kod_org = $this->kod_org
+            AND zakryt=0 AND doc_type=1";
+
+        $rows = $db->rows($sql);
+
+        if($db->cnt == 0)
+            return "0";
+
+        $summ = 0.;
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            if((int)$row['numb_otgruz'] == 0)
+                continue;
+
+            $summ += (int)$row['numb_otgruz']*Part::getPriceWithNDS($row);
+        }
+
+        $res = $summ - $this->getSummPlatByCurrentDocs();
+
+        if((int)$res == 0)
+            $res = "";
+        else
+            $res = func::Rub($res);
+
+        return $res;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -827,7 +899,12 @@ class Org
                     ORDER BY
                     summa_dogovor_ostat DESC");
 
-        $res = '<table><tr><td>Название</td><td>Задолженность</td></tr>';
+        $res = '<table>
+                    <tr>
+                       <td>Название</td>
+                       <td>К оплате</td>
+                       <td>По отгрузкам</td>
+                    </tr>';
 
         if ($db->cnt == 0)
             return '';
@@ -836,9 +913,11 @@ class Org
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
+            $this->kod_org = $row['kod_org'];
             $res .= '<tr>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                         <td align="right">' . Func::Rub($row['summa_dogovor_ostat']) . '</td>
+                        <td align="right">' . $this->getDolgOtgruz() . '</td>
                      </tr>';
             $summ += $row['summa_dogovor_ostat'];
         }

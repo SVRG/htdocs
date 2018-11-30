@@ -51,7 +51,8 @@ Docum::Events();
                 // Организация
                 echo $org->formOrg();
                 // Задолженность
-                echo '<br>Задолженность: ' . $org->getDolg();
+                echo '<br>К оплате: ' . $org->getDolg();
+                echo '<br>По отгрузкам: ' . $org->getDolgOtgruz();
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Реквизиты</div>
