@@ -92,7 +92,8 @@ class Doc
         // Внешние открытые
         if (isset($_POST['in_open']) or isset($_POST['all'])) {
 
-            $rows = $db->rows("SELECT
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
                                     `trin`.`dogovory`.`doc_type`                                                                         AS `doc_type`,
@@ -101,9 +102,8 @@ class Doc
                                     `trin`.`parts`.`modif`                                                                               AS `modif`,
                                     `trin`.`parts`.`numb`                                                                                AS `numb`,
                                     `trin`.`parts`.`data_postav`                                                                         AS `data_postav`,
-                                    round(`trin`.`parts`.`nds`, 2)                                                                       AS `nds`,
-                                    round(ifnull(((`trin`.`parts`.`numb` * `trin`.`parts`.`price`) * (1 + `trin`.`parts`.`nds`)), 0),
-                                          2)                                                                                             AS `part_summa`,
+                                    `trin`.`parts`.`nds`                                                                                 AS `nds`,
+                                    `trin`.`parts`.`sum_part`                                                                            AS `sum_part`,
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
                                     `trin`.`parts`.`price_or`                                                                            AS `price_or`,
@@ -141,9 +141,8 @@ class Doc
                                     `trin`.`parts`.`modif`                                                                               AS `modif`,
                                     `trin`.`parts`.`numb`                                                                                AS `numb`,
                                     `trin`.`parts`.`data_postav`                                                                         AS `data_postav`,
-                                    round(`trin`.`parts`.`nds`, 2)                                                                       AS `nds`,
-                                    round(ifnull(((`trin`.`parts`.`numb` * `trin`.`parts`.`price`) * (1 + `trin`.`parts`.`nds`)), 0),
-                                          2)                                                                                             AS `part_summa`,
+                                    `trin`.`parts`.`nds`                                                                                 AS `nds`,
+                                    trin.parts.sum_part                                                                                  AS `sum_part`,
                                     `trin`.`parts`.`val`                                                                                 AS `val`,
                                     `trin`.`parts`.`price`                                                                               AS `price`,
                                     `trin`.`parts`.`price_or`                                                                            AS `price_or`,
@@ -362,7 +361,7 @@ class Doc
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
             $val = ""; // Валюта
             $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
-            $part_summa = Part::getPartSumma($row); // Сумма партии
+            $sum_part = $row['sum_part']; // Сумма партии
             $nds = ""; // НДС
 
             // НДС
@@ -424,7 +423,7 @@ class Doc
             // Фильтр по организации
             $filter_kod_org = "";
             if (!isset($_GET['kod_org']))
-                $filter_kod_org = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+                $filter_kod_org = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_org=$kod_org'><img alt='OrgFilter' title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
 
 
             // Формируем строку
@@ -446,15 +445,15 @@ class Doc
             // Фильтры
             $filter_kod_elem = "";
             if (!isset($_GET['kod_elem']))
-                $filter_kod_elem = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_elem=$kod_elem'><img title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
+                $filter_kod_elem = "<a href='" . $_SERVER['REQUEST_URI'] . "&kod_elem=$kod_elem'><img alt='ElemFilter' title=\"Фильтр по Элементу\" src=\"img/filter.png\"></a>";
 
             $res .= /** @lang HTML */
-                "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img src='/img/edit.gif' height='14' border='0' /></a>
+                "<td  width='365'><a href='form_part.php?kod_part=$kod_part&kod_dogovora=$kod_dogovora'><img alt='Edit' src='/img/edit.gif' height='14' border='0' /></a>
                                        <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_kod_elem</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
                       <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
-                      <td width='120' align='right'>" . Func::Rub($part_summa) . $val . $nds . "</td>
+                      <td width='120' align='right'>" . Func::Rub($sum_part) . $val . $nds . "</td>
                       <td width='90'>$oplacheno</td>
                   </tr>";
         }
@@ -482,7 +481,7 @@ class Doc
 
             for ($i = 0; $i < $db->cnt; $i++) {
                 $row = $rows[$i];
-                $summa_dogovora += Part::getPartSumma($row);
+                $summa_dogovora += $row['sum_part'];
             }
 
             return $summa_dogovora;
@@ -587,8 +586,8 @@ class Doc
                             <td><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                             </tr>';
 
-                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img title="RFQ" src="img/rfq.png"></a></div>';
-                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="PO" src="img/po.png"></a></div>';
+                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img alt="RFQ" title="RFQ" src="img/rfq.png"></a></div>';
+                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PO" title="PO" src="img/po.png"></a></div>';
             }
 
             $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
@@ -607,7 +606,7 @@ class Doc
 
             $form_print = "";
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
-                $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img title="Форма для печати" src="img/printer.png"></a>';
+                $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PrintForm" title="Форма для печати" src="img/printer.png"></a>';
             $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
             $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
@@ -856,7 +855,7 @@ class Doc
                       view_rplan.numb,
                       view_rplan.data_postav,
                       view_rplan.nds,
-                      view_rplan.part_summa,
+                      view_rplan.sum_part,
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
@@ -920,7 +919,7 @@ class Doc
                       view_rplan.numb,
                       view_rplan.data_postav,
                       view_rplan.nds,
-                      view_rplan.part_summa,
+                      view_rplan.sum_part,
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
@@ -1021,7 +1020,7 @@ class Doc
             $data_postav = $row['data_postav']; // Дата поставки
             $data_postav_str = Func::Date_from_MySQL($data_postav);
             $price_nds_str = func::Rub(Part::getPriceWithNDS($row)); // Цена с НДС, Строка
-            $part_summa = Part::getPartSumma($row); // Сумма партии
+            $sum_part = $row['sum_part']; // Сумма партии
 
             $modif_str = '';            // Модификация
             if ($modif != '')
@@ -1072,9 +1071,9 @@ class Doc
             if ($numb_ostat != $numb and $numb_ostat > 0)
                 $numb_ostat_str = " <abbr title=\"Осталось $otgruz_poluch $numb_ostat\">($numb_ostat)</abbr>";
             $itog_numb_ostat += $numb_ostat;
-            $itog_summ += $part_summa;// Итоговая Сумма по всем партиям
+            $itog_summ += $sum_part;// Итоговая Сумма по всем партиям
 
-            $part_summa_str = Func::Rub($part_summa);// Строка - Сумма партии
+            $sum_part_str = Func::Rub($sum_part);// Строка - Сумма партии
 
             // Если предыдущий элемент другой то создаем заголовок + Итоги
             if ($kod_elem != $kod_elem_pred) {
@@ -1136,7 +1135,7 @@ class Doc
                 if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
                     $sign = "&";
 
-                $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+                $filter_link = "<a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img alt='OrgFilter' title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
             }
 
             // Формируем строку плана
@@ -1149,7 +1148,7 @@ class Doc
                                 <td><a href='form_org.php?kod_org=$kod_org'>$nazv_krat $filter_link</a></td>
                                 <td align='right' $ind_data>$data_postav_str</td>
                                 <td align='right'>$price_nds_str</td>
-                                <td align='right'>$part_summa_str $val_str $nds_str</td>
+                                <td align='right'>$sum_part_str $val_str $nds_str</td>
                          </tr>";
 
             $res .= $row_str;
@@ -2407,7 +2406,7 @@ class Doc
                         $name = elem::getNameForInvoice($row);
 
                     $numb = func::rnd($row['numb']);                                // Количество
-                    $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
+                    $summ_with_nds = $row['sum_part'];                            // Сумма партии с НДС
                     $price = Part::getPriceWithNDS($row);
                     $price_str = func::Rub($price);
                     $summ_with_nds_str = func::Rub($summ_with_nds);
@@ -2436,13 +2435,17 @@ class Doc
      * @param $summa
      * @param $data
      * @param string $prim
+     * @param int $nds
      * @internal param string $PayDate
      */
-    public function AddInvoice($nomer, $summa, $data, $prim = '-')
+    public function AddInvoice($nomer, $summa, $data, $prim = '-', $nds = 0)
     {
         $kod_dogovora = $this->kod_dogovora;
 
         if (!isset($prim)) $prim = '-';
+
+        if($nds == 0)
+            $nds = config::$nds_main;
 
         if ($nomer === "NEXT")
             $nomer = doc::getNextSchetNomer();
@@ -2463,7 +2466,7 @@ class Doc
         $prim = $db->real_escape_string($prim);
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user)");
+        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user,nds) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user,$nds)");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -2962,7 +2965,7 @@ class Doc
 
         if ($db->cnt == 0)
             return /** @lang HTML */
-                "<img title='Не указан контакт' src='img/no_contact.png'>";
+                "<img alt='ContactMissing' title='Не указан контакт' src='img/no_contact.png'>";
 
         return "";
     }
@@ -2980,7 +2983,7 @@ class Doc
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM dogovor_prim WHERE kod_dogovora=$kod_dogovora ORDER BY time_stamp DESC");
         $img = /** @lang HTML */
-            "<img title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
+            "<img alt='StatusUpdate' title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
 
         if ($db->cnt == 0)
             return $img;
@@ -3018,7 +3021,7 @@ class Doc
                       view_rplan.numb,
                       view_rplan.data_postav,
                       view_rplan.nds,
-                      view_rplan.part_summa,
+                      view_rplan.sum_part,
                       view_rplan.val,
                       view_rplan.price,
                       view_rplan.price_or,
