@@ -111,7 +111,7 @@ class Mail
         $mail->Subject = $subject;
 
         //Set an HTML message body
-        $mail->msgHTML("<html><body>$Body</body></html>");
+        $mail->msgHTML("<html lang='ru'><body>$Body</body></html>");
 
         //Replace the plain text body with one created manually
         $mail->AltBody = 'This is a plain-text message body';

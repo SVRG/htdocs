@@ -54,7 +54,7 @@ if (isset($_GET['kod_scheta'])) {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<html lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="menu/print.css">
@@ -147,20 +147,20 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             $name = elem::getNameForInvoice($row);
 
         $numb = func::rnd($row['numb']);                                // Количество
-        $summ_with_nds = Part::getPartSumma($row);                      // Сумма партии с НДС
+        $sum_part = $row["sum_part"];                      // Сумма партии с НДС
         $nds = func::rnd($row['nds']);                            // Ставка НДС
-        $summ_nds = func::rnd($summ_with_nds*$nds/(100+$nds));   // Сумма НДС
-        $summ = $summ_with_nds-$summ_nds;                               // Сумма без НДС
+        $summ_nds = func::rnd($sum_part*$nds/(100+$nds));   // Сумма НДС
+        $summ = $sum_part-$summ_nds;                               // Сумма без НДС
 
         $total_nds += $summ_nds;
         $total_summ += $summ;
-        $total_summ_with_nds += $summ_with_nds;
+        $total_summ_with_nds += $sum_part;
 
         $price = Part::getPriceWithNDS($row);
 
         $summ_str = func::Rub($summ);
         $price_str = func::Rub($price);
-        $summ_with_nds_str = func::Rub($summ_with_nds);
+        $summ_with_nds_str = func::Rub($sum_part);
 
         $n = $i + 1;
         echo "<tr>
@@ -195,8 +195,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
           </tr>";
 
     $name = $schet_data['prim'];
-    $summ_with_nds = $schet_data['summa'];                  // Сумма с НДС
-    $nds = func::rnd($summ_with_nds * config::$nds_main / (100 + config::$nds_main));     // Сумма НДС
+    $sum_part = $schet_data['summa'];                  // Сумма с НДС
+    $nds = func::rnd($sum_part * config::$nds_main / (100 + config::$nds_main));     // Сумма НДС
 
     $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']));

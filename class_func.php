@@ -22,8 +22,14 @@ class Func
         if (!isset($Date) or !self::validateDate($Date, $format))
             return 0;
 
-        $now = new DateTime("now");
-        $date = new DateTime($Date);
+        try {
+            $now = new DateTime("now");
+        } catch (Exception $e) {
+        }
+        try {
+            $date = new DateTime($Date);
+        } catch (Exception $e) {
+        }
         $res = $now->diff($date)->format("%r%a");
         return $res;
     }
@@ -55,10 +61,13 @@ class Func
     }
 //----------------------------------------------------------------------------------------------------------------------
 
-    public static function clearNum($num_str)
+    public static function clearNum($num_str, $precision=0)
     {
         $res = str_replace(",",".",$num_str);
         $res = preg_replace("/[^0-9.-]/", "", $res);
+
+        if($precision > 0)
+            $res = round((double)$res,(int)$precision);
 
         return $res;
     }
@@ -102,11 +111,12 @@ class Func
 //
     /**
      * @param $numb
+     * @param int $precision
      * @return float
      */
-    public static function rnd($numb)
+    public static function rnd($numb,$precision=2)
     {
-        $res = round((double)$numb, 2);
+        $res = round((double)$numb, (int)$precision);
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -181,17 +191,17 @@ class Func
         $btn = " <input title='$ButtValue' type='submit' name='Button' value='$ButtValue' />";
 
         if ($ButtValue == "Копировать")
-            $btn = "<input title='$ButtValue' type='image' src='img/copy.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='Copy' title='$ButtValue' type='image' src='img/copy.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Редактировать" or $ButtValue == "Изменить")
-            $btn = "<input title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='Edit' title='$ButtValue' type='image' src='img/edit.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Добавить")
-            $btn = "<input title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='Add' title='$ButtValue' type='image' src='img/add.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Добавить Примечание")
-            $btn = "<input title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='AddCaption' title='$ButtValue' type='image' src='img/add_note.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Удалить")
-            $btn = "<input title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='Delete' title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Выбрать")
-            $btn = "<input title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
+            $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
         return $btn;
     }
 //----------------------------------------------------------------------------------------------------------------------

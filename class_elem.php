@@ -151,11 +151,11 @@ class Elem
             $shifr = $row['shifr'];
             $img = "";
             $link = "form_elem.php?kod_elem=$kod_elem";
-            $link_modif = "<a href='form_nomen.php?kod_elem=$kod_elem'><img title='Посмотреть модификации' src='img/view_properties.png'></a>";
+            $link_modif = "<a href='form_nomen.php?kod_elem=$kod_elem'><img alt='Modif' title='Посмотреть модификации' src='img/view_properties.png'></a>";
 
             if (isset($row['path'])) {
                 $path = $row['path'];
-                $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
+                $img = "<a href='$link'><img alt='Path' src='$path' width='100' border='0' /></a>";
             }
 
             $this->kod_elem = $kod_elem;
@@ -310,7 +310,7 @@ class Elem
             $row = $rows[$i];
 
             if (file_exists($row['path']))
-                $res .= ' <a href="' . $link . '"><img src="' . $row['path'] . '" width="100" border="0" /></a>';
+                $res .= ' <a href="' . $link . '"><img alt="Path" src="' . $row['path'] . '" width="100" border="0" /></a>';
         }
         return $res;
     }
@@ -796,7 +796,7 @@ class Elem
             $link = "form_elem.php?kod_elem=$kod_elem";
             if (isset($row['path'])) {
                 $path = $row['path'];
-                $img = "<a href='$link'><img src='$path' width='100' border='0' /></a>";
+                $img = "<a href='$link'><img alt='Path' src='$path' width='100' border='0' /></a>";
             }
 
             $btn_nomen = "";
@@ -914,15 +914,20 @@ class Elem
     }
 //----------------------------------------------------------------------------------------------------------------------
 
-    public function getPriceForQuantity($quantity_for=1)
+    /**
+     * Цена в зависимости от количества
+     * @param $kod_elem
+     * @param int $quantity_for
+     * @return float
+     */
+    public static function getPriceForQuantity($kod_elem, $quantity_for=1)
     {
         $db = new Db();
-        $kod_elem = $this->kod_elem;
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ");
 
         if($db->cnt==0)
-            return 0;
+            return 0.;
 
         $price = func::rnd($rows[0]['price']);
         for ($i = 0; $i < $db->cnt; $i++) {

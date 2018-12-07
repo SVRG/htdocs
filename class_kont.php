@@ -321,7 +321,7 @@ class Kontakt
 
         $res .= /** @lang HTML */
             "<input type='hidden' name='formSelList' id='formSelList' />
-             <input type='image' src='img/add.png' name='button' id='button' value='Добавить из списка' />";
+             <input alt='Add' type='image' src='img/add.png' name='button' id='button' value='Добавить из списка' />";
 
         $res .= /** @lang HTML */
             "</form>";

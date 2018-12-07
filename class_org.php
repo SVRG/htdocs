@@ -832,22 +832,23 @@ class Org
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Задолженность по отгруженному товару
-     * @return string
+     * Сумма отгруженного товара
+     * @return float
      */
-    public function getDolgOtgruz()
+    public function getSummOtgruz()
     {
         $db = new Db();
 
         $sql = /** @lang MySQL */
-            "SELECT * FROM view_rplan 
-            WHERE kod_org = $this->kod_org
-            AND zakryt=0 AND doc_type=1";
+            "SELECT * 
+                FROM view_rplan 
+                WHERE kod_org = $this->kod_org
+                AND zakryt=0 AND doc_type=1";
 
         $rows = $db->rows($sql);
 
         if($db->cnt == 0)
-            return "0";
+            return 0.;
 
         $summ = 0.;
 
@@ -860,7 +861,17 @@ class Org
             $summ += (int)$row['numb_otgruz']*Part::getPriceWithNDS($row);
         }
 
-        $res = $summ - $this->getSummPlatByCurrentDocs();
+        return $summ;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Задолженность по отгруженному товару - разница между суммой отгруженного товара и суммой платежей
+     * @return string
+     */
+    public function getDolgOtgruz()
+    {
+        $res = $this->getSummOtgruz() - $this->getSummPlatByCurrentDocs();
 
         if((int)$res == 0)
             $res = "";
@@ -917,7 +928,7 @@ class Org
             $res .= '<tr>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                         <td align="right">' . Func::Rub($row['summa_dogovor_ostat']) . '</td>
-                        <td align="right">' . $this->getDolgOtgruz() . '</td>
+                        <td align="right">' . $this->getDolgOtgruz() /* todo - медленный запрос, надо переделать */ . '</td>
                      </tr>';
             $summ += $row['summa_dogovor_ostat'];
         }

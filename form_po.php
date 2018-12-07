@@ -39,7 +39,7 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html>
+    <html lang="ru">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <link rel="stylesheet" type="text/css" href="menu/print.css">
@@ -130,11 +130,11 @@ for ($i = 0; $i < $cnt; $i++) {
     if($price > 0)
         $price_str = func::Rub($price);
 
-    $summ = Part::getPartSumma($row);
-    $total_summ+=$summ;
+    $sum_part = $row['sum_part'];
+    $total_summ+=$sum_part;
     $summ_str = "";
-    if($summ > 0)
-        $summ_str = func::Rub($summ);
+    if($sum_part > 0)
+        $summ_str = func::Rub($sum_part);
 
     $data_str = "";
     $data_postav = func::Date_from_MySQL($row['data_postav']);
