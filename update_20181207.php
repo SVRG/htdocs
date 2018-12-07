@@ -21,7 +21,7 @@ $db->query($sql);
 
 // Обновляем цены без НДС
 $sql = /** @lang MySQL */
-    "UPDATE parts SET price = ROUND(price * 100 / (100+nds),2) WHERE price=0 OR isnull(price);";
+    "UPDATE parts SET price = ROUND(price_it * 100 / (100+nds),2) WHERE price=0 OR isnull(price);";
 $db->query($sql);
 
 // Проверка - кол-во записей должно равняться кол-ву записей в таблице партии
