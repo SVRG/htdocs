@@ -2173,8 +2173,8 @@ class Doc
         $kod_dogovora_new = $db->last_id;
 
         $db->query(/** @lang SQL */
-            "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, price_it, kod_dogovora, val, nds, kod_user) 
-                SELECT kod_elem, modif, numb, NOW(), price, price_or, price_it, $kod_dogovora_new, val, nds, $kod_user 
+            "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, price_it, sum_part, kod_dogovora, val, nds, kod_user) 
+                SELECT kod_elem, modif, numb, NOW(), price, price_or, price_it, sum_part, $kod_dogovora_new, val, nds, $kod_user 
                 FROM parts
                 WHERE kod_dogovora=$kod_dogovora AND del=0");
 
