@@ -1367,8 +1367,8 @@ class Part
 
         $db = new Db();
         $db->query(/** @lang MySQL */
-            "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,modif,nds,val,kod_user,price_or,data_nach) 
-                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,modif,nds,val,$kod_user,price_or,data_nach 
+            "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,sum_part,modif,nds,val,kod_user,price_or,data_nach) 
+                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,sum_part,modif,nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
     }
 //-----------------------------------------------------------------------
