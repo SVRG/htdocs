@@ -1465,7 +1465,7 @@ class Part
                 <table width="200" border="0">
                               <tr>
                                 <td>Сумма с НДС</td>
-                                <td><input name="sum_part" value="' . $row['sum_part'] . '" /></td>
+                                <td><input name="sum_part" value="' . func::Rub($row['sum_part']) . '" /></td>
                               </tr>
                             </table>
                 <input type="hidden" name="Flag" value="EditSumPart" />
