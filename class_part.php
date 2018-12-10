@@ -1440,7 +1440,7 @@ class Part
 
         $nds = (int)$row['nds'];
 
-        Db::getHistoryString("part", "kod_part", $kod_part);
+        Db::getHistoryString("parts", "kod_part", $kod_part);
 
         $price_it = func::rnd($sum_part / $numb);
         $price = func::rnd(($sum_part * 100 / (100 + $nds)) / $numb);
