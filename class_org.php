@@ -120,7 +120,7 @@ class Org
                     <td width="50" bgcolor="#CCCCCC">КПП</td><td  width="250">' . $row['kpp'] . '</td>
                 </tr>
                 <tr>
-                    <td bgcolor="#CCCCCC" width="50">ОГРН</td><td width="250">' . $row['ogrn'] . '</td>
+                    <td bgcolor="#CCCCCC" width="50">ОГРН</td><td width="250">' . self::formOGRN($row['ogrn']) . '</td>
                     <td width="50" bgcolor="#CCCCCC"></td><td  width="250"></td>
                 </tr>
 			    <tr>
@@ -370,14 +370,14 @@ class Org
 
             $ogrn = "";
             if($row['ogrn']!="")
-                $ogrn = " ОГРН ".func::clearNum($row['ogrn']);
+                $ogrn = "<br>ОГРН ".self::formOGRN($row['ogrn']);
 
             $tab_row = /** @lang HTML */
                 "<tr>
                       <td></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$poisk</a></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_krat</a></td>
-                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str $inn $ogrn</a></td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str $inn</a>$ogrn</td>
                       <td> $www </td>
 		            </tr>";
             if ($echo)
@@ -1213,5 +1213,20 @@ class Org
             $res .= '<br>Сумма: ' . Func::Rub($summ);
         return $res;
     }
-//-----------------------------------------------------------------
+//-----------------------------------------------------------
+//
+    /**
+     * Форма со ссылкой на Контур.Фокус
+     * @param $ogrn
+     * @return string
+     */
+    public static function formOGRN($ogrn)
+    {
+        $ogrn = func::clearNum($ogrn);
+        $res = /** @lang HTML */
+            "<a target='_blank' href='https://focus.kontur.ru/entity?query=$ogrn'>$ogrn</a>";
+        return $res;
+    }
+
+    //-----------------------------------------------------------------
 }
