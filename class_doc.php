@@ -3347,6 +3347,41 @@ class Doc
             "</table>";
         return $res;
     }
+//--------------------------------------------------------------
+//
 
+    /**
+     * Список договоров - по которым не вернулись документы
+     * @return string
+     */
+    public function formDocsNoDocuments()
+    {
+        $db = new Db();
+
+        $kod_org_main = config::$kod_org_main;
+
+        $and = "";
+        if (isset($_GET['kod_elem']))
+            $and .= " AND kod_elem=" . (int)$_GET['kod_elem'];
+
+        if (isset($_GET['kod_org']))
+            $and .= " AND kod_org=" . (int)$_GET['kod_org'];
+
+        if(isset($_GET['ost']))
+            $and .= " AND numb_ostat>0";
+
+        $sql = "SELECT *
+                FROM view_rplan
+                JOIN sklad ON sklad.kod_part=view_rplan.kod_part
+                WHERE zakryt=0 AND sklad.del=0 AND poluch=0 AND doc_type=1 AND kod_ispolnit=$kod_org_main $and
+                ORDER BY kod_dogovora ASC;";
+
+        $rows = $db->rows($sql);
+
+        if (count($rows) > 0)
+            return $this->formRPlan_by_Doc($rows);
+
+        return "Список пуст.";
+    }
 
 }// END CLASS

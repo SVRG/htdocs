@@ -41,6 +41,8 @@ include_once "security.php";
         echo $D->formDocsOpen(1); // Внешние открытые договоры
     elseif ($sgp == 8)
         echo $D->formProduction($_GET['kod_elem']);
+    elseif ($sgp == 9)
+        echo $D->formDocsNoDocuments();
     else
         echo $D->formRPlan(0); // Обычный
 

@@ -11,6 +11,7 @@
             <ul>
                 <li><a href="../form_main.php?sgp=1">Исходящие</a></li>
                 <li><a href="../form_main.php?sgp=1&pd&ost">Исходящие $</a></li>
+                <li><a href="../form_main.php?sgp=9">Исходящие ?</a></li>
                 <li><a href="../form_main.php?sgp=7">Входящие</a></li>
                 <li><a href="../form_main.php?sgp=7&pd&ost">Входящие $</a></li>
             </ul>
