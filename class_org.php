@@ -25,7 +25,8 @@ class Org
 
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM org WHERE del=0 ORDER BY poisk");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE del=0 ORDER BY poisk;");
 
         $cnt = $db->cnt;
 
@@ -63,7 +64,8 @@ class Org
     {
         $db = new Db();
 
-        $sql = "SELECT * FROM org WHERE del=0 ORDER BY poisk";
+        $sql = /** @lang MySQL */
+            "SELECT * FROM org WHERE del=0 ORDER BY poisk;";
 
         $rows = $db->rows($sql);
 
@@ -193,7 +195,8 @@ class Org
     public function getData()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM org WHERE kod_org=$this->kod_org");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE kod_org=$this->kod_org;");
         if ($db->cnt == 0)
             return;
 
@@ -240,7 +243,8 @@ class Org
         }
 
         $db = new DB();
-        $rows = $db->rows("SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0 ORDER BY kod_adresa DESC");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM adresa WHERE kod_org=$this->kod_org AND del=0 ORDER BY kod_adresa DESC;");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
@@ -329,7 +333,8 @@ class Org
     {
         $db = new DB();
 
-        $rows = $db->rows("SELECT * FROM org WHERE del=0 ORDER BY poisk");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE del=0 ORDER BY poisk;");
 
         $cnt = $db->cnt;
 
@@ -365,12 +370,12 @@ class Org
                 $nazv_poln_str = $nazv_poln;
 
             $inn = "";
-            if($row['inn']!="")
-                $inn = " ИНН ".func::clearNum($row['inn']);
+            if ($row['inn'] != "")
+                $inn = " ИНН " . func::clearNum($row['inn']);
 
             $ogrn = "";
-            if($row['ogrn']!="")
-                $ogrn = "<br>ОГРН ".self::formOGRN($row['ogrn']);
+            if ($row['ogrn'] != "")
+                $ogrn = "<br>ОГРН " . self::formOGRN($row['ogrn']);
 
             $tab_row = /** @lang HTML */
                 "<tr>
@@ -425,7 +430,8 @@ class Org
         }
 
         $db = new DB();
-        $rows = $db->rows("SELECT * FROM org_data WHERE del=0 AND kod_org=$this->kod_org");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org_data WHERE del=0 AND kod_org=$this->kod_org;");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
@@ -457,7 +463,8 @@ class Org
     {
         $db = new Db();
 
-        $db->query("UPDATE org_data SET del=1 WHERE kod_dat=$kod_dat");
+        $db->query(/** @lang MySQL */
+            "UPDATE org_data SET del=1 WHERE kod_dat=$kod_dat");
     }
 //---------------------------------------------------------------------
 //
@@ -468,14 +475,20 @@ class Org
      */
     public function formAddEdit($Edit = 0)
     {
-
         $poisk = "";
         $nazv_krat = "";
         $nazv_poln = "";
 
-        if ($Edit == 1) {
+        $body = "";
 
-            $this->getData();
+        if ((int)$Edit > 0) {
+            if ((int)$Edit == 1)
+                $this->getData();
+
+            if((int)$Edit == 2)
+                $body = /** @lang HTML */
+                    "<input type='hidden' name='AddAnyway' value='AddAnyway' >";
+
             $row = $this->Data;
 
             $poisk = htmlspecialchars($row['poisk']);
@@ -506,7 +519,7 @@ class Org
                         </tr>
                         <tr>
                           <td><input type='submit' name='button' id='button' value='Сохранить' />
-                          <td><input type='hidden' value='FormAddEdit' name='FormName'></td>
+                          <td><input type='hidden' value='FormAddEdit' name='FormName'>$body</td>
                         </tr>
                       </table>
                     </form>";
@@ -523,7 +536,7 @@ class Org
      */
     public function Save($poisk, $nazv_krat, $nazv_poln)
     {
-        Db::getHistoryString("org","kod_org",$this->kod_org);
+        Db::getHistoryString("org", "kod_org", $this->kod_org);
 
         $db = new Db();
         $poisk = $db->real_escape_string($poisk);
@@ -543,7 +556,7 @@ class Org
      */
     public function AddOrg($poisk, $nazv_krat, $nazv_poln)
     {
-        if(!isset($poisk,$nazv_krat))
+        if (!isset($poisk, $nazv_krat))
             return;
 
         $db = new Db();
@@ -551,15 +564,22 @@ class Org
         $nazv_krat = $db->real_escape_string($nazv_krat);
         $nazv_poln = $db->real_escape_string($nazv_poln);
 
-        // Проверка на наличие контрагента
-        $db->rows(/** @lang MySQL */
-            "SELECT * FROM org WHERE (poisk='$poisk') OR (nazv_krat='$nazv_krat') OR (nazv_poln='$nazv_poln')");
-        if($db->cnt > 0)
-        {
-            $btn = func::ActButton2("form_orglist.php","Вернуться");
-            exit("Наименование '$poisk' уже существует в списке Контрагентов<br>$btn");
-        }
+        // todo - Подумать как сделать красивей
+        if (!isset($_POST['AddAnyway'])) {
+            // Проверка на наличие контрагента
+            $db->rows(/** @lang MySQL */
+                "SELECT * FROM org WHERE (poisk='$poisk') OR (nazv_krat='$nazv_krat') OR (nazv_poln='$nazv_poln')");
+            if ($db->cnt > 0) {
+                echo "Данная организация уже сущетвует. Подтвердите добавление.";
 
+                $this->Data['poisk']=$poisk;
+                $this->Data['nazv_krat']=$nazv_krat;
+                $this->Data['nazv_poln']=$nazv_poln;
+
+                echo $this->formAddEdit(2);
+                exit("");
+            }
+        }
         $db->query(/** @lang MySQL */
             "INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
     }
@@ -592,9 +612,10 @@ class Org
         $k_sch = func::clearNum($k_sch);
         $bik = func::clearNum($bik);
 
-        Db::getHistoryString("org","kod_org",$kod_org);
+        Db::getHistoryString("org", "kod_org", $kod_org);
         $db = new DB();
-        $db->query("UPDATE org SET inn = '$inn', kpp = '$kpp', ogrn='$ogrn', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
+        $db->query(/** @lang MySQL */
+            "UPDATE org SET inn = '$inn', kpp = '$kpp', ogrn='$ogrn', r_sch = '$r_sch', bank_rs = '$bank_rs', k_sch = '$k_sch', bank_ks = '$bank_ks', 
                     bik = '$bik', okpo = '$okpo', okonh = '$okonh', www = '$www', e_mail = '$e_mail' WHERE kod_org =$kod_org");
 
     }
@@ -609,7 +630,8 @@ class Org
         $db = new Db();
 
         if (isset($kod_adresa)) {
-            $db->query("UPDATE adresa SET del=1 WHERE kod_adresa=$kod_adresa");
+            $db->query(/** @lang MySQL */
+                "UPDATE adresa SET del=1 WHERE kod_adresa=$kod_adresa");
 
         } else
             echo "Ошибка: Не задан ID адреса";
@@ -625,7 +647,8 @@ class Org
         $db = new Db();
 
         if (isset($kod_org)) {
-            $db->query("UPDATE org SET del=1 WHERE kod_org=$kod_org");
+            $db->query(/** @lang MySQL */
+                "UPDATE org SET del=1 WHERE kod_org=$kod_org");
 
         } else
             exit("Ошибка: Не задан ID организации");
@@ -648,7 +671,8 @@ class Org
         $kod_user = func::kod_user();
         $adres = $db->real_escape_string($adres);
         $type = (int)$type;
-        $db->query("INSERT INTO adresa (adres,kod_org,type,kod_user) VALUES('$adres',$kod_org,$type,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO adresa (adres,kod_org,type,kod_user) VALUES('$adres',$kod_org,$type,$kod_user)");
     }
 //----------------------------------------------------------------------
 //
@@ -665,7 +689,8 @@ class Org
         $kod_org = $this->kod_org;
         $kod_user = func::kod_user();
         $phone = $db->real_escape_string($phone);
-        $db->query("INSERT INTO org_data (data,kod_org,kod_user) VALUES('$phone',$kod_org,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO org_data (data,kod_org,kod_user) VALUES('$phone',$kod_org,$kod_user)");
     }
 //----------------------------------------------------------------------
 //
@@ -702,7 +727,7 @@ class Org
         if ($sql != "")
             $rows = $db->rows($sql);
         else
-            $rows = $db->rows(/** @lang SQL */
+            $rows = $db->rows(/** @lang MySQL */
                 "SELECT view_rplan.kod_elem, 
                             view_rplan.name,
                             view_rplan.data_postav, 
@@ -787,7 +812,8 @@ class Org
         $db = new DB();
 
         // Сумма действующих договоров
-        $sql = "SELECT
+        $sql = /** @lang MySQL */
+            "SELECT
                     dogovory.kod_org,
                     Sum(view_dogovor_summa.dogovor_summa) AS summa_dogovorov
                 FROM
@@ -806,7 +832,8 @@ class Org
         $summa_dogovorov = (double)$row['summa_dogovorov']; // Сумма действующих договоров
 
         // Сумма платежей по действующим договорам
-        $sql = "SELECT
+        $sql = /** @lang MySQL */
+            "SELECT
                     Sum(view_dogovor_summa_plat.summa_plat) AS summa_plat,
                     dogovory.kod_org
                 FROM
@@ -847,7 +874,7 @@ class Org
 
         $rows = $db->rows($sql);
 
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return 0.;
 
         $summ = 0.;
@@ -855,10 +882,10 @@ class Org
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
 
-            if((int)$row['numb_otgruz'] == 0)
+            if ((int)$row['numb_otgruz'] == 0)
                 continue;
 
-            $summ += (int)$row['numb_otgruz']*Part::getPriceWithNDS($row);
+            $summ += (int)$row['numb_otgruz'] * Part::getPriceWithNDS($row);
         }
 
         return $summ;
@@ -873,7 +900,7 @@ class Org
     {
         $res = $this->getSummOtgruz() - $this->getSummPlatByCurrentDocs();
 
-        if((int)$res == 0)
+        if ((int)$res == 0)
             $res = "";
         else
             $res = func::Rub($res);
@@ -1109,7 +1136,8 @@ class Org
         $db = new Db();
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE org_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
+        $db->query(/** @lang MySQL */
+            "UPDATE org_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1180,7 +1208,8 @@ class Org
             $w_kod_org .= " AND view_dogovory_nvs.kod_org=$kod_org ";
         }
 
-        $rows = $db->rows("SELECT sum(plat.summa) AS summ, 
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT sum(plat.summa) AS summ, 
                                         view_dogovory_nvs.nazv_krat,
                                         kod_org
                                   FROM plat INNER JOIN view_dogovory_nvs ON plat.kod_dogovora = view_dogovory_nvs.kod_dogovora
