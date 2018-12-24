@@ -39,7 +39,8 @@ class Elem
             $this->kod_elem = $kod_elem;
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM elem WHERE kod_elem=$this->kod_elem AND del=0");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM elem WHERE kod_elem=$this->kod_elem AND del=0");
         $this->Data = $rows[0];
 
         return $this->Data;
@@ -112,7 +113,8 @@ class Elem
     public function formNomen()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
                                     view_elem.name AS elem_name,
                                     view_elem.kod_elem,
                                     view_elem.shifr,
@@ -209,7 +211,8 @@ class Elem
 
         $db = new Db();
 
-        $sql = "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
+        $sql = /** @lang MySQL */
+            "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
 
         $rows = $db->rows($sql);
 
@@ -240,7 +243,8 @@ class Elem
     {
         $db = new Db();
 
-        $sql = "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
+        $sql = /** @lang MySQL */
+            "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
 
         $rows = $db->rows($sql);
 
@@ -259,17 +263,18 @@ class Elem
 
             $res .= "<option value='$kod_elem' $selected>$name</option>\r\n";
         }
-        $res .= '</select>
-        <script type="text/javascript">
-                        var kod_elem, $kod_elem;
-    
-                        $kod_elem = $("#kod_elem").selectize({
-                            onChange: function(value) {
-            if (!value.length) return;
-        }
-                        });
-                        kod_elem = $kod_elem[0].selectize;
-                </script>';
+        $res .= /** @lang HTML */
+            '</select>
+            <script type="text/javascript">
+                            var kod_elem, $kod_elem;
+        
+                            $kod_elem = $("#kod_elem").selectize({
+                                onChange: function(value) {
+                if (!value.length) return;
+            }
+                            });
+                            kod_elem = $kod_elem[0].selectize;
+            </script>';
 
         return $res;
     }
@@ -291,7 +296,8 @@ class Elem
      */
     public function formPhoto()
     {
-        $sql = "SELECT
+        $sql = /** @lang MySQL */
+            "SELECT
                         docum.`name`,
                         docum.path
                     FROM
@@ -339,7 +345,8 @@ class Elem
         $shifr = $db->real_escape_string($shifr);
         $nomen = (int)$nomen;
 
-        $db->query("INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user)");
 
     }
 //------------------------------------------------------------------------
@@ -366,7 +373,8 @@ class Elem
         $shablon = $db->real_escape_string($shablon);
         $shifr = $db->real_escape_string($shifr);
 
-        $db->query("UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
+        $db->query(/** @lang MySQL */
+            "UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
     }
 //------------------------------------------------------------------------
 //
@@ -377,7 +385,8 @@ class Elem
     public function formOrgByElem()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM view_elem_org WHERE kod_elem=" . $this->kod_elem);
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_elem_org WHERE kod_elem=" . $this->kod_elem);
 
         if ($db->cnt == 0)
             return "";
@@ -508,7 +517,8 @@ class Elem
 
         $db = new Db();
 
-        $elem_name = $db->rows("SELECT * FROM elem WHERE kod_elem = $kod_elem AND del=0"); // Получаем название удаляемого элемента
+        $elem_name = $db->rows(/** @lang MySQL */
+            "SELECT * FROM elem WHERE kod_elem = $kod_elem AND del=0"); // Получаем название удаляемого элемента
 
         $name = $elem_name[0]['name'];
         $obozn = $elem_name[0]['obozn'];
@@ -518,11 +528,13 @@ class Elem
         if (substr_count($name, $obozn) == 0)
             $new_name = $name . ' ' . $obozn;
 
-        $db->query("UPDATE elem SET del=1, kod_user=$kod_user WHERE kod_elem=$kod_elem"); // Удаляем элемент
+        $db->query(/** @lang MySQL */
+            "UPDATE elem SET del=1, kod_user=$kod_user WHERE kod_elem=$kod_elem"); // Удаляем элемент
         $Docum = new Docum();
         $Docum->DeleteElemFiles($kod_elem); // Удаляем связные документы
 
-        $rows = $db->rows("SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем список партий, где участвовал удаленный элемент
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM parts WHERE kod_elem=$kod_elem AND del=0"); // Получаем список партий, где участвовал удаленный элемент
         if ($db->cnt == 0)
             return;
 
@@ -537,7 +549,8 @@ class Elem
             $modif = $new_name . $modif;
             $kod_part = $row['kod_part'];
 
-            $db->query("UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1, kod_user=$kod_user WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
+            $db->query(/** @lang MySQL */
+                "UPDATE parts SET kod_elem=$kod_dest, modif='$modif', edit=1, kod_user=$kod_user WHERE kod_part=$kod_part"); // заменяем код уделенного элемента
         }
 
     }
@@ -607,8 +620,8 @@ class Elem
     {
         $db = new Db();
 
-        $db->query("UPDATE elem SET nomen = $nomen WHERE kod_elem = $kod_elem");
-
+        $db->query(/** @lang MySQL */
+            "UPDATE elem SET nomen = $nomen WHERE kod_elem = $kod_elem");
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -653,14 +666,16 @@ class Elem
         // todo - возможно потребуется проверка вложений, нет ли вхождений в подчиненные элементы
         $db = new Db();
         // Проверка - может элемент уже есть в спецификации
-        $db->rows("SELECT * FROM specs WHERE kod_elem_base=$this->kod_elem AND kod_elem_sub=$kod_elem");
+        $db->rows(/** @lang MySQL */
+            "SELECT * FROM specs WHERE kod_elem_base=$this->kod_elem AND kod_elem_sub=$kod_elem");
         if ($db->cnt > 0)
             return;
 
         $quantity = func::clearNum($quantity);
 
         $kod_user = func::kod_user();
-        $db->query("INSERT INTO specs (kod_elem_base,kod_elem_sub,quantity,type,kod_user) VALUES($this->kod_elem,$kod_elem,$quantity,$type,$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO specs (kod_elem_base,kod_elem_sub,quantity,type,kod_user) VALUES($this->kod_elem,$kod_elem,$quantity,$type,$kod_user)");
     }
 
 //------------------------------------------------------------------------
@@ -701,7 +716,8 @@ class Elem
     public function formSpec()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
                                       view_elem.name AS elem_name,
                                       view_elem.kod_elem,
                                       view_elem.shifr,
@@ -733,7 +749,8 @@ class Elem
     public function formSpecSub()
     {
         $db = new Db();
-        $rows = $db->rows("SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
                                       view_elem.name AS elem_name,
                                       view_elem.kod_elem,
                                       view_elem.shifr,
@@ -767,7 +784,8 @@ class Elem
             return;
 
         $db = new Db();
-        $db->query("UPDATE specs SET del=1 WHERE kod_spec=$kod_spec"); // Удаляем элемент
+        $db->query(/** @lang MySQL */
+            "UPDATE specs SET del=1 WHERE kod_spec=$kod_spec"); // Удаляем элемент
     }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,8 @@ class Docum
     {
         $sql = '';
         if ($Type == 'Elem')
-            $sql = "SELECT
+            $sql = /** @lang MySQL */
+                "SELECT
                                 docum_elem.kod_docum,
                                 docum_elem.kod_elem,
                                 docum.`name`,
@@ -35,7 +36,8 @@ class Docum
                               ORDER BY docum.time_stamp DESC";
 
         elseif ($Type == 'Doc')
-            $sql = "SELECT
+            $sql = /** @lang MySQL */
+                "SELECT
                             docum_dogovory.kod_docum,
                             docum_dogovory.kod_dogovora,
                             docum.`name`,
@@ -48,7 +50,8 @@ class Docum
                           ORDER BY docum.time_stamp DESC";
 
         elseif ($Type == 'Org')
-            $sql = "SELECT
+            $sql = /** @lang MySQL */
+                "SELECT
                         docum_org.kod_docum,
                         docum_org.kod_org,
                         docum.`name`,
@@ -124,17 +127,22 @@ class Docum
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM docum WHERE kod_docum=$kod_docum AND docum.del=0");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM docum WHERE kod_docum=$kod_docum AND docum.del=0");
 
         if ($db->cnt != 1)
             return;
 
         $row = $rows[0];
 
-        $db->query("UPDATE docum SET del=1 WHERE kod_docum= $kod_docum");
-        $db->query("UPDATE docum_dogovory SET del=1 WHERE kod_docum= $kod_docum");
-        $db->query("UPDATE docum_elem SET del=1 WHERE kod_docum= $kod_docum");
-        $db->query("UPDATE docum_org SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query(/** @lang MySQL */
+            "UPDATE docum SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query(/** @lang MySQL */
+            "UPDATE docum_dogovory SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query(/** @lang MySQL */
+            "UPDATE docum_elem SET del=1 WHERE kod_docum= $kod_docum");
+        $db->query(/** @lang MySQL */
+            "UPDATE docum_org SET del=1 WHERE kod_docum= $kod_docum");
 
         if (!file_exists($row['path']))
             return;
@@ -162,11 +170,14 @@ class Docum
         $last_id = $db->last_id;
 
         if ($Dest == 'Doc') {
-            $db->query("INSERT INTO docum_dogovory (kod_docum,kod_dogovora,kod_user) VALUES ($last_id,$ID,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO docum_dogovory (kod_docum,kod_dogovora,kod_user) VALUES ($last_id,$ID,$kod_user)");
         } elseif ($Dest == 'Org') {
-            $db->query("INSERT INTO docum_org (kod_docum,kod_org,kod_user) VALUES ($last_id,$ID,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO docum_org (kod_docum,kod_org,kod_user) VALUES ($last_id,$ID,$kod_user)");
         } elseif ($Dest == 'Elem') {
-            $db->query("INSERT INTO docum_elem (kod_docum,kod_elem,kod_user) VALUES ($last_id,$ID,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO docum_elem (kod_docum,kod_elem,kod_user) VALUES ($last_id,$ID,$kod_user)");
         }
     }
 
@@ -182,7 +193,8 @@ class Docum
     {
         $db = new Db();
 
-        $rows = $db->rows("  SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "  SELECT
                                         docum_elem.kod_docum,
                                         docum_elem.kod_elem,
                                         docum.path
@@ -203,14 +215,16 @@ class Docum
             $kod_docum = $row['kod_docum'];
             $path = $row['path'];
 
-            $db->query("UPDATE docum SET del=1,kod_user=$kod_user WHERE kod_docum=$kod_docum");
+            $db->query(/** @lang MySQL */
+                "UPDATE docum SET del=1,kod_user=$kod_user WHERE kod_docum=$kod_docum");
 
             if (!file_exists($path))
                 continue;
             unlink($_SERVER["DOCUMENT_ROOT"] . '/' . $row['path']);
         }
 
-        $db->query("UPDATE docum_elem SET del=1,kod_user=$kod_user WHERE kod_elem=$kod_elem");
+        $db->query(/** @lang MySQL */
+            "UPDATE docum_elem SET del=1,kod_user=$kod_user WHERE kod_elem=$kod_elem");
     }
 //----------------------------------------------------------------------------------------------------------------------
 

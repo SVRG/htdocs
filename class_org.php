@@ -770,7 +770,8 @@ class Org
     public function getSummPlatByCurrentDocs()
     {
         // Сумма платежей по действующим договорам
-        $sql = "SELECT
+        $sql = /** @lang MySQL */
+            "SELECT
                     Sum(view_dogovor_summa_plat.summa_plat) AS summa_plat,
                     dogovory.kod_org
                 FROM
@@ -1065,7 +1066,8 @@ class Org
         if (func::issetFlag("AddOrgLinkForm")) {
             $sel = self::formSelList(0, 'nazv_krat', 'kod_org_slave');
 
-            $res .= "<form id='form1' name='form1' method='post' action=''>
+            $res .= /** @lang HTML */
+                "<form id='form1' name='form1' method='post' action=''>
                       <table border='0'>
                         <tr>
                           <td width='133'>Связь</td>
@@ -1080,7 +1082,7 @@ class Org
         }
 
         $db = new Db();
-        $rows = $db->rows(/** @lang SQL */
+        $rows = $db->rows(/** @lang MySQL */
             "SELECT
                       org.nazv_krat,
                       org.kod_org,
@@ -1153,7 +1155,7 @@ class Org
         $db = new Db();
         $kod_user = func::kod_user();
         $prim = $db->real_escape_string($prim);
-        $db->query(/** @lang SQL */
+        $db->query(/** @lang MySQL */
             "INSERT INTO org_links (master, slave, prim,kod_user) VALUE ($kod_org_master,$kod_org_slave,'$prim',$kod_user)");
     }
 //----------------------------------------------------------------------------------------------------------------------

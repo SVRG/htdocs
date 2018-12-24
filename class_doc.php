@@ -57,7 +57,8 @@ class Doc
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         // Открытые
-        $rows = $db->rows("SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
                                       *
                                     FROM view_rplan
                                     WHERE kod_elem=$kod_elem AND zakryt=0 AND kod_ispolnit=$kod_org_main $where $where_kod_org
@@ -78,7 +79,8 @@ class Doc
 
         // Закрытые
         if (isset($_POST['close']) or isset($_POST['all'])) {
-            $rows = $db->rows("SELECT
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT
                                       *
                                     FROM view_rplan
                                     WHERE kod_elem=$kod_elem AND zakryt=1 AND kod_ispolnit=$kod_org_main $where $where_kod_org
@@ -132,7 +134,8 @@ class Doc
         // Внешние закрытые
         if (isset($_POST['in_close']) or isset($_POST['all'])) {
 
-            $rows = $db->rows("SELECT
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT
                                     `trin`.`dogovory`.`kod_dogovora`                                                                     AS `kod_dogovora`,
                                     `trin`.`dogovory`.`nomer`                                                                            AS `nomer`,
                                     `trin`.`dogovory`.`doc_type`                                                                         AS `doc_type`,
@@ -499,7 +502,8 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_dogovor_summa_plat WHERE kod_dogovora=$kod_dogovora");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_dogovor_summa_plat WHERE kod_dogovora=$kod_dogovora");
 
         if ($db->cnt > 0)
             return (double)$rows[0]['summa_plat'];
@@ -743,7 +747,8 @@ class Doc
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_dogovor_data WHERE kod_dogovora=$this->kod_dogovora");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_dogovor_data WHERE kod_dogovora=$this->kod_dogovora");
 
         unset($this->Data);
 
@@ -844,7 +849,7 @@ class Doc
         if(isset($_GET['p']))
             $where .= " AND doc_type=1";
 
-        $sql = /** @lang SQL */
+        $sql = /** @lang MySQL */
             "SELECT
                       view_rplan.kod_dogovora,
                       view_rplan.nomer,
@@ -908,7 +913,7 @@ class Doc
         if(isset($_GET['p']))
             $where .= " AND doc_type=1";
 
-        $sql = /** @lang SQL */
+        $sql = /** @lang MySQL */
             "SELECT
                       view_rplan.kod_dogovora,
                       view_rplan.nomer,
@@ -1230,7 +1235,8 @@ class Doc
             $res .= $this->formAddPP();
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora AND plat.del=0");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM plat WHERE kod_dogovora=$this->kod_dogovora AND plat.del=0");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
@@ -1368,7 +1374,8 @@ class Doc
         if(isset($_GET['ost']))
             $and .= " AND numb_ostat>0";
 
-        $sql = "SELECT 
+        $sql = /** @lang MySQL */
+            "SELECT 
                 * 
                 FROM 
                     view_rplan 
@@ -1405,7 +1412,8 @@ class Doc
             $res .= $this->formAddSchet();
 
         $db = new Db();
-        $rows = $db->rows("SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora AND scheta.del=0");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM scheta WHERE kod_dogovora=$this->kod_dogovora AND scheta.del=0");
         $cnt = $db->cnt;
 
         if ($cnt == 0)
@@ -1450,7 +1458,8 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT
                                     attributes.kod_attr,
                                     attributes.value,
                                     kod_type_attr
@@ -1521,7 +1530,8 @@ class Doc
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT 
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT 
                                     dogovor_attribute.kod_dogovor_attr,
                                     dogovor_attribute.kod_dogovora,
                                     dogovor_attribute.kod_attr,
@@ -1623,7 +1633,8 @@ class Doc
 
         $db = new Db();
         // todo - проверить будет ли работать запрос в отсутствии поля kod_part
-        $rows = $db->rows("SELECT * 
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * 
                                   FROM dogovor_prim 
                                   WHERE kod_dogovora=$this->kod_dogovora AND dogovor_prim.del=0 AND isnull(kod_part)
                                   ORDER BY dogovor_prim.time_stamp DESC
@@ -1799,7 +1810,8 @@ class Doc
 
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_plat ORDER BY view_plat.data DESC ");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_plat ORDER BY view_plat.data DESC ");
 
         $cnt = $db->cnt;
 
@@ -1930,9 +1942,11 @@ class Doc
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         if (!$VN)
-            $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
         else
-            $rows = $db->rows("SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
 
         $cnt = $db->cnt;
 
@@ -2013,7 +2027,8 @@ class Doc
     {
         $db = new Db();
 
-        $rows = $db->rows("SELECT * FROM view_plat WHERE kod_dogovora =$this->kod_dogovora ORDER BY view_plat.data DESC");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_plat WHERE kod_dogovora =$this->kod_dogovora ORDER BY view_plat.data DESC");
 
         $cnt = $db->cnt;
 
@@ -2094,7 +2109,8 @@ class Doc
                 $where .= " AND (data>='$data_s' AND data<'$data_n') ";
         }
 
-        $rows = $db->rows("SELECT * FROM view_sklad $where");
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_sklad $where");
 
         $cnt = $db->cnt;
 
@@ -2131,12 +2147,14 @@ class Doc
             else
                 $res .= '<tr bgcolor="#d8d210">';
 
+            $part_link = "<a href='form_part.php?kod_part=".(int)$row['kod_part']."'>".$row['naklad']."</a>";
+
             $res .= '
                     <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $row['name'] . '</a></td>
                     <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
                     <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</td>
-                    <td >' . (int)$row['numb'] . '</td>
-                    <td>' . $row['naklad'] . '</td>
+                    <td>' . (int)$row['numb'] . '</td>
+                    <td>' . $part_link . '</td>
                     <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                     <td>' . $row['oper'] . '</td>
                     <td align="right">' . Func::Proc($procent) . '%</td>
@@ -2165,14 +2183,14 @@ class Doc
         if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false))
             $nomer = $this->getNextSchetNomer();
         $nomer = $db->real_escape_string($nomer);
-        $db->query(/** @lang SQL */
+        $db->query(/** @lang MySQL */
             "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user) 
                       SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
                       FROM dogovory
                       WHERE kod_dogovora=$kod_dogovora");
         $kod_dogovora_new = $db->last_id;
 
-        $db->query(/** @lang SQL */
+        $db->query(/** @lang MySQL */
             "INSERT INTO parts (kod_elem, modif, numb, data_postav, price, price_or, price_it, sum_part, kod_dogovora, val, nds, kod_user) 
                 SELECT kod_elem, modif, numb, NOW(), price, price_or, price_it, sum_part, $kod_dogovora_new, val, nds, $kod_user 
                 FROM parts
@@ -2211,7 +2229,8 @@ class Doc
 
         $nomer = $db->real_escape_string($nomer);
 
-        $sql = "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user,doc_type) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user,$doc_type)";
+        $sql = /** @lang MySQL */
+            "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user,doc_type) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user,$doc_type)";
 
         $db->query($sql);
 
@@ -2354,7 +2373,8 @@ class Doc
         $user = func::user();
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
 
         // Информирование по e-mail
         if ($this->mail == 1) {
@@ -2378,7 +2398,8 @@ class Doc
             $body .= "Примечание: $prim<br>";
 
             $db = new Db();
-            $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$kod_dogovora");
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_rplan WHERE kod_dogovora=$kod_dogovora");
             $cnt = $db->cnt;
 
             if ($cnt == 0)
@@ -2466,7 +2487,8 @@ class Doc
         $prim = $db->real_escape_string($prim);
         $kod_user = func::kod_user();
 
-        $db->query("INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user,nds) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user,$nds)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO scheta (kod_dogovora,nomer,summa,data,prim,kod_user,nds) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim',$kod_user,$nds)");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -2488,11 +2510,14 @@ class Doc
         $kod_user = func::kod_user();
 
         if ($value != "") {
-            $db->query("INSERT INTO attributes (value, kod_type_attr,kod_user) VALUES($value,$kod_type_attr,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO attributes (value, kod_type_attr,kod_user) VALUES($value,$kod_type_attr,$kod_user)");
             $kod_attr = $db->last_id;
-            $db->query("INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
         } else
-            $db->query("INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
+            $db->query(/** @lang MySQL */
+                "INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
 
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -2547,7 +2572,8 @@ class Doc
         $db = new Db();
         $text = nl2br($text); // Вставялем <br> вместо перевода строки
         $text = $db->real_escape_string($text);
-        $db->query("INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$text','$user',$kod_user,$kod_part,$status)");
+        $db->query(/** @lang MySQL */
+            "INSERT INTO dogovor_prim (kod_dogovora,text,user,kod_user,kod_part,status) VALUES($this->kod_dogovora,'$text','$user',$kod_user,$kod_part,$status)");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2563,9 +2589,11 @@ class Doc
         $kod_user = func::kod_user();
 
         if (isset($kod_plat)) {
-            $db->query("UPDATE plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
+            $db->query(/** @lang MySQL */
+                "UPDATE plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
 
-            $db->query("UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
+            $db->query(/** @lang MySQL */
+                "UPDATE raschety_plat SET del=1,kod_user=$kod_user WHERE kod_plat=$kod_plat");
 
         } else
             echo "Ошибка: Не задан ID платежа";
@@ -2582,7 +2610,8 @@ class Doc
         $kod_user = func::kod_user();
 
         if (isset($kod_dogovor_attr)) {
-            $db->query("UPDATE dogovor_attribute SET del=1,kod_user=$kod_user WHERE kod_dogovor_attr=$kod_dogovor_attr");
+            $db->query(/** @lang MySQL */
+                "UPDATE dogovor_attribute SET del=1,kod_user=$kod_user WHERE kod_dogovor_attr=$kod_dogovor_attr");
         } else
             echo "Ошибка: Не задан ID";
     }
@@ -2598,7 +2627,8 @@ class Doc
         $kod_user = func::kod_user();
 
         if (isset($kod_prim)) {
-            $db->query("UPDATE dogovor_prim SET del=1,kod_user=$kod_user WHERE kod_prim=$kod_prim");
+            $db->query(/** @lang MySQL */
+                "UPDATE dogovor_prim SET del=1,kod_user=$kod_user WHERE kod_prim=$kod_prim");
 
         } else
             echo "Ошибка: Не задан ID примечания";
@@ -2714,7 +2744,8 @@ class Doc
         if (!isset($kod_prim))
             return;
 
-        $db->query("UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1 WHERE kod_prim=$kod_prim");
+        $db->query(/** @lang MySQL */
+            "UPDATE dogovor_prim SET status=$status, kod_user=$kod_user, edit=1 WHERE kod_prim=$kod_prim");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2729,7 +2760,8 @@ class Doc
         if (isset($kod_scheta)) {
             $kod_user = func::kod_user();
 
-            $db->query("UPDATE scheta SET del=1,kod_user=$kod_user WHERE kod_scheta=$kod_scheta");
+            $db->query(/** @lang MySQL */
+                "UPDATE scheta SET del=1,kod_user=$kod_user WHERE kod_scheta=$kod_scheta");
 
         } else
             echo "Ошибка: Не задан ID Счета";
@@ -2749,7 +2781,8 @@ class Doc
         $kod_link = (int)$kod_link;
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE doc_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
+        $db->query(/** @lang MySQL */
+            "UPDATE doc_links SET del=1,kod_user=$kod_user WHERE kod_link=$kod_link");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2764,7 +2797,8 @@ class Doc
         $now = date('y.m.d');
         $kod_user = func::kod_user();
 
-        $db->query("UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now', edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
+        $db->query(/** @lang MySQL */
+            "UPDATE dogovory SET zakryt = $zakryt, data_zakrytiya='$now', edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3370,7 +3404,8 @@ class Doc
         if(isset($_GET['ost']))
             $and .= " AND numb_ostat>0";
 
-        $sql = "SELECT *
+        $sql = /** @lang MySQL */
+            "SELECT *
                 FROM view_rplan
                 JOIN sklad ON sklad.kod_part=view_rplan.kod_part
                 WHERE zakryt=0 AND sklad.del=0 AND poluch=0 AND doc_type=1 AND kod_ispolnit=$kod_org_main $and
