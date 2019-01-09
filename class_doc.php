@@ -28,7 +28,6 @@ class Doc
     {
 
     }
-
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
@@ -2149,17 +2148,26 @@ class Doc
 
             $part_link = "<a href='form_part.php?kod_part=".(int)$row['kod_part']."'>".$row['naklad']."</a>";
 
+            $kod_org = $row['kod_org'];
+            $filter_link = "";
+            if (!isset($_GET['kod_org'])) {
+                $sign = "?";
+                if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
+                    $sign = "&";
+
+                $filter_link = " <a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img alt='OrgFilter' title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+            }
+
             $res .= '
                     <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $row['name'] . '</a></td>
                     <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
-                    <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</td>
+                    <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . "</a>" . $filter_link . '</td>
                     <td>' . (int)$row['numb'] . '</td>
                     <td>' . $part_link . '</td>
                     <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                     <td>' . $row['oper'] . '</td>
                     <td align="right">' . Func::Proc($procent) . '%</td>
                 </tr>';
-
         }
 
         $res .= '</table>';
