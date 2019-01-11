@@ -42,8 +42,9 @@ class Part
 
         // Если вызов списка партий - выводим кнопки Добавить партию и Авто-Расчет 100%
         // Если вызов из формы Партия - выводим только Авторасчет
-        if ($this->kod_part != 0)
+        if ($this->kod_part != 0) {
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
+        }
         else {
             if (func::user_group() == "admin") // todo - Придумать глобальную политику прав
                 $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
@@ -111,7 +112,7 @@ class Part
 
             // Форма редактированя суммы партии
             $sum_part_form = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], "Изменить", 'formSumPart', "kod_part_edit_sum", $row['kod_part']);;
-            if(isset($_POST['kod_part_edit_sum']))
+            if (isset($_POST['kod_part_edit_sum']))
                 if ($_POST['kod_part_edit_sum'] == $this->kod_part)
                     $sum_part_form = $this->formSumPart();
 
@@ -156,9 +157,9 @@ class Part
             //--------------------------
             // НДС
             $NDS = '';
-
+            // Если отличается от текущей ставки то выводить
             if ((int)$row['nds'] != (int)config::$nds_main)
-                $NDS = '<br>НДС ' . (int)$row['nds'] . '%';
+                $NDS = 'НДС ' . (int)$row['nds'] . '%';
 
             //--------------------------
             // Валюта
@@ -198,11 +199,13 @@ class Part
             $btn_copy_to_doc = $this->formCopyToDoc();
             $form_copy_to_doc = $this->formCopyToDoc(false);
 
+            $btn_set = "<div>". Func::ActButton("form_set.php?kod_part=" . $this->kod_part, 'Комплектация', 'PartSet') ."</div>";
+
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
                     <div>$btn_edit</div>
                     <div>$prim</div>
-                    $btn_del $btn_rfq $btn_po $btn_copy_to_doc
+                    $btn_del $btn_rfq $btn_po $btn_copy_to_doc $btn_set
                 </div>";
 
             $res .=
@@ -1184,7 +1187,7 @@ class Part
                 self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora']);
                 $event = true;
             } elseif ($_POST['Flag'] == 'EditSumPart' and isset($_POST['kod_part'], $_POST['sum_part'])) {
-                self::setSumPart($_POST['kod_part'],$_POST['sum_part']);
+                self::setSumPart($_POST['kod_part'], $_POST['sum_part']);
                 $event = true;
             }
         }
@@ -1435,7 +1438,7 @@ class Part
 
         $numb = $row['numb'];
 
-        if($numb == 0)
+        if ($numb == 0)
             $numb = 1;
 
         $nds = (int)$row['nds'];
@@ -1455,13 +1458,13 @@ class Part
      * @return string
      */
     public function formSumPart()
-   {
-       $kod_part = $this->kod_part;
+    {
+        $kod_part = $this->kod_part;
 
-       $row = self::getData($kod_part);
+        $row = self::getData($kod_part);
 
-       $res = /** @lang HTML */
-           '<form id="formSumPart" name="formSumPart" method="post" action="">
+        $res = /** @lang HTML */
+            '<form id="formSumPart" name="formSumPart" method="post" action="">
                 <table width="200" border="0">
                               <tr>
                                 <td>Сумма с НДС</td>
@@ -1473,8 +1476,157 @@ class Part
                 <input type="submit" name="button" id="button" value="Сохранить" />
                 </form>
                 ';
-       $res .= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', 'Cansel');
+        $res .= Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Отмена', 'Cansel');
 
-       return $res;
-   }
+        return $res;
+    }
+//-----------------------------------------------------------------------
+//
+    /**
+     * Сборка для партии
+     *
+     */
+    public function formPartSet()
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_set WHERE kod_part=$this->kod_part");
+
+        if ($db->cnt == 0)
+            return "Список элементов пуст.";
+
+        $res = /** @lang HTML */
+            "<table width='100%' border='1'>
+                <tr>
+                    <td>№</td>
+                    <td>Наименование</td>
+                    <td>Код</td>
+                    <td width='50'>Кол-во</td>
+                    <td>Примечание</td>
+                </tr>";
+
+        $sum = 0;
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $name = $row['name'];
+            $kod = $row['kod_1c'];
+            $numb = $row['numb'];
+            $sum += (double)$row['sum'];
+            $n = $i + 1;
+
+            $res .= /** @lang HTML */
+                "<tr>
+                    <td>$n</td>
+                    <td>$name</td>
+                    <td>$kod</td>
+                    <td align='right'>$numb</td>
+                    <td></td>
+                </tr>";
+        }
+        $res .= "</table>";
+        $res .= func::Rub($sum);
+
+        return $res;
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Добавление позиции в комплектацию
+     * @param $kod_item
+     * @param $numb
+     */
+    public function addItemToSet($kod_item, $numb)
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM sklad_1c WHERE kod_item=$kod_item");
+
+        if ($db->cnt == 0)
+            exit("Список элементов пуст.");
+
+        $row = $rows[0];
+        $name = $row['name'];
+        $kod_1c = $row['kod_1c'];
+        $price = $row['price'];
+        $numb_1c = $row['numb'];
+
+        $part_data = self::getData($this->kod_part);
+
+        if (!isset($numb) or $numb = 1)
+            $numb = $part_data['numb'];
+
+        if ($numb > $numb_1c)
+            $numb = $numb_1c;
+
+        $sum = func::rnd($numb * $price);
+
+        // Проверка, если позиция уже есть в комплектации то обновляем ее
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND kod_1c=$kod_1c AND del=0");
+        if ($db->cnt > 0) {
+            $row_1 = $rows[0];
+            $numb_old = $row_1['numb'];
+            $kod_item_ps = $row_1['kod_item']; // код позиции из таблицы part_set
+            $db->query(/** @lang MySQL */
+                "UPDATE part_set SET numb=($numb_old + $numb) WHERE kod_item=$kod_item_ps");
+        } else {
+            $sql = /** @lang MySQL */
+                "INSERT INTO part_set (name, kod_1c, price, numb, sum, kod_part) VALUES('$name',$kod_1c,$price,$numb,$sum,$this->kod_part);";
+            $db->query($sql);
+        }
+
+        $numb = func::rnd($row['numb'] - $numb);
+
+        $sql = /** @lang MySQL */
+            "UPDATE sklad_1c SET numb=$numb WHERE kod_item=$kod_item";
+        $db->query($sql);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление позиции из комплектации
+     * @param $kod_item
+     */
+    public function deleteItemFromSet($kod_item)
+    {
+        $db = new Db();
+        $db->query(/** @lang MySQL */
+            "UPDATE part_set SET del=1 WHERE kod_item=$kod_item");
+
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT numb,kod_1c FROM part_set WHERE kod_item=$kod_item");
+        $row = $rows[0];
+        $numb = $row['numb'];
+        $kod_1c = $row['kod_1c'];
+
+        $db->query(/** @lang MySQL */
+            "UPDATE sklad_1c SET numb=(numb+$numb) WHERE kod_1c=$kod_1c");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Изменение количества позиции
+     * @param $kod_item
+     * @param $numb
+     */
+    public function setItemNumb($kod_item, $numb)
+    {
+        $db = new Db();
+
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT numb,kod_1c FROM part_set WHERE kod_item=$kod_item");
+        $row = $rows[0];
+        $numb_old = $row['numb'];
+        $kod_1c = $row['kod_1c'];
+
+        // todo - проверка количества, нельзя взять больше чем есть
+
+        $db->query(/** @lang MySQL */
+            "UPDATE part_set SET numb=$numb WHERE kod_item=$kod_item");
+
+        $db->query(/** @lang MySQL */
+            "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb) WHERE kod_1c=$kod_1c");
+    }
 }

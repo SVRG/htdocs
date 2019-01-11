@@ -61,6 +61,12 @@ class Func
     }
 //----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Готовим число для вставки в MySQL
+     * @param $num_str
+     * @param int $precision
+     * @return float|mixed|string|string[]|null
+     */
     public static function clearNum($num_str, $precision=0)
     {
         $res = str_replace(",",".",$num_str);
@@ -70,6 +76,31 @@ class Func
             $res = round((double)$res,(int)$precision);
 
         return $res;
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаляем лишние пробелы и чистим строку
+     * @param $string
+     * @return string
+     */
+    public static function clearString($string)
+    {
+        // todo - надо проработать пробелы с точкой и запятой, это могут быть цифры или обозначения с децимал. номером
+        //$string = str_replace(".",". ",$string); // Добавляем пробел после точки
+        //$string = str_replace(",",", ",$string); // Добавляем пробел после запятой
+        $string = str_replace("("," (",$string); // Добавляем пробел перед откр скобкой
+        $string = preg_replace('/\s\s+/', ' ', $string); // Удаляем лишние пробелы
+        //$string = preg_replace('(^A-Za-z0-9.,-+)', '', $string); // todo - Удаляем лишние символы
+        $string = ltrim($string); // Удаляем пробел в начале строки
+        $string = rtrim($string); // Удаляем пробел в конце строки
+        $string = str_replace("( ","(",$string); // Удаляем пробел после откр скобки
+        $string = str_replace(" )",")",$string); // Удаляем пробел перед закр скобкой
+        $string = str_replace(" ,",",",$string); // Удаляем пробел перед запятой
+        $string = str_replace(" .",".",$string); // Удаляем пробел перед точкой
+
+        return $string;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -201,6 +232,8 @@ class Func
         elseif ($ButtValue == "Удалить")
             $btn = "<input alt='Delete' title='$ButtValue' type='image' src='img/delete.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Выбрать")
+            $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "Комплектация")
             $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
         return $btn;
     }
