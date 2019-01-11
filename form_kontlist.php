@@ -1,7 +1,4 @@
 <?php
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
 include_once "security.php";
 
 include_once("class_kont.php");

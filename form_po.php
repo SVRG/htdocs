@@ -7,6 +7,7 @@
  * Date: 04/04/18
  * Time: 18:30
  */
+include_once "security.php";
 include_once "class_doc.php";
 include_once "class_org.php";
 

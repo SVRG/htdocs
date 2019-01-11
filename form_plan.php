@@ -1,7 +1,4 @@
 <?php
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
 include_once "security.php";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

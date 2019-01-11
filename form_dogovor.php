@@ -1,14 +1,8 @@
 <?php
-if (!isset($_SESSION)) {
-    session_start();
-}
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
+include_once "security.php";
 
 $UserG = array('admin', 'oper');
 $UserG1 = array('admin', 'oper', 'manager');
-
-include_once "security.php";
 
 include_once("class_doc.php");
 

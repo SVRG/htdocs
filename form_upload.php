@@ -1,8 +1,8 @@
 <?php
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
 include_once "security.php";
+
+if (!isset($_GET['Desc']))
+    exit("Error: Не задан объект");
 
 include_once('class_docum.php');
 include_once('class_doc.php');
@@ -24,7 +24,7 @@ elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
     $Org->kod_org = (int)$_GET['kod_org'];
     $Text = $Org->getFormLink();
 } else {
-    exit("Err: Не задан объект");
+    exit("Error: Не задан объект");
 }
 
 $btn = ''; // Кнопка
@@ -101,7 +101,9 @@ if (isset($_FILES["filename"])) {
         <table width="200" border="0">
             <tr>
                 <td>Примечание</td>
-                <td><input title="prim" name="Type" value="<?php if (isset($Type)) echo (string)$Type; ?>"/>
+                <td><label>
+                        <input title="prim" name="Type" value="<?php if (isset($Type)) echo (string)$Type; ?>"/>
+                    </label>
                 </td>
             </tr>
             <tr>
@@ -113,10 +115,10 @@ if (isset($_FILES["filename"])) {
                 <td><input type="submit" value="Загрузить"/></td>
             </tr>
         </table>
-         <input type="hidden" name="FileAploadConfirm"/>
+        <input type="hidden" name="FileAploadConfirm"/>
     </form>
     <?php
-    if (isset($_FILES["filename"],$_POST['FileAploadConfirm']) and $CopyOK) {
+    if (isset($_FILES["filename"], $_POST['FileAploadConfirm']) and $CopyOK) {
         echo $btn;
         echo("Файл успешно загружен <br>");
         echo("Характеристики файла: <br>");
@@ -126,8 +128,7 @@ if (isset($_FILES["filename"])) {
         echo($_FILES["filename"]["size"]);
     } elseif (isset($_POST['FileAploadConfirm']))
         echo("Ошибка загрузки файла");
-    else
-    {
+    else {
         // ------------------------------------------------------------------------------
         if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
             $btn = Func::ActButton('form_dogovor.php?kod_dogovora=' . $_GET['kod_dogovora'], 'Отмена');

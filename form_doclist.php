@@ -1,7 +1,4 @@
 <?php
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
 include "security.php";
 
 $UserG = array('admin', 'oper');

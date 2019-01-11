@@ -1,12 +1,7 @@
 <?php
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
+include_once "security.php";
 $UserG = array('admin', 'oper', 'manager');
 $UserG1 = array('admin', 'oper');
-
-include_once "security.php";
-
 include_once("class_part.php");
 include_once("class_doc.php");
 

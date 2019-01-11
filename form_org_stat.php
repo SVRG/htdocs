@@ -5,12 +5,8 @@
  * Date: 17/01/18
  * Time: 08:24
  */
-
-$MM_authorizedUsers = "";
-$MM_donotCheckaccess = "true";
-
-include_once "class_org.php";
 include_once "security.php";
+include_once "class_org.php";
 $kod_org = (int)$_GET['kod_org'];
 $org = new Org();
 $org->kod_org = $kod_org;
