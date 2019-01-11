@@ -27,7 +27,7 @@ include "class_part.php";
 
 if (!isset($_GET['kod_part']))
     exit("Не выбрана партия");
-if((int)$_GET['kod_part'] <= 0)
+if ((int)$_GET['kod_part'] <= 0)
     exit("Не выбрана партия");
 
 $kod_part = (int)$_GET['kod_part'];
@@ -40,7 +40,10 @@ if (isset($_POST['Flag'])) {
     if ($_POST['Flag'] == "addItemToSet") {
         $part->addItemToSet((int)$_POST['kod_item'], 1);
     } // Если подтверждение удаления
-    elseif ($_POST['Flag'] == "delItemFromSet") {
+    // Если подтверждение добавления
+    if ($_POST['Flag'] == "addItemToSetAll") {
+        $part->addItemToSet((int)$_POST['kod_item'], 0);
+    } elseif ($_POST['Flag'] == "delItemFromSet") {
         $part->deleteItemFromSet((int)$_POST['kod_item']);
     } // Если подтверждение изменения количества
     elseif ($_POST['Flag'] == "editNumb") {
@@ -56,7 +59,7 @@ $d->kod_dogovora = $part_data['kod_dogovora'];
 $d->getData();
 
 $type = "Счет";
-if(strpos($part_data['nomer'],"НВС") !== false)
+if (strpos($part_data['nomer'], "НВС") !== false)
     $type = "Договор";
 
 echo "<h3>$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQL($d->Data['data_sost']) . " " . $part_data['nazv_krat'] . "</h3>";
@@ -241,13 +244,15 @@ if (isset($_GET['add'])) {
 
         $btn = func::ActButton2("", "Добавить", "addItemToSet", "kod_item", $kod_item);
 
+        $btn_all = func::ActButton2("", "Добавить", "addItemToSetAll", "kod_item", $kod_item);
+
         echo /** @lang HTML */
         "<tr>
                 <td>$n</td>
                 <td>$btn</td>
                 <td>$name</td>
                 <td>$kod_1c</td>
-                <td align='right'>$numb</td>
+                <td align='right'>$numb $btn_all</td>
                 <td align='right'>$prc_p</td>                
           </tr>";
     }

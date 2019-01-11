@@ -1554,8 +1554,10 @@ class Part
 
         $part_data = self::getData($this->kod_part);
 
-        if (!isset($numb) or $numb = 1)
+        if (!isset($numb) or $numb == 1)
             $numb = $part_data['numb'];
+        elseif ($numb == 0)
+            $numb = $numb_1c;
 
         if ($numb > $numb_1c)
             $numb = $numb_1c;
