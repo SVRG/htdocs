@@ -158,12 +158,16 @@ if (isset($_GET['add'])) {
     echo "<h3>Список выбора</h3>";
     $numb_min = $part_data['numb'];
 
+    $where = "";
+    if(isset($_GET['where']))
+        $where = "AND name LIKE '%".$db->real_escape_string($_GET['where'])."%'";
+
     // Список выбора - только те записи, которых нет в комплектации
     if (!isset($_GET['all']))
         $sql = /** @lang MySQL */
             "SELECT * 
                 FROM sklad_1c 
-                WHERE numb>=$numb_min
+                WHERE numb>=$numb_min $where
                 AND kod_1c NOT IN (SELECT part_set.kod_1c FROM part_set WHERE part_set.kod_part=$kod_part AND del=0)
         ORDER BY name ASC;";
     else
