@@ -1623,12 +1623,26 @@ class Part
         $numb_old = $row['numb'];
         $kod_1c = $row['kod_1c'];
 
-        // todo - проверка количества, нельзя взять больше чем есть
+        // todo - должна быть проверка количества, нельзя взять больше чем есть
+        // Проверка - сколько осталось по данным 1С
+        if(!isset($_GET['all'])) {
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT numb FROM sklad_1c WHERE kod_1c=$kod_1c");
+
+            if ($db->cnt > 0) {
+                $row = $rows[0];
+                $numb_1c = $row['numb'];
+                $numb_max = $numb_old + $numb_1c; // Максимальное количество которое можно взять со склада
+
+                if ($numb > $numb_max)
+                    $numb = $numb_max;
+            }
+        }
 
         $db->query(/** @lang MySQL */
-            "UPDATE part_set SET numb=$numb WHERE kod_item=$kod_item");
+            "UPDATE part_set SET numb=$numb,sum=ROUND(price*$numb,2) WHERE kod_item=$kod_item");
 
         $db->query(/** @lang MySQL */
-            "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb) WHERE kod_1c=$kod_1c");
+            "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb), sum=ROUND(price*(numb+$numb_old-$numb),2) WHERE kod_1c=$kod_1c");
     }
 }
