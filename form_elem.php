@@ -57,8 +57,10 @@ if (in_array($_SESSION['MM_UserGroup'], $UserG))
         <tr valign="top">
             <td align="left" bgcolor="#ECEEFD">
                 <?php
+                $link_modif = "<a href='form_nomen.php?kod_elem=$E->kod_elem'><img alt='Modif' title='Посмотреть модификации' src='img/view_properties.png'></a>";
+
                 echo $E->formPhoto() . '<br>';
-                echo $E->formName('all', 1);
+                echo $E->formName('all', 1).$link_modif;
                 echo $E->formPriceList();
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">
