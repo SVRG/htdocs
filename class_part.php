@@ -44,8 +44,7 @@ class Part
         // Если вызов из формы Партия - выводим только Авторасчет
         if ($this->kod_part != 0) {
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
-        }
-        else {
+        } else {
             if (func::user_group() == "admin") // todo - Придумать глобальную политику прав
                 $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
         }
@@ -193,13 +192,13 @@ class Part
             }
 
             // todo - Придумать глобальные права
-            if (isset($_GET['del']))
+            if (isset($_GET['del']) and func::user_group() == "admin")
                 $btn_del = "<div>" . Func::ActButton2('', "Удалить", 'DelPart', 'kod_part_del', $this->kod_part) . "</div>";
 
             $btn_copy_to_doc = $this->formCopyToDoc();
             $form_copy_to_doc = $this->formCopyToDoc(false);
 
-            $btn_set = "<div>". Func::ActButton("form_set.php?kod_part=" . $this->kod_part, 'Комплектация', 'PartSet') ."</div>";
+            $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part, 'Комплектация', 'PartSet') . "</div>";
 
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
@@ -1582,7 +1581,7 @@ class Part
         $numb = func::rnd($row['numb'] - $numb);
 
         $sql = /** @lang MySQL */
-            "UPDATE sklad_1c SET numb=$numb WHERE kod_item=$kod_item";
+            "UPDATE sklad_1c SET numb=$numb, sum=ROUND(price*numb,2) WHERE kod_item=$kod_item";
         $db->query($sql);
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -1599,17 +1598,23 @@ class Part
 
         $rows = $db->rows(/** @lang MySQL */
             "SELECT numb,kod_1c FROM part_set WHERE kod_item=$kod_item");
+
+        if ($db->cnt == 0)
+            return;
+
         $row = $rows[0];
         $numb = $row['numb'];
         $kod_1c = $row['kod_1c'];
 
+        // todo - надо подумать, по идее если на сладе нет, то позицию надо добавить
+
         $db->query(/** @lang MySQL */
-            "UPDATE sklad_1c SET numb=(numb+$numb) WHERE kod_1c=$kod_1c");
+            "UPDATE sklad_1c SET numb=(numb+$numb), sum=ROUND(price*numb,2) WHERE kod_1c=$kod_1c");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Изменение количества позиции
+     * Изменение количества позиции в комплектации
      * @param $kod_item
      * @param $numb
      */
@@ -1625,7 +1630,7 @@ class Part
 
         // todo - должна быть проверка количества, нельзя взять больше чем есть
         // Проверка - сколько осталось по данным 1С
-        if(!isset($_GET['all'])) {
+        if (!isset($_GET['all'])) {
             $rows = $db->rows(/** @lang MySQL */
                 "SELECT numb FROM sklad_1c WHERE kod_1c=$kod_1c");
 
@@ -1644,5 +1649,84 @@ class Part
 
         $db->query(/** @lang MySQL */
             "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb), sum=ROUND(price*(numb+$numb_old-$numb),2) WHERE kod_1c=$kod_1c");
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Список всех сборок
+     * @return string
+     */
+    public static function formSetList()
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT 
+                        kod_dogovora,
+                        nomer,
+                        view_rplan.numb,
+                        kod_org,
+                        nazv_krat,
+                        view_rplan.kod_part,
+                        kod_elem,
+                        modif,
+                        view_rplan.name
+                    FROM view_rplan JOIN part_set ON part_set.kod_part=view_rplan.kod_part 
+                    GROUP BY view_rplan.kod_part;");
+
+        if ($db->cnt == 0)
+            return "Список элементов пуст.";
+
+        $res = /** @lang HTML */
+            "<table width='100%' border='1'>
+                <tr>
+                    <td>№</td>
+                    <td>Организация</td>
+                    <td>Код</td>
+                    <td width='50'>Кол-во</td>
+                    <td>Примечание</td>
+                </tr>";
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $nomer = $row['nomer'];
+            $kod_dogovora = (int)$row['kod_dogovora'];
+            $kod_org = (int)$row['kod_org'];
+            $nazv_krat = $row['nazv_krat'];
+            $kod_part = (int)$row['kod_part'];
+            $name_invoice = Elem::getNameForInvoice($row);
+            $numb = $row['numb'];
+
+            $res .= /** @lang HTML */
+                "<tr>
+                    <td><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'>$nomer</a></td>
+                    <td><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>
+                    <td><a href='form_set.php?kod_part=$kod_part'>$name_invoice</a></td>
+                    <td align='right'>$numb</td>
+                    <td></td>
+                </tr>";
+        }
+        $res .= "</table>";
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Удаление всей комплектации по партии
+     *
+     */
+    public function deleteSet()
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND del=0;");
+        if ($db->cnt == 0)
+            return;
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $kod_item = (int)$row['kod_item'];
+            $this->deleteItemFromSet($kod_item);
+        }
     }
 }

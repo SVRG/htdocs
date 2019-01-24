@@ -25,8 +25,10 @@ include_once "security.php";
  */
 include "class_part.php";
 
-if (!isset($_GET['kod_part']))
-    exit("Не выбрана партия");
+if (!isset($_GET['kod_part'])) {
+    echo Part::formSetList();
+    exit("</body></html>");
+}
 if ((int)$_GET['kod_part'] <= 0)
     exit("Не выбрана партия");
 
@@ -48,6 +50,10 @@ if (isset($_POST['Flag'])) {
     } // Если подтверждение изменения количества
     elseif ($_POST['Flag'] == "editNumb") {
         $part->setItemNumb((int)$_POST['kod_item'], (double)$_POST['numb']);
+    }// Если подтверждение удаления всей комплектации
+    elseif ($_POST['Flag'] == "delSet") {
+        if(func::user_group() == "admin")
+            $part->deleteSet();
     }
 }
 
@@ -66,13 +72,18 @@ echo "<h3>$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQL($d
 echo "<h3>" . $elem::getNameForInvoice($part_data) . " - " . $part_data['numb'] . " шт. (Сумма: " . func::Rub($part_data['sum_part']) . ")</h3>";
 
 $db = new Db();
-$where = "";
 
 // Комплектация
 $rows = $db->rows(/** @lang MySQL */
     "SELECT * FROM part_set WHERE kod_part=$kod_part AND del=0;");
 if ($db->cnt == 0)
     echo "Нет данных";
+elseif(func::user_group() == "admin" and isset($_GET['del']))
+        echo func::ActButton2("", "Удалить", "delSet", "kod_part", $kod_part);
+
+$price_row = ""; // Цена
+if (isset($_GET['price']))
+    $price_row = "<td width='100'>Цена</td>";
 
 $line = "<table width='100%' border='1'>
         <tr>
@@ -80,6 +91,7 @@ $line = "<table width='100%' border='1'>
         <td>Наименование</td>
         <td>Код</td>
         <td width='50'>Кол-во</td>
+        $price_row
 </tr>";
 echo $line;
 
@@ -126,12 +138,19 @@ for ($i = 0; $i < $db->cnt; $i++) {
                 $btn_edit .= func::Cansel();
             }
 
+    $price_row = ""; // Цена
+    if (isset($_GET['price'])) {
+        $price = func::rnd($row['price'] * (100 + config::$nds_main) / 100); // Цена позиции
+        $price_row = "<td align='right'>" . func::Rub($price) . "</td>"; //
+    }
+
     $line = /** @lang HTML */
         "<tr>
                 <td>$n $btn</td>
                 <td>$name</td>
                 <td>$kod_1c</td>
                 <td align='right'>$numb $btn_edit</td>
+                $price_row
           </tr>";
     echo $line;
     $res .= $line . "\n";
@@ -158,9 +177,22 @@ if (isset($_GET['add'])) {
     echo "<h3>Список выбора</h3>";
     $numb_min = $part_data['numb'];
 
+    $search = "";
+    if (isset($_POST['search']))
+        $search = func::clearString($_POST['search']);
+    elseif (isset($_SESSION['search']))
+        $search = func::clearString($_SESSION['search']);
+
     $where = "";
-    if(isset($_GET['where']))
-        $where = "AND name LIKE '%".$db->real_escape_string($_GET['where'])."%'";
+    if ($search != "") {
+        $where = "AND name LIKE '%" . $db->real_escape_string($search) . "%'";
+
+        if(isset($_GET['all']))
+            $where = "WHERE name LIKE '%" . $db->real_escape_string($search) . "%'";
+        $_SESSION['search'] = $search;
+    }
+    else
+        unset($_SESSION['search']);
 
     // Список выбора - только те записи, которых нет в комплектации
     if (!isset($_GET['all']))
@@ -173,9 +205,19 @@ if (isset($_GET['add'])) {
     else
         $sql = /** @lang MySQL */
             "SELECT * 
-                FROM sklad_1c
+                FROM sklad_1c $where
               ORDER BY name ASC;";
     $rows = $db->rows($sql);
+
+    echo /** @lang HTML */
+    "<form method='post'>
+        <table border='0'>
+        <tr>
+        <td><label>Фильтр </label><input type='text' name='search' value='$search'></td>
+        <td><input type='submit' value='Применить'></td>
+        </tr>
+        </table>
+     </form>";
 
     // Автокоплит
     $res = /** @lang HTML */
@@ -210,10 +252,14 @@ if (isset($_GET['add'])) {
                         kod_item = $kod_item_str[0].selectize;
                 </script>';
     echo $res;
-    // Атокомплит
+    // Автокомплит
 
     if ($db->cnt == 0)
         exit("Нет данных");
+
+    $price_row = ""; // Цена
+    if (isset($_GET['price']))
+        $price_row = "<td width='100'>Цена</td>";
 
     echo "<table width='100%' border='1'>
         <tr>
@@ -223,6 +269,7 @@ if (isset($_GET['add'])) {
         <td>Код</td>
         <td width='50'>Кол-во</td>
         <td width='50'>%</td>
+        $price_row
         </tr>";
 
     for ($i = 0; $i < $db->cnt; $i++) {
@@ -232,6 +279,10 @@ if (isset($_GET['add'])) {
         $kod_1c = $row['kod_1c'];
         $numb = $row['numb'];
         $price = func::rnd($row['price'] * (100 + config::$nds_main) / 100); // Цена позиции
+
+        $price_row = ""; // Цена
+        if (isset($_GET['price']))
+            $price_row = "<td align='right'>" . func::Rub($price) . "</td>"; //
 
         if ($numb >= $part_data['numb'])
             $sum_item = func::rnd($price * $part_data['numb']); // Сумма позиции, которая может быть добавлена к комплектации
@@ -257,7 +308,8 @@ if (isset($_GET['add'])) {
                 <td>$name</td>
                 <td>$kod_1c</td>
                 <td align='right'>$numb $btn_all</td>
-                <td align='right'>$prc_p</td>                
+                <td align='right'>$prc_p</td>   
+                $price_row             
           </tr>";
     }
     echo "</table>";
