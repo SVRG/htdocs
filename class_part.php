@@ -1383,6 +1383,9 @@ class Part
         if ($btb)
             return "<div>" . Func::ActButton2('', "Копировать", 'CopyPart', 'kod_part_copy', $this->kod_part) . "</div>";
 
+        $data = self::getData($this->kod_part);
+        $kod_dogovora = $data['kod_dogovora'];
+
         $res = "";
         if (isset($_POST['Flag'], $_POST['kod_part_copy']))
             if ($_POST['Flag'] == "CopyPart" and (int)$_POST['kod_part_copy'] == $this->kod_part) {
@@ -1392,7 +1395,7 @@ class Part
                 $res = /** @lang HTML */
                     "<div>
                         <form method='post'>
-                        " . Doc::formSelList($rows_doc, 0) . "
+                        " . Doc::formSelList($rows_doc, $kod_dogovora) . "
                         <input type='hidden' name='kod_part_copy' value='$this->kod_part'>
                         <input type='hidden' name='Flag' value='CopyPartToDoc'>
                         <input type='submit' value='Копировать'>
