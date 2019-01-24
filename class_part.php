@@ -1367,10 +1367,12 @@ class Part
         $kod_dogovora = (int)$kod_dogovora;
         $data_postav = date("Y-m-d");
 
+        $nds = config::$nds_main;
+
         $db = new Db();
         $db->query(/** @lang MySQL */
             "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,sum_part,modif,nds,val,kod_user,price_or,data_nach) 
-                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,sum_part,modif,nds,val,$kod_user,price_or,data_nach 
+                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
     }
 //-----------------------------------------------------------------------

@@ -91,16 +91,12 @@ class Org
 
             $res .= "<option value='$kod_org' $selected>$name</option>\r\n";
         }
-        $res .= '</select>
-        <script type="text/javascript">
-                        var kod_org, $kod_org;
-    
-                        $kod_org = $("#kod_org").selectize({
-                            onChange: function(value) {
-            if (!value.length) return;
-        }
-                        });
-                        kod_org = $kod_org[0].selectize;
+        $res .= /** @lang HTML */
+            '</select>
+                <script type="text/javascript">
+                   var kod_org, $kod_org;    
+                   $kod_org = $("#kod_org").selectize({onChange: function(value) {if (!value.length) return;}});
+                   kod_org = $kod_org[0].selectize;
                 </script>';
 
         return $res;
