@@ -11,6 +11,7 @@ class Kontakt
     public $Name;
     public $OrgName;
     public $KontArray;// Массив контактов по Договору
+    private $max_str_length = 30; // Максимальная длина строки
 
 //------------------------------------------------------------------------
 
@@ -297,14 +298,19 @@ class Kontakt
 
             // Только оригинальные имена
             if (!in_array($row['famil'] . $row['name'] . $row['otch'], $exc)) {
+
+                $dolg = func::clearString($row['dolg']);
+                if(strlen($dolg)>$this->max_str_length) // Если должность длиннее максимальной строки
+                    $dolg = mb_substr($dolg,0,$this->max_str_length,'UTF-8')."...";
+
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
                 $res .= /** @lang HTML */
                     '<option value="' . $row['kod_kontakta'] . '">' .
                     Func::Mstr($row['famil']) . ' ' .
                     Func::Mstr($row['name']) . ' ' .
-                    Func::Mstr($row['otch']) . ' ' .
-                    Func::Mstr($row['dolg'])
+                    Func::Mstr($row['otch']) . ' - ' .
+                    $dolg
                     . '</option>';
             }
         }
