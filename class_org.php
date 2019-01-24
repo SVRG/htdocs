@@ -7,6 +7,7 @@ class Org
 {
     public $kod_org = 0; // Идентификатор
     public $Data;
+    public $max_str_length = 30;
 
 //-----------------------------------------------------------
 
@@ -45,7 +46,13 @@ class Org
             if ($Name !== '')
                 $N = ' - ' . $row['nazv_krat'];
 
-            $res .= "<option $sel value='$kod_org'>$poisk $N</option>";
+            $search_name = "$poisk $N";
+
+            $search_name = func::clearString($search_name);
+            if(strlen($search_name)>50) // Если должность длиннее максимальной строки
+                $search_name = mb_substr($search_name,0,50,'UTF-8')."...";
+
+            $res .= "<option $sel value='$kod_org'>$search_name</option>";
 
         }
 

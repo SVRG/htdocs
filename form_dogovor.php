@@ -44,13 +44,11 @@ if (isset($_POST['DelDocum'])) {
 <html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title><?php echo $Dogovor->Data['nomer'] ?></title>
-    <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-    <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
-
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Test</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+    <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="widgets/selectize/dist/js/standalone/selectize.js"></script>
     <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">

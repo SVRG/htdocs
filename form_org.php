@@ -37,6 +37,10 @@ Docum::Events();
     <link href="widgets/SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css"/>
     <script src="widgets/SpryAssets/SpryCollapsiblePanel.js" type="text/javascript"></script>
     <link href="widgets/SpryAssets/SpryCollapsiblePanel.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="widgets/selectize/dist/js/standalone/selectize.js"></script>
+    <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
 </head>
 <body>
 <?php include("header.php"); ?>
