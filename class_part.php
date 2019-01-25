@@ -1555,10 +1555,14 @@ class Part
             exit("Список элементов пуст.");
 
         $row = $rows[0];
+
+        $numb_1c = $row['numb'];
+        if($numb_1c < 0.001) // Если брать нечего
+            return;
+
         $name = $row['name'];
         $kod_1c = $row['kod_1c'];
         $price = $row['price'];
-        $numb_1c = $row['numb'];
 
         $part_data = self::getData($this->kod_part);
 
