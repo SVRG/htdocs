@@ -57,6 +57,13 @@ if (isset($_POST['Flag'])) {
     }
 }
 
+if(func::user_group() == "admin") {
+    if (isset($_GET['copyFrom'])) {
+        $kod_part_source = (int)$_GET['copyFrom'];
+        $part->copyItemsToPart($kod_part_source);
+    }
+}
+
 $elem = new Elem();
 $elem->kod_elem = $part_data['kod_elem'];
 

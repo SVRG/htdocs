@@ -1367,12 +1367,16 @@ class Part
         $kod_dogovora = (int)$kod_dogovora;
         $data_postav = date("Y-m-d");
 
-        $nds = config::$nds_main;
+        $data = self::getData($kod_part);
+        $nds = config::$nds_main; // Подставляем текущий НДС
+        $price = $data['price'];
+        $price_it = func::rnd($price*(100+$nds)/100);
+        $sum_part = func::rnd($price_it*$data['numb']);
 
         $db = new Db();
         $db->query(/** @lang MySQL */
             "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,sum_part,modif,nds,val,kod_user,price_or,data_nach) 
-                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,price_it,sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
+                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,$price_it,$sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
     }
 //-----------------------------------------------------------------------
@@ -1734,4 +1738,38 @@ class Part
             $this->deleteItemFromSet($kod_item);
         }
     }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Копирует состав комплектации из партии источника в текущую партию
+     * @param $kod_part_source - код источника
+     */
+    public function copyItemsToPart($kod_part_source)
+    {
+        $data = self::getData($this->kod_part);
+        $numb = $data['numb'];
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_set WHERE kod_part=$kod_part_source AND del=0;");
+        if ($db->cnt == 0)
+            return;
+
+        $cnt = $db->cnt;
+
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $kod_1c = (int)$row['kod_1c'];
+
+            $rows_1c = $db->rows(/** @lang MySQL */
+                "SELECT * FROM sklad_1c WHERE kod_1c=$kod_1c;");
+            if($db->cnt == 0)
+                continue;
+
+            $kod_item = $rows_1c[0]['kod_item'];
+
+            $this->addItemToSet($kod_item,$numb);
+        }
+    }
+
 }
