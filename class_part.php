@@ -695,7 +695,7 @@ class Part
      * @param float $price_or - ориентировочная цена
      * @param string $data_nach - дата начала этапа
      */
-    public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = 0.18, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
+    public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = 0.2, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
         $data_postav = func::Date_to_MySQL($data_postav);
 
@@ -709,8 +709,7 @@ class Part
         $price_it = func::rnd($price * (100 + $nds) / 100);
 
         if ($price < config::$min_price) { // Если цена не задана
-            Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
-            $price_it = func::rnd($price * (100 + $nds) / 100); // Цена с НДС
+            $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
         } elseif (isset($_POST['nds_yn']))
             if ((int)$_POST['nds_yn'] == 1) { // Если указана цена с НДС
                 $price_it = $price; // Цена с НДС
