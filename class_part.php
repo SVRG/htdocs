@@ -710,6 +710,7 @@ class Part
 
         if ($price < config::$min_price) { // Если цена не задана
             $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
+            $price = func::rnd($price_it * 100 / (100 + $nds)); // Цена без НДС
         } elseif (isset($_POST['nds_yn']))
             if ((int)$_POST['nds_yn'] == 1) { // Если указана цена с НДС
                 $price_it = $price; // Цена с НДС

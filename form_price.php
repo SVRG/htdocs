@@ -8,7 +8,7 @@ include_once "class_db.php";
 <!-- DW6 -->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>План поставок CSM</title>
+    <title>Прайс-лист</title>
 </head>
 <body>
 <?php include("header.php"); ?>
@@ -23,7 +23,7 @@ include_once "class_db.php";
                     FROM price_list
                     JOIN elem ON elem.kod_elem=price_list.kod_elem
                     WHERE price_list.del=0
-                    ORDER BY elem.kod_elem ASC
+                    ORDER BY elem.name ASC
         ");
 
         echo "<table width='100%' border='1' cellspacing='0'>";
@@ -45,9 +45,23 @@ include_once "class_db.php";
             $date = func::Date_from_MySQL($row['time_stamp']);
             $kod_elem = $row['kod_elem'];
 
+            $rows2 = $db->rows("SELECT *
+                                        FROM view_rplan
+                                        WHERE kod_elem=$kod_elem AND kod_ispolnit=683 AND numb_otgruz>0
+                                        ORDER BY kod_part DESC;");
+            $last_price = "";
+            for($j=0;$j<$db->cnt;$j++)
+            {
+                $row2 = $rows2[$j];
+                $last_price .= func::Rub($row2['price_it'])."<br>";
+
+                if($j >= 5)
+                    break;
+            }
+
             echo "<tr>
                     <td><a href='form_elem.php?kod_elem=$kod_elem'>$name</a></td>
-                    <td>$price</td>
+                    <td><b>$price</b><br>$last_price</td>
                     <td>$quantity</td>
                     <td>$date</td>
                 </td>";
