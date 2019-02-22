@@ -135,6 +135,7 @@ class Elem
             $all = true;
 
         $btn = "";
+        // todo - придумать глобальную политику прав
         if($_SESSION['MM_UserGroup'] == "admin")
             $btn =  Func::ActButton('', 'Добавить Элемент', 'formAdd');
 
@@ -236,7 +237,7 @@ class Elem
 //----------------------------------------------------------------------
 //
     /**
-     * Вывод списка-выбора Элементов
+     * Вывод списка-выбора Элементов с автозаполнением
      * @return string
      */
     public function formSelList2()
@@ -251,8 +252,9 @@ class Elem
         if ($db->cnt == 0)
             return "";
 
-        $res = "<select id='kod_elem' name='kod_elem' placeholder=\"Выбрать элемент...\">
-";
+        $res = /** @lang HTML */
+            "<select id='kod_elem' name='kod_elem' placeholder=\"Выбрать элемент...\">
+                ";
         for ($i = 0; $i < $db->cnt; $i++) {
             $name = self::getSearchName($rows[$i]);
             $kod_elem = $rows[$i]['kod_elem'];
@@ -405,7 +407,7 @@ class Elem
             $numb = (int)$row['numb'];
             $kod_org = (int)$row['kod_org'];
 
-            $org_link = "form_org.php?kod_org=" . $kod_org;
+            $org_link = "form_elem.php?kod_elem=$this->kod_elem&kod_org=" . $kod_org;
 
             $res .= "<tr>
                         <td><a href='$org_link'> $nazv_krat </a></td>
@@ -942,7 +944,7 @@ class Elem
     {
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ");
+            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ",1);
 
         if($db->cnt==0)
             return 0.;
@@ -1111,5 +1113,57 @@ class Elem
             return $row['name']." (".$rplan_row['modif'].")";
 
         return str_replace("[Mod]",$rplan_row['modif'],$row['shablon']);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Шаблон комплектации элемента - подбор позиций из 1с в соотвествии с заданным шаблоном
+     *
+     */
+    public function formElemSetTemplate()
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM elem_set_template WHERE kod_elem=$this->kod_elem AND del=0;");
+        if($db->cnt == 0)
+            return "Список пуст";
+
+        $res = /** @lang HTML */
+            "<table>
+                <tr>
+                   <td>Наименование</td>
+                   <td>Кол-во</td>
+                   <td>Список</td>
+             </tr>";
+        $cnt = $db->cnt;
+
+        for($i=0;$i<$cnt;$i++)
+        {
+            $row = $rows[$i];
+            $name = $row['name'];
+            $numb = $row['numb'];
+
+            $list = "";
+
+            $rows_n = $db->rows(/** @lang MySQL */
+                "SELECT * FROM sklad_1c WHERE name LIKE name;");
+
+            for($j=0;$j<$db->cnt;$j++)
+            {
+                $row_n = $rows_n[$j];
+                $list .= $row_n['name'];
+            }
+
+            $res .= /** @lang HTML */
+                "<tr>
+                    <td>$name</td>
+                    <td>$numb</td>
+                    <td>$list</td>
+                </tr>";
+        }
+
+        $res .= /** @lang HTML */
+            "</table>";
+        return $res;
     }
 }
