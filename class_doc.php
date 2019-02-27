@@ -2214,7 +2214,7 @@ class Doc
      * @param $data_sost
      * @param int $kod_org - Код организации Заказчика
      * @param int $kod_ispolnit
-     * @param int $doc_type
+     * @param int $doc_type : 1 = "Contract", 2 = "Order Confirmation", 3 = "PO", 4 = "Quotation", 5 = "RFQ"
      * @return int
      */
     public function Add($nomer, $data_sost, $kod_org, $kod_ispolnit, $doc_type = 1)
@@ -2235,6 +2235,13 @@ class Doc
             $nomer = self::getNextSchetNomer();
 
         $nomer = $db->real_escape_string($nomer);
+
+        if ($nomer == "PO")
+            $doc_type = 3;
+        elseif ($nomer == "Q")
+            $doc_type = 4;
+        elseif ($nomer == "RFQ")
+            $doc_type = 5;
 
         $sql = /** @lang MySQL */
             "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user,doc_type) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user,$doc_type)";
