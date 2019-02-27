@@ -244,13 +244,14 @@ class Func
      * @param string $Act
      * @param string $ButtValue
      * @param string $FlagVal
+     * @param string $form_option например target='_blank'
      * @return string
      */
-    public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act')
+    public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act', $form_option='')
     {
         $btn = self::btnImage($ButtValue);
 
-        $res = "<form name='FNAME' method='POST' action='$Act '>
+        $res = "<form name='FNAME' method='POST' action='$Act ' $form_option>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                    $btn
                 </form>";

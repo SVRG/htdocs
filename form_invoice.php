@@ -126,7 +126,6 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         echo "<tr bgcolor='#f5f5f5'>
             <td width='30'>№</td>
             <td>Наименование</td>
-            <td width='30'>Ед. изм.</td>
             <td width='70'>Кол-во</td>
           </tr>";
     else
@@ -180,7 +179,6 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             echo "<tr>
             <td align='center'>$n</td>
             <td align='left'>$name</td>
-            <td>шт.</td>
             <td align='center'>$numb</td>
           </tr>";
         else
