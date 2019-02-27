@@ -16,16 +16,16 @@ $D = new Doc();
 $D->kod_dogovora = (int)$_GET['kod_dogovora'];
 $D->getData();
 $doc_type = (int)$D->Data['doc_type'];
-if($doc_type==1)
-    $nomer = "Счет №".$D->Data['nomer'];
-elseif ($doc_type==2)
-    $nomer = "Подтверждение заказа №OC-".$D->kod_dogovora;
-elseif ($doc_type==3)
-    $nomer = "Заказ №PO-".$D->kod_dogovora;
-elseif ($doc_type==4)
-    $nomer = "Предложение №QT-".$D->kod_dogovora;
-elseif ($doc_type==5)
-    $nomer = "Запрос №RFQ-".$D->kod_dogovora;
+if ($doc_type == 1)
+    $nomer = "Счет №" . $D->Data['nomer'];
+elseif ($doc_type == 2)
+    $nomer = "Подтверждение заказа №OC-" . $D->kod_dogovora;
+elseif ($doc_type == 3)
+    $nomer = "Заказ №PO-" . $D->kod_dogovora;
+elseif ($doc_type == 4)
+    $nomer = "Предложение №QT-" . $D->kod_dogovora;
+elseif ($doc_type == 5)
+    $nomer = "Запрос №RFQ-" . $D->kod_dogovora;
 
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
@@ -40,7 +40,7 @@ if (isset($_GET['kod_scheta'])) {
 
     if ($db->cnt > 0) {
         $schet_data = $rows[0];
-        $nomer = "Счет №".$schet_data['nomer'];
+        $nomer = "Счет №" . $schet_data['nomer'];
         $data_sost = func::Date_from_MySQL($schet_data['data']);
     }
 }
@@ -52,7 +52,8 @@ if (isset($_GET['kod_scheta'])) {
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="menu/print.css">
-    <title><?php $nomer_str = str_replace('/','_',$nomer); echo "$nomer_str от $data_sost"; ?></title>
+    <title><?php $nomer_str = str_replace('/', '_', $nomer);
+        echo "$nomer_str от $data_sost"; ?></title>
 </head>
 <body>
 <br>
@@ -69,7 +70,7 @@ $dogovor_nomer = "";
 if (isset($_GET['kod_scheta']))
     $dogovor_nomer = '<br>Договор: №' . $D->Data['nomer'] . ' от ' . func::Date_from_MySQL($D->Data['data_sost']);
 
-echo "<br><b>ИНН" . $Isp->Data['inn'] . " КПП" . $Isp->Data['kpp'] . "</b><br>";
+echo "<br><b>ИНН " . $Isp->Data['inn'] . " КПП " . $Isp->Data['kpp'] . "<br>" . config::$invoice_header . "</b><br>";
 
 $db = new Db();
 // Адрес Поставщика
@@ -107,10 +108,13 @@ $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];
 
 echo "<h3>$nomer от $data_sost</h3>";
-echo "Заказчик: " . $D->Data['nazv_krat'];
+if (isset($_GET['pl'])) // Paking List
+    echo "Грузополуччатель: " . $D->Data['nazv_krat'];
+else
+    echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " . $adres;
 echo $dogovor_nomer;
-echo "<table border='1' cellspacing='0' cellpadding='3'>";
+echo "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
 
 $total_nds = 0;
 $total_summ = 0;
@@ -118,7 +122,15 @@ $total_summ_with_nds = 0;
 
 if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставлен по договору
 
-    echo "<tr bgcolor='#f5f5f5'>
+    if (isset($_GET['pl']))  // Paking List
+        echo "<tr bgcolor='#f5f5f5'>
+            <td width='30'>№</td>
+            <td>Наименование</td>
+            <td width='30'>Ед. изм.</td>
+            <td width='70'>Кол-во</td>
+          </tr>";
+    else
+        echo "<tr bgcolor='#f5f5f5'>
             <td width='30'>№</td>
             <td>Наименование</td>
             <td width='30'>Ед. изм.</td>
@@ -127,7 +139,13 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             <td>Сумма с НДС</td>
           </tr>";
 
-    $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
+    if (isset($_GET['kod_part']))
+    {
+        $kod_part = (int)$_GET['kod_part'];
+        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$kod_part");
+    }
+    else
+        $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
     $cnt = $db->cnt;
 
     if ($cnt == 0)
@@ -143,8 +161,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $numb = func::rnd($row['numb']);                                // Количество
         $sum_part = $row["sum_part"];                      // Сумма партии с НДС
         $nds = func::rnd($row['nds']);                            // Ставка НДС
-        $summ_nds = func::rnd($sum_part*$nds/(100+$nds));   // Сумма НДС
-        $summ = $sum_part-$summ_nds;                               // Сумма без НДС
+        $summ_nds = func::rnd($sum_part * $nds / (100 + $nds));   // Сумма НДС
+        $summ = $sum_part - $summ_nds;                               // Сумма без НДС
 
         $total_nds += $summ_nds;
         $total_summ += $summ;
@@ -157,7 +175,16 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $summ_with_nds_str = func::Rub($sum_part);
 
         $n = $i + 1;
-        echo "<tr>
+
+        if (isset($_GET['pl']))  // Paking List
+            echo "<tr>
+            <td align='center'>$n</td>
+            <td align='left'>$name</td>
+            <td>шт.</td>
+            <td align='center'>$numb</td>
+          </tr>";
+        else
+            echo "<tr>
             <td align='center'>$n</td>
             <td align='left'>$name</td>
             <td>шт.</td>
@@ -172,14 +199,19 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     $total_nds_text = func::num2str($total_nds);
     $total_nds = func::Rub($total_nds);
 
-    echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
-    echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
-    echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
-    echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
-    if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
-        echo "<tr><th colspan='6' align='left'>$text</th></tr>";
-    echo "</table>";
-    echo "<br>";
+    if (isset($_GET['pl'])) {  // Paking List
+        echo "</table>";
+        echo "<br>";
+    } else {
+        echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
+        echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
+        echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
+        echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
+        if ($D->Data['kod_ispolnit'] == config::$kod_org_main)
+            echo "<tr><th colspan='6' align='left'>$text</th></tr>";
+        echo "</table>";
+        echo "<br>";
+    }
 } else {
 
     echo "<tr bgcolor='#f5f5f5'>
@@ -240,7 +272,7 @@ if (isset($_GET['p']) and $D->Data['kod_ispolnit'] == config::$kod_org_main) {
                 <td>_______________ </td>
                 <td>$invoice_sign_gb</td>
             </tr>";
-} elseif ($D->Data['kod_ispolnit'] == config::$kod_org_main) {
+} elseif ($D->Data['kod_ispolnit'] == config::$kod_org_main and !isset($_GET['pl'])) {
     echo /** @lang HTML */
     "<img alt='sign' src='img/sign.png' width='776'>";
 }

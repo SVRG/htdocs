@@ -199,11 +199,13 @@ class Part
             $form_copy_to_doc = $this->formCopyToDoc(false);
 
             $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part, 'Комплектация', 'PartSet') . "</div>";
+            $btn_pl = "<a target='_blank' href='form_invoice.php?pl&kod_part=$this->kod_part&kod_dogovora=".$row['kod_dogovora']."'>PL</a>";
 
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
                     <div>$btn_edit</div>
                     <div>$prim</div>
+                    <div>$btn_pl</div>
                     $btn_del $btn_rfq $btn_po $btn_copy_to_doc $btn_set
                 </div>";
 
