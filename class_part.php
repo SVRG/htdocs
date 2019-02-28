@@ -1684,10 +1684,12 @@ class Part
                         view_rplan.kod_part,
                         kod_elem,
                         modif,
+                        MAX(kod_item) AS kod_item,
                         view_rplan.name
                     FROM view_rplan JOIN part_set ON part_set.kod_part=view_rplan.kod_part
                     WHERE part_set.del=0
-                    GROUP BY view_rplan.kod_part;");
+                    GROUP BY view_rplan.kod_part
+                    ORDER BY kod_item DESC;");
 
         if ($db->cnt == 0)
             return "Список элементов пуст.";
