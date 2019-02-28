@@ -22,7 +22,11 @@
                 <li><a href="../form_orglist.php?pays">Рейтинг <?php echo date("Y"); ?></a></li>
             </ul>
         </li>
-        <li><a href="../form_nomen.php">Номенклатура</a></li>
+        <li><a href="../form_nomen.php">Номенклатура</a>
+            <ul>
+                <li><a href="../form_set.php">Сборки</a></li>
+            </ul>
+        </li>
         <li><a href="../form_pays.php">Платежи</a>
             <ul>
                 <li><a href="../form_pays.php?VN">Исходящие</a></li>

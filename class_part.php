@@ -1701,7 +1701,6 @@ class Part
                     <td>Организация</td>
                     <td>Код</td>
                     <td width='50'>Кол-во</td>
-                    <td>Примечание</td>
                 </tr>";
 
         for ($i = 0; $i < $db->cnt; $i++) {
@@ -1720,7 +1719,6 @@ class Part
                     <td><a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a></td>
                     <td><a href='form_set.php?kod_part=$kod_part'>$name_invoice</a></td>
                     <td align='right'>$numb</td>
-                    <td></td>
                 </tr>";
         }
         $res .= "</table>";
