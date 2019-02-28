@@ -1685,7 +1685,8 @@ class Part
                         kod_elem,
                         modif,
                         view_rplan.name
-                    FROM view_rplan JOIN part_set ON part_set.kod_part=view_rplan.kod_part 
+                    FROM view_rplan JOIN part_set ON part_set.kod_part=view_rplan.kod_part
+                    WHERE part_set.del=0
                     GROUP BY view_rplan.kod_part;");
 
         if ($db->cnt == 0)
