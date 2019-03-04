@@ -2238,7 +2238,7 @@ class Doc
 
         if ($nomer == "PO")
             $doc_type = 3;
-        elseif ($nomer == "Q")
+        elseif ($nomer == "QT")
             $doc_type = 4;
         elseif ($nomer == "RFQ")
             $doc_type = 5;
@@ -2669,6 +2669,13 @@ class Doc
             $nomer = self::getNextSchetNomer();
 
         $nomer = $db->real_escape_string($nomer);
+
+        if ($nomer == "PO")
+            $doc_type = 3;
+        elseif ($nomer == "QT")
+            $doc_type = 4;
+        elseif ($nomer == "RFQ")
+            $doc_type = 5;
 
         $db::getHistoryString("dogovory", "kod_dogovora", $this->kod_dogovora);
 
