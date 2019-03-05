@@ -2185,12 +2185,13 @@ class Doc
 
         $this->getData();
         $nomer = $this->Data['nomer'] . " copy";
-        if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false))
+
+        if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false) and (int)$this->Data['doc_type'] == 1)
             $nomer = $this->getNextSchetNomer();
         $nomer = $db->real_escape_string($nomer);
         $db->query(/** @lang MySQL */
-            "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user) 
-                      SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user 
+            "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user, doc_type) 
+                      SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user,doc_type
                       FROM dogovory
                       WHERE kod_dogovora=$kod_dogovora");
         $kod_dogovora_new = $db->last_id;
