@@ -172,6 +172,8 @@ $res .= $line . "\n";
 //echo func::Rub($sum); // Без НДС
 $sum_it = func::rnd($sum * (100 + config::$nds_main) / 100); // Сумма комплектации с НДС
 $ostat = $part_data['sum_part'] - $sum_it;
+if($part_data['sum_part'] == 0)
+    $part_data['sum_part'] = 1;
 $prc = func::rnd((100 * $ostat) / $part_data['sum_part']);
 $ostat_str = func::Rub($ostat); // Преобразуем в строку
 echo "Сумма комплектации с НДС: " . func::Rub($sum_it) . " (Прибыль: $ostat_str / $prc%)"; // Сумма с НДС
