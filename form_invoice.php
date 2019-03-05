@@ -109,7 +109,7 @@ $Org->kod_org = $D->Data['kod_org'];
 
 echo "<h3>$nomer от $data_sost</h3>";
 if (isset($_GET['pl'])) // Paking List
-    echo "Грузополуччатель: " . $D->Data['nazv_krat'];
+    echo "<h2>" . $D->Data['nazv_krat'] . "</h2>";
 else
     echo "Заказчик: " . $D->Data['nazv_krat'];
 echo "<br>Юридический адрес: " . $adres;
@@ -138,12 +138,10 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
             <td>Сумма с НДС</td>
           </tr>";
 
-    if (isset($_GET['kod_part']))
-    {
+    if (isset($_GET['kod_part'])) {
         $kod_part = (int)$_GET['kod_part'];
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_part=$kod_part");
-    }
-    else
+    } else
         $rows = $db->rows("SELECT * FROM view_rplan WHERE kod_dogovora=$D->kod_dogovora");
     $cnt = $db->cnt;
 
