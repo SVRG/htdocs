@@ -143,7 +143,27 @@ class Kontakt
                     $d->getData((int)$_GET['kod_dogovora']);
                     $nomer = $d->Data['nomer'];
                     $data_sost = func::Date_from_MySQL($d->Data['data_sost']);
-                    $dogovor = "Счет №$nomer от $data_sost";
+
+                    $type = "Счет";
+                    if((int)$d->Data['doc_type'] > 1) {
+                        $nomer = $d->Data['kod_dogovora'];
+                        switch ((int)$d->Data['doc_type']) {
+                            case 2:
+                                $type = "Подтверждение";
+                                break;
+                            case 3:
+                                $type = "Заказ";
+                                break;
+                            case 4:
+                                $type = "Предложение";
+                                break;
+                            case 5:
+                                $type = "Запрос";
+                                break;
+                        }
+                    }
+
+                    $dogovor = "$type №$nomer от $data_sost";
                 }
 
                 $res .= '<tr>
