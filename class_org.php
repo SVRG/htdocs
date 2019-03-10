@@ -65,22 +65,24 @@ class Org
     /**
      * Вывод списка-выбора контрагента
      * @param int $kod_org_selected - выбранный элемент
+     * @param $rows
      * @return string
      */
-    public static function formSelList2($kod_org_selected = 0)
+    public static function formSelList2($kod_org_selected = 0, $rows = [])
     {
-        $db = new Db();
+        if(count($rows) == 0) {
+            $db = new Db();
 
-        $sql = /** @lang MySQL */
-            "SELECT * FROM org WHERE del=0 ORDER BY poisk;";
+            $sql = /** @lang MySQL */
+                "SELECT * FROM org WHERE del=0 ORDER BY poisk;";
 
-        $rows = $db->rows($sql);
+            $rows = $db->rows($sql);
 
-        if ($db->cnt == 0)
-            return "";
+            if ($db->cnt == 0)
+                return "";
+        }
 
-        $res = "<select id='kod_org' name='kod_org' placeholder=\"Выбрать контрагента...\">
-";
+        $res = "<select id='kod_org' name='kod_org' placeholder=\"Выбрать контрагента...\">";
         for ($i = 0; $i < $db->cnt; $i++) {
             $name = self::getSearchName($rows[$i]);
             $kod_org = $rows[$i]['kod_org'];

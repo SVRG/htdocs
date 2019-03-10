@@ -183,13 +183,6 @@ class Part
             // todo - Придумать ограничение на редактирование/удаление если была оплата (не выводить кнопку редактирования)
             $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
             $btn_del = "";
-            $btn_po = "";
-            $btn_rfq = "";
-            $kod_org_main = config::$kod_org_main;
-            if ($row['kod_org'] == $kod_org_main) {
-                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '&kod_part=' . $row['kod_part'] . '"><img alt="RFQ" title="RFQ" src="img/rfq.png"></a></div>';
-                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '&kod_part=' . $row['kod_part'] . '"><img alt="PO" title="PO" src="img/po.png"></a></div>';
-            }
 
             // todo - Придумать глобальные права
             if (isset($_GET['del']) and func::user_group() == "admin")
@@ -197,27 +190,29 @@ class Part
 
             $btn_copy_to_doc = $this->formCopyToDoc();
             $form_copy_to_doc = $this->formCopyToDoc(false);
-
-            $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part . "&add", 'Комплектация', 'PartSet',"target='_blank'") . "</div>";
-            $btn_pl = "<a target='_blank' href='form_invoice.php?pl&kod_part=$this->kod_part&kod_dogovora=".$row['kod_dogovora']."'>PL</a>";
+            $btn_pl = "<a target='_blank' href='form_invoice.php?pl&kod_part=$this->kod_part&kod_dogovora=" . $row['kod_dogovora'] . "'>PL</a>";
+            $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part . "&add", 'Комплектация', 'PartSet', "target='_blank'") . "</div>";
+            $btn_add_po = "<div>" . $this->formAddPO() . "</div>";
+            $form_add_po = $this->formAddPO(false);
+            $form_linked_parts = "<div>" . $this->formLinkedParts() . "</div>";
 
             $btn_panel = /** @lang HTML */
                 "<div class='btn'>
                     <div>$btn_edit</div>
                     <div>$prim</div>
                     <div>$btn_pl</div>
-                    $btn_del $btn_rfq $btn_po $btn_copy_to_doc $btn_set
+                    $btn_del $btn_copy_to_doc $btn_set $btn_add_po $form_linked_parts
                 </div>";
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img alt="Edit" src="/img/edit.gif" height="14" border="0" /></a>
-                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif . '</a>' . $pn . $btn_panel . $form_copy_to_doc . '</td>
+                                  <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif . '</a>' . $pn . $btn_panel . $form_copy_to_doc . $form_add_po . '</td>
                       <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
                       <td width="120" >' . $price_str . $Val . '</td>
                       <td width="120" >' . Func::Rub($row['price_it']) . $Val . '</td>
-                      <td width="120">' . Func::Rub($sum_part) . $sum_part_form . $Val . $NDS . '</td>
+                      <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "</div><div>" . $sum_part_form . "</div><div>" . $Val . "</div><div>" . $NDS . '</div></div></td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
         }
@@ -1190,6 +1185,9 @@ class Part
             } elseif ($_POST['Flag'] == 'EditSumPart' and isset($_POST['kod_part'], $_POST['sum_part'])) {
                 self::setSumPart($_POST['kod_part'], $_POST['sum_part']);
                 $event = true;
+            } elseif ($_POST['Flag'] == 'AddPOtoPart' and isset($_POST['kod_part_master'], $_POST['kod_org'])) {
+                $this->addPO($_POST['kod_part_master'], $_POST['kod_org']);
+                $event = true;
             }
         }
 
@@ -1361,6 +1359,7 @@ class Part
      * Копировать партию в договор
      * @param $kod_part
      * @param $kod_dogovora
+     * @return int
      */
     public static function copyToDoc($kod_part, $kod_dogovora)
     {
@@ -1372,14 +1371,18 @@ class Part
         $data = self::getData($kod_part);
         $nds = config::$nds_main; // Подставляем текущий НДС
         $price = $data['price'];
-        $price_it = func::rnd($price*(100+$nds)/100);
-        $sum_part = func::rnd($price_it*$data['numb']);
+        $price_it = func::rnd($price * (100 + $nds) / 100);
+        $sum_part = func::rnd($price_it * $data['numb']);
 
         $db = new Db();
         $db->query(/** @lang MySQL */
             "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,sum_part,modif,nds,val,kod_user,price_or,data_nach) 
                               SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,$price_it,$sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
+        $kod_part_slave = $db->last_id;
+        self::addLink($kod_part, $kod_part_slave);
+
+        return $kod_part_slave;
     }
 //-----------------------------------------------------------------------
 //
@@ -1400,6 +1403,20 @@ class Part
                 $db_doc = new Db();
                 $rows_doc = $db_doc->rows(/** @lang MySQL */
                     "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
+
+                // Пробуем найти подчиненный договор
+                $rows_links = $db_doc->rows(/** @lang MySQL */
+                    "SELECT   `part_links`.`kod_part_master`,
+                                     `view_rplan`.`kod_dogovora` AS `kod_dogovora_master`,
+                                     `part_links`.`kod_part_slave`,
+                                     `V`.`kod_dogovora` AS `kod_dogovora_slave`
+                            FROM     `part_links`
+                                       INNER JOIN `view_rplan`  ON `part_links`.`kod_part_master` = `view_rplan`.`kod_part`
+                                       INNER JOIN `view_rplan` `V` ON `part_links`.`kod_part_slave` = `V`.`kod_part`
+                            WHERE view_rplan.kod_dogovora=$kod_dogovora;");
+                if ($db_doc->cnt > 0)
+                    $kod_dogovora = $rows_links[0]['kod_dogovora_slave'];
+
                 $res = /** @lang HTML */
                     "<div>
                         <form method='post'>
@@ -1559,7 +1576,7 @@ class Part
         $row = $rows[0];
 
         $numb_1c = $row['numb'];
-        if($numb_1c < 0.001) // Если брать нечего
+        if ($numb_1c < 0.001) // Если брать нечего
             return;
 
         $name = $row['name'];
@@ -1770,13 +1787,190 @@ class Part
 
             $rows_1c = $db->rows(/** @lang MySQL */
                 "SELECT * FROM sklad_1c WHERE kod_1c=$kod_1c;");
-            if($db->cnt == 0)
+            if ($db->cnt == 0)
                 continue;
 
             $kod_item = $rows_1c[0]['kod_item'];
 
-            $this->addItemToSet($kod_item,$numb);
+            $this->addItemToSet($kod_item, $numb);
         }
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Добавление связи партий - для отслеживания заказов
+     * @param $kod_part_master
+     * @param $kod_part_slave
+     */
+    public static function addLink($kod_part_master, $kod_part_slave)
+    {
+        if ((int)$kod_part_master == 0 or (int)$kod_part_slave == 0)
+            return;
+
+        $db = new Db();
+        $kod_part_master = (int)$kod_part_master;
+        $kod_part_slave = (int)$kod_part_slave;
+
+        // Проверяем наличие связи
+        $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_links WHERE kod_part_master=$kod_part_master AND kod_part_slave=$kod_part_slave;");
+        if ($db->cnt > 0)
+            return;
+        $kod_user = func::kod_user();
+        $db->query(/** @lang MySQL */
+            "INSERT INTO part_links(kod_part_master, kod_part_slave, kod_user) VALUES($kod_part_master,$kod_part_slave,$kod_user);");
+
+        // Создаем связь для договоров
+        $kod_dogovora_master = 0;
+        $kod_dogovora_slave = 0;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT kod_dogovora FROM parts WHERE kod_part=$kod_part_master");
+        if ($db->cnt > 0)
+            $kod_dogovora_master = $rows[0]['kod_dogovora'];
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT kod_dogovora FROM parts WHERE kod_part=$kod_part_slave");
+        if ($db->cnt > 0)
+            $kod_dogovora_slave = $rows[0]['kod_dogovora'];
+        Doc::addLink($kod_dogovora_master, $kod_dogovora_slave);
+
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Добавление заказа к партии - если требуется заказать производство/товар у контрагента
+     * @param $kod_part
+     * @param $kod_ispolnit
+     * @param int $doc_type
+     */
+    public static function addPO($kod_part, $kod_ispolnit, $doc_type = 3)
+    {
+        $d = new Doc();
+        $nomer = "PO";
+        $data_sos = func::NowE();
+        $kod_org = config::$kod_org_main;
+        $kod_ispolnit = (int)$kod_ispolnit;
+        $kod_part = (int)$kod_part;
+        $kod_dogovora = $d->Add($nomer, $data_sos, $kod_org, $kod_ispolnit, $doc_type);
+        $kod_part_slave = self::copyToDoc($kod_part, $kod_dogovora);
+        self::addLink($kod_part, $kod_part_slave);
+    }
+//-----------------------------------------------------------------------
+//
+    /**
+     * Форма создания заказа по партии
+     * @param bool $btb
+     * @return string
+     */
+    public function formAddPO($btb = true)
+    {
+        if (func::user_group() !== "admin")
+            return "";
+
+        if ($btb)
+            return "<div>" . Func::ActButton2('', "PO", 'AddPO', 'kod_part_master', $this->kod_part) . "</div>";
+        $res = "";
+        if (isset($_POST['Flag'], $_POST['kod_part_master']))
+            if ($_POST['Flag'] == "AddPO" and (int)$_POST['kod_part_master'] == $this->kod_part) {
+                $res = /** @lang HTML */
+                    "<div>
+                        <form method='post'>
+                        " . Org::formSelList2() . "
+                        <input type='hidden' name='kod_part_master' value='$this->kod_part'>
+                        <input type='hidden' name='Flag' value='AddPOtoPart'>
+                        <input type='submit' value='Создать заказ'>
+                        </form>
+                        " . func::Cansel() . "
+                    </div>";
+            }
+        return $res;
+    }
+//-----------------------------------------------------------------------
+//
+    /**
+     * Связанные партии
+     *
+     */
+    public function formLinkedParts()
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM part_links WHERE (kod_part_master=$this->kod_part OR kod_part_slave=$this->kod_part) AND part_links.del=0;");
+        if ($db->cnt == 0)
+            return "";
+
+        $cnt = $db->cnt;
+        $res = "";
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $link = "S";
+            if ($row['kod_part_master'] == $this->kod_part)
+                $kod_part = $row['kod_part_slave'];
+            else {
+                $link = "M";
+                $kod_part = $row['kod_part_master'];
+            }
+            $res .= "<a href='form_part.php?kod_part=$kod_part'>$link</a>";
+        }
+
+        return $res;
+    }
+
+//----------------------------------------------------------------------
+//
+    /**
+     * Вывод списка-выбора
+     * @param $rows array
+     * @param $kod_part_selected int
+     * @return string
+     */
+    public static function formSelList($rows = [], $kod_part_selected = 0)
+    {
+        $cnt = count($rows);
+
+        if ($cnt == 0) {
+            $db = new Db();
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_rplan WHERE zakryt=0 ORDER BY nomer ASC;");
+            $cnt = $db->cnt;
+        }
+
+        if ($cnt == 0)
+            return "";
+
+        $res = /** @lang HTML */
+            "<select id='kod_part' name='kod_part' placeholder=\"Выбрать партию...\">";
+
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $nomer = $row['nomer'];
+            $nazv_krat = $row['nazv_krat'];
+            if ($row['kod_org'] == config::$kod_org_main)
+                $nazv_krat = "* " . $row['ispolnit_nazv_krat'];
+            $kod_dogovora = $rows[$i]['kod_dogovora'];
+            $kod_part = $rows[$i]['kod_part'];
+            $name = $rows[$i]['obozn'];
+
+            $selected = "";
+            if ($rows[$i]['kod_part'] == $kod_part_selected)
+                $selected = " selected='selected'";
+
+            $res .= /** @lang HTML */
+                "<option value='$kod_part' $selected>$nomer $nazv_krat $name $kod_dogovora $kod_part</option>\r\n";
+        }
+        $res .= /** @lang HTML */
+            '</select>
+                    <script type="text/javascript">
+                                    var kod_part, $kod_part;
+                
+                                    $kod_part = $("#kod_part").selectize({
+                                        onChange: function(value) {
+                        if (!value.length) return "";
+                    }
+                                    });
+                        kod_part = $kod_part[0].selectize;
+                </script>';
+
+        return $res;
     }
 
 }

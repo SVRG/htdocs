@@ -2353,7 +2353,7 @@ class Doc
                 $this->setSchet($_POST['kod_scheta_edit'], $_POST['nomer'], $_POST['summa'], $_POST['data'], $_POST['prim']);
                 $event = true;
             } elseif ($_POST['Flag'] == 'AddDocLink' and isset($_POST['kod_dogovora'], $_POST['kod_dogovora_master'])) {
-                $this->addDocLink($_POST['kod_dogovora_master'], $_POST['kod_dogovora']);
+                self::addLink($_POST['kod_dogovora_master'], $_POST['kod_dogovora']);
                 $event = true;
             } elseif ($_POST['Flag'] == 'DelDocLink' and isset($_POST['kod_link_del'])) {
                 $this->delLink($_POST['kod_link_del']);
@@ -3305,10 +3305,10 @@ class Doc
      */
     public function setDocType($doc_type = 1)
     {
-        $db = new Db();
         $doc_type = (int)$doc_type;
         $kod_user = func::kod_user();
 
+        $db = new Db();
         $db->query(/** @lang MySQL */
             "UPDATE dogovory SET doc_type = $doc_type, edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
     }
@@ -3319,12 +3319,21 @@ class Doc
      * @param $kod_dogovora_master
      * @param $kod_dogovora_slave
      */
-    public function addDocLink($kod_dogovora_master, $kod_dogovora_slave)
+    public static function addLink($kod_dogovora_master, $kod_dogovora_slave)
     {
-        $db = new Db();
+        if((int)$kod_dogovora_master == 0 or (int)$kod_dogovora_slave == 0)
+            return;
+
         $kod_dogovora_master = (int)$kod_dogovora_master;
         $kod_dogovora_slave = (int)$kod_dogovora_slave;
         $kod_user = func::kod_user();
+        $db = new Db();
+        // Проверяем наличие связи
+        $db->rows(/** @lang MySQL */
+            "SELECT * FROM doc_links WHERE kod_doc_master=$kod_dogovora_master AND kod_doc_slave=$kod_dogovora_slave;");
+        if($db->cnt > 0)
+            return;
+
         $db->query(/** @lang MySQL */
             "INSERT INTO doc_links(kod_doc_master, kod_doc_slave, kod_user) VALUES($kod_dogovora_master,$kod_dogovora_slave,$kod_user);");
     }
