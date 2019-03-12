@@ -180,8 +180,10 @@ class Part
             $prim = $this->formPrim();
 
             // Кнопка редактирования партии
-            // todo - Придумать ограничение на редактирование/удаление если была оплата (не выводить кнопку редактирования)
-            $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
+            $btn_edit = ""; // Редактирование тольо если не было платежей или если админ задаст $_GET['edit']
+            if (!Doc::getPaymentFlag($row['kod_dogovora']) or (isset($_GET['edit']) and func::user_group() == "admin"))
+                $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
+
             $btn_del = "";
 
             // todo - Придумать глобальные права

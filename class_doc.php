@@ -609,7 +609,11 @@ class Doc
             $form_print = "";
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
                 $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PrintForm" title="Форма для печати" src="img/printer.png"></a>';
-            $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
+
+            $btn_edit = ""; // Редактирование тольо если не было платежей или если админ задаст $_GET['edit']
+            if (!self::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit']) and func::user_group() == "admin"))
+                $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
+
             $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
             echo // todo - Валюта - пока только руб.
@@ -3321,7 +3325,7 @@ class Doc
      */
     public static function addLink($kod_dogovora_master, $kod_dogovora_slave)
     {
-        if((int)$kod_dogovora_master == 0 or (int)$kod_dogovora_slave == 0)
+        if ((int)$kod_dogovora_master == 0 or (int)$kod_dogovora_slave == 0)
             return;
 
         $kod_dogovora_master = (int)$kod_dogovora_master;
@@ -3331,7 +3335,7 @@ class Doc
         // Проверяем наличие связи
         $db->rows(/** @lang MySQL */
             "SELECT * FROM doc_links WHERE kod_doc_master=$kod_dogovora_master AND kod_doc_slave=$kod_dogovora_slave;");
-        if($db->cnt > 0)
+        if ($db->cnt > 0)
             return;
 
         $db->query(/** @lang MySQL */
@@ -3438,6 +3442,24 @@ class Doc
             return $this->formRPlan_by_Doc($rows);
 
         return "Список пуст.";
+    }
+//--------------------------------------------------------------
+//
+    /**
+     * Возвращает true если по договору был платеж, в противном случае false
+     * @param $kod_dogovora
+     * @return bool
+     */
+    public static function getPaymentFlag($kod_dogovora)
+    {
+        $kod_dogovora = (int)$kod_dogovora;
+        $db = new Db();
+        $db->rows(/** @lang MySQL */
+            "SELECT kod_dogovora FROM plat WHERE kod_dogovora=$kod_dogovora AND plat.del=0;");
+        if ($db->cnt > 0)
+            return true;
+
+        return false;
     }
 
 }// END CLASS
