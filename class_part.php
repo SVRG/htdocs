@@ -1974,5 +1974,77 @@ class Part
 
         return $res;
     }
+//----------------------------------------------------------------------
+//
+    /**
+     * Возвращает историю по коду записи
+     * @param $kod_part
+     * @return array
+     */
+    public static function getHistory($kod_part)
+    {
+        $kod_part = (int)$kod_part;
 
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM history WHERE table_name='parts' AND key_field_value=$kod_part ORDER BY time_stamp DESC;");
+
+        if ($db->cnt == 0)
+            return [];
+
+        $res = array();
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = unserialize($rows[$i]['ser_array']);
+            array_push($res, $row);
+        }
+        return $res;
+    }
+//----------------------------------------------------------------------
+//
+    public static function formHistory($kod_part)
+    {
+        $kod_part = (int)$kod_part;
+
+        $rows = self::getHistory($kod_part);
+        $cnt = count($rows);
+
+        if ($cnt == 0)
+            return "Нет данных: formHistory";
+
+        $E = new Elem();
+
+        $res = "<table><tr>
+                            <td>Наименование</td>
+                            <td>Модификация</td>
+                            <td>Кол-во</td>
+                            <td>Дата</td>
+                            <td width='100'>Цена с НДС</td>
+                            <td width='130'>Сумма</td>
+                            <td width='130'>Оператор</td>                            
+                       </tr>";
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $E->kod_elem = (int)$row['kod_elem'];
+            $name = $E->getFormLink();
+            $modif = $row['modif'];
+            $numb = $row['numb'];
+            $data_postav = func::Date_from_MySQL($row['data_postav']);
+            $price_it = func::Rub($row['price_it']);
+            $sum_part = func::Rub($row['sum_part']);
+            $kod_user = $row['kod_user'];
+
+            $res .= "<tr>
+                            <td>$name</td>
+                            <td>$modif</td>
+                            <td>$numb</td>
+                            <td align='center'>$data_postav</td>
+                            <td align='right'>$price_it</td>
+                            <td align='right'>$sum_part</td>
+                            <td>$kod_user</td>
+                    </tr>";
+        }
+        $res .= "</table>";
+        return $res;
+    }
 }
