@@ -109,10 +109,16 @@ $Org->kod_org = $D->Data['kod_org'];
 
 echo "<h3>$nomer от $data_sost</h3>";
 if (isset($_GET['pl'])) // Paking List
-    echo "<h2>" . $D->Data['nazv_krat'] . "</h2>";
+    {
+        $proc_pay = Doc::getProcPay($D->kod_dogovora);
+
+        if(Doc::getPaymentFlag($D->kod_dogovora))
+            echo "<h3>Оплачено $proc_pay%</h3>";
+        echo "<h3>" . $D->Data['nazv_krat'] . "</h3>";
+    }
 else
-    echo "Заказчик: " . $D->Data['nazv_krat'];
-echo "<br>Юридический адрес: " . $adres;
+    echo "Заказчик: " . $D->Data['nazv_krat'] . "<br>";
+echo "Юридический адрес: " . $adres;
 echo $dogovor_nomer;
 echo "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
 
