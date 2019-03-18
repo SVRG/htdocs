@@ -610,8 +610,8 @@ class Doc
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
                 $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PrintForm" title="Форма для печати" src="img/printer.png"></a>';
 
-            $btn_edit = ""; // Редактирование тольо если не было платежей или если админ задаст $_GET['edit']
-            if (!self::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit']) and func::user_group() == "admin"))
+            $btn_edit = ""; // Редактирование тольо если не было платежей или если пользователь задаст $_GET['edit']
+            if (!self::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit'])))
                 $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
 
             $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
@@ -660,7 +660,7 @@ class Doc
 //
 
     /**
-     * Форма редактирования Договора
+     * Форма добавления/редактирования Договора
      * @param int $Edit - 1 форма редактирования
      * @return string
      */
