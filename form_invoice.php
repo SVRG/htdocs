@@ -182,7 +182,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         if (isset($_GET['pl']))  // Paking List
             echo "<tr>
             <td align='center'>$n</td>
-            <td align='left'>$name</td>
+            <td align='left'>$name <br>p/n $kod_part</td>
             <td align='center'>$numb</td>
           </tr>";
         else
