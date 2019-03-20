@@ -67,13 +67,13 @@ class Func
      * @param int $precision
      * @return float|mixed|string|string[]|null
      */
-    public static function clearNum($num_str, $precision=0)
+    public static function clearNum($num_str, $precision = 0)
     {
-        $res = str_replace(",",".",$num_str);
+        $res = str_replace(",", ".", $num_str);
         $res = preg_replace("/[^0-9.-]/", "", $res);
 
-        if($precision > 0)
-            $res = round((double)$res,(int)$precision);
+        if ($precision > 0)
+            $res = round((double)$res, (int)$precision);
 
         return $res;
     }
@@ -90,15 +90,15 @@ class Func
         // todo - надо проработать пробелы с точкой и запятой, это могут быть цифры или обозначения с децимал. номером
         //$string = str_replace(".",". ",$string); // Добавляем пробел после точки
         //$string = str_replace(",",", ",$string); // Добавляем пробел после запятой
-        $string = str_replace("("," (",$string); // Добавляем пробел перед откр скобкой
+        $string = str_replace("(", " (", $string); // Добавляем пробел перед откр скобкой
         $string = preg_replace('/\s\s+/', ' ', $string); // Удаляем лишние пробелы
         //$string = preg_replace('(^A-Za-z0-9.,-+)', '', $string); // todo - Удаляем лишние символы
         $string = ltrim($string); // Удаляем пробел в начале строки
         $string = rtrim($string); // Удаляем пробел в конце строки
-        $string = str_replace("( ","(",$string); // Удаляем пробел после откр скобки
-        $string = str_replace(" )",")",$string); // Удаляем пробел перед закр скобкой
-        $string = str_replace(" ,",",",$string); // Удаляем пробел перед запятой
-        $string = str_replace(" .",".",$string); // Удаляем пробел перед точкой
+        $string = str_replace("( ", "(", $string); // Удаляем пробел после откр скобки
+        $string = str_replace(" )", ")", $string); // Удаляем пробел перед закр скобкой
+        $string = str_replace(" ,", ",", $string); // Удаляем пробел перед запятой
+        $string = str_replace(" .", ".", $string); // Удаляем пробел перед точкой
 
         return $string;
     }
@@ -145,7 +145,7 @@ class Func
      * @param int $precision
      * @return float
      */
-    public static function rnd($numb,$precision=2)
+    public static function rnd($numb, $precision = 2)
     {
         $res = round((double)$numb, (int)$precision);
         return $res;
@@ -247,7 +247,7 @@ class Func
      * @param string $form_option например target='_blank'
      * @return string
      */
-    public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act', $form_option='')
+    public static function ActButton($Act = '', $ButtValue = 'OK', $FlagVal = 'Act', $form_option = '')
     {
         $btn = self::btnImage($ButtValue);
 
@@ -290,20 +290,21 @@ class Func
      * @param string $FlagVal
      * @param string $hidden_name
      * @param string $hidden_val
+     * @param string $confirm_text - текст в форме
      * @return string
      */
-    public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val = "1")
+    public static function ActButton2($Act = '', $ButtValue = 'OK', $FlagVal = "Act", $hidden_name = "Name", $hidden_val = "1", $confirm_text = "")
     {
         $btn = self::btnImage($ButtValue);
 
-        if (strpos($ButtValue, "Удалить") !== false)
-            $res = "<form name='FNAME' method='POST' action='$Act' onsubmit='return confirm(\"Вы уверены, что хотите удалить запись?\");' >
-                    <input type='hidden' name='Flag' value='$FlagVal' />
-                    <input type='hidden' name='$hidden_name' value='$hidden_val' />
-                    $btn
-                </form>";
-        else
-            $res = "<form name='FNAME' method='POST' action='$Act'>
+        if (strpos($ButtValue, "Удалить") !== false and $confirm_text == "")
+            $confirm_text = "Вы уверены, что хотите удалить запись?";
+
+        $confirm_code = "";
+        if ($confirm_text != "")
+            $confirm_code = "onsubmit='return confirm(\"$confirm_text\");'";
+
+        $res = "<form name='FNAME' method='POST' action='$Act' $confirm_code>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
                     $btn

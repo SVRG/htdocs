@@ -558,7 +558,7 @@ class Doc
                 $clr = '<tr>
                             <th ></th>
                             <td bgcolor="#F18585">Закрыт</td>
-                            <td>' . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora']) . '</td>
+                            <td>' . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora'],"Восстановить Договор?") . '</td>
                         </tr>';
             else {
                 $close = true;
@@ -579,22 +579,17 @@ class Doc
             }
 
             $ISP = '';
-            $btn_po = "";
-            $btn_rfq = "";
             $kod_org_main = config::$kod_org_main;
             if ($this->kod_org == $kod_org_main) {
                 $ISP = '<tr>
                             <th >Исполнитель</th>
                             <td><a href="form_org.php?kod_org=' . $row['kod_ispolnit'] . '">' . $row['ispolnit_nazv_krat'] . '</a></td>
                             </tr>';
-
-                $btn_rfq = '<div><a target="_blank" href="form_po.php?rfq&kod_dogovora=' . $this->kod_dogovora . '"><img alt="RFQ" title="RFQ" src="img/rfq.png"></a></div>';
-                $btn_po = '<div><a target="_blank" href="form_po.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PO" title="PO" src="img/po.png"></a></div>';
             }
 
-            $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
-            $summa_plat = self::getSummaPlat($row['kod_dogovora']);
-            $ostatok = $summa_dogovora - $summa_plat;
+            $summa_dogovora = func::Rub(self::getSummaDogovora($row['kod_dogovora']));
+            $summa_plat = func::Rub(self::getSummaPlat($row['kod_dogovora']));
+            $ostatok = func::Rub($summa_dogovora - $summa_plat);
 
             $user = $this->getUser();
             $row_user = "";
@@ -612,48 +607,50 @@ class Doc
 
             $btn_edit = ""; // Редактирование тольо если не было платежей или если пользователь задаст $_GET['edit']
             if (!self::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit'])))
-                $btn_edit = Func::ActButton('', 'Изменить', 'DocEditForm');
+                $btn_edit = "<div>" . Func::ActButton('', 'Изменить', 'DocEditForm') . "</div>";
 
             $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
-            echo // todo - Валюта - пока только руб.
-                '<table border="0">
+            echo // todo - Продумать вариант с валютой
+                "<table border='0'>
                       <tr>  
-                        <th width="202" >Номер</th>
-                        <td width="200">
-                        <div class="btn">
-                            <div><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '" ><h1>' . $row['nomer'] . '</h1></a></div>
-                            <div>' . $form_print . '</div>
-                            <div>' . $btn_edit . '</div>
-                            <div>' . $btn_copy . '</div>' . $btn_rfq . $btn_po . '
+                        <th width='202' >Номер</th>
+                        <td width='200'>
+                        <div class='btn'>
+                            <div><a href='form_dogovor.php?kod_dogovora=" . $row['kod_dogovora'] . "'><h1>" . $row['nomer'] . "</h1></a></div>
+                            <div>$form_print</div>
+                            $btn_edit
+                            <div>$btn_copy</div>
                         </div>
-                        ' . $doc_type . '
+                        $doc_type
                        </td>
                       </tr>
                       <tr>
                         <th >Дата Составления </th>
-                        <td>' . Func::Date_from_MySQL($row['data_sost']) . '</td>
+                        <td>" . Func::Date_from_MySQL($row['data_sost']) . "</td>
                       </tr>
                       <tr>
                         <th >Заказчик</th>
-                        <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
+                        <td><a href='form_org.php?kod_org=" . $row['kod_org'] . "'>" . $row['nazv_krat'] . "</a></td>
                       </tr>
                       <tr>
                       </tr>
-                        ' . $ISP . '
+                        $ISP
                       <tr>
                         <th >Сумма Договора</th>
-                        <td>' . func::Rub($summa_dogovora) . ' р.</td>
+                        <td>$summa_dogovora</td>
                       </tr>
                       <tr>
                         <th >Сумма Платежей</th>
-                        <td>' . Func::Rub($summa_plat) . ' р.</td>
+                        <td>$summa_plat</td>
                       </tr>
                       <tr>
                         <th >Остаток</th>
-                        <td>' . Func::Rub($ostatok) . ' р.</td>
-                      </tr>' . $row_user . $clr . '
-                </table>';
+                        <td>$ostatok</td>
+                      </tr>
+                      $row_user 
+                      $clr
+                </table>";
         }
     }
 //--------------------------------------------------------------
@@ -1257,7 +1254,7 @@ class Doc
             $btn_edit = "";
             if (func::user_group() == "admin") {
                 $btn_del = func::ActButton2("", "Удалить", "DelPlat", "kod_plat_del", $kod_plat);
-                $btn_edit = func::ActButton2("", "Изменить", "EditPP", "kod_plat_edit", $kod_plat);
+                $btn_edit = func::ActButton2("", "Изменить", "EditPP", "kod_plat_edit", $kod_plat, "Изменить платеж?");
             }
             $nomer = "<div class='btn'>
                     <div><b>" . $row['nomer'] . "</b></div>
@@ -1668,7 +1665,7 @@ class Doc
             $status_str = "";
             $delivery_color = "";
             if ($status == 1) {
-                $btn_submit = func::ActButton2("", "Подтвердить доставку", "SubmitDelivery", "kod_prim_status", $kod_prim);
+                $btn_submit = func::ActButton2("", "Подтвердить доставку", "SubmitDelivery", "kod_prim_status", $kod_prim, "Подтверждаете доставку?");
                 $status_str = "<div class='btn'><div>Доставка</div><div>$btn_submit</div></div>";
                 $yellow = func::$yellow;
                 $delivery_color = /** @lang HTML */

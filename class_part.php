@@ -74,6 +74,11 @@ class Part
 
         $dogovor_proc_pay = Doc::getProcPay($this->kod_dogovora); // Процент платежей по договору. Строка вида "70%"
 
+        // Редактирование партии
+        $edit = false;
+        if (!Doc::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit'])))
+            $edit = true;
+
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 
@@ -110,7 +115,9 @@ class Part
                 $nacl .= Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], "Добавить", 'AddNaklad', "kod_part", $row['kod_part']);
 
             // Форма редактированя суммы партии
-            $sum_part_form = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], "Изменить", 'formSumPart', "kod_part_edit_sum", $row['kod_part']);;
+            $sum_part_form = "";
+            if ($edit)
+                $sum_part_form = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], "Изменить", 'formSumPart', "kod_part_edit_sum", $row['kod_part']);
             if (isset($_POST['kod_part_edit_sum']))
                 if ($_POST['kod_part_edit_sum'] == $this->kod_part)
                     $sum_part_form = $this->formSumPart();
@@ -181,7 +188,7 @@ class Part
 
             // Кнопка редактирования партии
             $btn_edit = ""; // Редактирование тольо если не было платежей или если пользователь задаст $_GET['edit']
-            if (!Doc::getPaymentFlag($row['kod_dogovora']) or (isset($_GET['edit'])))
+            if ($edit)
                 $btn_edit = Func::ActButton("form_part.php?kod_part=" . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora, 'Изменить', 'EditPartForm');
 
             $btn_del = "";
