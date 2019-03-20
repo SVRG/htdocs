@@ -587,9 +587,12 @@ class Doc
                             </tr>';
             }
 
+            $summa_dogovora = self::getSummaDogovora($row['kod_dogovora']);
+            $summa_plat = self::getSummaPlat($row['kod_dogovora']);
+            $ostatok = func::Rub($summa_dogovora - $summa_plat);
+            // Преобразуем в строку
             $summa_dogovora = func::Rub(self::getSummaDogovora($row['kod_dogovora']));
             $summa_plat = func::Rub(self::getSummaPlat($row['kod_dogovora']));
-            $ostatok = func::Rub($summa_dogovora - $summa_plat);
 
             $user = $this->getUser();
             $row_user = "";
