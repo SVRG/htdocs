@@ -558,7 +558,7 @@ class Doc
                 $clr = '<tr>
                             <th ></th>
                             <td bgcolor="#F18585">Закрыт</td>
-                            <td>' . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora'],"Восстановить Договор?") . '</td>
+                            <td>' . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora'], "Восстановить Договор?") . '</td>
                         </tr>';
             else {
                 $close = true;
@@ -614,6 +614,13 @@ class Doc
 
             $btn_copy = Func::ActButtonConfirm('Копировать', 'copyDogovor', 'Подтвердить копирование Договора');
 
+            $btn_copy_as_po = "";
+            $btn_copy_as_qt = "";
+            if($row['kod_org'] == config::$kod_org_main)
+                $btn_copy_as_po = "<div>" . Func::ActButtonConfirm('PO', 'copyDogovorAsPO', 'Подтвердить создание PO') . "</div>";
+            elseif($row['kod_ispolnit'] == config::$kod_org_main)
+                $btn_copy_as_qt = "<div>" . Func::ActButtonConfirm('QT', 'copyDogovorAsQT', 'Подтвердить создание QT') . "</div>";
+
             echo // todo - Продумать вариант с валютой
                 "<table border='0'>
                       <tr>  
@@ -624,6 +631,8 @@ class Doc
                             <div>$form_print</div>
                             $btn_edit
                             <div>$btn_copy</div>
+                            $btn_copy_as_po
+                            $btn_copy_as_qt
                         </div>
                         $doc_type
                        </td>
@@ -2179,23 +2188,28 @@ class Doc
 
     /**
      * Создает копию договора
+     * @param int $doc_type
      * @return int
      */
-    public function Copy()
+    public function Copy($doc_type = 1)
     {
         $db = new Db();
         $kod_dogovora = $this->kod_dogovora;
         $kod_user = func::kod_user();
 
         $this->getData();
-        $nomer = $this->Data['nomer'] . " copy";
+        if ($doc_type != 1)
+            $nomer = self::formDocType($doc_type, false);
+        else {
+            $nomer = $this->Data['nomer'] . " copy";
 
-        if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false) and (int)$this->Data['doc_type'] == 1)
-            $nomer = $this->getNextSchetNomer();
+            if ($this->Data['kod_ispolnit'] == config::$kod_org_main and (stripos($nomer, config::$dogovor_marker) === false) and $doc_type == 1)
+                $nomer = $this->getNextSchetNomer();
+        }
         $nomer = $db->real_escape_string($nomer);
         $db->query(/** @lang MySQL */
             "INSERT INTO dogovory (nomer, data_sost, kod_org, kod_ispolnit, kod_gruzopoluchat, kod_user, doc_type) 
-                      SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user,doc_type
+                      SELECT '$nomer',NOW(),kod_org,kod_ispolnit,kod_gruzopoluchat,$kod_user,$doc_type
                       FROM dogovory
                       WHERE kod_dogovora=$kod_dogovora");
         $kod_dogovora_new = $db->last_id;
@@ -2339,6 +2353,15 @@ class Doc
                 $event = true;
             } elseif ($_POST['Flag'] == 'copyDogovor') {
                 $kod_dogovora = $this->Copy();
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
+                return;
+            } elseif ($_POST['Flag'] == 'copyDogovorAsPO') {
+                $kod_dogovora = $this->Copy(3);
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
+                return;
+            }
+            elseif ($_POST['Flag'] == 'copyDogovorAsQT') {
+                $kod_dogovora = $this->Copy(4);
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
             } elseif ($_POST['Flag'] == 'DelAttr' and isset($_POST['kod_attr_del'])) {

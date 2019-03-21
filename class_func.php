@@ -235,6 +235,10 @@ class Func
             $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
         elseif ($ButtValue == "Комплектация")
             $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/view_properties.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "PO")
+            $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/po.png' name='Button' value='$ButtValue'/>";
+        elseif ($ButtValue == "QT")
+            $btn = "<input alt='Select' title='$ButtValue' type='image' src='img/qt.png' name='Button' value='$ButtValue'/>";
         return $btn;
     }
 //----------------------------------------------------------------------------------------------------------------------
