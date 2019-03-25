@@ -1980,37 +1980,9 @@ class Part
     }
 //----------------------------------------------------------------------
 //
-    /**
-     * Возвращает историю по коду записи
-     * @param $kod_part
-     * @return array
-     */
-    public static function getHistory($kod_part)
-    {
-        $kod_part = (int)$kod_part;
-
-        $db = new Db();
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM history WHERE table_name='parts' AND key_field_value=$kod_part ORDER BY time_stamp DESC;");
-
-        if ($db->cnt == 0)
-            return [];
-
-        $res = array();
-
-        for ($i = 0; $i < $db->cnt; $i++) {
-            $row = unserialize($rows[$i]['ser_array']);
-            array_push($res, $row);
-        }
-        return $res;
-    }
-//----------------------------------------------------------------------
-//
     public static function formHistory($kod_part)
     {
-        $kod_part = (int)$kod_part;
-
-        $rows = self::getHistory($kod_part);
+        $rows = func::getHistory('parts', $kod_part);
         $cnt = count($rows);
 
         if ($cnt == 0)

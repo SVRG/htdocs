@@ -650,8 +650,7 @@ class Func
         if ($n == 1) return $f1;
         return $f5;
     }
-//
-
+//----------------------------------------------------------------------------------------------------------------------
     /**
      * Генератор произвольной строки
      * @param int $length
@@ -666,5 +665,32 @@ class Func
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
         return $randomString;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Возвращает историю по коду записи
+     * @param $table_name
+     * @param $key_field_value
+     * @return array
+     */
+    public static function getHistory($table_name, $key_field_value)
+    {
+        $key_field_value = (int)$key_field_value;
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM history WHERE table_name='$table_name' AND key_field_value=$key_field_value ORDER BY time_stamp DESC;");
+
+        if ($db->cnt == 0)
+            return [];
+
+        $res = array();
+
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = unserialize($rows[$i]['ser_array']);
+            array_push($res, $row);
+        }
+        return $res;
     }
 }

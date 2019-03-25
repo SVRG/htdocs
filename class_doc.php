@@ -616,9 +616,9 @@ class Doc
 
             $btn_copy_as_po = "";
             $btn_copy_as_qt = "";
-            if($row['kod_org'] == config::$kod_org_main)
+            if ($row['kod_org'] == config::$kod_org_main)
                 $btn_copy_as_po = "<div>" . Func::ActButtonConfirm('PO', 'copyDogovorAsPO', 'Подтвердить создание PO') . "</div>";
-            elseif($row['kod_ispolnit'] == config::$kod_org_main)
+            elseif ($row['kod_ispolnit'] == config::$kod_org_main)
                 $btn_copy_as_qt = "<div>" . Func::ActButtonConfirm('QT', 'copyDogovorAsQT', 'Подтвердить создание QT') . "</div>";
 
             echo // todo - Продумать вариант с валютой
@@ -2359,8 +2359,7 @@ class Doc
                 $kod_dogovora = $this->Copy(3);
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
-            }
-            elseif ($_POST['Flag'] == 'copyDogovorAsQT') {
+            } elseif ($_POST['Flag'] == 'copyDogovorAsQT') {
                 $kod_dogovora = $this->Copy(4);
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
@@ -3484,5 +3483,49 @@ class Doc
 
         return false;
     }
+//----------------------------------------------------------------------
+//
+    public static function formHistory($kod_dogovora)
+    {
+        $rows = func::getHistory('dogovory', $kod_dogovora);
+        $cnt = count($rows);
 
+        if ($cnt == 0)
+            return "Нет данных: formHistory";
+
+        $O = new Org();
+
+        $res = "<table><tr>
+                            <td>Номер</td>
+                            <td>Дата</td>
+                            <td>Тип</td>
+                            <td>Заказчик</td>
+                            <td>Исполнитель</td>
+                            <td>Оператор</td>                            
+                       </tr>";
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $nomer = $row['nomer'];
+            $data_sost = func::Date_from_MySQL($row['data_sost']);
+            $doc_type = self::formDocType($row['doc_type'],false);
+            $O->kod_org = (int)$row['kod_org'];
+            $O->getData();
+            $org = $O->getFormLink();
+            $O->kod_org = (int)$row['kod_ispolnit'];
+            $O->getData();
+            $ispolni = $O->getFormLink();
+            $kod_user = $row['kod_user'];
+
+            $res .= "<tr>
+                            <td>$nomer</td>
+                            <td>$data_sost</td>
+                            <td>$doc_type</td>
+                            <td>$org</td>
+                            <td>$ispolni</td>
+                            <td>$kod_user</td>
+                    </tr>";
+        }
+        $res .= "</table>";
+        return $res;
+    }
 }// END CLASS

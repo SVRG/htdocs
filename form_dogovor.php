@@ -83,6 +83,9 @@ else
                         $Dogovor->formDogovor();
                 }
 
+                if (isset($_GET['hist']))
+                    echo Doc::formHistory($Dogovor->kod_dogovora);
+
                 echo $Dogovor->formDocum(); // Документы договора
                 echo $Dogovor->formAttributes(); // Аттрибуты
                 echo $Dogovor->formLinks(); // Ссылки на другие договоры
