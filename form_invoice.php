@@ -157,6 +157,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $row = $rows[$i];
         $name = $row['name'];
         $modif = $row['modif'];
+        $part_numb = $row['kod_part'];
 
         if ($modif !== "")
             $name = elem::getNameForInvoice($row);
@@ -182,7 +183,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         if (isset($_GET['pl']))  // Paking List
             echo "<tr>
             <td align='center'>$n</td>
-            <td align='left'>$name <br>p/n $kod_part</td>
+            <td align='left'>$name <br>p/n $part_numb</td>
             <td align='center'>$numb</td>
           </tr>";
         else
