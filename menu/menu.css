@@ -158,3 +158,11 @@ a.glink:hover {
 }
 
 .btn div {display:inline-block; margin: 0 5px 0 0;}
+
+.table_border_0 {border: none;}
+.td_align_center {
+    text-align: center;}
+.td_align_left {
+    text-align: left;}
+.td_align_right {
+    text-align: right;}

@@ -32,7 +32,7 @@ class Doc
 //
     /**
      * Показать Партии по Элементу - только партии, для просмотра договора надо в него перейти
-     * @param  int $kod_elem
+     * @param int $kod_elem
      * @return string
      */
     static public function formDocByElem($kod_elem)
@@ -551,32 +551,6 @@ class Doc
         } else {
             $this->getData();
             $row = $this->Data;
-            $clr = '';
-
-            // Если договор закрыт то красим красным
-            if ($row['zakryt'] == 1)
-                $clr = '<tr>
-                            <th ></th>
-                            <td bgcolor="#F18585">Закрыт</td>
-                            <td>' . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora'], "Восстановить Договор?") . '</td>
-                        </tr>';
-            else {
-                $close = true;
-                if (isset($_POST['Flag']))
-                    if ($_POST['Flag'] == 'DocClose') {
-                        $clr = "   <tr>
-                                        <td bgcolor=\"#F18585\">Закрыть?</td>
-                                        <td bgcolor='red'>" . Func::ActButton('', 'Подтвердить Закрытие', 'DocCloseConf') . Func::Cansel(0) . "</td>
-                                    </tr>";
-                        $close = false;
-                    }
-
-                if ($Close == 1 and $close)
-                    $clr = '<tr>
-                            <th ></th>
-                            <td>' . Func::ActButton('', 'Закрыть', 'DocClose') . '</td>
-                            </tr>';
-            }
 
             $ISP = '';
             $kod_org_main = config::$kod_org_main;
@@ -593,6 +567,35 @@ class Doc
             // Преобразуем в строку
             $summa_dogovora = func::Rub(self::getSummaDogovora($row['kod_dogovora']));
             $summa_plat = func::Rub(self::getSummaPlat($row['kod_dogovora']));
+
+            $clr = "";
+            // Если договор закрыт то красим красным
+            $bgcolor = "bgcolor='#F18585'";
+            if ($summa_plat > 0 and ($ostatok < config::$min_price))
+                $bgcolor = "bgcolor='green'";
+            if ($row['zakryt'] == 1) {
+                $clr = "<tr>
+                            <th ></th>
+                            <td $bgcolor>Закрыт</td>
+                            <td>" . Func::ActButton2('', "Восстановить", "DocOpen", 'kod_dogovora_open', $row['kod_dogovora'], "Восстановить Договор?") . '</td>
+                        </tr>';
+            } else {
+                $close = true;
+                if (isset($_POST['Flag']))
+                    if ($_POST['Flag'] == 'DocClose') {
+                        $clr = "<tr>
+                                   <td $bgcolor>Закрыть?</td>
+                                   <td $bgcolor>" . Func::ActButton('', 'Подтвердить Закрытие', 'DocCloseConf') . Func::Cansel(0) . "</td>
+                                </tr>";
+                        $close = false;
+                    }
+
+                if ($Close == 1 and $close)
+                    $clr = '<tr>
+                            <th ></th>
+                            <td>' . Func::ActButton('', 'Закрыть', 'DocClose') . '</td>
+                            </tr>';
+            }
 
             $user = $this->getUser();
             $row_user = "";
@@ -2470,12 +2473,12 @@ class Doc
 
                     $n = $i + 1;
                     $body .= "<tr>
-                    <td align='center'>$n</td>
-                    <td align='left'>$name</td>
+                    <td class='td_align_center'>$n</td>
+                    <td >$name</td>
                     <td>шт.</td>
-                    <td align='center'>$numb</td>
-                    <td align='right' nowrap>$price_str</td>
-                    <td align='right' nowrap>$summ_with_nds_str</td>
+                    <td class='td_align_center'>$numb</td>
+                    <td class='td_align_right' nowrap>$price_str</td>
+                    <td class='td_align_right' nowrap>$summ_with_nds_str</td>
                   </tr>";
                 }
                 $body .= "</table>";
@@ -2882,10 +2885,10 @@ class Doc
         }
         $res = /** @lang HTML */
             "<form id='form1' name='form1' method='post' action=''>
-                              <table width='434' border='0'>
+                              <table>
                                 <tr>
-                                  <td width='126'>Номер</td>
-                                  <td width='292'><span id='SNumR'>
+                                  <td>Номер</td>
+                                  <td><span id='SNumR'>
                                   <input  name='nomer' id='nomer' value='$nomer' />
                                   <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldMinCharsMsg'>Minimum
                                   number of characters not met.</span></span></td>
@@ -2957,10 +2960,10 @@ class Doc
         }
         $res = /** @lang HTML */
             "               <form name='form1' method='post' action=''>
-                                  <table width='434' border='0'>
+                                  <table>
                                     <tr>
-                                      <td width='126'>Номер ПП</td>
-                                      <td width='292'><span id='SNumR'>
+                                      <td>Номер ПП</td>
+                                      <td><span id='SNumR'>
                                       <input name='nomer' id='nomer' value='$pp_nomer' />
                                       <span class='textfieldRequiredMsg'>A value is required.</span><span class='textfieldMinCharsMsg'>Minimum
                                       number of characters not met.</span></span></td>
@@ -3407,7 +3410,7 @@ class Doc
             return $res;
 
         $res .= /** @lang HTML */
-            "<table border='0' >";
+            "<table class='table_border_0' >";
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $kod_link = $row['kod_link'];
@@ -3507,7 +3510,7 @@ class Doc
             $row = $rows[$i];
             $nomer = $row['nomer'];
             $data_sost = func::Date_from_MySQL($row['data_sost']);
-            $doc_type = self::formDocType($row['doc_type'],false);
+            $doc_type = self::formDocType($row['doc_type'], false);
             $O->kod_org = (int)$row['kod_org'];
             $O->getData();
             $org = $O->getFormLink();
