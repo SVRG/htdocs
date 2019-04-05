@@ -387,7 +387,7 @@ class Org
                       <td></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$poisk</a></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_krat</a></td>
-                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str $inn</a>$ogrn</td>
+                      <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str</a>$inn $ogrn</td>
                       <td> $www </td>
 		            </tr>";
             if ($echo)
