@@ -18,28 +18,26 @@ include_once "security.php";
 
     $sgp = 0;
     if (isset($_GET['sgp'])) {
-        $sgp = $_GET['sgp'];
-    }
-
-    if ($sgp == 1)
-        echo $D->formDocsOpen(); // Открытые договоры
-    elseif ($sgp == 2)
-        echo $D->formRPlan(1); // Внешние
-    elseif ($sgp == 3)
-        echo $D->formSGPHistory(); // История по складу
-    elseif ($sgp == 4)
-        echo $D->formRPlanNeOplach(); // Не оплаченные
-    elseif ($sgp == 5)
-        echo $D->formRPlanOplach(); // Оплаченные
-    elseif ($sgp == 6)
-        echo $D->formSGPHistory(1); // История по складу
-    elseif ($sgp == 7)
-        echo $D->formDocsOpen(1); // Внешние открытые договоры
-    elseif ($sgp == 8)
-        echo $D->formProduction($_GET['kod_elem']);
-    elseif ($sgp == 9)
-        echo $D->formDocsNoDocuments();
-    else
+        $sgp = (int)$_GET['sgp'];
+        if ($sgp == 1)
+            echo $D->formDocsOpen(); // Открытые договоры
+        elseif ($sgp == 2)
+            echo $D->formRPlan(1); // Внешние
+        elseif ($sgp == 3)
+            echo $D->formSGPHistory(); // История по складу
+        elseif ($sgp == 4)
+            echo $D->formRPlanNeOplach(); // Не оплаченные
+        elseif ($sgp == 5)
+            echo $D->formRPlanOplach(); // Оплаченные
+        elseif ($sgp == 6)
+            echo $D->formSGPHistory(1); // История по складу
+        elseif ($sgp == 7)
+            echo $D->formDocsOpen(1); // Внешние открытые договоры
+        elseif ($sgp == 8)
+            echo $D->formProduction($_GET['kod_elem']);
+        elseif ($sgp == 9)
+            echo $D->formDocsNoDocuments();
+    } else
         echo $D->formRPlan(0); // Обычный
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
