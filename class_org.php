@@ -123,7 +123,7 @@ class Org
         if (!func::issetFlag("SetRecv")) {
             $res .= '<table border=1 cellspacing=0 cellpadding=0>
                 <tr>
-                    <td bgcolor="#CCCCCC" width="50">ИНН</td><td width="250">' . $row['inn'] . '</td>
+                    <td bgcolor="#CCCCCC" width="50">ИНН</td><td width="250">' . self::formINN($row['inn']) . '</td>
                     <td width="50" bgcolor="#CCCCCC">КПП</td><td  width="250">' . $row['kpp'] . '</td>
                 </tr>
                 <tr>
@@ -376,7 +376,7 @@ class Org
 
             $inn = "";
             if ($row['inn'] != "")
-                $inn = " ИНН " . func::clearNum($row['inn']);
+                $inn = " ИНН " . self::formINN($row['inn']);
 
             $ogrn = "";
             if ($row['ogrn'] != "")
@@ -1263,6 +1263,19 @@ class Org
             "<a target='_blank' href='https://focus.kontur.ru/entity?query=$ogrn'>$ogrn</a>";
         return $res;
     }
-
+//-----------------------------------------------------------
+//
+    /**
+     * Форма со ссылкой на SBIS
+     * @param $inn
+     * @return string
+     */
+    public static function formINN($inn)
+    {
+        $ogrn = func::clearNum($inn);
+        $res = /** @lang HTML */
+            "<a target='_blank' href='https://sbis.ru/contragents/$inn'>$inn</a>";
+        return $res;
+    }
     //-----------------------------------------------------------------
 }
