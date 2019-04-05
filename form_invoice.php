@@ -225,8 +225,10 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 
     $name = $schet_data['prim'];
     $sum_part = $schet_data['summa'];                  // Сумма с НДС
-    $nds = func::rnd($sum_part * config::$nds_main / (100 + config::$nds_main));     // Сумма НДС
-
+    $nds_scheta = (int)$schet_data['nds'];
+    $nds = 0;
+    if($nds_scheta > 0)
+        $nds = func::rnd($sum_part * $nds_scheta / (100 + $nds_scheta));     // Сумма НДС
     $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']));
     $summ_str = $price_str;

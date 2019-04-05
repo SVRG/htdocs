@@ -360,7 +360,6 @@ class Org
         if ($echo)
             echo $res;
 
-
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
 

@@ -2495,17 +2495,21 @@ class Doc
      * @param $summa
      * @param $data
      * @param string $prim
-     * @param int $nds
      * @internal param string $PayDate
      */
-    public function AddInvoice($nomer, $summa, $data, $prim = '-', $nds = 0)
+    public function AddInvoice($nomer, $summa, $data, $prim = '-')
     {
         $kod_dogovora = $this->kod_dogovora;
 
         if (!isset($prim)) $prim = '-';
 
-        if ($nds == 0)
-            $nds = config::$nds_main;
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */ "SELECT nds FROM view_rplan WHERE kod_dogovora=$kod_dogovora;");
+
+        if($db->cnt == 0)
+            return;
+
+        $nds = (int)$rows[0]['nds'];
 
         if ($nomer === "NEXT")
             $nomer = doc::getNextSchetNomer();
@@ -2776,8 +2780,13 @@ class Doc
         $prim = $db->real_escape_string(addslashes($prim));
         $nomer = $db->real_escape_string($nomer);
 
+        // Правим НДС
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */ "SELECT nds FROM view_rplan WHERE kod_dogovora=$kod_dogovora;");
+        $nds = (int)$rows[0]['nds'];
+
         $db->query(/** @lang MySQL */
-            "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, edit=1 WHERE kod_scheta=$kod_scheta");
+            "UPDATE scheta SET nomer='$nomer', summa=$summa, data='$data', prim='$prim', kod_user=$kod_user, nds=$nds, edit=1 WHERE kod_scheta=$kod_scheta");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3359,7 +3368,7 @@ class Doc
         $db = new Db();
         // Проверяем наличие связи
         $db->rows(/** @lang MySQL */
-            "SELECT * FROM doc_links WHERE kod_doc_master=$kod_dogovora_master AND kod_doc_slave=$kod_dogovora_slave;");
+            "SELECT * FROM doc_links WHERE kod_doc_master=$kod_dogovora_master AND kod_doc_slave=$kod_dogovora_slave AND del=0;");
         if ($db->cnt > 0)
             return;
 
