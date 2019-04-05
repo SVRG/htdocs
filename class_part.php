@@ -46,7 +46,10 @@ class Part
             $btn_auto_ras = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora&kod_part=" . $this->kod_part, 'Авто-Расчет', 'AddAVOK') . "</div>";
         } else {
             if (func::user_group() == "admin") // todo - Придумать глобальную политику прав
+            {
+                // todo - добавить проверку, может уже есть расчеты на 100%
                 $btn_add_100 = "<div>" . Func::ActButton("form_part.php?kod_dogovora=$this->kod_dogovora", 'Авто-Расчет 100%', 'AddRasch100') . "</div>";
+            }
         }
 
         $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddPartForm');
@@ -133,7 +136,7 @@ class Part
                     $data_postav_str = Func::Date_from_MySQL($row['data_nach']) . "<br>" . $data_postav; // Дата начала
             }
 
-            // Окраска отруженных/полученных партий в зелёный
+            // Окраска отгруженных/полученных партий в зелёный
             $ind = '';// Индикатор окраски даты поставки
             if ($ost == 0) {
                 $res .= '<tr bgcolor="#ADFAC2">';
