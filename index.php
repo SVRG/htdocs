@@ -67,7 +67,7 @@ if (isset($_POST['login'], $_POST['password'])) {
         $_SESSION['MM_kod_user'] = $kod_user; // код пользователя
 
         // Запись сесии
-        $SessionSQL = sprintf("INSERT INTO sessions VALUES('','%s','%s','%s')", $loginUsername, date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR']);
+        $db->query(sprintf("INSERT INTO sessions (login, ip)  VALUES('%s','%s')", $loginUsername, $_SERVER['REMOTE_ADDR']));
 
         if (isset($_SESSION['PrevUrl']) && false) {
             $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];
