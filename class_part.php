@@ -1371,9 +1371,10 @@ class Part
      * Копировать партию в договор
      * @param $kod_part
      * @param $kod_dogovora
+     * @param bool $add_link
      * @return int
      */
-    public static function copyToDoc($kod_part, $kod_dogovora)
+    public static function copyToDoc($kod_part, $kod_dogovora, $add_link = false)
     {
         $kod_user = func::kod_user();
         $kod_part = (int)$kod_part;
@@ -1392,7 +1393,9 @@ class Part
                               SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,$price_it,$sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
         $kod_part_slave = $db->last_id;
-        self::addLink($kod_part, $kod_part_slave);
+
+        if($add_link)
+            self::addLink($kod_part, $kod_part_slave);
 
         return $kod_part_slave;
     }
@@ -1816,14 +1819,15 @@ class Part
      */
     public static function addLink($kod_part_master, $kod_part_slave)
     {
-        if ((int)$kod_part_master == 0 or (int)$kod_part_slave == 0)
-            return;
-
-        $db = new Db();
         $kod_part_master = (int)$kod_part_master;
         $kod_part_slave = (int)$kod_part_slave;
 
+        if ($kod_part_master == 0 or $kod_part_slave == 0 or ($kod_part_master == $kod_part_slave))
+            return;
+
         // Проверяем наличие связи
+        $db = new Db();
+
         $db->rows(/** @lang MySQL */
             "SELECT * FROM part_links WHERE kod_part_master=$kod_part_master AND kod_part_slave=$kod_part_slave;");
         if ($db->cnt > 0)
@@ -1844,7 +1848,6 @@ class Part
         if ($db->cnt > 0)
             $kod_dogovora_slave = $rows[0]['kod_dogovora'];
         Doc::addLink($kod_dogovora_master, $kod_dogovora_slave);
-
     }
 //----------------------------------------------------------------------
 //
@@ -1863,7 +1866,7 @@ class Part
         $kod_ispolnit = (int)$kod_ispolnit;
         $kod_part = (int)$kod_part;
         $kod_dogovora = $d->Add($nomer, $data_sos, $kod_org, $kod_ispolnit, $doc_type);
-        $kod_part_slave = self::copyToDoc($kod_part, $kod_dogovora);
+        $kod_part_slave = self::copyToDoc($kod_part, $kod_dogovora, true);
         self::addLink($kod_part, $kod_part_slave);
     }
 //-----------------------------------------------------------------------
