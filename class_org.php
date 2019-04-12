@@ -1263,6 +1263,9 @@ class Org
      */
     public static function formOGRN($ogrn)
     {
+        if($ogrn == "")
+            return "";
+
         $ogrn = func::clearNum($ogrn);
         $res = $ogrn;
         $res .= /** @lang HTML */
@@ -1278,6 +1281,9 @@ class Org
      */
     public static function formINN($inn)
     {
+        if($inn == "")
+            return "";
+
         $inn = func::clearNum($inn);
         $res = $inn;
         $res .= /** @lang HTML */
