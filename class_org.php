@@ -302,9 +302,9 @@ class Org
         $res = "";
 
         if ($nazv_krat != $nazv_poln)
-            $res .= '<h1>' . $this->getFormLink() . '</h1>' . $nazv_poln . '<br>';
+            $res .= '<h1>' . $this->getFormLink(true) . '</h1>' . $nazv_poln . '<br>';
         else
-            $res .= '<h1>' . $this->getFormLink() . '</h1>';
+            $res .= '<h1>' . $this->getFormLink(true) . '</h1>';
 
         $poisk = $this->Data['poisk'];
 
@@ -751,11 +751,13 @@ class Org
 
         $res = '<table border=0 cellspacing=0 cellpadding=0 width="100%">';
 
+        $kod_org = $this->kod_org;
+
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $kod_elem = $row['kod_elem'];
             $name = $row['name'];
-            $form_link = "<a href='form_elem.php?kod_elem=$kod_elem'>$name</a>";
+            $form_link = "<a href='form_elem.php?kod_elem=$kod_elem&kod_org=$kod_org'>$name</a>";
 
             $res .= '<tr>
                         <td width="100%">' . $form_link . ' </td>
@@ -973,15 +975,19 @@ class Org
 //
     /**
      * Ссылка на форму Огранизации
+     * @param bool $form_stat
      * @return string
      */
-    public function getFormLink()
+    public function getFormLink($form_stat = false)
     {
         if (!isset($this->Data))
             $this->getData();
 
         $kod_org = $this->kod_org;
         $nazv_krat = $this->Data['nazv_krat'];
+
+        if($form_stat)
+            return "<a href='form_org_stat.php?kod_org=$kod_org'>$nazv_krat</a>";
 
         return "<a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a>";
     }
