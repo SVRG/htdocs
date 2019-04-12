@@ -143,7 +143,8 @@ class Elem
             "$btn<table border=0 cellspacing=5 cellpadding=10 rules=\"rows\" frame=\"below\">
                  <tr bgcolor=\"#CCCCCC\">
                      <td width=\"10%\">Фото</td>
-                     <td align=\"center\">Наименование <a href=\"form_nomen.php?all\">Показать все</a></td>
+                     <td width='30%' align=\"center\">Наименование <a href=\"form_nomen.php?all\">Показать все</a></td>
+                     <td>Цены</td>
                  </tr>";
 
         $other = "";
@@ -167,9 +168,12 @@ class Elem
             if ($row['shifr'] != $row['elem_name'])
                 $name = $row['elem_name'];
 
+            $price_list = $this->formPriceList();
+
             $row_nomen = "<tr>
                             <td align='left' valign='top'>$img $link_modif</td>
                             <td valign='top'><a href='$link'><h1> $shifr </h1> $name </a></td>
+                            <td valign='top'>$price_list</td>
                          </tr>";
 
             if ($row['nomen'] == 1)
