@@ -1258,8 +1258,9 @@ class Org
     public static function formOGRN($ogrn)
     {
         $ogrn = func::clearNum($ogrn);
-        $res = /** @lang HTML */
-            "<a target='_blank' href='https://focus.kontur.ru/entity?query=$ogrn'>$ogrn</a>";
+        $res = $ogrn;
+        $res .= /** @lang HTML */
+            "&nbsp;<a target='_blank' href='https://focus.kontur.ru/entity?query=$ogrn'><img alt='sbis' src='img/view_properties.png'></a>";
         return $res;
     }
 //-----------------------------------------------------------
@@ -1271,9 +1272,12 @@ class Org
      */
     public static function formINN($inn)
     {
-        $ogrn = func::clearNum($inn);
-        $res = /** @lang HTML */
-            "<a target='_blank' href='https://sbis.ru/contragents/$inn'>$inn</a>";
+        $inn = func::clearNum($inn);
+        $res = $inn;
+        $res .= /** @lang HTML */
+            "&nbsp;<a target='_blank' href='https://sbis.ru/contragents/$inn'><img alt='sbis' src='img/view_properties.png'></a>";
+        $res .= /** @lang HTML */
+            "&nbsp;<a target='_blank' href='http://www.list-org.com/search?val=$inn&type=all'><img alt='list-org' src='img/view_properties.png'></a>";
         return $res;
     }
     //-----------------------------------------------------------------
