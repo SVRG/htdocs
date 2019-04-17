@@ -822,6 +822,12 @@ class Doc
         if (isset($_GET['p']))
             $where .= " AND doc_type=1";
 
+        if (isset($_GET['qt']))
+            $where .= " AND doc_type=4";
+
+        if (isset($_GET['po']))
+            $where .= " AND doc_type=3";
+
         $order_by = "shifr ASC, numb DESC";
         if (isset($_GET['order']))
             if ($_GET['order'] == 'data') {
@@ -1385,6 +1391,12 @@ class Doc
 
         if (isset($_GET['ost']))
             $and .= " AND numb_ostat>0";
+
+        if (isset($_GET['qt']))
+            $and .= " AND doc_type=4";
+
+        if (isset($_GET['po']))
+            $and .= " AND doc_type=3";
 
         $sql = /** @lang MySQL */
             "SELECT 
