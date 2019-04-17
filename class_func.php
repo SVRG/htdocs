@@ -52,12 +52,13 @@ class Func
     /**
      * Формат денег
      * @param double $R
+     * @param int $decimals
      * @return string
      */
-    public static function Rub($R)
+    public static function Rub($R, $decimals = 2)
     {
         $R = round((double)$R, 2);
-        return number_format($R, 2, '.', ' ');
+        return number_format($R, $decimals, '.', ' ');
     }
 //----------------------------------------------------------------------------------------------------------------------
 

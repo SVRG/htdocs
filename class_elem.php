@@ -391,8 +391,10 @@ class Elem
     public function formOrgByElem()
     {
         $db = new Db();
+        $kod_org_main = config::$kod_org_main;
+        $kod_elem = $this->kod_elem;
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM view_elem_org WHERE kod_elem=" . $this->kod_elem);
+            "SELECT * FROM view_elem_org WHERE kod_org<>$kod_org_main AND kod_elem=$kod_elem");
 
         if ($db->cnt == 0)
             return "";
@@ -408,7 +410,7 @@ class Elem
             $row = $rows[$i];
 
             $nazv_krat = $row['nazv_krat'];
-            $numb = (int)$row['numb'];
+            $numb = func::Rub($row['numb'],0);
             $kod_org = (int)$row['kod_org'];
 
             $org_link = "form_elem.php?kod_elem=$this->kod_elem&kod_org=" . $kod_org;
@@ -417,11 +419,11 @@ class Elem
                         <td><a href='$org_link'> $nazv_krat </a></td>
                         <td align='right'> $numb </td>
         		  	</tr>";
-            $sum += (int)$numb;
+            $sum += (int)$row['numb'];;
         }
         $res .= '<tr bgcolor="#CCCCCC">
                     <td align="right">Сумма</td>
-                    <td align="right">' . $sum . '</td>
+                    <td align="right">' . func::Rub($sum,0) . '</td>
                  </tr>';
 
         $res .= '</table>';
@@ -1168,6 +1170,65 @@ class Elem
 
         $res .= /** @lang HTML */
             "</table>";
+        return $res;
+    }
+    //------------------------------------------------------------------------
+//
+    /**
+     * Список Организаций которые поставляли данный элемент
+     * @return string
+     */
+    public function formSuppliers()
+    {
+        $db = new Db();
+
+        $kod_elem = $this->kod_elem;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT   `view_pplan`.`kod_org`,
+                             `view_pplan`.`modif`,
+                             `view_pplan`.`kod_elem`,
+                             `view_pplan`.`shifr`,
+                             SUM( `view_pplan`.`numb_postup` )  AS `numb`,
+                             `view_pplan`.`data_postav`,
+                             `view_pplan`.`ispolnit_nazv_krat`,
+                             `view_pplan`.`kod_ispolnit`,
+                             `view_pplan`.`name`
+                    FROM     `view_pplan`
+                    WHERE    ( `view_pplan`.`numb_postup` > 0  ) AND kod_elem = $kod_elem
+                    GROUP BY `view_pplan`.`kod_ispolnit`
+                    ORDER BY numb DESC;");
+
+        if ($db->cnt == 0)
+            return "";
+
+        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+		            <tr bgcolor="#CCCCCC">
+		                <td>Название</td>
+		                <td>Количество</td>
+		            </tr>';
+
+        $sum = 0;
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            $nazv_krat = $row['ispolnit_nazv_krat'];
+            $numb = func::Rub($row['numb'],0);
+            $kod_org = (int)$row['kod_ispolnit'];
+
+            $org_link = "form_elem.php?kod_elem=$this->kod_elem&kod_org=" . $kod_org;
+
+            $res .= "<tr>
+                        <td><a href='$org_link'> $nazv_krat </a></td>
+                        <td align='right'> $numb </td>
+        		  	</tr>";
+            $sum += (int)$row['numb'];
+        }
+        $res .= '<tr bgcolor="#CCCCCC">
+                    <td align="right">Сумма</td>
+                    <td align="right">' . func::Rub($sum,0) . '</td>
+                 </tr>';
+
+        $res .= '</table>';
         return $res;
     }
 }

@@ -79,6 +79,13 @@ if (in_array($_SESSION['MM_UserGroup'], $UserG))
                                         </div>
                                   </div>';
 
+                echo ' <div id="CollapsiblePanel5" class="CollapsiblePanel">
+                                        <div class="CollapsiblePanelTab" tabindex="0">Поставщики</div>
+                                        <div class="CollapsiblePanelContent">
+                                            ' . $E->formSuppliers() . '
+                                        </div>
+                                  </div>';
+
                 echo ' <div id="CollapsiblePanel4" class="CollapsiblePanel">
                                         <div class="CollapsiblePanelTab" tabindex="0">Спецификация</div>
                                         <div class="CollapsiblePanelContent">'.
@@ -103,6 +110,7 @@ if (in_array($_SESSION['MM_UserGroup'], $UserG))
         var CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: false});
         var CollapsiblePanel3 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel3", {contentIsOpen: true});
         var CollapsiblePanel4 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel4", {contentIsOpen: false});
+        var CollapsiblePanel5 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel5", {contentIsOpen: false});
         //-->
     </script>
 </div>
