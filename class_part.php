@@ -223,8 +223,8 @@ class Part
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
                       <td width="40">' . $nacl . '</td>
                       <td width="120" >' . $price_str . $Val . '</td>
-                      <td width="120" >' . Func::Rub($row['price_it']) . $Val . '</td>
-                      <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "</div><div>" . $sum_part_form . "</div><div>" . $Val . "</div><div>" . $NDS . '</div></div></td>
+                      <td width="120" >' . Func::Rub($row['price_it']) . "$Val  $NDS" . '</td>
+                      <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "$Val</div><div>$sum_part_form</div></div>" . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
         }

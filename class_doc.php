@@ -360,7 +360,11 @@ class Doc
             $numb = (int)$row['numb']; // Количество
             $numb_ostat = (int)$row['numb_ostat']; // Осталось отгрузить
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
-            $val = ""; // Валюта
+
+            $val = "";// Валюта
+            if(isset($row['val']))
+                $val = func::val_sign($row['val']); // Валюта
+
             $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
             $sum_part = $row['sum_part']; // Сумма партии
             $nds = ""; // НДС
@@ -453,8 +457,8 @@ class Doc
                                        <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_kod_elem</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
-                      <td width='120' align='right'>" . Func::Rub($price_nds) . "</td>
-                      <td width='120' align='right'>" . Func::Rub($sum_part) . $val . $nds . "</td>
+                      <td width='120' align='right'>" . Func::Rub($price_nds) ." $val $nds</td>
+                      <td width='120' align='right'>" . Func::Rub($sum_part) ." $val $nds</td>
                       <td width='90'>$oplacheno</td>
                   </tr>";
         }
@@ -2518,7 +2522,7 @@ class Doc
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */ "SELECT nds FROM view_rplan WHERE kod_dogovora=$kod_dogovora;");
 
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return;
 
         $nds = (int)$rows[0]['nds'];
@@ -2612,6 +2616,11 @@ class Doc
             echo "Err: Слишком короткое примечание. Должно быть не менее 4-х символов.";
             return;
         }
+
+        // Удаляем лишние переводы строк
+        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text);
+        $text = rtrim($text);
+        $text = ltrim($text);
 
         $kod_part = "NULL";
         if (isset($_POST['kod_part']))
