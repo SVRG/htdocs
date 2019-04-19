@@ -216,12 +216,14 @@ class Part
                     $btn_del $btn_copy_to_doc $btn_set $btn_add_po $form_linked_parts
                 </div>";
 
+            $status = self::formStatus($this->kod_part);
+
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img alt="Edit" src="/img/edit.gif" height="14" border="0" /></a>
                                   <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif . '</a>' . $pn . $btn_panel . $form_copy_to_doc . $form_add_po . '</td>
                       <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
                       <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
-                      <td width="40">' . $nacl . '</td>
+                      <td width="40">' . $nacl . $status . '</td>
                       <td width="120" >' . $price_str . $Val . '</td>
                       <td width="120" >' . Func::Rub($row['price_it']) . "$Val  $NDS" . '</td>
                       <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "$Val</div><div>$sum_part_form</div></div>" . $NDS . '</td>
@@ -1200,6 +1202,9 @@ class Part
             } elseif ($_POST['Flag'] == 'AddPOtoPart' and isset($_POST['kod_part_master'], $_POST['kod_org'])) {
                 $this->addPO($_POST['kod_part_master'], $_POST['kod_org']);
                 $event = true;
+            } elseif ($_POST['Flag'] == 'kod_part_status' and isset($_POST['kod_part'])) {
+                $this->addStatus();
+                $event = true;
             }
         }
 
@@ -2028,5 +2033,60 @@ class Part
         }
         $res .= "</table>";
         return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Добавления статуса партии: 1 - Отгружено; 2 - Упаковано(Готов к отгрузке); 3 - Возврат на склад (переупаковка);
+     */
+    public function addStatus()
+    {
+        $type = self::getStatus($this->kod_part);
+
+        if($type == 0)
+            $type = 2;
+        else
+            $type = 1;
+
+        $kod_user = func::kod_user();
+
+        $db = new Db();
+        $db->query(/** @lang MySQL */
+            "INSERT INTO part_status (kod_part,type,kod_user) VALUES($this->kod_part,$type,$kod_user)");
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Получение текущего статуса партии
+     * @param $kod_part
+     * @return int
+     */
+    public static function getStatus($kod_part)
+    {
+        $kod_part = (int)$kod_part;
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */ "SELECT * FROM part_status WHERE kod_part=$kod_part AND del=0 ORDER BY time_stamp DESC;");
+
+        if($db->cnt == 0)
+            return 0;
+
+        return (int)$rows[0]['type'];
+    }
+
+//----------------------------------------------------------------------
+//
+    public function formStatus($kod_part)
+    {
+        $kod_part = (int)$kod_part;
+        $type = self::getStatus($kod_part);
+
+        if($type == 1)
+            return "Отгружено";
+
+        $btn = "Отгружено";
+        if($type == 0)
+            $btn = "Упаковано";
+
+        return func::ActButton2("",$btn,"kod_part_status","kod_part",$kod_part,"Подтвердите действие");
     }
 }

@@ -406,6 +406,14 @@ class Doc
                     " bgcolor='#85e085'";
                 $data = "<b>" . Part::getLastNaklDate($kod_part) . "</b>";
             }
+            else{
+                $status = Part::getStatus($kod_part);
+
+                if ($status == 2) {
+                    $ind_part = /** @lang HTML */
+                        " bgcolor='#CECEF2'";
+                }
+            }
 
             // Если договор внешний то надо Код организации указать как Код исполнителя
             if ($kod_ispolnit != $kod_org_main) {
