@@ -216,16 +216,23 @@ class Part
                     $btn_del $btn_copy_to_doc $btn_set $btn_add_po $form_linked_parts
                 </div>";
 
-            $status = self::formStatus($this->kod_part);
+            $formStatus = self::formStatus($this->kod_part);
+            $status = self::getStatus($this->kod_part);
+            $ind_part = "";
+            if ($status == 2)
+                $ind_part = /** @lang HTML */
+                    " bgcolor='#CECEF2'";
+            elseif ($status == 1)
+                $ind_part = " bgcolor='#5ba6fb'";
 
             $res .=
                 '<td  width="365"><a href="form_part.php?kod_part=' . $row['kod_part'] . '&kod_dogovora=' . $this->kod_dogovora . '"><img alt="Edit" src="/img/edit.gif" height="14" border="0" /></a>
                                   <a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '"><b>' . $row['shifr'] . "</b> " . $modif . '</a>' . $pn . $btn_panel . $form_copy_to_doc . $form_add_po . '</td>
-                      <td width="70" align="right">' . $row['numb'] . $ostatok . '</td>
-                      <td width="80" align="center" ' . $ind . '>' . $data_postav_str . '</td>
-                      <td width="40">' . $nacl . $status . '</td>
-                      <td width="120" >' . $price_str . $Val . '</td>
-                      <td width="120" >' . Func::Rub($row['price_it']) . "$Val  $NDS" . '</td>
+                      <td width="70" align="right">' . $row['numb'] . $ostatok . "</td>
+                      <td width='80' align='center' $ind >$data_postav_str</td>
+                      <td width='40' $ind_part>$nacl $formStatus</td>
+                      <td width='120' >" . $price_str . $Val . "</td>
+                      <td width='120' >" . Func::Rub($row['price_it']) . "$Val  $NDS" . '</td>
                       <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "$Val</div><div>$sum_part_form</div></div>" . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
@@ -2081,7 +2088,7 @@ class Part
         $type = self::getStatus($kod_part);
 
         if($type == 1)
-            return "Отгружено";
+            return "";
 
         $btn = "Отгружено";
         if($type == 0)

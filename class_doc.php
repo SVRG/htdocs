@@ -362,7 +362,7 @@ class Doc
             $data = Func::Date_from_MySQL($row['data_postav']); // Дата поставки
 
             $val = "";// Валюта
-            if(isset($row['val']))
+            if (isset($row['val']))
                 $val = func::val_sign($row['val']); // Валюта
 
             $price_nds = Part::getPriceWithNDS($row); // Цена с НДС
@@ -405,14 +405,14 @@ class Doc
                 $ind_part = /** @lang HTML */
                     " bgcolor='#85e085'";
                 $data = "<b>" . Part::getLastNaklDate($kod_part) . "</b>";
-            }
-            else{
+            } else {
                 $status = Part::getStatus($kod_part);
 
                 if ($status == 2) {
                     $ind_part = /** @lang HTML */
                         " bgcolor='#CECEF2'";
-                }
+                } elseif ($status == 1)
+                    $ind_part = " bgcolor='#5ba6fb'";
             }
 
             // Если договор внешний то надо Код организации указать как Код исполнителя
@@ -465,8 +465,8 @@ class Doc
                                        <a href='form_elem.php?kod_elem=$kod_elem'>$shifr $mod $filter_kod_elem</a></td>
                       <td width='40' align='right' $ind_part>$numb $ostatok_str </td>
                       <td width='80' align='center' $ind_data >$data</td>
-                      <td width='120' align='right'>" . Func::Rub($price_nds) ." $val $nds</td>
-                      <td width='120' align='right'>" . Func::Rub($sum_part) ." $val $nds</td>
+                      <td width='120' align='right'>" . Func::Rub($price_nds) . " $val $nds</td>
+                      <td width='120' align='right'>" . Func::Rub($sum_part) . " $val $nds</td>
                       <td width='90'>$oplacheno</td>
                   </tr>";
         }
