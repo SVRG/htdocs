@@ -2096,4 +2096,44 @@ class Part
 
         return func::ActButton2("",$btn,"kod_part_status","kod_part",$kod_part,"Подтвердите действие");
     }
+
+//----------------------------------------------------------------------
+//
+    public static function formPrimTable($kod_part)
+    {
+        $res = "";
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * 
+                                  FROM dogovor_prim 
+                                  WHERE kod_part=$kod_part AND dogovor_prim.del=0 
+                                  ORDER BY dogovor_prim.time_stamp DESC
+                                  ");
+        $cnt = $db->cnt;
+
+        if ($cnt == 0)
+            return $res;
+
+        // Формируем таблицу
+        $res = ' <table border=1 cellspacing=0 cellpadding=0 width="100%">';
+
+        // Заполняем данными
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+
+            $user = "";
+            if ($row['user'] != "")
+                $user = "<br>" . $row['user'];
+
+            $res .= /** @lang HTML */
+                '<tr>
+                        <td>' . Func::Date_from_MySQL($row['time_stamp']) . $user . '</td>
+                        <td width="100%">' . $row['text'] . '</td>
+                     </tr>';
+        }
+        $res .= '</table>';
+
+        return $res;
+    }
 }

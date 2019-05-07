@@ -109,14 +109,13 @@ $Org->kod_org = $D->Data['kod_org'];
 
 echo "<h3>$nomer от $data_sost</h3>";
 if (isset($_GET['pl'])) // Paking List
-    {
-        $proc_pay = Doc::getProcPay($D->kod_dogovora);
+{
+    $proc_pay = Doc::getProcPay($D->kod_dogovora);
 
-        if(Doc::getPaymentFlag($D->kod_dogovora))
-            echo "<h3>Оплачено $proc_pay%</h3>";
-        echo "<h3>" . $D->Data['nazv_krat'] . "</h3>";
-    }
-else
+    if (Doc::getPaymentFlag($D->kod_dogovora))
+        echo "<h3>Оплачено $proc_pay%</h3>";
+    echo "<h3>" . $D->Data['nazv_krat'] . "</h3>";
+} else
     echo "Заказчик: " . $D->Data['nazv_krat'] . "<br>";
 echo "Юридический адрес: " . $adres;
 echo $dogovor_nomer;
@@ -181,12 +180,14 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $n = $i + 1;
 
         if (isset($_GET['pl']))  // Paking List
+        {
+            $prim = Part::formPrimTable($kod_part);
             echo "<tr>
-            <td align='center'>$n</td>
-            <td align='left'>$name <br>p/n $part_numb</td>
-            <td align='center'>$numb</td>
-          </tr>";
-        else
+                    <td align='center'>$n</td>
+                    <td align='left'>$name <br>p/n $part_numb $prim</td>
+                    <td align='center'>$numb</td>
+                  </tr>";
+        } else
             echo "<tr>
             <td align='center'>$n</td>
             <td align='left'>$name</td>
@@ -227,7 +228,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     $sum_part = $schet_data['summa'];                  // Сумма с НДС
     $nds_scheta = (int)$schet_data['nds'];
     $nds = 0;
-    if($nds_scheta > 0)
+    if ($nds_scheta > 0)
         $nds = func::rnd($sum_part * $nds_scheta / (100 + $nds_scheta));     // Сумма НДС
     $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
     $price_str = func::Rub(func::rnd($schet_data['summa']));
