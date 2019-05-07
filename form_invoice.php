@@ -156,7 +156,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $row = $rows[$i];
         $name = $row['name'];
         $modif = $row['modif'];
-        $part_numb = $row['kod_part'];
+        $kod_part = (int)$row['kod_part'];
+        $part_numb = $kod_part;
 
         if ($modif !== "")
             $name = elem::getNameForInvoice($row);
