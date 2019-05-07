@@ -771,6 +771,10 @@ class Doc
         if ($kod_dogovora > 0)
             $this->kod_dogovora = $kod_dogovora;
 
+        if (isset($this->Data))
+            if ((int)$this->Data['kod_dogovora'] == (int)$kod_dogovora)
+                return $this->Data;
+
         $db = new Db();
 
         $rows = $db->rows(/** @lang MySQL */
@@ -1991,8 +1995,8 @@ class Doc
 
         $summ = 0; // Сумма по месяцу
 
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-        $res .= '<tr bgcolor="#CCCCCC" >
+        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+                <tr bgcolor="#CCCCCC" >
                     <td width="60">Номер ПП</td>
                     <td width="100">Сумма</td>
                     <td width="80">Дата</td>
@@ -2010,14 +2014,23 @@ class Doc
 
             // Процент распределения платежа
             $prs = 0;
-            if ($row['summa'] != 0)
+            $col_row = "";
+            if ($row['summa'] > 0)
                 $prs = Func::Proc($row['summa_raspred'] / $row['summa']);
+            elseif ($row['summa'] < 0) {
+                $prs = -1;
+                $col_row = 'bgcolor="#ff9999"';
+            }
 
             // Если процент не равен 100 то красим ячейку
-            if ($prs != 100)
-                $col = 'bgcolor="#FFFF99"';
-            else
-                $col = '';
+            $col = '';
+            $prs_str = $prs . "%";
+            if ($prs != 100) {
+                if ($prs >= 0)
+                    $col = 'bgcolor="#FFFF99"';
+                else
+                    $prs_str = "-";
+            }
 
             $nazv_krat = $row['nazv_krat'];
             $kod_org = $row['kod_org'];
@@ -2026,11 +2039,10 @@ class Doc
                 $kod_org = $row['kod_ispolnit'];
             }
 
-
-            $res .= '<tr><td>' . $row['nomer'] . '</td>
+            $res .= "<tr $col_row><td>" . $row['nomer'] . '</td>
                           <td  align="right">' . Func::Rub($row['summa']) . '</td>
                           <td  align="center">' . $d . '</td>
-                          <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
+                          <td ' . $col . ' align="center"><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs_str . '</a></td>
                           <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
                           <td><a href="form_org.php?kod_org=' . $kod_org . '">' . $nazv_krat . '</a></td>
                           <td>' . $row['prim'] . '</td>
@@ -2625,10 +2637,10 @@ class Doc
             return;
         }
 
-        // Удаляем лишние переводы строк
-        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text);
-        $text = rtrim($text);
-        $text = ltrim($text);
+        $text = strip_tags($text); // Удаляем HTML тэги
+        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text); // Удаляем лишние переводы строк
+        $text = rtrim($text); // Пробелы справа
+        $text = ltrim($text); // Пробелы слева
 
         $kod_part = "NULL";
         if (isset($_POST['kod_part']))
