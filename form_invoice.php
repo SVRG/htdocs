@@ -19,13 +19,13 @@ $doc_type = (int)$D->Data['doc_type'];
 if ($doc_type == 1)
     $nomer = "Счет №" . $D->Data['nomer'];
 elseif ($doc_type == 2)
-    $nomer = "Подтверждение заказа №OC-" . $D->kod_dogovora;
+    $nomer = "Подтверждение заказа №" . $D->kod_dogovora;
 elseif ($doc_type == 3)
-    $nomer = "Заказ №PO-" . $D->kod_dogovora;
+    $nomer = "Заказ №" . $D->kod_dogovora;
 elseif ($doc_type == 4)
-    $nomer = "Предложение №QT-" . $D->kod_dogovora;
+    $nomer = "Предложение №" . $D->kod_dogovora;
 elseif ($doc_type == 5)
-    $nomer = "Запрос №RFQ-" . $D->kod_dogovora;
+    $nomer = "Запрос №" . $D->kod_dogovora;
 
 $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
