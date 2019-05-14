@@ -8,8 +8,11 @@ $org = new Org();
 if (isset($_POST['FormName']))
     if ($_POST['FormName'] == "FormAddEdit")
         if (isset($_POST['poisk']) and isset($_POST['nazv_krat']) and isset($_POST['nazv_poln'])) {
-            $org->AddOrg($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
-            header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
+            $kod_org = (int)$org->AddOrg($_POST['poisk'], $_POST['nazv_krat'], $_POST['nazv_poln']);
+            if ($kod_org > 0)
+                header("Location: http://" . $_SERVER['HTTP_HOST'] . "/form_org.php?kod_org=$kod_org");
+            else
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
         }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -30,10 +33,8 @@ if (isset($_POST['FormName']))
     $add_edit = false;
 
     if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-
-        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Организацию', 'AddOrg');
-        if (isset($_POST['Flag']))
-            if ($_POST['Flag'] == 'AddOrg') {
+        if (isset($_GET['add']))
+            {
                 echo $org->formAddEdit();
                 $add_edit = true;
             }

@@ -31,17 +31,14 @@ $Dogovor->Events();
     <div id="pageName">
         <?php
         $add = false;
-        if (isset($_POST['Flag']))
-            if ($_POST['Flag'] == 'AddDoc') {
+        if (isset($_GET['add'])) {
+            if (in_array($_SESSION['MM_UserGroup'], $UserG))
                 echo $Dogovor->formAddEdit();
-                echo func::Cansel();
-                $add = true;
-            }
+            echo func::Cansel();
+            $add = true;
+        }
 
         if (!$add) {
-            if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Новый Договор', 'AddDoc');
-
             echo $Dogovor->formDocList();
         }
         ?>

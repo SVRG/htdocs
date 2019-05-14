@@ -557,6 +557,7 @@ class Org
      * @param $poisk
      * @param $nazv_krat
      * @param $nazv_poln
+     * @return int|void
      */
     public function AddOrg($poisk, $nazv_krat, $nazv_poln)
     {
@@ -586,6 +587,7 @@ class Org
         }
         $db->query(/** @lang MySQL */
             "INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
+        return $db->last_id;
     }
 //----------------------------------------------------------------------
 //

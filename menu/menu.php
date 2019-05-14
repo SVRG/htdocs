@@ -9,6 +9,7 @@
         </li>
         <li><a href="../form_doclist.php">Договоры</a>
             <ul>
+                <li><a href="../form_doclist.php?add">Добавить</a></li>
                 <li><a href="../form_main.php?sgp=1">Исходящие</a></li>
                 <li><a href="../form_main.php?sgp=1&pd&ost">Исходящие $</a></li>
                 <li><a href="../form_main.php?sgp=9">Исходящие ?</a></li>
@@ -18,6 +19,7 @@
         </li>
         <li><a href="../form_orglist.php">Организации</a>
             <ul>
+                <li><a href="../form_orglist.php?add">Добавить</a></li>
                 <li><a href="../form_orglist.php?dolg">Должники</a></li>
                 <li><a href="../form_orglist.php?pays">Рейтинг <?php echo date("Y"); ?></a></li>
             </ul>
