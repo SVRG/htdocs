@@ -157,10 +157,12 @@ class Part
                 $drem = Func::DaysRem($row['data_postav']);
 
                 // Если осталось меньше 30 и больше 14 дней то красим в оранжевый
-                if ($drem <= 14)
-                    $ind = "bgcolor='#F18585'";// Красный
-                elseif ($drem <= 30)
-                    $ind = 'bgcolor="#FFD222"';// Оранжевый
+                if ($dogovor_proc_pay > 0) {
+                    if ($drem <= 14)
+                        $ind = "bgcolor='#F18585'";// Красный
+                    elseif ($drem <= 30)
+                        $ind = 'bgcolor="#FFD222"';// Оранжевый
+                }
             }
 
             //--------------------------
