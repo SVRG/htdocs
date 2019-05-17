@@ -2289,18 +2289,19 @@ class Doc
             $kod_ispolnit = config::$kod_org_main;
         }
 
-        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
+        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main) {
             $nomer = self::getNextSchetNomer();
+            $doc_type = 1;
+        } else {
+            $nomer = $db->real_escape_string($nomer);
 
-        $nomer = $db->real_escape_string($nomer);
-
-        if ($nomer == "PO")
-            $doc_type = 3;
-        elseif ($nomer == "QT")
-            $doc_type = 4;
-        elseif ($nomer == "RFQ")
-            $doc_type = 5;
-
+            if ($nomer == "PO")
+                $doc_type = 3;
+            elseif ($nomer == "QT")
+                $doc_type = 4;
+            elseif ($nomer == "RFQ")
+                $doc_type = 5;
+        }
         $sql = /** @lang MySQL */
             "INSERT INTO dogovory (nomer,data_sost,kod_org,kod_ispolnit,kod_user,doc_type) VALUES('$nomer','$data_sost',$kod_org,$kod_ispolnit,$kod_user,$doc_type)";
 
@@ -2740,17 +2741,19 @@ class Doc
             $kod_ispolnit = config::$kod_org_main;
         }
 
-        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main)
+        if ($nomer === "NEXT" and $kod_ispolnit == config::$kod_org_main) {
             $nomer = self::getNextSchetNomer();
+            $doc_type = 1;
+        } else {
+            $nomer = $db->real_escape_string($nomer);
 
-        $nomer = $db->real_escape_string($nomer);
-
-        if ($nomer == "PO")
-            $doc_type = 3;
-        elseif ($nomer == "QT")
-            $doc_type = 4;
-        elseif ($nomer == "RFQ")
-            $doc_type = 5;
+            if ($nomer == "PO")
+                $doc_type = 3;
+            elseif ($nomer == "QT")
+                $doc_type = 4;
+            elseif ($nomer == "RFQ")
+                $doc_type = 5;
+        }
 
         $db::getHistoryString("dogovory", "kod_dogovora", $this->kod_dogovora);
 
@@ -3346,9 +3349,9 @@ class Doc
     {
         $doc_types = array(
             0 => "Contract",
-            1 => "Order Confirmation",
+            1 => "OC",
             2 => "PO",
-            3 => "Quotation",
+            3 => "QT",
             4 => "RFQ"
         );
 
