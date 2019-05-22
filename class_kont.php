@@ -476,7 +476,7 @@ class Kontakt
                                 INNER JOIN org ON kontakty.kod_org = org.kod_org
                                 WHERE kontakty.del=0
                                 ORDER BY
-                                    kontakty.famil ASC";
+                                    kontakty.famil;";
 
         $rows = $db->rows($query);
 

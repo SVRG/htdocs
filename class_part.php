@@ -32,7 +32,7 @@ class Part
         // Если запрос не был передан в параметрах
         if ($sql == "")
             $sql = /** @lang MySQL */
-                "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora ORDER BY data_postav ASC"; // Сначала старые партии
+                "SELECT * FROM view_rplan WHERE kod_dogovora=$this->kod_dogovora ORDER BY data_postav;"; // Сначала старые партии
 
         $rows = $db->rows($sql);
         $cnt = $db->cnt;
@@ -319,7 +319,7 @@ class Part
     {
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM raschet WHERE del=0 AND kod_part=$this->kod_part ORDER BY data ASC"); //
+            "SELECT * FROM raschet WHERE del=0 AND kod_part=$this->kod_part ORDER BY data;"); //
 
         $cnt = $db->cnt;
 
@@ -1247,7 +1247,7 @@ class Part
         $db = new Db();
 
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT kod_part FROM parts WHERE del=0 AND kod_dogovora=$kod_dogovora ORDER BY kod_part ASC ");
+            "SELECT kod_part FROM parts WHERE del=0 AND kod_dogovora=$kod_dogovora ORDER BY kod_part;");
         return $rows[0]['kod_part'];
     }
 //-----------------------------------------------------------------------
@@ -1431,7 +1431,7 @@ class Part
             if ($_POST['Flag'] == "CopyPart" and (int)$_POST['kod_part_copy'] == $this->kod_part) {
                 $db_doc = new Db();
                 $rows_doc = $db_doc->rows(/** @lang MySQL */
-                    "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
+                    "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer;");
 
                 // Пробуем найти подчиненный договор
                 $rows_links = $db_doc->rows(/** @lang MySQL */
@@ -1956,7 +1956,7 @@ class Part
         if ($cnt == 0) {
             $db = new Db();
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT * FROM view_rplan WHERE zakryt=0 ORDER BY nomer ASC;");
+                "SELECT * FROM view_rplan WHERE zakryt=0 ORDER BY nomer;");
             $cnt = $db->cnt;
         }
 

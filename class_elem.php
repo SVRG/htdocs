@@ -123,7 +123,7 @@ class Elem
                                   FROM view_elem 
                                   LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                   GROUP BY view_elem.kod_elem
-                                  ORDER BY shifr ASC");
+                                  ORDER BY shifr;");
 
         $cnt = $db->cnt;
 
@@ -737,7 +737,7 @@ class Elem
                                       INNER JOIN view_elem ON kod_elem_sub=view_elem.kod_elem
                                       LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                     WHERE specs.kod_elem_base=$this->kod_elem AND specs.del=0
-                                    ORDER BY shifr ASC");
+                                    ORDER BY shifr;");
 
         $cnt = $db->cnt;
 
@@ -770,7 +770,7 @@ class Elem
                                       INNER JOIN view_elem ON kod_elem_base=view_elem.kod_elem
                                       LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                     WHERE specs.kod_elem_sub=$this->kod_elem AND specs.del=0
-                                    ORDER BY shifr ASC");
+                                    ORDER BY shifr;");
 
         $cnt = $db->cnt;
 
@@ -897,7 +897,7 @@ class Elem
         $db = new Db();
         $kod_elem = $this->kod_elem;
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ");
+            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity;");
 
         $btn_add = "";
         if(func::user_group()=="admin")
@@ -950,7 +950,7 @@ class Elem
     {
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity ASC ",1);
+            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity;");
 
         if($db->cnt==0)
             return 0.;
@@ -973,7 +973,7 @@ class Elem
         $db = new Db();
         $kod_elem = $this->kod_elem;
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT elem.kod_elem,kod_price,price,quantity,obozn,name,shifr FROM price_list INNER JOIN elem ON elem.kod_elem=price_list.kod_elem WHERE price_list.del=0 ORDER BY shifr ASC,quantity ASC ");
+            "SELECT elem.kod_elem,kod_price,price,quantity,obozn,name,shifr FROM price_list INNER JOIN elem ON elem.kod_elem=price_list.kod_elem WHERE price_list.del=0 ORDER BY shifr,quantity;");
 
         $btn_add = "";
         if(func::user_group()=="admin")

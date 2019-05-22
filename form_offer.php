@@ -201,7 +201,7 @@ if (isset($_GET['p']) and $D->Data['kod_ispolnit'] == config::$kod_org_main) {
             </tr>";
 } elseif ($D->Data['kod_ispolnit'] == config::$kod_org_main) {
     echo /** @lang HTML */
-    "<img src='img/sign.png' width='776'></image>";
+    "<img alt='sign' src='img/sign.png' width='776'></image>";
 }
 ?>
 </body>

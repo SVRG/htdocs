@@ -46,8 +46,8 @@ if(func::user_group() != "admin")
                                 WHERE kod_elem = $kod_elem
                                 GROUP BY kontakty.kod_kontakta
                                 ORDER BY
-                                    view_rplan.nazv_krat ASC,
-                                    kontakty.famil ASC";
+                                    view_rplan.nazv_krat,
+                                    kontakty.famil;";
         }
 
         echo $c->formAllKontats($query);

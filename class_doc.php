@@ -543,7 +543,7 @@ class Doc
                                         view_kontakty_dogovora.kod_kontakta = $kod_kontakta
                                     ORDER BY
                                         view_rplan.kod_dogovora DESC,
-                                        view_rplan.name ASC");
+                                        view_rplan.name;");
 
         return Doc::formRPlan_by_Doc($rows);
     }
@@ -917,7 +917,7 @@ class Doc
                     WHERE
                       $where
                     ORDER BY
-                      shifr ASC,
+                      shifr,
                       $order_by";
 
         $db = new Db();
@@ -981,7 +981,7 @@ class Doc
                     WHERE
                       $where
                     ORDER BY
-                      shifr ASC,
+                      shifr,
                       $order_by";
 
         $db = new Db();
@@ -1349,7 +1349,7 @@ class Doc
                      $where AND zakryt=0
                 ORDER BY
                 kod_dogovora DESC, 
-                view_rplan.name ASC;";
+                view_rplan.name;";
 
             $rows = $db->rows($sql);
             if (count($rows) > 0)
@@ -1365,14 +1365,14 @@ class Doc
                     $where
                 ORDER BY 
                 kod_dogovora DESC,
-                view_rplan.name ASC";
+                view_rplan.name;";
 
         $rows = $db->rows($sql);
         if (count($rows) > 0)
             return ($this->formRPlan_by_Doc($rows));
 
         return "Договоры без партий:<br>" . $this->formDocList(/** @lang SQL */
-                "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org");
+                "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org;");
 
     }
 //-----------------------------------------------------------------------
@@ -1423,7 +1423,7 @@ class Doc
                     view_rplan.zakryt = 0 AND $and
                 ORDER BY 
                 kod_dogovora DESC,
-                view_rplan.name ASC";
+                view_rplan.name;";
 
         $rows = $db->rows($sql);
 
@@ -1505,7 +1505,7 @@ class Doc
                                     kod_type_attr
                                   FROM attributes
                                   WHERE attributes.del=0
-                                  ORDER BY kod_type_attr ASC"
+                                  ORDER BY kod_type_attr;"
         );
         $cnt = $db->cnt;
 
@@ -1580,7 +1580,7 @@ class Doc
                                   FROM dogovor_attribute
                                   INNER JOIN attributes ON attributes.kod_attr=dogovor_attribute.kod_attr
                                   WHERE kod_dogovora=$this->kod_dogovora AND dogovor_attribute.del=0 AND attributes.del=0
-                                  ORDER BY kod_type_attr ASC"
+                                  ORDER BY kod_type_attr;"
         );
         $cnt = $db->cnt;
         if (isset($_POST['formAddAttr'])) {
@@ -3173,7 +3173,7 @@ class Doc
                     WHERE
                       $where
                     ORDER BY
-                      shifr ASC,
+                      shifr,
                       numb DESC";
 
         $db = new Db();
@@ -3297,7 +3297,7 @@ class Doc
         if ($cnt == 0) {
             $db = new Db();
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer ASC;");
+                "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer;");
             $cnt = $db->cnt;
         }
 
@@ -3434,7 +3434,7 @@ class Doc
         if (isset($_POST['AddDocLink'])) {
             $db = new Db();
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT * FROM view_dogovor_data WHERE zakryt=0 AND kod_dogovora<>$kod_dogovora_master ORDER BY nomer ASC;");
+                "SELECT * FROM view_dogovor_data WHERE zakryt=0 AND kod_dogovora<>$kod_dogovora_master ORDER BY nomer;");
 
             $sel_list = self::formSelList($rows);
             $btn_cansel = func::Cansel();
@@ -3512,7 +3512,7 @@ class Doc
                 FROM view_rplan
                 JOIN sklad ON sklad.kod_part=view_rplan.kod_part
                 WHERE zakryt=0 AND sklad.del=0 AND poluch=0 AND doc_type=1 AND kod_ispolnit=$kod_org_main $and
-                ORDER BY kod_dogovora ASC;";
+                ORDER BY kod_dogovora;";
 
         $rows = $db->rows($sql);
 

@@ -23,7 +23,7 @@ include_once "security.php";
             "SELECT *
                     FROM view_rplan
                     WHERE (kod_elem=1002 OR kod_elem=1123 OR kod_elem=1004) AND zakryt=0 AND kod_ispolnit=683 AND numb_ostat>0
-                    ORDER BY shifr ASC, kod_dogovora ASC, data_postav ASC
+                    ORDER BY shifr, kod_dogovora, data_postav;
         ");
 
         echo "<table width='100%' border='1' cellspacing='0'>";

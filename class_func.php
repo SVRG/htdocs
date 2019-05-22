@@ -16,20 +16,16 @@ class Func
      * @param string $Date - 17.07.2017
      * @param string $format - формат даты
      * @return int
+     * @throws Exception
      */
     public static function DaysRem($Date, $format = "Y-m-d")
     {
         if (!isset($Date) or !self::validateDate($Date, $format))
             return 0;
 
-        try {
-            $now = new DateTime("now");
-        } catch (Exception $e) {
-        }
-        try {
-            $date = new DateTime($Date);
-        } catch (Exception $e) {
-        }
+        $now = new DateTime("now");
+        $date = new DateTime($Date);
+
         $res = $now->diff($date)->format("%r%a");
         return $res;
     }
@@ -584,10 +580,10 @@ class Func
 
     /**
      * Возвращает сумму прописью
-     * @author runcore
-     * @uses morph(...)
      * @param $num
      * @return string
+     * @author runcore
+     * @uses morph(...)
      */
     public static function num2str($num)
     {
@@ -651,6 +647,7 @@ class Func
         return $f5;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Генератор произвольной строки
      * @param int $length

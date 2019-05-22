@@ -70,8 +70,8 @@ class Org
      */
     public static function formSelList2($kod_org_selected = 0, $rows = [])
     {
+        $db = new Db();
         if(count($rows) == 0) {
-            $db = new Db();
 
             $sql = /** @lang MySQL */
                 "SELECT * FROM org WHERE del=0 ORDER BY poisk;";

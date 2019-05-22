@@ -23,7 +23,7 @@ include_once "class_db.php";
                     FROM price_list
                     JOIN elem ON elem.kod_elem=price_list.kod_elem
                     WHERE price_list.del=0
-                    ORDER BY elem.name ASC
+                    ORDER BY elem.name;
         ");
 
         echo "<table width='100%' border='1' cellspacing='0'>";
