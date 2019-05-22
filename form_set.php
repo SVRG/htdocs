@@ -213,9 +213,9 @@ if (isset($_GET['add'])) {
     else {
         if (isset($_GET['n']))
             if ($where == "")
-                $where .= " AND numb=$numb_min ";
-            else
                 $where .= " WHERE numb=$numb_min ";
+            else
+                $where .= " AND numb=$numb_min ";
 
         $sql = /** @lang MySQL */
             "SELECT * 
