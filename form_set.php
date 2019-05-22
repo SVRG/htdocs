@@ -52,12 +52,12 @@ if (isset($_POST['Flag'])) {
         $part->setItemNumb((int)$_POST['kod_item'], (double)$_POST['numb']);
     }// Если подтверждение удаления всей комплектации
     elseif ($_POST['Flag'] == "delSet") {
-        if(func::user_group() == "admin")
+        if (func::user_group() == "admin")
             $part->deleteSet();
     }
 }
 
-if(func::user_group() == "admin") {
+if (func::user_group() == "admin") {
     if (isset($_GET['copyFrom'])) {
         $kod_part_source = (int)$_GET['copyFrom'];
         $part->copyItemsToPart($kod_part_source);
@@ -85,8 +85,8 @@ $rows = $db->rows(/** @lang MySQL */
     "SELECT * FROM part_set WHERE kod_part=$kod_part AND del=0;");
 if ($db->cnt == 0)
     echo "Нет данных";
-elseif(func::user_group() == "admin" and isset($_GET['del']))
-        echo func::ActButton2("", "Удалить", "delSet", "kod_part", $kod_part);
+elseif (func::user_group() == "admin" and isset($_GET['del']))
+    echo func::ActButton2("", "Удалить", "delSet", "kod_part", $kod_part);
 
 $price_row = ""; // Цена
 if (isset($_GET['price']))
@@ -172,7 +172,7 @@ $res .= $line . "\n";
 //echo func::Rub($sum); // Без НДС
 $sum_it = func::rnd($sum * (100 + config::$nds_main) / 100); // Сумма комплектации с НДС
 $ostat = $part_data['sum_part'] - $sum_it;
-if($part_data['sum_part'] == 0)
+if ($part_data['sum_part'] == 0)
     $part_data['sum_part'] = 1;
 $prc = func::rnd((100 * $ostat) / $part_data['sum_part']);
 $ostat_str = func::Rub($ostat); // Преобразуем в строку
@@ -196,11 +196,10 @@ if (isset($_GET['add'])) {
     if ($search != "") {
         $where = "AND name LIKE '%" . $db->real_escape_string($search) . "%'";
 
-        if(isset($_GET['all']))
+        if (isset($_GET['all']))
             $where = "WHERE name LIKE '%" . $db->real_escape_string($search) . "%'";
         $_SESSION['search'] = $search;
-    }
-    else
+    } else
         unset($_SESSION['search']);
 
     // Список выбора - только те записи, которых нет в комплектации
@@ -210,12 +209,19 @@ if (isset($_GET['add'])) {
                 FROM sklad_1c 
                 WHERE numb>=$numb_min $where
                 AND kod_1c NOT IN (SELECT part_set.kod_1c FROM part_set WHERE part_set.kod_part=$kod_part AND del=0)
-        ORDER BY name ASC;";
-    else
+        ORDER BY name;";
+    else {
+        if (isset($_GET['n']))
+            if ($where == "")
+                $where .= " AND numb=$numb_min ";
+            else
+                $where .= " WHERE numb=$numb_min ";
+
         $sql = /** @lang MySQL */
             "SELECT * 
                 FROM sklad_1c $where
-              ORDER BY name ASC;";
+              ORDER BY name;";
+    }
     $rows = $db->rows($sql);
 
     echo /** @lang HTML */
