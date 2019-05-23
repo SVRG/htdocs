@@ -186,6 +186,9 @@ if (isset($_GET['add'])) {
     echo "<h3>Список выбора</h3>";
     $numb_min = $part_data['numb'];
 
+    if (isset($_GET['min']))
+        $numb_min = (int)$_GET['min'];
+
     $search = "";
     if (isset($_POST['search']))
         $search = func::clearString($_POST['search']);
@@ -216,6 +219,9 @@ if (isset($_GET['add'])) {
                 $where .= " WHERE numb=$numb_min ";
             else
                 $where .= " AND numb=$numb_min ";
+
+        if (isset($_GET['w'])) // удаляем условия отбора
+            $where = "";
 
         $sql = /** @lang MySQL */
             "SELECT * 
