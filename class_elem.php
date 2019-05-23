@@ -134,16 +134,11 @@ class Elem
         if (isset($_GET['all']))
             $all = true;
 
-        $btn = "";
-        // todo - придумать глобальную политику прав
-        if($_SESSION['MM_UserGroup'] == "admin")
-            $btn =  Func::ActButton('', 'Добавить Элемент', 'formAdd');
-
         $res = /** @lang HTML */
-            "$btn<table border=0 cellspacing=5 cellpadding=10 rules=\"rows\" frame=\"below\">
+            "<table border=1 cellspacing=0 width=\"70%\" rules=\"rows\" frame=\"void\">
                  <tr bgcolor=\"#CCCCCC\">
                      <td width=\"10%\">Фото</td>
-                     <td width='30%' align=\"center\">Наименование <a href=\"form_nomen.php?all\">Показать все</a></td>
+                     <td width='70%' align=\"center\">Наименование <a href=\"form_nomen.php?all\">Показать все</a></td>
                      <td>Цены</td>
                  </tr>";
 

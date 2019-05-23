@@ -24,8 +24,8 @@ $E->Events();
     } else {
         $add = false;
 
-        if (isset($_POST['Flag']))
-            if ($_POST['Flag'] == 'formAdd') {
+        if (isset($_GET['add']))
+            {
                 echo $E->formAddEdit();
                 $add = true;
             }

@@ -26,6 +26,7 @@
         </li>
         <li><a href="../form_nomen.php">Номенклатура</a>
             <ul>
+                <li><a href="../form_nomen.php?add">Добавить</a></li>
                 <li><a href="../form_set.php">Сборки</a></li>
             </ul>
         </li>
