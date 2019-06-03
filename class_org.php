@@ -349,7 +349,6 @@ class Org
         $res = /** @lang HTML */
             "<table border=1 cellspacing=0 width=\"70%\" rules=\"rows\" frame=\"void\">
 	                    <tr bgcolor=\"#CCCCCC\">
-	                            <td width=\"20\">№</td>
 	                            <td width=\"100\">Поиск</td>
 	                            <td width=\"200\">Наименование краткое</td>
 	                            <td width=\"200\">Наименование полное</td>
@@ -383,7 +382,6 @@ class Org
 
             $tab_row = /** @lang HTML */
                 "<tr>
-                      <td></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$poisk</a></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_krat</a></td>
                       <td><a href=\"form_org.php?kod_org=$kod_org \">$nazv_poln_str</a>$inn $ogrn</td>
