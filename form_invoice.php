@@ -106,6 +106,7 @@ else {
 }
 $Org = new Org();
 $Org->kod_org = $D->Data['kod_org'];
+$Org->getData();
 
 echo "<h3>$nomer от $data_sost</h3>";
 if (isset($_GET['pl'])) // Paking List
@@ -116,7 +117,15 @@ if (isset($_GET['pl'])) // Paking List
         echo "<h3>Оплачено $proc_pay%</h3>";
     echo "<h3>" . $D->Data['nazv_krat'] . "</h3>";
 } else
-    echo "Заказчик: " . $D->Data['nazv_krat'] . "<br>";
+{
+    $inn = "";
+    if($Org->Data['inn'] != "")
+    {
+        $inn = "<br>ИНН " . $Org->Data['inn'];
+        $inn .= " КПП " . $Org->Data['kpp'];
+    }
+    echo "Заказчик: " . $D->Data['nazv_krat'] . $inn . "<br>";
+}
 echo "Юридический адрес: " . $adres;
 echo $dogovor_nomer;
 echo "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
