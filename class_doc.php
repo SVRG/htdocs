@@ -2149,7 +2149,16 @@ class Doc
 
         if (isset($_GET['y'])) {
             $y = (int)$_GET['y'];
-            $data_s = "$y-01-01";
+            $m = "01";
+
+            if(isset($_GET['m']))
+            {
+                $m = (int)$_GET['m'];
+                if($m > 12 or $m < 1)
+                    $m = "01";
+            }
+
+            $data_s = "$y-$m-01";
             $data_n = ($y + 1) . "-01-01";
             if ($where == "")
                 $where = " WHERE (data>='$data_s' AND data<'$data_n') ";
@@ -3541,6 +3550,11 @@ class Doc
     }
 //----------------------------------------------------------------------
 //
+    /**
+     * История изменений
+     * @param $kod_dogovora
+     * @return string
+     */
     public static function formHistory($kod_dogovora)
     {
         $rows = func::getHistory('dogovory', $kod_dogovora);
@@ -3582,6 +3596,35 @@ class Doc
                     </tr>";
         }
         $res .= "</table>";
+        return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Форма поиска с переходом к выбранному элементу
+     * @param array $rows
+     * @return string
+     */
+    public static function formSearch($rows = [])
+    {
+        if (count($rows) > 0)
+            $selList = self::formSelList($rows);
+        else {
+            $db = new Db();
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM view_dogovor_data ORDER BY data_sost DESC, kod_dogovora DESC;");
+            $cnt = $db->cnt;
+
+            if ($cnt == 0)
+                return "Нет данных";
+            $selList = self::formSelList($rows);
+        }
+
+        $res = "<form action='form_dogovor.php' method='post'>
+                    $selList
+                    <input type='submit' value='GO'>
+                </form>";
+
         return $res;
     }
 }// END CLASS
