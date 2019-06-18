@@ -311,10 +311,13 @@ if (isset($_GET['add'])) {
             $sum_item = func::rnd($price * $numb);
 
         $ostat_p = $part_data['sum_part'] - ($sum_it + $sum_item); // Остаток
-        $prc_p = func::rnd(($ostat_p * 100) / $part_data['sum_part']); // Если добавить данную позицию то получим такой процент прибыли
-
         if ($ostat_p < 0)
             continue;
+        
+        if($part_data['sum_part'] > 0)
+            $prc_p = (int)(($ostat_p * 100) / $part_data['sum_part']); // Если добавить данную позицию то получим такой процент прибыли
+        else
+            $prc_p = 0;
 
         $n = $i + 1;
 
