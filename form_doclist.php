@@ -30,17 +30,18 @@ $Dogovor->Events();
 <div class="style1" id="pagecell1">
     <div id="pageName">
         <?php
-        $add = false;
         if (isset($_GET['add'])) {
             if (in_array($_SESSION['MM_UserGroup'], $UserG))
                 echo $Dogovor->formAddEdit();
             echo func::Cansel();
             $add = true;
         }
-
-        if (!$add) {
-            echo $Dogovor->formDocList();
+        elseif (isset($_GET['search']))
+        {
+            echo Doc::formSearch(); // Тут будет форма поиска
         }
+        else
+            echo $Dogovor->formDocList();
         ?>
     </div>
 </div>
