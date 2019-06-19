@@ -313,7 +313,7 @@ if (isset($_GET['add'])) {
         $ostat_p = $part_data['sum_part'] - ($sum_it + $sum_item); // Остаток
         if ($ostat_p < 0)
             continue;
-        
+
         if($part_data['sum_part'] > 0)
             $prc_p = (int)(($ostat_p * 100) / $part_data['sum_part']); // Если добавить данную позицию то получим такой процент прибыли
         else

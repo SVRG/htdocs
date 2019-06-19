@@ -1591,9 +1591,9 @@ class Part
     /**
      * Добавление позиции в комплектацию
      * @param $kod_item
-     * @param $numb
+     * @param $add_type
      */
-    public function addItemToSet($kod_item, $numb)
+    public function addItemToSet($kod_item, $add_type)
     {
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
@@ -1614,9 +1614,15 @@ class Part
 
         $part_data = self::getData($this->kod_part);
 
-        if (!isset($numb) or $numb == 1)
+        $numb = 1;
+        if (!isset($add_type) or $add_type == 1)
+        {
             $numb = $part_data['numb'];
-        elseif ($numb == 0)
+
+            if(isset($_GET['min'])) // Вручную задается количество которое надо добавить в комплектацию
+                $numb = (int)$_GET['min'];
+        }
+        elseif ($add_type == 0)
             $numb = $numb_1c;
 
         if ($numb > $numb_1c)
@@ -1626,7 +1632,7 @@ class Part
 
         // Проверка, если позиция уже есть в комплектации то обновляем ее
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND kod_1c=$kod_1c AND del=0");
+            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND kod_1c='$kod_1c' AND del=0");
         if ($db->cnt > 0) {
             $row_1 = $rows[0];
             $numb_old = $row_1['numb'];
@@ -1635,7 +1641,7 @@ class Part
                 "UPDATE part_set SET numb=($numb_old + $numb) WHERE kod_item=$kod_item_ps");
         } else {
             $sql = /** @lang MySQL */
-                "INSERT INTO part_set (name, kod_1c, price, numb, sum, kod_part) VALUES('$name',$kod_1c,$price,$numb,$sum,$this->kod_part);";
+                "INSERT INTO part_set (name, kod_1c, price, numb, sum, kod_part) VALUES('$name','$kod_1c',$price,$numb,$sum,$this->kod_part);";
             $db->query($sql);
         }
 
@@ -1670,7 +1676,7 @@ class Part
         // todo - надо подумать, по идее если на сладе нет, то позицию надо добавить
 
         $db->query(/** @lang MySQL */
-            "UPDATE sklad_1c SET numb=(numb+$numb), sum=ROUND(price*numb,2) WHERE kod_1c=$kod_1c");
+            "UPDATE sklad_1c SET numb=(numb+$numb), sum=ROUND(price*numb,2) WHERE kod_1c='$kod_1c';");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1693,7 +1699,7 @@ class Part
         // Проверка - сколько осталось по данным 1С
         if (!isset($_GET['all'])) {
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT numb FROM sklad_1c WHERE kod_1c=$kod_1c");
+                "SELECT numb FROM sklad_1c WHERE kod_1c='$kod_1c';");
 
             if ($db->cnt > 0) {
                 $row = $rows[0];
@@ -1709,7 +1715,7 @@ class Part
             "UPDATE part_set SET numb=$numb,sum=ROUND(price*$numb,2) WHERE kod_item=$kod_item");
 
         $db->query(/** @lang MySQL */
-            "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb), sum=ROUND(price*(numb+$numb_old-$numb),2) WHERE kod_1c=$kod_1c");
+            "UPDATE sklad_1c SET numb=(numb+$numb_old-$numb), sum=ROUND(price*(numb+$numb_old-$numb),2) WHERE kod_1c='$kod_1c';");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1815,7 +1821,7 @@ class Part
             $kod_1c = (int)$row['kod_1c'];
 
             $rows_1c = $db->rows(/** @lang MySQL */
-                "SELECT * FROM sklad_1c WHERE kod_1c=$kod_1c;");
+                "SELECT * FROM sklad_1c WHERE kod_1c='$kod_1c';");
             if ($db->cnt == 0)
                 continue;
 
