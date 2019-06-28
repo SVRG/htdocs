@@ -1087,7 +1087,7 @@ class Elem
 
     /**
      * Наименование для документов
-     * @param $rplan_row
+     * @param $rplan_row[] - kod_elem, modif, name, [shablon]
      * @return mixed|string
      */
     public static function getNameForInvoice($rplan_row)
@@ -1100,20 +1100,25 @@ class Elem
         if($rplan_row['modif'] == "")
             return $rplan_row['name'];
 
-        $db = new Db();
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM elem WHERE kod_elem=$kod_elem;");
-        if($db->cnt == 0)
-            return "";
+        if(!isset($rplan_row['shablon'])) {
+            $db = new Db();
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM elem WHERE kod_elem=$kod_elem;");
+            if ($db->cnt == 0)
+                return "";
+            $row = $rows[0];
+            $shablon = $row['shablon'];
+        }
+        else
+            $shablon = $rplan_row['shablon'];
 
-        $row = $rows[0];
-        if($row['shablon'] == "")
-            return $row['name']." (".$rplan_row['modif'].")";
+        if($shablon == "")
+            return $rplan_row['name']." (".$rplan_row['modif'].")";
 
-        if(strpos($row['shablon'], "[Mod]") === false)
-            return $row['name']." (".$rplan_row['modif'].")";
+        if(strpos($shablon, "[Mod]") === false)
+            return $rplan_row['name']." (".$rplan_row['modif'].")";
 
-        return str_replace("[Mod]",$rplan_row['modif'],$row['shablon']);
+        return str_replace("[Mod]",$rplan_row['modif'],$shablon);
     }
 //----------------------------------------------------------------------------------------------------------------------
 

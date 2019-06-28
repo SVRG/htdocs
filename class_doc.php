@@ -2216,8 +2216,10 @@ class Doc
                 $filter_link = " <a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img alt='OrgFilter' title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
             }
 
+            $name = Elem::getNameForInvoice($row);
+
             $res .= '
-                    <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $row['name'] . '</a></td>
+                    <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $name . '</a></td>
                     <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
                     <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . "</a>" . $filter_link . '</td>
                     <td>' . (int)$row['numb'] . '</td>
