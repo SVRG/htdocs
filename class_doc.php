@@ -2151,10 +2151,9 @@ class Doc
             $y = (int)$_GET['y'];
             $m = "01";
 
-            if(isset($_GET['m']))
-            {
+            if (isset($_GET['m'])) {
                 $m = (int)$_GET['m'];
-                if($m > 12 or $m < 1)
+                if ($m > 12 or $m < 1)
                     $m = "01";
             }
 
@@ -2212,14 +2211,22 @@ class Doc
                 $sign = "?";
                 if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
                     $sign = "&";
-
                 $filter_link = " <a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_org=$kod_org'><img alt='OrgFilter' title=\"Фильтр по Организации\" src=\"img/filter.png\"></a>";
+            }
+
+            $kod_elem = $row['kod_elem'];
+            $elem_filter_link = "";
+            if (!isset($_GET['kod_elem'])) {
+                $sign = "?";
+                if (strpos($_SERVER['REQUEST_URI'], "?") !== false)
+                    $sign = "&";
+                $elem_filter_link = " <a href='" . $_SERVER['REQUEST_URI'] . $sign . "kod_elem=$kod_elem'><img alt='OrgFilter' title=\"Фильтр по Номенклатуре\" src=\"img/filter.png\"></a>";
             }
 
             $name = Elem::getNameForInvoice($row);
 
             $res .= '
-                    <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $name . '</a></td>
+                    <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $name . "</a>" . $elem_filter_link . '</td>
                     <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
                     <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . "</a>" . $filter_link . '</td>
                     <td>' . (int)$row['numb'] . '</td>
