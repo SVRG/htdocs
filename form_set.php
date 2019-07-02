@@ -1,22 +1,5 @@
 <?php
 include_once "security.php";
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="ru">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <link rel="stylesheet" type="text/css" href="menu/print.css">
-    <title>Комплектация</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="widgets/selectize/dist/js/standalone/selectize.js"></script>
-    <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
-    <script type="text/javascript" src="js/index.js"></script>
-</head>
-<body>
-<?php
 /**
  * Created by PhpStorm.
  * User: svrg
@@ -75,7 +58,25 @@ $type = "Счет";
 if (strpos($part_data['nomer'], "НВС") !== false)
     $type = "Договор";
 
-echo "<h3>$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQL($d->Data['data_sost']) . " " . $part_data['nazv_krat'] . "</h3>";
+$doc_nomer = "$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQL($d->Data['data_sost']);
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="menu/print.css">
+    <title>Комплектация <?php echo $doc_nomer;?></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="widgets/selectize/dist/js/standalone/selectize.js"></script>
+    <link rel="stylesheet" href="widgets/selectize/dist/css/selectize.default.css">
+    <script type="text/javascript" src="js/index.js"></script>
+</head>
+<body>
+<?php
+echo "<h3>$doc_nomer " . $part_data['nazv_krat'] . "</h3>";
 echo "<h3>" . $elem::getNameForInvoice($part_data) . " - " . $part_data['numb'] . " шт. (Сумма: " . func::Rub($part_data['sum_part']) . ")</h3>";
 
 $db = new Db();
@@ -110,7 +111,7 @@ $res = /** @lang HTML */
         <head>
             <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
             <link rel=\"stylesheet\" type=\"text/css\" href=\"menu/print.css\">
-            <title>Комплектация</title>
+            <title>Комплектация $doc_nomer</title>
         </head>
         <body>" . $line;
 
