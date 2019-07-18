@@ -188,7 +188,7 @@ class Kontakt
         if ($Add == 1)
             $btn = func::btnImage("Добавить");
         $res .= '<form name="form1" method="post" action="">
-                           <input name="phone" />
+                           <textarea cols="30" rows="1" name="phone"></textarea>
                            <input type="hidden" name="kod_kontakta" value="' . $kod_kontakta . '" />
                            <input type="hidden" name="formPhones" value="formPhones" />
                            ' . $btn . '
@@ -251,15 +251,26 @@ class Kontakt
      */
     public function AddPhone($phone)
     {
+        $phone = func::clearText($phone);
+        if ($phone == "") return;
+
+        $rows = explode("\n", $phone);
+
+        $cnt = count($rows);
+        if($cnt == 0)
+            return;
+
         $db = new Db();
         $kod_kontakta = $this->kod_kontakta;
-
-        if (!isset($phone) or $phone == "") return;
         $kod_user = func::kod_user();
-        $phone = $db->real_escape_string($phone);
-        $db->query(/** @lang MySQL */
-            "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
+
+        for($i=0; $i <= $cnt;$i++)
+        {
+            $phone = $db->real_escape_string($rows[$i]);
+            $db->query(/** @lang MySQL */
+                "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
                     VALUES($kod_kontakta,'$phone',$kod_user)");
+        }
     }
 //----------------------------------------------------------------------------------------------------------------------
 //

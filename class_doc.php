@@ -2656,10 +2656,7 @@ class Doc
             return;
         }
 
-        $text = strip_tags($text); // Удаляем HTML тэги
-        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text); // Удаляем лишние переводы строк
-        $text = rtrim($text); // Пробелы справа
-        $text = ltrim($text); // Пробелы слева
+        $text = func::clearText($text);
 
         $kod_part = "NULL";
         if (isset($_POST['kod_part']))

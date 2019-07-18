@@ -690,4 +690,20 @@ class Func
         }
         return $res;
     }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Очистка текста от лишних пробелов и переводов
+     * @param $text
+     * @return string|string[]|null
+     */
+    public static function clearText($text)
+    {
+        $text = strip_tags($text); // Удаляем HTML тэги
+        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text); // Удаляем лишние переводы строк
+        $text = rtrim($text); // Пробелы справа
+        $text = ltrim($text); // Пробелы слева
+
+        return $text;
+    }
 }
