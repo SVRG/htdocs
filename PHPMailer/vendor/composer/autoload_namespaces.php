@@ -8,7 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'phpDocumentor' => array($vendorDir . '/phpdocumentor/fileset/src', $vendorDir . '/phpdocumentor/fileset/tests/unit', $vendorDir . '/phpdocumentor/graphviz/src', $vendorDir . '/phpdocumentor/graphviz/tests/unit', $vendorDir . '/phpdocumentor/phpdocumentor/src', $vendorDir . '/phpdocumentor/phpdocumentor/tests/unit', $vendorDir . '/phpdocumentor/reflection/src', $vendorDir . '/phpdocumentor/reflection/tests/unit', $vendorDir . '/phpdocumentor/reflection/tests/mocks', $vendorDir . '/phpdocumentor/reflection-docblock/src'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
-    'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
     'Pimple' => array($vendorDir . '/pimple/pimple/lib'),
     'PhpOption\\' => array($vendorDir . '/phpoption/phpoption/src'),
     'PhpCollection' => array($vendorDir . '/phpcollection/phpcollection/src'),
@@ -19,7 +18,6 @@ return array(
     'JMS\\' => array($vendorDir . '/jms/parser-lib/src'),
     'Herrera\\Phar\\Update' => array($vendorDir . '/herrera-io/phar-update/src/lib'),
     'Herrera\\Json' => array($vendorDir . '/herrera-io/json/src/lib'),
-    'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/lib'),
     'Doctrine\\Common\\Annotations\\' => array($vendorDir . '/doctrine/annotations/lib'),
     'Cilex\\Provider\\Console' => array($vendorDir . '/cilex/console-service-provider/src'),
     'Cilex\\Provider' => array($vendorDir . '/phpdocumentor/phpdocumentor/src'),

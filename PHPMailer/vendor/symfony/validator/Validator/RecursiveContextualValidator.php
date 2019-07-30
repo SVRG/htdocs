@@ -162,11 +162,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return $this;
         }
 
-        throw new RuntimeException(sprintf(
-            'Cannot validate values of type "%s" automatically. Please '.
-            'provide a constraint.',
-            \gettype($value)
-        ));
+        throw new RuntimeException(sprintf('Cannot validate values of type "%s" automatically. Please provide a constraint.', \gettype($value)));
     }
 
     /**
@@ -179,12 +175,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
             // Symfony < 2.5
-            throw new ValidatorException(sprintf(
-                'The metadata factory should return instances of '.
-                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                'got: "%s".',
-                \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)
-            ));
+            throw new ValidatorException(sprintf('The metadata factory should return instances of "\Symfony\Component\Validator\Mapping\ClassMetadataInterface", got: "%s".', \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)));
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
@@ -230,12 +221,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
             // Symfony < 2.5
-            throw new ValidatorException(sprintf(
-                'The metadata factory should return instances of '.
-                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                'got: "%s".',
-                \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)
-            ));
+            throw new ValidatorException(sprintf('The metadata factory should return instances of "\Symfony\Component\Validator\Mapping\ClassMetadataInterface", got: "%s".', \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)));
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
@@ -289,9 +275,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Normalizes the given group or list of groups to an array.
      *
-     * @param mixed $groups The groups to normalize
+     * @param string|GroupSequence|(string|GroupSequence)[] $groups The groups to normalize
      *
-     * @return array A group array
+     * @return (string|GroupSequence)[] A group array
      */
     protected function normalizeGroups($groups)
     {
@@ -312,7 +298,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @param object                    $object            The object to cascade
      * @param string                    $propertyPath      The current property path
-     * @param string[]                  $groups            The validated groups
+     * @param (string|GroupSequence)[]  $groups            The validated groups
      * @param int                       $traversalStrategy The strategy for traversing the
      *                                                     cascaded object
      * @param ExecutionContextInterface $context           The current execution context
@@ -331,12 +317,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
             if (!$classMetadata instanceof ClassMetadataInterface) {
-                throw new UnsupportedMetadataException(sprintf(
-                    'The metadata factory should return instances of '.
-                    '"Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                    'got: "%s".',
-                    \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)
-                ));
+                throw new UnsupportedMetadataException(sprintf('The metadata factory should return instances of "Symfony\Component\Validator\Mapping\ClassMetadataInterface", got: "%s".', \is_object($classMetadata) ? \get_class($classMetadata) : \gettype($classMetadata)));
             }
 
             $this->validateClassNode(
@@ -380,7 +361,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @param iterable                  $collection    The collection
      * @param string                    $propertyPath  The current property path
-     * @param string[]                  $groups        The validated groups
+     * @param (string|GroupSequence)[]  $groups        The validated groups
      * @param bool                      $stopRecursion Whether to disable
      *                                                 recursive iteration. For
      *                                                 backwards compatibility
@@ -460,7 +441,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     the object
      * @param string                    $propertyPath      The property path leading
      *                                                     to the object
-     * @param string[]                  $groups            The groups in which the
+     * @param (string|GroupSequence)[]  $groups            The groups in which the
      *                                                     object should be validated
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should
@@ -572,12 +553,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // returns two metadata objects, not just one
             foreach ($metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
                 if (!$propertyMetadata instanceof PropertyMetadataInterface) {
-                    throw new UnsupportedMetadataException(sprintf(
-                        'The property metadata instances should implement '.
-                        '"Symfony\Component\Validator\Mapping\PropertyMetadataInterface", '.
-                        'got: "%s".',
-                        \is_object($propertyMetadata) ? \get_class($propertyMetadata) : \gettype($propertyMetadata)
-                    ));
+                    throw new UnsupportedMetadataException(sprintf('The property metadata instances should implement "Symfony\Component\Validator\Mapping\PropertyMetadataInterface", got: "%s".', \is_object($propertyMetadata) ? \get_class($propertyMetadata) : \gettype($propertyMetadata)));
                 }
 
                 $propertyValue = $propertyMetadata->getPropertyValue($object);
@@ -618,11 +594,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         if (!$object instanceof \Traversable) {
             // Must throw a ConstraintDefinitionException for backwards
             // compatibility reasons with Symfony < 2.5
-            throw new ConstraintDefinitionException(sprintf(
-                'Traversal was enabled for "%s", but this class '.
-                'does not implement "\Traversable".',
-                \get_class($object)
-            ));
+            throw new ConstraintDefinitionException(sprintf('Traversal was enabled for "%s", but this class does not implement "\Traversable".', \get_class($object)));
         }
 
         $this->validateEachObjectIn(
@@ -658,7 +630,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     value
      * @param string                    $propertyPath      The property path leading
      *                                                     to the value
-     * @param string[]                  $groups            The groups in which the
+     * @param (string|GroupSequence)[]  $groups            The groups in which the
      *                                                     value should be validated
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should

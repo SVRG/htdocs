@@ -52,6 +52,7 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         'P' => 
         array (
             'Psr\\Log\\' => 8,
+            'Prophecy\\' => 9,
         ),
         'M' => 
         array (
@@ -64,6 +65,7 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         'D' => 
         array (
             'Doctrine\\Instantiator\\' => 22,
+            'Doctrine\\Common\\Lexer\\' => 22,
         ),
     );
 
@@ -172,6 +174,10 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
+        'Prophecy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
+        ),
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
@@ -183,6 +189,10 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         'Doctrine\\Instantiator\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
+        ),
+        'Doctrine\\Common\\Lexer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/lexer/lib/Doctrine/Common/Lexer',
         ),
     );
 
@@ -212,10 +222,6 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         ),
         'P' => 
         array (
-            'Prophecy\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/phpspec/prophecy/src',
-            ),
             'Pimple' => 
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/lib',
@@ -271,10 +277,6 @@ class ComposerStaticInitc4f00bb93b197fd7fd599e3686e226d6
         ),
         'D' => 
         array (
-            'Doctrine\\Common\\Lexer\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/lexer/lib',
-            ),
             'Doctrine\\Common\\Annotations\\' => 
             array (
                 0 => __DIR__ . '/..' . '/doctrine/annotations/lib',
