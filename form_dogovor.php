@@ -128,11 +128,19 @@ else
                         echo $Part->formAddEdit(0);
                     elseif ($_POST['Flag'] == 'AddNaklad' and isset($_POST['kod_part'])) {
                         $Part->kod_part = $_POST['kod_part'];
-                        echo $Part->formPart(1);
+                        try {
+                            echo $Part->formPart(1);
+                        } catch (Exception $e) {
+                        }
                     }
                 }
                 // Партии
-                echo $Part->formParts(1, "", 0);
+                try {
+                    echo $Part->formParts(1, "", 0);
+                    if(isset($_GET['hist']))
+                        echo "<b>Удаленные</b>".$Part->formPartsDeleted();
+                } catch (Exception $e) {
+                }
                 ?>
             </td>
         </tr>

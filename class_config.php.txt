@@ -23,7 +23,6 @@ class config
     public static $admin_host = "localhost"; // С этого адреса доступ только для admin
     public static $mail_link_host = "localhost"; // Для вставки ссылок в письма (например ссылка на договор)
     public static $logo_img = "img/logo.png"; // Логотип компании
-    public static $comp_name_eng = "MyCompany"; // Название на английском
     public static $price_or = 0; // Работа с ориентировочными ценами. Отображается в партии
     public static $data_nach = 0; // Дата начала этапа. Отображается в партии
     public static $nds_main = 18; // Базовый НДС

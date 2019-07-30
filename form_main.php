@@ -26,7 +26,11 @@ include_once "security.php";
         elseif ($sgp == 3)
             echo $D->formSGPHistory(); // История по складу
         elseif ($sgp == 4)
-            echo $D->formRPlanNeOplach(); // Не оплаченные
+            try {
+                echo $D->formRPlanNeOplach();
+            } catch (Exception $e) {
+        echo "Ошибка: formRPlanNeOplach";
+        } // Не оплаченные
         elseif ($sgp == 5)
             echo $D->formRPlanOplach(); // Оплаченные
         elseif ($sgp == 6)

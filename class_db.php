@@ -156,7 +156,14 @@ class Db
         return $connection->real_escape_string($value);
     }
 //----------------------------------------------------------------------------------------------------------------------
-    public static function getUndoString($table,$key_field,$key_value)
+
+    /**
+     * Отмена действия
+     * @param $table
+     * @param $key_field
+     * @param $key_value
+     */
+    public static function getUndoString($table, $key_field, $key_value)
     {
         if(!isset($table,$key_field,$key_value))
             return;

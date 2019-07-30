@@ -202,40 +202,6 @@ class Elem
 //----------------------------------------------------------------------
 //
     /**
-     * Вывод списка-выбора Элементов
-     * @return string
-     */
-    public function formSelList()
-    {
-        $res = '<select name="kod_elem" id="kod_elem">';
-
-        $db = new Db();
-
-        $sql = /** @lang MySQL */
-            "SELECT * FROM view_elem WHERE nomen=1 ORDER BY shifr";
-
-        $rows = $db->rows($sql);
-
-        for ($i = 0; $i < $db->cnt; $i++) {
-            $row = $rows[$i];
-            $kod_elem = $row['kod_elem'];
-            //$obozn = $row['obozn'];
-            $shifr = $row['shifr'];
-            $name = $row['name'];
-
-            $selected = "";
-            if ($row['kod_elem'] == $this->kod_elem)
-                $selected = " selected='selected'";
-
-            $res .= "<option value=\"$kod_elem\" $selected > $shifr  \"$name\" </option>";
-        }
-        $res .= '</select>';
-
-        return $res;
-    }
-//----------------------------------------------------------------------
-//
-    /**
      * Вывод списка-выбора Элементов с автозаполнением
      * @return string
      */

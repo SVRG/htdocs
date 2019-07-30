@@ -6,9 +6,9 @@ class Func
 {
 
     public static $green = '#ADFAC2'; // Зеленый
-    public static $orange = '#FFD222'; // Оранж
+    //public static $orange = '#FFD222'; // Оранж
     public static $red = '#F18585'; // Красный
-    public static $grey = '#CCCCCC'; // Серый
+    //public static $grey = '#CCCCCC'; // Серый
     public static $yellow = '#FFFF99'; // Желтый
 //----------------------------------------------------------------------------------------------------------------------
     /**
@@ -314,27 +314,6 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
 //
     /**
-     * Построение Формы с одной кнопкой
-     * + скрытое поле Flag со значением
-     * @param string $Act
-     * @param string $Body
-     * @param string $ButtValue
-     * @param string $FlagVal
-     * @return string
-     */
-    public static function ActForm($Act = '', $Body = '', $ButtValue = 'OK', $FlagVal = 'OK')
-    {
-        $res = "<form name='FNAME' method='POST' action=' $Act '>
-                    $Body
-                    <input type='submit' name='Button' value='$ButtValue' />
-                    <input type='hidden' name='Flag' value='$FlagVal' />
-               </form>";
-
-        return $res;
-    }
-//----------------------------------------------------------------------------------------------------------------------
-//
-    /**
      * Текущее число
      * @param string $Delim
      * @return string
@@ -395,58 +374,6 @@ class Func
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Disclaimer: Скрипт принципиально не сохраняет регистр! Кириллица принудительно переводится в нижний, латиница - в верхний.
-
-// Это связано с необходимостью корректной транслитерации двуязычных названий страниц. 
-
-// Использованная локале-независимая функция UpLow($s)
-
-    static public function UpLow(&$string, $registr = 'up')
-    {
-        $upper = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        $lower = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz';
-
-        if ($registr == 'up') $string = strtr($string, $lower, $upper);
-        else $string = strtr($string, $upper, $lower);
-
-    }
-//----------------------------------------------------------------------------------------------------------------------
-// Функция обратимой перекодировки кириллицы в транслит.
-    static public function rus2lat($s)
-    {
-// Сначала всё переводим в верхний регистр, причём не с помощью глючной strtoupper
-        Func::UpLow($s);
-//а потом только кириллицу в нижний
-
-        $s = str_replace("ЫА", "yha", $s);
-        $s = str_replace("ЫО", "yho", $s);
-        $s = str_replace("ЫУ", "yhu", $s);
-        $s = str_replace("Ё", "yo", $s);
-        $s = str_replace("Ж", "zh", $s);
-        $rus = "АБВГДЕЗИЙКЛМНОПРСТУФХЦ";
-        $lat = "abvgdezijklmnoprstufxc";
-        $s = strtr($s, $rus, $lat);
-        $s = str_replace("Ч", "ch", $s);
-        $s = str_replace("Ш", "sh", $s);
-        $s = str_replace("Щ", "shh", $s);
-        $s = str_replace("Ъ", "qh", $s);
-        $s = str_replace("Ы", "y", $s);
-        $s = str_replace("Ь", "q", $s);
-        $s = str_replace("Э", "eh", $s);
-        $s = str_replace("Ю", "yu", $s);
-        $s = str_replace("Я", "ya", $s);
-        $s = str_replace(" ", "_", $s); // сохраняем пробел от перехода в %20
-        $s = str_replace(",", ".h", $s); // сохраняем запятую
-        $s = str_replace("№", "N", $s); // сохраняем N
-        $s = str_replace("(", "_", $s); // сохраняем (
-        $s = str_replace(")", "_", $s); // сохраняем )
-//$s=str_replace(""","&quot;",$s); // сохраняем кавычки
-        $s = rawurlencode($s); // Разрешённые символы URL - латинские буквы, точка, минус и подчёркивание
-        return $s;
-    }
-
-//----------------------------------------------------------------------------------------------------------------------
     static public function rus2lat2($string)
     {
 
@@ -485,31 +412,6 @@ class Func
     {
         return preg_split('~~u', $str, null, PREG_SPLIT_NO_EMPTY);
     }
-
-//----------------------------------------------------------------------------------------------------------------------
-    static public function lat2rus($s)
-    { // Функция обратной перекодировки транслита в кириллицу.
-        $s = rawurldecode($s);
-        $s = str_replace("_", ",", $s);// возвращаем запятую
-        $s = str_replace("_", " ", $s);// возвращаем пробел
-        $s = str_replace("_", "(", $s);// возвращаем пробел
-        $s = str_replace("_", ")", $s);// возвращаем пробел
-        $s = str_replace("yh", "Ы", $s);
-        $s = str_replace("yu", "Ю", $s);
-        $s = str_replace("ya", "Я", $s);
-        $s = str_replace("yo", "Ё", $s);
-        $s = str_replace("shh", "Щ", $s);
-        $s = str_replace("eh", "Э", $s);
-        $s = str_replace("sh", "Ш", $s);
-        $s = str_replace("ch", "Ч", $s);
-        $s = str_replace("qh", "Ъ", $s);
-        $s = str_replace("zh", "Ж", $s);
-        $lat = "abvgdezijklmnoprstufxcyq";
-        $rus = "АБВГДЕЗИЙКЛМНОПРСТУФХЦЫЬ";
-        $s = strtr($s, $lat, $rus);
-        return $s;
-    } // function lat2rus($s)
-
 //----------------------------------------------------------------------------------------------------------------------
     /**
      * @param $s
@@ -649,23 +551,6 @@ class Func
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Генератор произвольной строки
-     * @param int $length
-     * @return string
-     */
-    function generateRandomString($length = 10)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
-//----------------------------------------------------------------------------------------------------------------------
-
-    /**
      * Возвращает историю по коду записи
      * @param $table_name
      * @param $key_field_value
@@ -705,5 +590,20 @@ class Func
         $text = ltrim($text); // Пробелы слева
 
         return $text;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Выбирает все e-mail из текста
+     * @param $text
+     * @return string
+     */
+    public static function extract_email_from_text($text)
+    {
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $text, $matches);
+        if(isset($matches[0][0]))
+            return $matches[0][0];
+        else
+            return "";
     }
 }

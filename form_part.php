@@ -87,9 +87,15 @@ include_once("header.php");
         if (isset($_POST['Flag'])) {
 
             if ($_POST['Flag'] == 'AddNaklad')
-                echo $Part->formPart(1); // Партия + Форма добавления накладной
+                try {
+                    echo $Part->formPart(1);
+                } catch (Exception $e) {
+                } // Партия + Форма добавления накладной
             else {
-                echo $Part->formPart(0);
+                try {
+                    echo $Part->formPart(0);
+                } catch (Exception $e) {
+                }
             } // Партия
 
             if (in_array($_SESSION['MM_UserGroup'], $UserG1)) {
@@ -100,7 +106,10 @@ include_once("header.php");
                     echo $Part->formAddEdit(0);
             }
         } else
-            echo $Part->formPart(0); // Партия
+            try {
+                echo $Part->formPart(0);
+            } catch (Exception $e) {
+            } // Партия
 
         // График платежей
         echo $Part->formPayGraph(true);

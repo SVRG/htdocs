@@ -931,6 +931,7 @@ class Doc
     /**
      * Список не оплаченных договоров - по которым вообще нет никакой оплаты, частично оплаченные не выводятся
      * @return string
+     * @throws Exception
      */
     public function formRPlanNeOplach()
     {
@@ -1840,124 +1841,6 @@ class Doc
         return $res;
     }
 //-----------------------------------------------------------------------
-
-    /**
-     * Список всех платежей.
-     * @return string - таблица всех введенных платежей
-     */
-    public function formAllPays()
-    {
-
-        $db = new Db();
-
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM view_plat ORDER BY view_plat.data DESC ");
-
-        $cnt = $db->cnt;
-
-        if ($cnt == 0)
-            return '';
-
-
-        $summ = 0; // Сумма по месяцу
-
-        $res = '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
-        $res .= '<tr bgcolor="#CCCCCC" >
-                    <td width="60">Номер ПП</td>
-                    <td width="100">Сумма</td>
-                    <td width="80">Дата</td>
-                    <td width="100">Распределено</td>
-                    <td width="130">Договор</td>
-                    <td  width="220">Организация</td>
-                    <td>Примечание</td>
-                </tr>';
-
-        for ($i = 0; $i < $cnt; $i++) {
-
-            // Используется отсортированный массив по Дате
-            $pm = '-';
-            if ($i > 1) {
-
-                $row = $rows[$i - 1];
-
-                $d = Func::Date_from_MySQL($row['data']);
-
-                if ($d <> '-') {
-                    $m = explode('.', $d);
-                    $pm = $m[1]; // Предыдущий месяц
-                }
-            }
-
-            $row = $rows[$i];
-
-            $d = Func::Date_from_MySQL($row['data']); // Дата
-
-            $cm = '-';
-            $cy = '-';
-            if ($d != '-') {
-                $m = explode('.', $d);
-                if (count($m) > 2) {
-                    $cm = $m[1];
-                    $cy = $m[2];
-                }
-            }
-
-
-            if ($i > 1) {
-                // Если текущее значение месяца не равно значению на пред. шаге
-                // то выводим заголовок и начинаем таблицу заново
-                if ($cm != $pm) {
-
-                    $res .= '<br><h1>Сумма: ' . Func::Rub($summ) . '</h1><br>';
-                    $res .= '</table><br><h1>' . $cm . '.' . $cy . '</h1>
-                                  <table border=1 cellspacing=0 cellpadding=0 width="100%">
-                                  <tr bgcolor="#CCCCCC" ><td width="60">Номер ПП</td>
-                                    <td width="100">Сумма</td>
-                                    <td width="80">Дата</td>
-                                    <td width="100">Распределено</td>
-                                    <td width="130">Договор</td>
-                                    <td width="220">Организация</td>
-                                    <td>Примечание</td>
-                                  </tr>';
-                    $summ = 0.;
-
-                }
-
-            }
-
-
-            if ($i == 1)
-                $res .= '<br><h1>' . $cm . '.' . $cy . '</h1>';
-
-            // Процент распределения платежа
-            $prs = 0;
-            if ($row['summa'] != 0)
-                $prs = Func::Proc($row['summa_raspred'] / $row['summa']);
-
-            // Если процент не равен 100 то красим ячейку
-            if ($prs != 100)
-                $col = 'bgcolor="#FFFF99"';
-            else
-                $col = '';
-
-            $res .= '<tr><td>' . $row['nomer'] . '</td>
-                          <td  align="right">' . Func::Rub($row['summa']) . '</td>
-                          <td  align="center">' . $d . '</td>
-                          <td ' . $col . '><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $prs . '%</a></td>
-                          <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer_dogovora'] . '</a></td>
-                          <td>' . $row['nazv_krat'] . '</td>
-                          <td>' . $row['prim'] . '</td>
-                        </tr>';
-
-            $summ += $row['summa'];
-        }
-
-        $res .= '</table>';
-
-        return $res;
-    }
-    //-----------------------------------------------------------------------
-
     /**
      * Список платежей в выбранном месяце.
      * @param int $Month - месяц текущего года
@@ -2617,31 +2500,6 @@ class Doc
             $db->query(/** @lang MySQL */
                 "INSERT INTO dogovor_attribute (kod_dogovora,kod_attr,kod_user) VALUES($kod_dogovora,$kod_attr,$kod_user)");
 
-    }
-//----------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Добавление контакта в договор
-     * @param $dolg
-     * @param $famil
-     * @param $name
-     * @param $otch
-     */
-    public function AddKontakt($dolg, $famil, $name, $otch)
-    {
-        $kontakt = new Kontakt();
-        $kontakt->kod_dogovora = $this->kod_dogovora;
-
-        $kod_org = $this->kod_org;
-
-        $kod_org_main = config::$kod_org_main;
-        if ($kod_org == $kod_org_main) {
-            $this->getData();
-            $kod_org = $this->Data['kod_ispolnit'];
-        }
-
-        $kontakt->kod_org = $kod_org;
-        $kontakt->AddKontakt($dolg, $famil, $name, $otch);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -3397,21 +3255,6 @@ class Doc
 //----------------------------------------------------------------------
 //
     /**
-     * Изменить тип Документа
-     * @param int $doc_type
-     */
-    public function setDocType($doc_type = 1)
-    {
-        $doc_type = (int)$doc_type;
-        $kod_user = func::kod_user();
-
-        $db = new Db();
-        $db->query(/** @lang MySQL */
-            "UPDATE dogovory SET doc_type = $doc_type, edit=1, kod_user=$kod_user WHERE kod_dogovora=$this->kod_dogovora");
-    }
-//----------------------------------------------------------------------
-//
-    /**
      * Добавление связи договоров
      * @param $kod_dogovora_master
      * @param $kod_dogovora_slave
@@ -3632,5 +3475,79 @@ class Doc
                 </form>";
 
         return $res;
+    }
+//----------------------------------------------------------------------
+//
+
+    /**
+     * Информирование по договору
+     * @param $kod_dogovora
+     * @param $text
+     * @throws phpmailerException
+     */
+    public function email_inform($kod_dogovora, $text)
+    {
+        $mail = new Mail();
+        $row = $this->getData($kod_dogovora);
+        $dog_nomer = $row['nomer'];
+        $kod_org = $row['kod_org'];
+        $nazv_krat = $row['nazv_krat'];
+        $host = config::$mail_link_host;
+        $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
+        $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
+
+        $kod_ispolnit = $row['kod_ispolnit'];
+        if ($kod_ispolnit != config::$kod_org_main) {
+            $ispolnit_nazv_krat = $row['ispolnit_nazv_krat'];
+            $body .= "Исполнитель: <a href='http://$host/form_org.php?kod_org=$kod_ispolnit'>$ispolnit_nazv_krat</a><br>";
+            $nazv_krat = $ispolnit_nazv_krat;
+        }
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM view_rplan WHERE kod_dogovora=$kod_dogovora");
+        $cnt = $db->cnt;
+
+        if ($cnt == 0) {
+            $body .= "Нет партий";
+        } else {
+            $body .= /** @lang HTML */
+                "<table border='1' cellspacing='0' cellpadding='3'>
+                            <tr bgcolor='#f5f5f5'>
+                            <td width='30'>№</td>
+                            <td>Наименование</td>
+                            <td width='30'>Ед. изм.</td>
+                            <td width='70'>Кол-во</td>
+                            <td>Цена с НДС</td>
+                            <td>Сумма с НДС</td>
+                          </tr>";
+            for ($i = 0; $i < $cnt; $i++) {
+                $row = $rows[$i];
+                $name = $row['name'];
+                $modif = $row['modif'];
+
+                if ($modif !== "")
+                    $name = elem::getNameForInvoice($row);
+
+                $numb = func::rnd($row['numb']);                                // Количество
+                $summ_with_nds = $row['sum_part'];                            // Сумма партии с НДС
+                $price = Part::getPriceWithNDS($row);
+                $price_str = func::Rub($price);
+                $summ_with_nds_str = func::Rub($summ_with_nds);
+
+                $n = $i + 1;
+                $body .= "<tr>
+                    <td class='td_align_center'>$n</td>
+                    <td >$name</td>
+                    <td>шт.</td>
+                    <td class='td_align_center'>$numb</td>
+                    <td class='td_align_right' nowrap>$price_str</td>
+                    <td class='td_align_right' nowrap>$summ_with_nds_str</td>
+                  </tr>";
+            }
+            $body .= "</table>";
+        }
+
+        $mail->send_mail($body, "НВС - $dog_nomer - $nazv_krat");
     }
 }// END CLASS

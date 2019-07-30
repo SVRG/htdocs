@@ -7,7 +7,6 @@ class Org
 {
     public $kod_org = 0; // Идентификатор
     public $Data;
-    public $max_str_length = 30;
 
 //-----------------------------------------------------------
 
