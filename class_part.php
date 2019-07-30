@@ -154,7 +154,11 @@ class Part
                     $ostatok = "";
 
                 // Дней до отгрузки
-                $drem = Func::DaysRem($row['data_postav']);
+                try {
+                    $drem = Func::DaysRem($row['data_postav']);
+                } catch (Exception $e) {
+                $drem = 0;
+                }
 
                 // Если осталось меньше 30 и больше 14 дней то красим в оранжевый
                 if ($dogovor_proc_pay > 0) {
@@ -300,6 +304,7 @@ class Part
      * Вывод партии с формой добавления накладной, если $AddNaklad=1
      * @param int $AddNacl
      * @return string
+     * @throws Exception
      */
     public function formPart($AddNacl = 0)
     {
@@ -949,34 +954,38 @@ class Part
     /**
      * Удаление партии и связей
      * @param int $kod_part
+     * @param int $recovery
      */
-    public static function Delete($kod_part = 0)
+    public static function Delete($kod_part = 0, $recovery = 0)
     {
         if ($kod_part == 0)
             return;
+
+        $del = 1;
+        if($recovery == 1)
+            $del = 0;
 
         $db = new Db();
         $kod_user = func::kod_user();
 
         $db->query(/** @lang MySQL */
-            "UPDATE parts SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+            "UPDATE parts SET del=$del,kod_user=$kod_user WHERE kod_part=$kod_part");
 
         $db->query(/** @lang MySQL */
-            "UPDATE raschet SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+            "UPDATE raschet SET del=$del,kod_user=$kod_user WHERE kod_part=$kod_part");
 
         //todo - проверить
         $db->query(/** @lang MySQL */
             "UPDATE
                             raschety_plat
                            INNER JOIN raschet ON raschet.kod_rascheta = raschety_plat.kod_rascheta
-                           SET raschety_plat.del=1,raschety_plat.kod_user=$kod_user
+                           SET raschety_plat.del=$del,raschety_plat.kod_user=$kod_user
                            WHERE raschet.kod_part=$kod_part
                           ");
 
         $db->query(/** @lang MySQL */
-            "UPDATE sklad SET del=1,kod_user=$kod_user WHERE kod_part=$kod_part");
+            "UPDATE sklad SET del=$del,kod_user=$kod_user WHERE kod_part=$kod_part");
     }
-
 //-------------------------------------------------------------------------
 //
     /**
@@ -1097,35 +1106,6 @@ class Part
         $price_with_nds = $price + $summ_nds;
         return $price_with_nds;
     }
-//-------------------------------------------------------------------------
-
-    /**
-     * Количество отгруженное по партии
-     * @param $kod_part
-     * @return int
-     */
-    public static function getNumbOtgruz($kod_part)
-    {
-        $db = new Db();
-
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT
-                        view_sklad_otgruzka.kod_part,
-                        Sum(view_sklad_otgruzka.numb) AS summ_numb
-                    FROM
-                        view_sklad_otgruzka
-                    WHERE
-                        view_sklad_otgruzka.kod_part = $kod_part
-                    GROUP BY
-                        view_sklad_otgruzka.kod_part;");
-        if ($db->cnt == 0)
-            return 0;
-
-        $res = $rows[0]['summ_numb'];
-
-        return $res;
-    }
-    //
 //-------------------------------------------------------------------------
     /**
      * Количество полученное по партии
@@ -1955,7 +1935,7 @@ class Part
      * @param $kod_part_selected int
      * @return string
      */
-    public static function formSelList($rows = [], $kod_part_selected = 0)
+    private static function formSelList($rows = [], $kod_part_selected = 0)
     {
         $cnt = count($rows);
 
@@ -2141,6 +2121,55 @@ class Part
                      </tr>';
         }
         $res .= '</table>';
+
+        return $res;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Форма удаленных партий
+     * @return string
+     */
+    public function formPartsDeleted()
+    {
+        $res = "";
+        $sql = /** @lang MySQL */
+            "select `trin`.`dogovory`.`kod_dogovora`                                            AS `kod_dogovora`,
+                           `trin`.`dogovory`.`nomer`                                                   AS `nomer`,
+                           `trin`.`dogovory`.`doc_type`                                                AS `doc_type`,
+                           `trin`.`org`.`kod_org`                                                      AS `kod_org`,
+                           `trin`.`org`.`nazv_krat`                                                    AS `nazv_krat`,
+                           `trin`.`parts`.`modif`                                                      AS `modif`,
+                           `trin`.`parts`.`numb`                                                       AS `numb`,
+                           `trin`.`parts`.`data_postav`                                                AS `data_postav`,
+                           `trin`.`parts`.`nds`                                                        AS `nds`,
+                           `trin`.`parts`.`sum_part`                                                   AS `sum_part`,
+                           `trin`.`parts`.`val`                                                        AS `val`,
+                           `trin`.`parts`.`price`                                                      AS `price`,
+                           parts.del                                                                   AS del,
+                           `trin`.`elem`.`kod_elem`                                                    AS `kod_elem`,
+                           `trin`.`elem`.`obozn`                                                       AS `obozn`,
+                           `trin`.`elem`.`shifr`                                                       AS `shifr`,
+                           `trin`.`parts`.`kod_part`                                                   AS `kod_part`,
+                           ifnull(`trin`.`dogovory`.`zakryt`, 0)                                       AS `zakryt`,
+                           `trin`.`dogovory`.`kod_ispolnit`                                            AS `kod_ispolnit`,
+                           `trin`.`elem`.`name`                                                        AS `name`,
+                           `ispolnit`.`nazv_krat`                                                      AS `ispolnit_nazv_krat`,
+                           ifnull(`view_sklad_summ_otgruz`.`summ_otgruz`, 0)                           AS `numb_otgruz`,
+                           (`trin`.`parts`.`numb` - ifnull(`view_sklad_summ_otgruz`.`summ_otgruz`, 0)) AS `numb_ostat`,
+                           `trin`.`parts`.`price_or`                                                   AS `price_or`,
+                           `trin`.`parts`.`data_nach`                                                  AS `data_nach`,
+                           `trin`.`parts`.`price_it`                                                   AS `price_it`,
+                           `trin`.`elem`.`shablon`                                                     AS `shablon`
+                    from (((((`trin`.`dogovory` join `trin`.`parts` on ((`trin`.`dogovory`.`kod_dogovora` = `trin`.`parts`.`kod_dogovora`))) join `trin`.`org` on ((`trin`.`org`.`kod_org` = `trin`.`dogovory`.`kod_org`))) join `trin`.`elem` on ((`trin`.`elem`.`kod_elem` = `trin`.`parts`.`kod_elem`))) join `trin`.`org` `ispolnit` on ((`ispolnit`.`kod_org` = `trin`.`dogovory`.`kod_ispolnit`)))
+                             left join `trin`.`view_sklad_summ_otgruz`
+                   on ((`trin`.`parts`.`kod_part` = `view_sklad_summ_otgruz`.`kod_part`)))
+            where parts.del=1 AND parts.kod_dogovora=$this->kod_dogovora ORDER BY data_postav DESC;";
+
+        try {
+            $res = $this->formParts(0, $sql, 0);
+        } catch (Exception $e) {
+        }
 
         return $res;
     }
