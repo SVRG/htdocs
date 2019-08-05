@@ -157,7 +157,7 @@ class Part
                 try {
                     $drem = Func::DaysRem($row['data_postav']);
                 } catch (Exception $e) {
-                $drem = 0;
+                    $drem = 0;
                 }
 
                 // Если осталось меньше 30 и больше 14 дней то красим в оранжевый
@@ -561,6 +561,9 @@ class Part
     {
         $summa = func::clearNum($summa);
         $summa = func::rnd($summa);
+
+        if ($summa < config::$min_price)
+            return;
         $db = new Db();
         $kod_user = func::kod_user();
 
@@ -962,7 +965,7 @@ class Part
             return;
 
         $del = 1;
-        if($recovery == 1)
+        if ($recovery == 1)
             $del = 0;
 
         $db = new Db();
@@ -1107,6 +1110,7 @@ class Part
         return $price_with_nds;
     }
 //-------------------------------------------------------------------------
+
     /**
      * Количество полученное по партии
      * @param $kod_part
@@ -1388,7 +1392,7 @@ class Part
                               FROM parts WHERE kod_part=$kod_part;");
         $kod_part_slave = $db->last_id;
 
-        if($add_link)
+        if ($add_link)
             self::addLink($kod_part, $kod_part_slave);
 
         return $kod_part_slave;
@@ -1595,14 +1599,12 @@ class Part
         $part_data = self::getData($this->kod_part);
 
         $numb = 1;
-        if (!isset($add_type) or $add_type == 1)
-        {
+        if (!isset($add_type) or $add_type == 1) {
             $numb = $part_data['numb'];
 
-            if(isset($_GET['min'])) // Вручную задается количество которое надо добавить в комплектацию
+            if (isset($_GET['min'])) // Вручную задается количество которое надо добавить в комплектацию
                 $numb = (int)$_GET['min'];
-        }
-        elseif ($add_type == 0)
+        } elseif ($add_type == 0)
             $numb = $numb_1c;
 
         if ($numb > $numb_1c)
@@ -2038,7 +2040,7 @@ class Part
     {
         $type = self::getStatus($this->kod_part);
 
-        if($type == 0)
+        if ($type == 0)
             $type = 2;
         else
             $type = 1;
@@ -2062,7 +2064,7 @@ class Part
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */ "SELECT * FROM part_status WHERE kod_part=$kod_part AND del=0 ORDER BY time_stamp DESC;");
 
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return 0;
 
         return (int)$rows[0]['type'];
@@ -2075,14 +2077,14 @@ class Part
         $kod_part = (int)$kod_part;
         $type = self::getStatus($kod_part);
 
-        if($type == 1)
+        if ($type == 1)
             return "";
 
         $btn = "Отгружено";
-        if($type == 0)
+        if ($type == 0)
             $btn = "Упаковано";
 
-        return func::ActButton2("",$btn,"kod_part_status","kod_part",$kod_part,"Подтвердите действие");
+        return func::ActButton2("", $btn, "kod_part_status", "kod_part", $kod_part, "Подтвердите действие");
     }
 
 //----------------------------------------------------------------------
