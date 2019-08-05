@@ -34,6 +34,7 @@ class Doc
      * Показать Партии по Элементу - только партии, для просмотра договора надо в него перейти
      * @param int $kod_elem
      * @return string
+     * @throws Exception
      */
     static public function formDocByElem($kod_elem)
     {
@@ -174,13 +175,13 @@ class Doc
         return $res;
     }
 //-----------------------------------------------------------------
-
     /**
      * Договоры - основной формат вывода
      * Группировка строк rplan по договорам
      * На вход должен подаватья rplan отсотированный по коду договора!
      * @param array $rplan_rows
      * @return string
+     * @throws Exception
      */
     static public function formRPlan_by_Doc($rplan_rows)
     {
@@ -299,12 +300,12 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * Формирует объединенную строку Договор + Партии из строк/строки rplan отобранных по одному коду договора
      * На вход подается массив с одним кодом договора
      * @param array $rplan_rows - Строки rplan
      * @return string
+     * @throws Exception
      */
     public static function getRPlan_Row($rplan_rows)
     {
@@ -522,11 +523,11 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * Договоры по Контакту
      * @param int $kod_kontakta
      * @return string
+     * @throws Exception
      */
     public static function formDocsByKontakt($kod_kontakta)
     {
@@ -809,11 +810,11 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * План реализации
      * @param int $VN : 1 - внешний; 0 - внутренний
      * @return string
+     * @throws Exception
      */
     public function formRPlan($VN = 0)
     {
@@ -863,10 +864,10 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * Список оплаченных договоров
      * @return string
+     * @throws Exception
      */
     public function formRPlanOplach()
     {
@@ -992,11 +993,11 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * График поставок по изделиям (План Реализации)
      * @param array $rplan_rows - массив rplan отсортированный по элементам
      * @return string
+     * @throws Exception
      */
     static public function formRPlan_by_Elem($rplan_rows)
     {
@@ -1317,6 +1318,7 @@ class Doc
     /**
      * Договоры по Организации - Внешние и Поставка
      * @return string
+     * @throws Exception
      */
     public function formDocsByOrg()
     {
@@ -1378,11 +1380,11 @@ class Doc
     }
 //-----------------------------------------------------------------------
 //
-
     /**
      * Договоры - Внешние или Поставка
      * @param int $VN
      * @return string
+     * @throws Exception
      */
     public function formDocsOpen($VN = 0)
     {
@@ -3006,6 +3008,7 @@ class Doc
     /**
      * @param int $kod_elem_sub
      * @return string
+     * @throws Exception
      */
     public function formProduction($kod_elem_sub = 1002)
     {
@@ -3121,41 +3124,6 @@ class Doc
         return $nomer;
     }
 //----------------------------------------------------------------------------------------------------------------------
-//
-    /**
-     * Запрос параметров фильтра в GET
-     *
-     */
-    public static function getWHERE()
-    {
-        $where = "";
-
-        if (isset($_GET['kod_org'])) {
-            $kod_org = (int)$_GET['kod_org'];
-            $where = " kod_org=$kod_org ";
-        }
-
-        if (isset($_GET['kod_elem'])) {
-            $kod_elem = (int)$_GET['kod_elem'];
-            if ($where == "")
-                $where = " kod_elem=$kod_elem ";
-            else
-                $where .= " AND kod_elem=$kod_elem ";
-        }
-
-        if (isset($_GET['y'])) {
-            $y = (int)$_GET['y'];
-            $data_s = "$y-01-01";
-            $data_n = ($y + 1) . "-01-01";
-            if ($where == "")
-                $where = " (data>='$data_s' AND data<'$data_n') ";
-            else
-                $where .= " AND (data>='$data_s' AND data<'$data_n') ";
-        }
-
-        return $where;
-    }
-//----------------------------------------------------------------------
 //
     /**
      * Вывод списка-выбора
@@ -3344,10 +3312,10 @@ class Doc
     }
 //--------------------------------------------------------------
 //
-
     /**
      * Список договоров - по которым не вернулись документы
      * @return string
+     * @throws Exception
      */
     public function formDocsNoDocuments()
     {
@@ -3478,28 +3446,28 @@ class Doc
     }
 //----------------------------------------------------------------------
 //
-
     /**
      * Информирование по договору
      * @param $kod_dogovora
-     * @param $text
+     * @param $text_html
      * @throws phpmailerException
      */
-    public function email_inform($kod_dogovora, $text)
+    public function email_inform($kod_dogovora, $text_html)
     {
         $mail = new Mail();
         $row = $this->getData($kod_dogovora);
         $dog_nomer = $row['nomer'];
-        $kod_org = $row['kod_org'];
         $nazv_krat = $row['nazv_krat'];
         $host = config::$mail_link_host;
-        $body = "<a href='http://$host/form_dogovor.php?kod_dogovora=$kod_dogovora'>№$dog_nomer</a><br>";
-        $body .= "<a href='http://$host/form_org.php?kod_org=$kod_org'>$nazv_krat</a><br>";
+
+        $body = $text_html;
+        $body .= "№$dog_nomer<br>";
+        $body .= "$nazv_krat<br>";
 
         $kod_ispolnit = $row['kod_ispolnit'];
         if ($kod_ispolnit != config::$kod_org_main) {
             $ispolnit_nazv_krat = $row['ispolnit_nazv_krat'];
-            $body .= "Исполнитель: <a href='http://$host/form_org.php?kod_org=$kod_ispolnit'>$ispolnit_nazv_krat</a><br>";
+            $body .= "Исполнитель: $ispolnit_nazv_krat<br>";
             $nazv_krat = $ispolnit_nazv_krat;
         }
 
@@ -3509,7 +3477,7 @@ class Doc
         $cnt = $db->cnt;
 
         if ($cnt == 0) {
-            $body .= "Нет партий";
+            $body .= "Партии не найдены<br>";
         } else {
             $body .= /** @lang HTML */
                 "<table border='1' cellspacing='0' cellpadding='3'>
