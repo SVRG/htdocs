@@ -1187,7 +1187,10 @@ class Part
                 $this->Delete($_POST['kod_part_del']);
                 $event = true;
             } elseif ($_POST['Flag'] == 'CopyPartToDoc' and isset($_POST['kod_part_copy'], $_POST['kod_dogovora'])) {
-                self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora']);
+                $addPartLink = false;
+                if(isset($_POST['addPartLink']))
+                    $addPartLink = true;
+                self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora'],$addPartLink);
                 $event = true;
             } elseif ($_POST['Flag'] == 'EditSumPart' and isset($_POST['kod_part'], $_POST['sum_part'])) {
                 self::setSumPart($_POST['kod_part'], $_POST['sum_part']);
@@ -1399,12 +1402,17 @@ class Part
     }
 //-----------------------------------------------------------------------
 //
+    /**
+     * Форма копирования в договор
+     * @param bool $btb
+     * @return string
+     */
     public function formCopyToDoc($btb = true)
     {
         if (func::user_group() !== "admin")
             return "";
 
-        if ($btb)
+        if ($btb === true)
             return "<div>" . Func::ActButton2('', "Копировать", 'CopyPart', 'kod_part_copy', $this->kod_part) . "</div>";
 
         $data = self::getData($this->kod_part);
@@ -1414,9 +1422,6 @@ class Part
         if (isset($_POST['Flag'], $_POST['kod_part_copy']))
             if ($_POST['Flag'] == "CopyPart" and (int)$_POST['kod_part_copy'] == $this->kod_part) {
                 $db_doc = new Db();
-                $rows_doc = $db_doc->rows(/** @lang MySQL */
-                    "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer;");
-
                 // Пробуем найти подчиненный договор
                 $rows_links = $db_doc->rows(/** @lang MySQL */
                     "SELECT   `part_links`.`kod_part_master`,
@@ -1427,8 +1432,16 @@ class Part
                                        INNER JOIN `view_rplan`  ON `part_links`.`kod_part_master` = `view_rplan`.`kod_part`
                                        INNER JOIN `view_rplan` `V` ON `part_links`.`kod_part_slave` = `V`.`kod_part`
                             WHERE view_rplan.kod_dogovora=$kod_dogovora;");
+
+                $addPartLink = "";
                 if ($db_doc->cnt > 0)
+                {
                     $kod_dogovora = $rows_links[0]['kod_dogovora_slave'];
+                    $addPartLink = "<input type='hidden' name='addPartLink' value='1'>";
+                }
+                // todo - Может потребоваться выбрать закрытый договор
+                $rows_doc = $db_doc->rows(/** @lang MySQL */
+                    "SELECT * FROM view_dogovor_data WHERE zakryt=0 ORDER BY nomer;");
 
                 $res = /** @lang HTML */
                     "<div>
@@ -1437,6 +1450,7 @@ class Part
                         <input type='hidden' name='kod_part_copy' value='$this->kod_part'>
                         <input type='hidden' name='Flag' value='CopyPartToDoc'>
                         <input type='submit' value='Копировать'>
+                        $addPartLink
                         </form>
                         " . func::Cansel() . "
                     </div>";
@@ -1815,7 +1829,7 @@ class Part
 //----------------------------------------------------------------------
 //
     /**
-     * Добавление связи партий - для отслеживания заказов
+     * Добавление связи партий и договоров - для отслеживания заказов
      * @param $kod_part_master
      * @param $kod_part_slave
      */
@@ -1827,28 +1841,33 @@ class Part
         if ($kod_part_master == 0 or $kod_part_slave == 0 or ($kod_part_master == $kod_part_slave))
             return;
 
-        // Проверяем наличие связи
         $db = new Db();
-
+        // Проверяем наличие связи (прямой или обратной)
         $db->rows(/** @lang MySQL */
-            "SELECT * FROM part_links WHERE kod_part_master=$kod_part_master AND kod_part_slave=$kod_part_slave;");
+            "SELECT * FROM part_links WHERE (kod_part_master=$kod_part_master AND kod_part_slave=$kod_part_slave) OR (kod_part_master=$kod_part_slave AND kod_part_slave=$kod_part_master);");
         if ($db->cnt > 0)
             return;
+
         $kod_user = func::kod_user();
         $db->query(/** @lang MySQL */
             "INSERT INTO part_links(kod_part_master, kod_part_slave, kod_user) VALUES($kod_part_master,$kod_part_slave,$kod_user);");
 
-        // Создаем связь для договоров
-        $kod_dogovora_master = 0;
-        $kod_dogovora_slave = 0;
+        // Получаем код основного договора
         $rows = $db->rows(/** @lang MySQL */
             "SELECT kod_dogovora FROM parts WHERE kod_part=$kod_part_master");
         if ($db->cnt > 0)
             $kod_dogovora_master = $rows[0]['kod_dogovora'];
+        else
+            return;
+        // Получаем код подчиненного договора
         $rows = $db->rows(/** @lang MySQL */
             "SELECT kod_dogovora FROM parts WHERE kod_part=$kod_part_slave");
         if ($db->cnt > 0)
             $kod_dogovora_slave = $rows[0]['kod_dogovora'];
+        else
+            return;
+
+        // Создаем связь для договоров
         Doc::addLink($kod_dogovora_master, $kod_dogovora_slave);
     }
 //----------------------------------------------------------------------
