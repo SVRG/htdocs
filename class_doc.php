@@ -175,6 +175,7 @@ class Doc
         return $res;
     }
 //-----------------------------------------------------------------
+
     /**
      * Договоры - основной формат вывода
      * Группировка строк rplan по договорам
@@ -1843,6 +1844,7 @@ class Doc
         return $res;
     }
 //-----------------------------------------------------------------------
+
     /**
      * Список платежей в выбранном месяце.
      * @param int $Month - месяц текущего года
@@ -2327,6 +2329,11 @@ class Doc
             } elseif ($_POST['Flag'] == 'DelDocLink' and isset($_POST['kod_link_del'])) {
                 $this->delLink($_POST['kod_link_del']);
                 $event = true;
+            } elseif ($_POST['Flag'] == 'formQuickAdd' and isset($_POST['kod_org'],$_POST['kod_elem'],$_POST['numb'])) {
+                $kod_dogovora = $this->addQuick($_POST['kod_org'],$_POST['kod_elem'],$_POST['numb']);
+                // переходим в форму договору
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
+                return;
             }
         }
 
@@ -3148,6 +3155,7 @@ class Doc
         $res = /** @lang HTML */
             "<select id='kod_dogovora' name='kod_dogovora' placeholder=\"Выбрать договор...\">";
 
+        $selected = "";
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $nomer = $row['nomer'];
@@ -3156,9 +3164,9 @@ class Doc
                 $nazv_krat = "* " . $row['ispolnit_nazv_krat'];
             $kod_dogovora = $rows[$i]['kod_dogovora'];
 
-            $selected = "";
-            if ($rows[$i]['kod_dogovora'] == $kod_dogovora_selected)
-                $selected = " selected='selected'";
+            if ($selected == "")
+                if ($rows[$i]['kod_dogovora'] == $kod_dogovora_selected)
+                    $selected = " selected='selected'";
 
             $res .= /** @lang HTML */
                 "<option value='$kod_dogovora' $selected>$nomer $nazv_krat $kod_dogovora</option>\r\n";
@@ -3517,5 +3525,48 @@ class Doc
         }
 
         $mail->send_mail($body, "НВС - $dog_nomer - $nazv_krat");
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Новый договор с 1 партией
+     * @param $kod_org
+     * @param $kod_elem
+     * @param $numb
+     * @return int
+     */
+    private function addQuick($kod_org, $kod_elem, $numb)
+    {
+        $data_sost = func::NowDoc();
+        $kod_dogovora = $this->Add("NEXT", $data_sost, $kod_org, config::$kod_org_main);
+        $p = new Part();
+        $p->kod_dogovora = $kod_dogovora;
+        $p->AddEdit($kod_elem, $numb, $data_sost);
+        return $kod_dogovora;
+    }
+//----------------------------------------------------------------------
+//
+    /**
+     * Форма быстрого добавления договора
+     * @param $kod_org
+     * @return string
+     */
+    public static function formQuickAdd($kod_org)
+    {
+        $res = func::ActButton2("", "Добавить", "", "formQuickAddShow");
+        if (isset($_POST['formQuickAddShow'])) {
+            $E = new Elem();
+            $selList = $E->formSelList2();
+            $res = /** @lang HTML */
+                "<form action='' method='post'>
+                <input type='hidden' name='kod_org' value='$kod_org'>
+                <input type='hidden' name='Flag' value='formQuickAdd'>               
+                $selList
+                <input type='text' name='numb' value='1'>
+                <input type='submit' value='Добавить'>
+            </form>";
+            $res .= func::Cansel();
+        }
+        return $res;
     }
 }// END CLASS

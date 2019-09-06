@@ -717,15 +717,18 @@ class Part
      * @param $data_postav - дата поставки
      * @param float $price - цена без НДС
      * @param string $modif - модификация
-     * @param float $nds - НДС
+     * @param int $nds - НДС
      * @param int $val - валюта
      * @param int $Add
      * @param float $price_or - ориентировочная цена
      * @param string $data_nach - дата начала этапа
      */
-    public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = 0.2, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
+    public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = -1, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
         $data_postav = func::Date_to_MySQL($data_postav);
+
+        if($nds < 0)
+            $nds = config::$nds_main;
 
         if ($data_nach != "")
             $data_nach = func::Date_to_MySQL($data_nach);
@@ -1391,7 +1394,7 @@ class Part
         $db = new Db();
         $db->query(/** @lang MySQL */
             "INSERT INTO parts (kod_dogovora,kod_elem,numb,data_postav,price,price_it,sum_part,modif,nds,val,kod_user,price_or,data_nach) 
-                              SELECT $kod_dogovora,kod_elem,numb,$data_postav,price,$price_it,$sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
+                              SELECT $kod_dogovora,kod_elem,numb,'$data_postav',price,$price_it,$sum_part,modif,$nds,val,$kod_user,price_or,data_nach 
                               FROM parts WHERE kod_part=$kod_part;");
         $kod_part_slave = $db->last_id;
 
@@ -1422,21 +1425,19 @@ class Part
         if (isset($_POST['Flag'], $_POST['kod_part_copy']))
             if ($_POST['Flag'] == "CopyPart" and (int)$_POST['kod_part_copy'] == $this->kod_part) {
                 $db_doc = new Db();
+
                 // Пробуем найти подчиненный договор
+                // todo - надо упростить и по-другому выбирать договор - по соответствию элемента, либо как составная часть комплекта
                 $rows_links = $db_doc->rows(/** @lang MySQL */
-                    "SELECT   `part_links`.`kod_part_master`,
-                                     `view_rplan`.`kod_dogovora` AS `kod_dogovora_master`,
-                                     `part_links`.`kod_part_slave`,
-                                     `V`.`kod_dogovora` AS `kod_dogovora_slave`
-                            FROM     `part_links`
-                                       INNER JOIN `view_rplan`  ON `part_links`.`kod_part_master` = `view_rplan`.`kod_part`
-                                       INNER JOIN `view_rplan` `V` ON `part_links`.`kod_part_slave` = `V`.`kod_part`
-                            WHERE view_rplan.kod_dogovora=$kod_dogovora;");
+                    "SELECT   `doc_links`.`kod_doc_master`,
+                                     `doc_links`.`kod_doc_slave`
+                            FROM     `doc_links`
+                            WHERE kod_doc_master=$kod_dogovora AND del=0;");
 
                 $addPartLink = "";
                 if ($db_doc->cnt > 0)
                 {
-                    $kod_dogovora = $rows_links[0]['kod_dogovora_slave'];
+                    $kod_dogovora = $rows_links[0]['kod_doc_slave'];
                     $addPartLink = "<input type='hidden' name='addPartLink' value='1'>";
                 }
                 // todo - Может потребоваться выбрать закрытый договор
