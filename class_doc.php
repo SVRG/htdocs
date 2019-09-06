@@ -559,7 +559,6 @@ class Doc
      */
     public function formDogovor($Edit = 0, $Close = 0)
     {
-
         if ($Edit == 1) {
             echo $this->formAddEdit(1);
         } else {
