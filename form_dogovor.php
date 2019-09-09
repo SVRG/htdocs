@@ -104,7 +104,6 @@ else
                     if (isset($_POST['Flag']))
                         if ($_POST['Flag'] == 'AddKontakt') {
                             echo $Kontakt->formAddEdit();
-                            echo func::Cansel();
                             $_POST['Flag'] = null;
                             $add_kont = true;
                         }

@@ -46,7 +46,7 @@ class Kontakt
         // Формируем массив контактов
         $cnt = $this->getKontArray($Doc_Org);
 
-        $btn_add = Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddKontakt');
+        $btn_add = Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddKontakt');
 
         $res = "<div class='btn'>
                     <div><b>Контакты</b></div>
@@ -458,6 +458,7 @@ class Kontakt
                   <input type=\"hidden\" name=\"$form_name\" id=\"$form_name\" value=\"$form_name\" />
                 </label>
             </form>";
+        $res .= func::Cansel();
 
         return $res;
     }

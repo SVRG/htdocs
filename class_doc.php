@@ -757,6 +757,7 @@ class Doc
                     <input id='$FormName' type='hidden' value='$FormName' name='$FormName'/>
                     <input type='submit' value='Сохранить' />
                 </form>";
+        $res .= func::Cansel();
         return $res;
     }
 //--------------------------------------------------------------------
@@ -2328,8 +2329,8 @@ class Doc
             } elseif ($_POST['Flag'] == 'DelDocLink' and isset($_POST['kod_link_del'])) {
                 $this->delLink($_POST['kod_link_del']);
                 $event = true;
-            } elseif ($_POST['Flag'] == 'formQuickAdd' and isset($_POST['kod_org'],$_POST['kod_elem'],$_POST['numb'])) {
-                $kod_dogovora = $this->addQuick($_POST['kod_org'],$_POST['kod_elem'],$_POST['numb']);
+            } elseif ($_POST['Flag'] == 'formQuickAdd' and isset($_POST['kod_org'], $_POST['kod_elem'], $_POST['numb'])) {
+                $kod_dogovora = $this->addQuick($_POST['kod_org'], $_POST['kod_elem'], $_POST['numb']);
                 // переходим в форму договору
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
@@ -3558,12 +3559,20 @@ class Doc
             $selList = $E->formSelList2();
             $res = /** @lang HTML */
                 "<form action='' method='post'>
-                <input type='hidden' name='kod_org' value='$kod_org'>
-                <input type='hidden' name='Flag' value='formQuickAdd'>               
-                $selList
-                <input type='text' name='numb' value='1'>
-                <input type='submit' value='Добавить'>
-            </form>";
+                    <table>
+                    <tr>
+                        <td>Наименование</td>
+                        <td width='100%'>$selList</td>
+                    </tr>
+                    <tr>
+                        <td>Количество</td>
+                        <td><input type='text' name='numb' value='1'></td>    
+                    </tr>             
+                    </table>
+                    <input type='hidden' name='kod_org' value='$kod_org'>
+                    <input type='hidden' name='Flag' value='formQuickAdd'>
+                    <input type='submit' value='Добавить'>
+                </form>";
             $res .= func::Cansel();
         }
         return $res;

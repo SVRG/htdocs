@@ -89,12 +89,11 @@ Docum::Events();
                 </div>
                 <?php
                 if (in_array($_SESSION['MM_UserGroup'], $UserG))
-                    echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Контакт', 'AddKontakt');
+                    echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddKontakt');
 
                 if (isset($_POST['Flag']))
                     if ($_POST['Flag'] == 'AddKontakt') {
                         echo $Kontakt->formAddEdit();
-                        Func::Cansel(1);
                     }
                 ?>
                 <div id="CollapsiblePanel3" class="CollapsiblePanel">
@@ -110,17 +109,17 @@ Docum::Events();
                 <div id="CollapsiblePanel4" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Договоры</div>
                     <div class="CollapsiblePanelContent">
+                        <div class="btn">
+                            <div><?php echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddDogovor');?></div>
+                            <div><?php echo Doc::formQuickAdd($kod_org);?></div>
+                        </div>
                         <?php
-                        
-                        echo Func::ActButton($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить Договор', 'AddDogovor');
-                        echo Doc::formQuickAdd($kod_org);
-
                         if (isset($_POST['Flag']))
                             if ($_POST['Flag'] == "AddDogovor")
                                 echo $Doc->formAddEdit();
 
 
-                        if ($kod_org != 683) // Чтобы не выводить все договоры
+                        if ($kod_org != config::$kod_org_main) // Чтобы не выводить все договоры
                             echo $org->formDocs();
                         ?>
                     </div>
