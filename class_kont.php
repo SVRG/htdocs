@@ -56,7 +56,7 @@ class Kontakt
         if ($cnt == 0) // если нет контактов то возвращаем список
         {
             // todo: Информировать, что контакт не выбран
-            return $res.$this->formSelList();
+            return $res . $this->formSelList();
         }
 
         $res .= '<table border=1 cellspacing=0 cellpadding=0 width="100%">';
@@ -137,15 +137,14 @@ class Kontakt
             if (strpos($row['data'], '@')) {
 
                 $dogovor = "";
-                if(isset($_GET['kod_dogovora']))
-                {
+                if (isset($_GET['kod_dogovora'])) {
                     $d = new Doc();
                     $d->getData((int)$_GET['kod_dogovora']);
                     $nomer = $d->Data['nomer'];
                     $data_sost = func::Date_from_MySQL($d->Data['data_sost']);
 
                     $type = "Счет";
-                    if((int)$d->Data['doc_type'] > 1) {
+                    if ((int)$d->Data['doc_type'] > 1) {
                         $nomer = $d->Data['kod_dogovora'];
                         switch ((int)$d->Data['doc_type']) {
                             case 2:
@@ -168,7 +167,7 @@ class Kontakt
 
                 $res .= '<tr>
                             <td>
-                                <a href="mailto:' . $row['data'] . '?subject=НВС - '.$dogovor.'&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
+                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
                     . $row['data'] .
                     '</a>
                             </td>';
@@ -211,12 +210,12 @@ class Kontakt
 
         $kod_dogovora = $this->kod_dogovora;
         $kod_org = $this->kod_org;
-        if($kod_org == 0) // Если не задан код организации то берем из договора
+        if ($kod_org == 0) // Если не задан код организации то берем из договора
         {
             $D = new Doc();
             $D->kod_dogovora = $kod_dogovora;
             $D->getData();
-            if($D->Data['kod_ispolnit']==config::$kod_org_main) // Если исполнитель - основная компания
+            if ($D->Data['kod_ispolnit'] == config::$kod_org_main) // Если исполнитель - основная компания
                 $kod_org = $D->Data['kod_org'];
             else
                 $kod_org = $D->Data['kod_ispolnit'];
@@ -257,19 +256,20 @@ class Kontakt
         $rows = explode("\n", $phone);
 
         $cnt = count($rows);
-        if($cnt == 0)
+        if ($cnt == 0)
             return;
 
         $db = new Db();
         $kod_kontakta = $this->kod_kontakta;
         $kod_user = func::kod_user();
 
-        for($i=0; $i <= $cnt;$i++)
-        {
-            $phone = $db->real_escape_string($rows[$i]);
-            $db->query(/** @lang MySQL */
-                "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
+        for ($i = 0; $i <= $cnt; $i++) {
+            if (preg_match('/[A-Za-z]/', $rows[$i]) || preg_match('/[0-9]/', $rows[$i])) {
+                $phone = $db->real_escape_string($rows[$i]);
+                $db->query(/** @lang MySQL */
+                    "INSERT INTO kontakty_data (kod_kontakta,data,kod_user)
                     VALUES($kod_kontakta,'$phone',$kod_user)");
+            }
         }
     }
 //----------------------------------------------------------------------------------------------------------------------
@@ -331,8 +331,8 @@ class Kontakt
             if (!in_array($row['famil'] . $row['name'] . $row['otch'], $exc)) {
 
                 $dolg = func::clearString($row['dolg']);
-                if(strlen($dolg)>$this->max_str_length) // Если должность длиннее максимальной строки
-                    $dolg = mb_substr($dolg,0,$this->max_str_length,'UTF-8')."...";
+                if (strlen($dolg) > $this->max_str_length) // Если должность длиннее максимальной строки
+                    $dolg = mb_substr($dolg, 0, $this->max_str_length, 'UTF-8') . "...";
 
                 array_push($exc, $row['famil'] . $row['name'] . $row['otch']);
 
