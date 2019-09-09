@@ -108,11 +108,13 @@ Docum::Events();
             <td colspan="2">
                 <div id="CollapsiblePanel4" class="CollapsiblePanel">
                     <div class="CollapsiblePanelTab">Договоры</div>
-                    <div class="CollapsiblePanelContent">
-                        <div class="btn">
-                            <div><?php echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddDogovor');?></div>
-                            <div><?php echo Doc::formQuickAdd($kod_org);?></div>
-                        </div>
+                    <table class="CollapsiblePanelContent">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td><?php echo Func::ActButton2($_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'], 'Добавить', 'AddDogovor');?></td>
+                                <td><?php echo Doc::formQuickAdd($kod_org);?></td>
+                            </tr>
+                        </table>
                         <?php
                         if (isset($_POST['Flag']))
                             if ($_POST['Flag'] == "AddDogovor")
