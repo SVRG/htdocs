@@ -637,18 +637,21 @@ class Doc
             elseif ($row['kod_ispolnit'] == config::$kod_org_main)
                 $btn_copy_as_qt = "<div>" . Func::ActButtonConfirm('QT', 'copyDogovorAsQT', 'Подтвердить создание QT') . "</div>";
 
+            $kod_dogovora = $row['kod_dogovora'];
+            $btn_pl = "<div><a href='form_invoice.php?kod_dogovora=$kod_dogovora&pl'>PL</a></div>";
             echo // todo - Продумать вариант с валютой
                 "<table border='0'>
                       <tr>  
                         <th width='202' >Номер</th>
                         <td width='200'>
                         <div class='btn'>
-                            <div><a href='form_dogovor.php?kod_dogovora=" . $row['kod_dogovora'] . "'><h1>" . $row['nomer'] . "</h1></a></div>
+                            <div><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'><h1>" . $row['nomer'] . "</h1></a></div>
                             <div>$form_print</div>
                             $btn_edit
                             <div>$btn_copy</div>
                             $btn_copy_as_po
                             $btn_copy_as_qt
+                            $btn_pl
                         </div>
                         $doc_type
                        </td>
