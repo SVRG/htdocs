@@ -638,7 +638,7 @@ class Doc
                 $btn_copy_as_qt = "<div>" . Func::ActButtonConfirm('QT', 'copyDogovorAsQT', 'Подтвердить создание QT') . "</div>";
 
             $kod_dogovora = $row['kod_dogovora'];
-            $btn_pl = "<div><a href='form_invoice.php?kod_dogovora=$kod_dogovora&pl'>PL</a></div>";
+            $btn_pl = "<div><a target='_blank' href='form_invoice.php?kod_dogovora=$kod_dogovora&pl'>PL</a></div>";
             echo // todo - Продумать вариант с валютой
                 "<table border='0'>
                       <tr>  
