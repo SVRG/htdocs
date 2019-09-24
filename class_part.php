@@ -127,6 +127,7 @@ class Part
 
             // Цена без НДС-------------------------------------------------------------------------------
             $price_str = self::formPrice($row);
+            $price_it_str = Func::Rub($row['price_it']) ." ". Part::formPriceIndicator($row);
 
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
@@ -238,7 +239,7 @@ class Part
                       <td width='80' align='center' $ind >$data_postav_str</td>
                       <td width='40' $ind_part>$nacl $formStatus</td>
                       <td width='120' >" . $price_str . $Val . "</td>
-                      <td width='120' >" . Func::Rub($row['price_it']) . "$Val  $NDS" . '</td>
+                      <td width='120' >$price_it_str $Val  $NDS" . '</td>
                       <td width="120"><div class="btn"><div>' . Func::Rub($sum_part) . "$Val</div><div>$sum_part_form</div></div>" . $NDS . '</td>
                       <td width="90">' . $PRC . '%</td>
                   </tr>';
@@ -2194,5 +2195,28 @@ class Part
         }
 
         return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Показывает, больше или меньше цена элемента по сравнению с текущим прайсом
+     * @param array $rplan_row - строка запроса rplan
+     * @return string
+     */
+    public static function formPriceIndicator(array $rplan_row)
+    {
+        $kod_elem = $rplan_row['kod_elem'];
+        $numb = $rplan_row['numb'];
+        $price_elem_for_numb = Elem::getPriceForQuantity($kod_elem,$numb);
+
+        if($price_elem_for_numb < config::$min_price)
+            return "";
+
+        $price_it = $rplan_row['price_it'];
+        if($price_it > $price_elem_for_numb)
+            return "<img src='img/up.png'>";
+        elseif ($price_it < $price_elem_for_numb)
+            return "<img src='img/down.png'>";
+
+        return "";
     }
 }

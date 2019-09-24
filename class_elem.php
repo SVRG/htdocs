@@ -122,7 +122,7 @@ class Elem
                                     photo.path
                                   FROM view_elem 
                                   LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
-                                  GROUP BY view_elem.kod_elem
+                                  GROUP BY view_elem.kod_elem,shifr
                                   ORDER BY shifr;");
 
         $cnt = $db->cnt;
@@ -902,7 +902,7 @@ class Elem
 //----------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Цена в зависимости от количества
+     * Цена из прайса в зависимости от количества
      * @param $kod_elem
      * @param int $quantity_for
      * @return float
@@ -925,7 +925,6 @@ class Elem
                 $price = func::rnd($row['price']);
             }
         }
-
         return $price;
     }
 //----------------------------------------------------------------------------------------------------------------------
