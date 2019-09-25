@@ -127,7 +127,7 @@ class Part
 
             // Цена без НДС-------------------------------------------------------------------------------
             $price_str = self::formPrice($row);
-            $price_it_str = Func::Rub($row['price_it']) ." ". Part::formPriceIndicator($row);
+            $price_it_str = Func::Rub($row['price_it']) . " " . Part::formPriceIndicator($row);
 
             // Дата поставки------------------------------------------------------------------------------
             $data_postav = Func::Date_from_MySQL($row['data_postav']);
@@ -728,7 +728,7 @@ class Part
     {
         $data_postav = func::Date_to_MySQL($data_postav);
 
-        if($nds < 0)
+        if ($nds < 0)
             $nds = config::$nds_main;
 
         if ($data_nach != "")
@@ -741,7 +741,13 @@ class Part
         $price_it = func::rnd($price * (100 + $nds) / 100);
 
         if ($price < config::$min_price) { // Если цена не задана
-            $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
+            $D = new Doc();
+            $D->kod_dogovora = $this->kod_dogovora;
+            $dataD = $D->getData();
+            $price_it = Elem::getLastPriceByOrg($kod_elem, $dataD['kod_org']); // Пытаемся получить прошлую цену по компании
+            if ($price_it < config::$min_price)
+                $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
+
             $price = func::rnd($price_it * 100 / (100 + $nds)); // Цена без НДС
         } elseif (isset($_POST['nds_yn']))
             if ((int)$_POST['nds_yn'] == 1) { // Если указана цена с НДС
@@ -1192,9 +1198,9 @@ class Part
                 $event = true;
             } elseif ($_POST['Flag'] == 'CopyPartToDoc' and isset($_POST['kod_part_copy'], $_POST['kod_dogovora'])) {
                 $addPartLink = false;
-                if(isset($_POST['addPartLink']))
+                if (isset($_POST['addPartLink']))
                     $addPartLink = true;
-                self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora'],$addPartLink);
+                self::copyToDoc((int)$_POST['kod_part_copy'], (int)$_POST['kod_dogovora'], $addPartLink);
                 $event = true;
             } elseif ($_POST['Flag'] == 'EditSumPart' and isset($_POST['kod_part'], $_POST['sum_part'])) {
                 self::setSumPart($_POST['kod_part'], $_POST['sum_part']);
@@ -1436,8 +1442,7 @@ class Part
                             WHERE kod_doc_master=$kod_dogovora AND del=0;");
 
                 $addPartLink = "";
-                if ($db_doc->cnt > 0)
-                {
+                if ($db_doc->cnt > 0) {
                     $kod_dogovora = $rows_links[0]['kod_doc_slave'];
                     $addPartLink = "<input type='hidden' name='addPartLink' value='1'>";
                 }
@@ -2197,6 +2202,7 @@ class Part
         return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Показывает, больше или меньше цена элемента по сравнению с текущим прайсом
      * @param array $rplan_row - строка запроса rplan
@@ -2206,13 +2212,13 @@ class Part
     {
         $kod_elem = $rplan_row['kod_elem'];
         $numb = $rplan_row['numb'];
-        $price_elem_for_numb = Elem::getPriceForQuantity($kod_elem,$numb);
+        $price_elem_for_numb = Elem::getPriceForQuantity($kod_elem, $numb);
 
-        if($price_elem_for_numb < config::$min_price)
+        if ($price_elem_for_numb < config::$min_price)
             return "";
 
         $price_it = $rplan_row['price_it'];
-        if($price_it > $price_elem_for_numb)
+        if ($price_it > $price_elem_for_numb)
             return "<img src='img/up.png'>";
         elseif ($price_it < $price_elem_for_numb)
             return "<img src='img/down.png'>";

@@ -64,7 +64,7 @@ class Elem
 
         $res = "";
         $btn_edit = "";
-        if($_SESSION['MM_UserGroup'] == "admin") {
+        if ($_SESSION['MM_UserGroup'] == "admin") {
             $btn_edit = Func::ActButton('', 'Изменить', 'formAddEdit');
             if (isset($_POST['Flag']))
                 if ($_POST['Flag'] == 'formAddEdit') {
@@ -87,8 +87,7 @@ class Elem
             if ($name == $row['shifr'])
                 $name = "";
 
-            if($name!=="" and $obozn!=="")
-            {
+            if ($name !== "" and $obozn !== "") {
                 if (strpos($row['name'], $obozn) !== false)
                     $obozn = "";
             }
@@ -299,7 +298,7 @@ class Elem
      */
     public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon = '')
     {
-        if($obozn==="" or $name==="")
+        if ($obozn === "" or $name === "")
             return;
 
         $obozn = ltrim($obozn);
@@ -333,7 +332,7 @@ class Elem
             return;
         $kod_user = func::kod_user();
 
-        Db::getHistoryString("elem","kod_elem",$kod_elem);
+        Db::getHistoryString("elem", "kod_elem", $kod_elem);
         $db = new Db();
         $obozn = $db->real_escape_string($obozn);
         $name = $db->real_escape_string($name);
@@ -371,7 +370,7 @@ class Elem
             $row = $rows[$i];
 
             $nazv_krat = $row['nazv_krat'];
-            $numb = func::Rub($row['numb'],0);
+            $numb = func::Rub($row['numb'], 0);
             $kod_org = (int)$row['kod_org'];
 
             $org_link = "form_elem.php?kod_elem=$this->kod_elem&kod_org=" . $kod_org;
@@ -384,7 +383,7 @@ class Elem
         }
         $res .= '<tr bgcolor="#CCCCCC">
                     <td align="right">Сумма</td>
-                    <td align="right">' . func::Rub($sum,0) . '</td>
+                    <td align="right">' . func::Rub($sum, 0) . '</td>
                  </tr>';
 
         $res .= '</table>';
@@ -418,8 +417,7 @@ class Elem
             $FormName = "formEdit";
 
             if (isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
-                if ($_SESSION['MM_UserGroup'] === "admin")
-                {
+                if ($_SESSION['MM_UserGroup'] === "admin") {
                     if ($row['nomen'] == 1)
                         $btn_nomen = func::ActButton2('', 'Удалить из номенклатуры', "UnsetNomen", "kod_elem_set", $row['kod_elem']);
                     elseif ($row['nomen'] == 0)
@@ -481,7 +479,7 @@ class Elem
      */
     public function DeleteReplace($kod_elem, $kod_dest = 1001)
     {
-        if(func::user_group()!=="admin") // todo - Придумать глобальные права
+        if (func::user_group() !== "admin") // todo - Придумать глобальные права
             return;
 
         $db = new Db();
@@ -564,12 +562,10 @@ class Elem
             } elseif ($flag == "DelFromSpec" and isset($_POST['kod_spec_del'])) {
                 $this->delSpec($_POST['kod_spec_del']);
                 $event = true;
-            }
-            elseif ($flag == "AddPrice" and isset($_POST['price'],$_POST['quantity'])) {
-                $this->addPrice($_POST['price'],$_POST['quantity']);
+            } elseif ($flag == "AddPrice" and isset($_POST['price'], $_POST['quantity'])) {
+                $this->addPrice($_POST['price'], $_POST['quantity']);
                 $event = true;
-            }
-            elseif ($flag == "DelPrice" and isset($_POST['kod_price_del'])) {
+            } elseif ($flag == "DelPrice" and isset($_POST['kod_price_del'])) {
                 $this->delPrice($_POST['kod_price_del']);
                 $event = true;
             }
@@ -749,7 +745,7 @@ class Elem
      */
     public function delSpec($kod_spec)
     {
-        if(func::user_group()!=="admin") // todo - Придумать глобальные права
+        if (func::user_group() !== "admin") // todo - Придумать глобальные права
             return;
 
         $db = new Db();
@@ -827,12 +823,12 @@ class Elem
      * @param int $price
      * @param int $quantity
      */
-    public function addPrice($price=1, $quantity=10)
+    public function addPrice($price = 1, $quantity = 10)
     {
         $kod_elem = $this->kod_elem;
         $db = new Db();
         $price = func::clearNum($price);
-        if($price<=0.01 or (int)$quantity<=0)
+        if ($price <= 0.01 or (int)$quantity <= 0)
             return;
         $quantity = (int)$quantity;
         $kod_user = func::kod_user();
@@ -852,6 +848,7 @@ class Elem
         $db->query(/** @lang MySQL */
             "UPDATE price_list SET del=1 WHERE kod_price=$kod_price");
     }
+
 //----------------------------------------------------------------------------------------------------------------------
     public function formPriceList()
     {
@@ -861,90 +858,14 @@ class Elem
             "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity;");
 
         $btn_add = "";
-        if(func::user_group()=="admin")
+        if (func::user_group() == "admin")
             $btn_add = Func::ActButton('', 'Добавить', 'formAddPrice');
 
         $res = /** @lang HTML */
             "<div class='btn'><div><h1>Прайс-лист</h1></div><div>$btn_add</div></div>";
 
-        if(isset($_POST['Flag']) and func::user_group()=="admin")
-        if($_POST['Flag']=='formAddPrice')
-        {
-            $res .= /** @lang HTML */
-                "<form action='' method='post'>
-                    Цена<input title='price' name='price'>
-                    Кол-во<input title='quantity' name='quantity'>
-                    <input type='hidden' name='kod_elem' value='$kod_elem'>
-                    <input type='submit' value='Добавить'>
-                    <input type='hidden' name='Flag' value='AddPrice'>                       
-                </form>";
-            $res .= func::Cansel();
-        }
-
-        $res.="<table border='0'>";
-        for ($i = 0; $i < $db->cnt; $i++) {
-            $row = $rows[$i];
-
-            $btn_del = "";
-            if(func::user_group()=="admin")
-                $btn_del = func::ActButton2('', 'Удалить', "DelPrice", "kod_price_del", $row['kod_price']);
-
-            $price = func::Rub($row['price']);
-            $quantity = $row['quantity'];
-
-            $res .= /** @lang HTML */
-                "<tr><td><$quantity</td><td>-</td><td>$price</td><td>$btn_del</td></tr>";
-        }
-        $res.="</table>";
-
-        return $res;
-    }
-//----------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Цена из прайса в зависимости от количества
-     * @param $kod_elem
-     * @param int $quantity_for
-     * @return float
-     */
-    public static function getPriceForQuantity($kod_elem, $quantity_for=1)
-    {
-        $db = new Db();
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity;");
-
-        if($db->cnt==0)
-            return 0.;
-
-        $price = func::rnd($rows[0]['price']);
-        for ($i = 0; $i < $db->cnt; $i++) {
-            $row = $rows[$i];
-            $quantity = $row['quantity'];
-
-            if($quantity_for>=$quantity){
-                $price = func::rnd($row['price']);
-            }
-        }
-        return $price;
-    }
-//----------------------------------------------------------------------------------------------------------------------
-    public function formPriceListAll()
-    {
-        $db = new Db();
-        $kod_elem = $this->kod_elem;
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT elem.kod_elem,kod_price,price,quantity,obozn,name,shifr FROM price_list INNER JOIN elem ON elem.kod_elem=price_list.kod_elem WHERE price_list.del=0 ORDER BY shifr,quantity;");
-
-        $btn_add = "";
-        if(func::user_group()=="admin")
-            $btn_add = Func::ActButton('', 'Добавить', 'formAddPrice');
-
-        $res = /** @lang HTML */
-            "<div class='btn'><div><h1>Прайс-лист</h1></div><div>$btn_add</div></div>";
-
-        if(isset($_POST['Flag']) and func::user_group()=="admin")
-            if($_POST['Flag']=='formAddPrice')
-            {
+        if (isset($_POST['Flag']) and func::user_group() == "admin")
+            if ($_POST['Flag'] == 'formAddPrice') {
                 $res .= /** @lang HTML */
                     "<form action='' method='post'>
                     Цена<input title='price' name='price'>
@@ -956,12 +877,87 @@ class Elem
                 $res .= func::Cansel();
             }
 
-        $res.="<table border='0'>";
+        $res .= "<table border='0'>";
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
 
             $btn_del = "";
-            if(func::user_group()=="admin")
+            if (func::user_group() == "admin")
+                $btn_del = func::ActButton2('', 'Удалить', "DelPrice", "kod_price_del", $row['kod_price']);
+
+            $price = func::Rub($row['price']);
+            $quantity = $row['quantity'];
+
+            $res .= /** @lang HTML */
+                "<tr><td><$quantity</td><td>-</td><td>$price</td><td>$btn_del</td></tr>";
+        }
+        $res .= "</table>";
+
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Цена из прайса в зависимости от количества
+     * @param $kod_elem
+     * @param int $quantity_for
+     * @return float
+     */
+    public static function getPriceForQuantity($kod_elem, $quantity_for = 1)
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT price,quantity FROM price_list WHERE kod_elem=$kod_elem AND del=0 ORDER BY quantity;");
+
+        if ($db->cnt == 0)
+            return 0.;
+
+        $price = func::rnd($rows[0]['price']);
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $quantity = $row['quantity'];
+
+            if ($quantity_for >= $quantity) {
+                $price = func::rnd($row['price']);
+            }
+        }
+        return $price;
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+    public function formPriceListAll()
+    {
+        $db = new Db();
+        $kod_elem = $this->kod_elem;
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT elem.kod_elem,kod_price,price,quantity,obozn,name,shifr FROM price_list INNER JOIN elem ON elem.kod_elem=price_list.kod_elem WHERE price_list.del=0 ORDER BY shifr,quantity;");
+
+        $btn_add = "";
+        if (func::user_group() == "admin")
+            $btn_add = Func::ActButton('', 'Добавить', 'formAddPrice');
+
+        $res = /** @lang HTML */
+            "<div class='btn'><div><h1>Прайс-лист</h1></div><div>$btn_add</div></div>";
+
+        if (isset($_POST['Flag']) and func::user_group() == "admin")
+            if ($_POST['Flag'] == 'formAddPrice') {
+                $res .= /** @lang HTML */
+                    "<form action='' method='post'>
+                    Цена<input title='price' name='price'>
+                    Кол-во<input title='quantity' name='quantity'>
+                    <input type='hidden' name='kod_elem' value='$kod_elem'>
+                    <input type='submit' value='Добавить'>
+                    <input type='hidden' name='Flag' value='AddPrice'>                       
+                </form>";
+                $res .= func::Cansel();
+            }
+
+        $res .= "<table border='0'>";
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+
+            $btn_del = "";
+            if (func::user_group() == "admin")
                 $btn_del = func::ActButton2('', 'Удалить', "DelPrice", "kod_price_del", $row['kod_price']);
 
             $price = func::Rub($row['price']);
@@ -970,7 +966,7 @@ class Elem
             $res .= /** @lang HTML */
                 "<tr><td>$shifr</td><td><$quantity</td><td>-</td><td>$price</td><td>$btn_del</td></tr>";
         }
-        $res.="</table>";
+        $res .= "</table>";
 
         return $res;
     }
@@ -981,14 +977,14 @@ class Elem
      * @param int $kod_elem
      * @return string
      */
-    public function formNomenModif($kod_elem=1001)
+    public function formNomenModif($kod_elem = 1001)
     {
         $kod_elem = (int)$kod_elem;
 
         $db = new Db();
-        if($kod_elem>0)
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM parts where kod_elem=$kod_elem and del=0 group by modif order by modif;");
+        if ($kod_elem > 0)
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT * FROM parts where kod_elem=$kod_elem and del=0 group by modif order by modif;");
         else
             $rows = $db->rows(/** @lang MySQL */
                 "SELECT * FROM parts where del=0 group by modif order by modif;");
@@ -1008,10 +1004,10 @@ class Elem
             $row = $rows[$i];
             $modif = $row['modif'];
 
-            $btn = func::ActButton2("","Выбрать","Select","modif",$modif);
+            $btn = func::ActButton2("", "Выбрать", "Select", "modif", $modif);
 
             $res .= /** @lang HTML */
-                    "<tr>
+                "<tr>
                             <td valign='top'><div class='btn'><div>$btn</div><div>$modif</div></div></td>
                      </tr>";
         }
@@ -1029,7 +1025,7 @@ class Elem
      */
     public function formNomenDocs($modif, $kod_elem)
     {
-        if(!isset($modif,$kod_elem))
+        if (!isset($modif, $kod_elem))
             return "";
 
         $kod_elem = (int)$kod_elem;
@@ -1037,13 +1033,13 @@ class Elem
         $db = new Db();
         $modif = $db->real_escape_string($modif);
         $and = "";
-        if(isset($_GET['p']))
+        if (isset($_GET['p']))
             $and = " AND doc_type=1";
         $sql = /** @lang MySQL */
             "SELECT * FROM view_rplan WHERE kod_elem=$kod_elem and $and modif='$modif' order by view_rplan.data_postav;";
         $rows = $db->rows($sql);
 
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return "";
 
         return Doc::formRPlan_by_Doc($rows);
@@ -1052,20 +1048,20 @@ class Elem
 
     /**
      * Наименование для документов
-     * @param $rplan_row[] - kod_elem, modif, name, [shablon]
+     * @param $rplan_row [] - kod_elem, modif, name, [shablon]
      * @return mixed|string
      */
     public static function getNameForInvoice($rplan_row)
     {
-        if(!isset($rplan_row['kod_elem']))
+        if (!isset($rplan_row['kod_elem']))
             return "";
 
         $kod_elem = (int)$rplan_row['kod_elem'];
 
-        if($rplan_row['modif'] == "")
+        if ($rplan_row['modif'] == "")
             return $rplan_row['name'];
 
-        if(!isset($rplan_row['shablon'])) {
+        if (!isset($rplan_row['shablon'])) {
             $db = new Db();
             $rows = $db->rows(/** @lang MySQL */
                 "SELECT * FROM elem WHERE kod_elem=$kod_elem;");
@@ -1073,17 +1069,16 @@ class Elem
                 return "";
             $row = $rows[0];
             $shablon = $row['shablon'];
-        }
-        else
+        } else
             $shablon = $rplan_row['shablon'];
 
-        if($shablon == "")
-            return $rplan_row['name']." (".$rplan_row['modif'].")";
+        if ($shablon == "")
+            return $rplan_row['name'] . " (" . $rplan_row['modif'] . ")";
 
-        if(strpos($shablon, "[Mod]") === false)
-            return $rplan_row['name']." (".$rplan_row['modif'].")";
+        if (strpos($shablon, "[Mod]") === false)
+            return $rplan_row['name'] . " (" . $rplan_row['modif'] . ")";
 
-        return str_replace("[Mod]",$rplan_row['modif'],$shablon);
+        return str_replace("[Mod]", $rplan_row['modif'], $shablon);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1096,7 +1091,7 @@ class Elem
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM elem_set_template WHERE kod_elem=$this->kod_elem AND del=0;");
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return "Список пуст";
 
         $res = /** @lang HTML */
@@ -1108,8 +1103,7 @@ class Elem
              </tr>";
         $cnt = $db->cnt;
 
-        for($i=0;$i<$cnt;$i++)
-        {
+        for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
             $name = $row['name'];
             $numb = $row['numb'];
@@ -1119,8 +1113,7 @@ class Elem
             $rows_n = $db->rows(/** @lang MySQL */
                 "SELECT * FROM sklad_1c WHERE name LIKE name;");
 
-            for($j=0;$j<$db->cnt;$j++)
-            {
+            for ($j = 0; $j < $db->cnt; $j++) {
                 $row_n = $rows_n[$j];
                 $list .= $row_n['name'];
             }
@@ -1137,7 +1130,7 @@ class Elem
             "</table>";
         return $res;
     }
-    //------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //
     /**
      * Список Организаций которые поставляли данный элемент
@@ -1177,7 +1170,7 @@ class Elem
             $row = $rows[$i];
 
             $nazv_krat = $row['ispolnit_nazv_krat'];
-            $numb = func::Rub($row['numb'],0);
+            $numb = func::Rub($row['numb'], 0);
             $kod_org = (int)$row['kod_ispolnit'];
 
             $org_link = "form_elem.php?kod_elem=$this->kod_elem&kod_org=" . $kod_org;
@@ -1190,10 +1183,31 @@ class Elem
         }
         $res .= '<tr bgcolor="#CCCCCC">
                     <td align="right">Сумма</td>
-                    <td align="right">' . func::Rub($sum,0) . '</td>
+                    <td align="right">' . func::Rub($sum, 0) . '</td>
                  </tr>';
 
         $res .= '</table>';
         return $res;
+    }
+//------------------------------------------------------------------------
+//
+    /**
+     * Последняя цена по организации
+     * @param $kod_elem
+     * @param $kod_org
+     * @return float
+     */
+    public static function getLastPriceByOrg($kod_elem, $kod_org)
+    {
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT price_it FROM view_rplan WHERE kod_elem=$kod_elem AND kod_org=$kod_org ORDER BY data_postav DESC LIMIT 1;");
+
+        if ($db->cnt < 1)
+            return 0.;
+
+        $price = func::rnd($rows[0]['price_it']);
+
+        return $price;
     }
 }
