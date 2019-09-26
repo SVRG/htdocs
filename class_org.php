@@ -520,11 +520,11 @@ class Org
                         </tr>
                         <tr>
                           <td><input type='submit' name='button' id='button' value='Сохранить' />
+                          <input type='button' value='Отмена' onClick=\"document.location.href='form_orglist.php'\" />
                           <td><input type='hidden' value='FormAddEdit' name='FormName'>$body</td>
                         </tr>
                       </table>
                     </form>";
-        $res .= func::Cansel();
         return $res;
     }
 //----------------------------------------------------------------------

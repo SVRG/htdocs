@@ -463,9 +463,10 @@ class Elem
                   </table>
                   <input id="' . $FormName . '" type="hidden" value="' . $FormName . '" name="' . $FormName . '"/>
                   <input type="submit" value="Сохранить" />
+                  <input type=\'button\' value=\'Отмена\' onClick="document.location.href=\'form_nomen.php\'" />
                 </form>';
         $res .= $btn_nomen;
-        return $res . Func::Cansel(0);
+        return $res;
     }
 //------------------------------------------------------------------
 //
