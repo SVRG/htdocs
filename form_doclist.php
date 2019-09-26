@@ -33,7 +33,6 @@ $Dogovor->Events();
         if (isset($_GET['add'])) {
             if (in_array($_SESSION['MM_UserGroup'], $UserG))
                 echo $Dogovor->formAddEdit();
-            echo func::Cansel();
             $add = true;
         }
         elseif (isset($_GET['search']))
