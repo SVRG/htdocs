@@ -31,9 +31,10 @@ $Dogovor->Events();
     <div id="pageName">
         <?php
         if (isset($_GET['add'])) {
-            if (in_array($_SESSION['MM_UserGroup'], $UserG))
+            if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                 echo $Dogovor->formAddEdit();
-            $add = true;
+                $add = true;
+            }
         }
         elseif (isset($_GET['search']))
         {
