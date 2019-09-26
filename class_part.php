@@ -389,7 +389,7 @@ class Part
                                         <td width='105'>Процент АВ</td>
                                             <td width='172'>
                                             <span id='sprytextfield_AVPr'>
-                                                <input name='AVPr' type='text' id='text1' value='100'/>
+                                                <input name='AVPr' type='text' id='text1' value='50'/>
                                                 <span class='textfieldRequiredMsg'>A value is required.</span>
                                             </span>
                                         </td>
