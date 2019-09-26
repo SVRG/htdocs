@@ -63,15 +63,15 @@ if (isset($_FILES["filename"]))
 // ------------------------------------------------------------------------------
             if ($_GET['Desc'] == 'IncludeToDoc' and isset($_GET['kod_dogovora'])) {
                 $docum->Add($name, $path, $_GET['kod_dogovora'], 'Doc');
-                $btn = Func::ActButton('form_dogovor.php?kod_dogovora=' . $_GET['kod_dogovora'], 'Перейти к Договору');
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $_GET['kod_dogovora']);
             } // ------------------------------------------------------------------------------
             elseif ($_GET['Desc'] == 'IncludeToElem' and isset($_GET['kod_elem'])) {
                 $docum->Add($name, $path, $_GET['kod_elem'], 'Elem');
-                $btn = Func::ActButton('form_elem.php?kod_elem=' . $_GET['kod_elem'], 'Перейти к Элементу');
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_elem.php?kod_elem=' . $_GET['kod_elem']);
             } // ------------------------------------------------------------------------------
             elseif ($_GET['Desc'] == 'IncludeToOrg' and isset($_GET['kod_org'])) {
                 $docum->Add($name, $path, $_GET['kod_org'], 'Org');
-                $btn = Func::ActButton('form_org.php?kod_org=' . $_GET['kod_org'], 'Перейти к Организации');
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_org.php?kod_org=' . $_GET['kod_org']);
             }
         }
     }
