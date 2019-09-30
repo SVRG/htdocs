@@ -643,7 +643,7 @@ class Doc
                 "<table border='0'>
                       <tr>  
                         <th width='202' >Номер</th>
-                        <td width='200'>
+                        <td width='100%'>
                         <div class='btn'>
                             <div><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'><h1>" . $row['nomer'] . "</h1></a></div>
                             <div>$form_print</div>
@@ -657,7 +657,7 @@ class Doc
                        </td>
                       </tr>
                       <tr>
-                        <th >Дата Составления </th>
+                        <th >Дата </th>
                         <td>" . Func::Date_from_MySQL($row['data_sost']) . "</td>
                       </tr>
                       <tr>
@@ -668,11 +668,11 @@ class Doc
                       </tr>
                         $ISP
                       <tr>
-                        <th >Сумма Договора</th>
+                        <th >Сумма</th>
                         <td>$summa_dogovora</td>
                       </tr>
                       <tr>
-                        <th >Сумма Платежей</th>
+                        <th >Оплачено</th>
                         <td>$summa_plat</td>
                       </tr>
                       <tr>

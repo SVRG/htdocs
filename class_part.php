@@ -379,6 +379,10 @@ class Part
     }
 //--------------------------------------------------------------
 //
+    /**
+     * Форма добавления Аванса и Окончательного расчета (2 равсчета)
+     * @return string
+     */
     public function formAddAVOK()
     {
         $dt = Func::NowE();
@@ -2014,6 +2018,11 @@ class Part
     }
 //----------------------------------------------------------------------
 //
+    /**
+     * Форма истории изменений партии
+     * @param $kod_part
+     * @return string
+     */
     public static function formHistory($kod_part)
     {
         $rows = func::getHistory('parts', $kod_part);
@@ -2098,6 +2107,11 @@ class Part
 
 //----------------------------------------------------------------------
 //
+    /**
+     * Форма состояния партии
+     * @param $kod_part
+     * @return string
+     */
     public function formStatus($kod_part)
     {
         $kod_part = (int)$kod_part;
@@ -2115,6 +2129,11 @@ class Part
 
 //----------------------------------------------------------------------
 //
+    /**
+     * Примечание по партии
+     * @param $kod_part
+     * @return string
+     */
     public static function formPrimTable($kod_part)
     {
         $res = "";
