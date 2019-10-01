@@ -2342,6 +2342,7 @@ class Doc
             elseif ($_POST['Flag'] == 'emailNotification' and isset($_POST['name'],$_POST['email'])) {
                 $text = config::$email_po_notif; // todo - менять текст в зависимости от ситуации (состояние/оплата/уведомление)
                 $this->emailNotification($this->kod_dogovora,$text,$_POST['name'],$_POST['email']);
+                $this->AddPrim("Направлено напоминание");
                 $event = true;
             }
         }
