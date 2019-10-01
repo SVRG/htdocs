@@ -3547,7 +3547,7 @@ class Doc
 
         $email_arr = array(0 => $email);
         $mail->setToAdress($email_arr);
-        $mail->send_mail($body, "НВС - $dog_nomer - $nazv_krat");
+        $mail->send_mail($body, "НВС - $dog_nomer ($kod_dogovora) - $nazv_krat");
     }
 //----------------------------------------------------------------------
 //
