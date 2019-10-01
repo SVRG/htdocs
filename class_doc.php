@@ -3001,11 +3001,16 @@ class Doc
         $img = /** @lang HTML */
             "<img alt='StatusUpdate' title='Необходимо связаться и обновить статус' src='img/time_out.png'>";
 
-        if ($db->cnt == 0)
-            return $img;
+        if ($db->cnt == 0) {
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT data_sost FROM dogovory WHERE kod_dogovora=$kod_dogovora;");
+            $row = $rows[0];
+            $datetime1 = date_create($row['data_sost']);
+        } else {
+            $row = $rows[0];
+            $datetime1 = date_create($row['time_stamp']);
+        }
 
-        $row = $rows[0];
-        $datetime1 = date_create($row['time_stamp']);
         $datetime2 = date_create(date("Y-m-d"));
         $interval = date_diff($datetime2, $datetime1);
         if ((int)$interval->days > 7)
