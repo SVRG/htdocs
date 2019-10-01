@@ -3488,7 +3488,7 @@ class Doc
         $body = "Здравствуйте, $name!<br>";
 
         $body .= $text_html."<br>";
-        $body .= "№$dog_nomer от $data_sost<br>";
+        $body .= "№$dog_nomer ($kod_dogovora) от $data_sost<br>";
         $body .= "$nazv_krat<br>";
 
         $kod_ispolnit = $row['kod_ispolnit'];
