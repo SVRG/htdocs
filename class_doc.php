@@ -2222,6 +2222,7 @@ class Doc
     /**
      * Обработчик событий
      *
+     * @throws phpmailerException
      */
     public function Events()
     {
@@ -2337,6 +2338,11 @@ class Doc
                 // переходим в форму договору
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
+            }
+            elseif ($_POST['Flag'] == 'emailNotification' and isset($_POST['name'],$_POST['email'])) {
+                $text = config::$email_po_notif; // todo - менять текст в зависимости от ситуации (состояние/оплата/уведомление)
+                $this->emailNotification($this->kod_dogovora,$text,$_POST['name'],$_POST['email']);
+                $event = true;
             }
         }
 
@@ -3466,18 +3472,22 @@ class Doc
      * Информирование по договору
      * @param $kod_dogovora
      * @param $text_html
+     * @param $name
+     * @param $email
      * @throws phpmailerException
      */
-    public function email_inform($kod_dogovora, $text_html)
+    public function emailNotification($kod_dogovora, $text_html, $name, $email)
     {
         $mail = new Mail();
         $row = $this->getData($kod_dogovora);
         $dog_nomer = $row['nomer'];
+        $data_sost = func::Date_from_MySQL($row['data_sost']);
         $nazv_krat = $row['nazv_krat'];
-        $host = config::$mail_link_host;
 
-        $body = $text_html;
-        $body .= "№$dog_nomer<br>";
+        $body = "Здравствуйте, $name!<br>";
+
+        $body .= $text_html."<br>";
+        $body .= "№$dog_nomer от $data_sost<br>";
         $body .= "$nazv_krat<br>";
 
         $kod_ispolnit = $row['kod_ispolnit'];
@@ -3493,7 +3503,7 @@ class Doc
         $cnt = $db->cnt;
 
         if ($cnt == 0) {
-            $body .= "Партии не найдены<br>";
+            return;
         } else {
             $body .= /** @lang HTML */
                 "<table border='1' cellspacing='0' cellpadding='3'>
@@ -3532,6 +3542,10 @@ class Doc
             $body .= "</table>";
         }
 
+        $body .= "<br>" . config::$email_sign;
+
+        $email_arr = array(0 => $email);
+        $mail->setToAdress($email_arr);
         $mail->send_mail($body, "НВС - $dog_nomer - $nazv_krat");
     }
 //----------------------------------------------------------------------

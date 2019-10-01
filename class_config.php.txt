@@ -27,4 +27,6 @@ class config
     public static $data_nach = 0; // Дата начала этапа. Отображается в партии
     public static $nds_main = 18; // Базовый НДС
     public static $min_price = 0.01; // Минимальная цена
+    public static $invoice_header = "www.nvs-gnss.ru +7 495 660-06-30"; //
+    public static $email_sign = "";// Подпись при отправке писем
 }

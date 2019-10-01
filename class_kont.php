@@ -96,7 +96,6 @@ class Kontakt
                 $res .= $this->formPhones($row['kod_kontakta'], $AddPh) . '</td></tr>';
             }
         }
-
         $res .= '</table>';
         return $res;
     }
@@ -164,13 +163,21 @@ class Kontakt
 
                     $dogovor = "$type №$nomer от $data_sost";
                 }
+                $name = $kontakt_data['name'];
+                if ($kontakt_data['otch'] == '-')
+                    $otch = "";
+                else
+                    $otch = " " . $kontakt_data['otch'];
+
+
+                $btn_email = $this->formEmailNotification($name, $row['data']);
 
                 $res .= '<tr>
                             <td>
-                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $kontakt_data['name'] . ' ' . $kontakt_data['otch'] . '!">'
-                    . $row['data'] .
-                    '</a>
-                            </td>';
+                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . $otch . '!">'
+                                . $row['data'] .
+                                '</a>'.$btn_email.
+                            '</td>';
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>';
@@ -636,6 +643,21 @@ class Kontakt
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
-
-
+    /**
+     * Форма информирования по почте
+     * @param $name
+     * @param $email
+     * @return string
+     */
+    public function formEmailNotification($name, $email)
+    {
+        $res = /** @lang HTML */
+            "<form method='post'>
+                 <input type='submit' value='Напомнить'>
+                 <input type='hidden' name='name' value='$name'>
+                 <input type='hidden' name='email' value='$email'>
+                 <input type='hidden' name='Flag' value='emailNotification'>
+            </form>";
+        return $res;
+    }
 }

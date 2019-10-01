@@ -134,4 +134,20 @@ class Mail
             return true;
         }
     }
+
+    /**
+     * @param array $to_adress
+     */
+    public function setToAdress($to_adress)
+    {
+        $this->to_adress = $to_adress;
+    }
+
+    /**
+     * @return array
+     */
+    public function getToAdress()
+    {
+        return $this->to_adress;
+    }
 }
