@@ -169,8 +169,9 @@ class Kontakt
                 else
                     $otch = " " . $kontakt_data['otch'];
 
-
-                $btn_email = $this->formEmailNotification($name, $row['data']);
+                $btn_email = "";
+                if(isset($_GET['kod_dogovora']))
+                    $btn_email = $this->formEmailNotification($name, $row['data']);
 
                 $res .= '<tr>
                             <td>
