@@ -168,17 +168,18 @@ class Kontakt
                     $otch = "";
                 else
                     $otch = " " . $kontakt_data['otch'];
+                $name .= $otch;
 
                 $btn_email = "";
-                if(isset($_GET['kod_dogovora']))
+                if (isset($_GET['kod_dogovora']))
                     $btn_email = $this->formEmailNotification($name, $row['data']);
 
                 $res .= '<tr>
                             <td>
                                 <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . $otch . '!">'
-                                . $row['data'] .
-                                '</a>'.$btn_email.
-                            '</td>';
+                    . $row['data'] .
+                    '</a>' . $btn_email .
+                    '</td>';
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>';
