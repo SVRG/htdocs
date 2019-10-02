@@ -176,7 +176,7 @@ class Kontakt
 
                 $res .= '<tr>
                             <td>
-                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . $otch . '!">'
+                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . '!">'
                     . $row['data'] .
                     '</a>' . $btn_email .
                     '</td>';
