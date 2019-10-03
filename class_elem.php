@@ -425,7 +425,8 @@ class Elem
                 }
         }
 
-        $res = '
+        $res = $btn_nomen;
+        $res .= '
             <form id="form1" name="form1" method="post" action="">
                   <table width="521" border="0">
                       <tr>
@@ -465,7 +466,6 @@ class Elem
                   <input type="submit" value="Сохранить" />
                   <input type=\'button\' value=\'Отмена\' onClick="document.location.href=\'form_nomen.php\'" />
                 </form>';
-        $res .= $btn_nomen;
         return $res;
     }
 //------------------------------------------------------------------
@@ -580,9 +580,9 @@ class Elem
     /**
      * Установить признак номенклатуры
      * @param $kod_elem
-     * @param int $nomen - 0-не в номенклатуре, 1-в номенклатуре(продаем)
+     * @param int $nomen - 0-не в номенклатуре(не продаем), 1-в номенклатуре(продаем)
      */
-    public function setNomen($kod_elem, $nomen = 0)
+    public static function setNomen($kod_elem, $nomen = 0)
     {
         $db = new Db();
 
