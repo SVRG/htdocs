@@ -233,7 +233,7 @@ class Org
                           <td >
                               <select name="type" id="type">
                                 <option value="1">Фактический</option>
-                                <option value="2">Юридический</option>
+                                <option selected value="2">Юридический</option>
                                 <option value="3">Почтовый</option>
                               </select>
                           </td>
