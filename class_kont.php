@@ -172,7 +172,8 @@ class Kontakt
 
                 $btn_email = "";
                 if (isset($_GET['kod_dogovora']))
-                    $btn_email = $this->formEmailNotification($name, $row['data']);
+                    if (!Doc::getPaymentFlag((int)$_GET['kod_dogovora'])) // Если были платежи то не напоминать
+                        $btn_email = $this->formEmailNotification($name, $row['data']);
 
                 $res .= '<tr>
                             <td>
