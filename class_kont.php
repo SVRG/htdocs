@@ -177,10 +177,10 @@ class Kontakt
 
                 $res .= '<tr>
                             <td>
-                                <a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . '!">'
+                                <div class="btn"><div><a href="mailto:' . $row['data'] . '?subject=НВС - ' . $dogovor . '&body=Добрый день, ' . $name . '!">'
                     . $row['data'] .
-                    '</a>' . $btn_email .
-                    '</td>';
+                        '</a></div><div>' . $btn_email .
+                    '</div></div></td>';
             } else
                 $res .= '<tr>
                     <td>' . $row['data'] . '</td>';
