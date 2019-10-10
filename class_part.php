@@ -748,7 +748,8 @@ class Part
             $D = new Doc();
             $D->kod_dogovora = $this->kod_dogovora;
             $dataD = $D->getData();
-            $price_it = Elem::getLastPriceByOrg($kod_elem, $dataD['kod_org']); // Пытаемся получить прошлую цену по компании
+            if($Add == 1) // Прошлая цена только при создании
+                $price_it = Elem::getLastPriceByOrg($kod_elem, $dataD['kod_org']); // Пытаемся получить прошлую цену по компании
             if ($price_it < config::$min_price)
                 $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
 
