@@ -655,7 +655,7 @@ class Kontakt
     public function formEmailNotification($name, $email)
     {
         $res = /** @lang HTML */
-            "<form method='post'>
+            "<form method='post' onsubmit='return confirm(\"Отправить сообщение?\");'>
                  <input type='submit' value='Напомнить'>
                  <input type='hidden' name='name' value='$name'>
                  <input type='hidden' name='email' value='$email'>
