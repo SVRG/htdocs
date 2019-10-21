@@ -748,7 +748,7 @@ class Part
             $D = new Doc();
             $D->kod_dogovora = $this->kod_dogovora;
             $dataD = $D->getData();
-            if($Add == 1) // Прошлая цена только при создании
+            if ($Add == 1) // Прошлая цена только при создании
                 $price_it = Elem::getLastPriceByOrg($kod_elem, $dataD['kod_org']); // Пытаемся получить прошлую цену по компании
             if ($price_it < config::$min_price)
                 $price_it = Elem::getPriceForQuantity((int)$kod_elem, (int)$numb); // Пытаемся получить цену элемента из прайс-листа для указанного количества
@@ -2239,10 +2239,43 @@ class Part
 
         $price_it = $rplan_row['price_it'];
         if ($price_it > $price_elem_for_numb)
-            return "<img src='img/up.png'>";
+            return "<img src='img/up.png' alt='more'>";
         elseif ($price_it < $price_elem_for_numb)
-            return "<img src='img/down.png'>";
+            return "<img src='img/down.png' alt='less'>";
 
         return "";
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Возвращает сумму сборки без НДС
+     * @param $kod_part
+     * @return string
+     */
+    public static function getPartSetSumm($kod_part)
+    {
+        $db = new Db();
+        $rows = $db->rows("SELECT sum(part_set.sum) AS summ_set FROM part_set WHERE kod_part=$kod_part AND del=0;");
+        if ($db->cnt < 1)
+            return 0;
+        return $rows[0]['summ_set'];
+    }
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Выводит процент прибыли
+     * @param $kod_part
+     * @return string
+     */
+    public static function formPartProfitProc($kod_part)
+    {
+        $sum_set = self::getPartSetSumm($kod_part);
+        if (!($sum_set > 0))
+            return "";
+
+        $sum_set = $sum_set * (100 + config::$nds_main) / 100; // Сумма с НДС
+        $part_data = self::getData($kod_part);
+        $ostat = $part_data['sum_part'] - $sum_set;
+        $prc = func::rnd((100 * $ostat) / $part_data['sum_part'], 0);
+        return $prc . "%";
     }
 }

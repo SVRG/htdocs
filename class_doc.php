@@ -2093,7 +2093,7 @@ class Doc
             else
                 $res .= '<tr bgcolor="#d8d210">';
 
-            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] . "</a>";
+            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] ." ". Part::formPartProfitProc((int)$row['kod_part']) . "</a>";
 
             $kod_org = $row['kod_org'];
             $filter_link = "";
@@ -2342,7 +2342,7 @@ class Doc
             elseif ($_POST['Flag'] == 'emailNotification' and isset($_POST['name'],$_POST['email'])) {
                 $text = config::$email_po_notif; // todo - менять текст в зависимости от ситуации (состояние/оплата/уведомление)
                 $this->emailNotification($this->kod_dogovora,$text,$_POST['name'],$_POST['email']);
-                $this->AddPrim("Направлено напоминание");
+                $this->AddPrim("Направлено напоминание. ".$_POST['name']." - ". $_POST['email'] );
                 $event = true;
             }
         }
