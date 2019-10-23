@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9655314-2c9e-4bf2-ab16-fbbf5315d5ac" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/class_db.php" beforeDir="false" afterPath="$PROJECT_DIR$/class_db.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/class_doc.php" beforeDir="false" afterPath="$PROJECT_DIR$/class_doc.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_part.php" beforeDir="false" afterPath="$PROJECT_DIR$/class_part.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/form_set.php" beforeDir="false" afterPath="$PROJECT_DIR$/form_set.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/menu.php" beforeDir="false" afterPath="$PROJECT_DIR$/menu/menu.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -59,14 +60,6 @@
         <item name="trin: schema" type="ebfa3cd1:MariaImplModel$Schema" />
         <item name="tables" type="d4e8921:DatabaseStructure$FamilyGroup" />
       </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="trin@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="trin: schema" type="ebfa3cd1:MariaImplModel$Schema" />
-        <item name="tables" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="dogovory: table" type="dbc44a63:MariaImplModel$Table" />
-      </path>
     </expand>
     <select />
   </component>
@@ -81,67 +74,6 @@
         <option value="CSS File" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>списка</find>
-      <find>biv</find>
-      <find>Новый</find>
-      <find>DelFromSpec</find>
-      <find>UPDATE</find>
-      <find>INSERT</find>
-      <find>formAdd</find>
-      <find>formAddDoc</find>
-      <find>btn</find>
-      <find>0.18</find>
-      <find>['nds']</find>
-      <find>price_it</find>
-      <find>5870</find>
-      <find>part_summa</find>
-      <find>part_summ</find>
-      <find>sum_part</find>
-      <find>view_dogovory_nvs</find>
-      <find>4822</find>
-      <find>$_GET</find>
-      <find>lb</find>
-      <find>nvs_root</find>
-      <find>PO</find>
-      <find>DocEditForm</find>
-      <find>Неправильный ко</find>
-      <find>['d']</find>
-      <find>QT</find>
-      <find>Quot</find>
-      <find>$add_type</find>
-      <find>jquery</find>
-      <find>kod_1c</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>form_org</replace>
-      <replace>kod_elem</replace>
-      <replace>kod_org</replace>
-      <replace>form_dok</replace>
-      <replace>kod_doc</replace>
-      <replace>form_doc</replace>
-      <replace>form_dogovor</replace>
-      <replace>kod_dogovora</replace>
-      <replace>Func::Rub</replace>
-      <replace>&quot;time_stamp&quot;</replace>
-      <replace>DROP TABLE IF EXISTS</replace>
-      <replace>view_rplan</replace>
-      <replace>form_kont</replace>
-      <replace>= 1;</replace>
-      <replace>= 0;</replace>
-      <replace>form_main.php</replace>
-      <replace>$this-&gt;kod_org_main</replace>
-      <replace>$kod_org_main</replace>
-      <replace>echo</replace>
-      <replace>config::$kod_org_main</replace>
-      <replace>'</replace>
-      <replace>pl</replace>
-    </replaceStrings>
-    <dirStrings>
-      <dir>$PROJECT_DIR$/img</dir>
-    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -246,7 +178,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
     <property name="two.files.diff.last.used.file" value="$USER_HOME$/Google Диск/Exchange/htdocs/docform.php" />
   </component>
   <component name="RecentsManager">
@@ -306,7 +238,22 @@
     <option name="allServicesViewState">
       <serviceView>
         <treeState>
-          <expand />
+          <expand>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+            </path>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@23615010" type="9fbbdea:ServiceModel$ServiceNode" />
+            </path>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@2c9e407d" type="9fbbdea:ServiceModel$ServiceNode" />
+            </path>
+          </expand>
           <select />
         </treeState>
       </serviceView>
@@ -582,6 +529,28 @@
       <workItem from="1564601481896" duration="237000" />
       <workItem from="1564601926396" duration="1680000" />
       <workItem from="1565019948338" duration="18000" />
+      <workItem from="1565019977560" duration="295000" />
+      <workItem from="1565687952952" duration="18000" />
+      <workItem from="1565687980629" duration="439000" />
+      <workItem from="1567507630210" duration="61000" />
+      <workItem from="1567507712455" duration="29000" />
+      <workItem from="1567507751892" duration="583000" />
+      <workItem from="1567616438102" duration="3866000" />
+      <workItem from="1567638733595" duration="425000" />
+      <workItem from="1567704944844" duration="78000" />
+      <workItem from="1567705033457" duration="15763000" />
+      <workItem from="1568360990668" duration="29000" />
+      <workItem from="1568361040489" duration="432000" />
+      <workItem from="1569344160513" duration="9457000" />
+      <workItem from="1569633938381" duration="72000" />
+      <workItem from="1569673819742" duration="572000" />
+      <workItem from="1569925576994" duration="12363000" />
+      <workItem from="1570536945284" duration="260000" />
+      <workItem from="1570543891352" duration="6105000" />
+      <workItem from="1571112202320" duration="720000" />
+      <workItem from="1571153244888" duration="146000" />
+      <workItem from="1571219807507" duration="158000" />
+      <workItem from="1571222350834" duration="9780000" />
     </task>
     <servers />
   </component>
