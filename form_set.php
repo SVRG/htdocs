@@ -15,6 +15,11 @@ if (!isset($_GET['kod_part'])) {
 if ((int)$_GET['kod_part'] <= 0)
     exit("Не выбрана партия");
 
+$set_id = 0;
+if(isset($_GET['set_id']))
+    if((int)$_GET['set_id'] > 0)
+        $set_id = (int)$_GET['set_id'];
+
 $kod_part = (int)$_GET['kod_part'];
 $part = new Part();
 $part->kod_part = $kod_part;
@@ -92,7 +97,7 @@ $db = new Db();
 
 // Комплектация
 $rows = $db->rows(/** @lang MySQL */
-    "SELECT * FROM part_set WHERE kod_part=$kod_part AND del=0;");
+    "SELECT * FROM part_set WHERE kod_part=$kod_part AND del=0 AND set_id=$set_id;");
 if ($db->cnt == 0)
     echo "Нет данных";
 elseif (func::user_group() == "admin" and isset($_GET['del']))
@@ -217,7 +222,7 @@ if (isset($_GET['add'])) {
             "SELECT * 
                 FROM sklad_1c 
                 WHERE numb>=$part_numb_max $where
-                AND kod_1c NOT IN (SELECT part_set.kod_1c FROM part_set WHERE part_set.kod_part=$kod_part AND del=0)
+                AND kod_1c NOT IN (SELECT part_set.kod_1c FROM part_set WHERE part_set.kod_part=$kod_part AND del=0 AND set_id=$set_id)
         ORDER BY name;";
     else {
         if (isset($_GET['n']))

@@ -1613,6 +1613,11 @@ class Part
         if ($db->cnt == 0)
             exit("Список элементов пуст.");
 
+        $set_id = 0;
+        if(isset($_GET['set_id']))
+            if((int)$_GET['set_id'] > 0)
+                $set_id = (int)$_GET['set_id'];
+
         $row = $rows[0];
 
         $numb_1c = $row['numb'];
@@ -1641,16 +1646,16 @@ class Part
 
         // Проверка, если позиция уже есть в комплектации то обновляем ее
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND kod_1c='$kod_1c' AND del=0");
+            "SELECT * FROM part_set WHERE kod_part=$this->kod_part AND kod_1c='$kod_1c' AND del=0 AND set_id=$set_id;");
         if ($db->cnt > 0) {
             $row_1 = $rows[0];
             $numb_old = $row_1['numb'];
             $kod_item_ps = $row_1['kod_item']; // код позиции из таблицы part_set
             $db->query(/** @lang MySQL */
-                "UPDATE part_set SET numb=($numb_old + $numb) WHERE kod_item=$kod_item_ps");
+                "UPDATE part_set SET numb=($numb_old + $numb) WHERE kod_item=$kod_item_ps AND set_id=$set_id;");
         } else {
             $sql = /** @lang MySQL */
-                "INSERT INTO part_set (name, kod_1c, price, numb, sum, kod_part) VALUES('$name','$kod_1c',$price,$numb,$sum,$this->kod_part);";
+                "INSERT INTO part_set (name, kod_1c, price, numb, sum, kod_part,set_id) VALUES('$name','$kod_1c',$price,$numb,$sum,$this->kod_part,$set_id);";
             $db->query($sql);
         }
 
@@ -1670,7 +1675,7 @@ class Part
     {
         $db = new Db();
         $db->query(/** @lang MySQL */
-            "UPDATE part_set SET del=1 WHERE kod_item=$kod_item");
+            "UPDATE part_set SET del=1 WHERE kod_item=$kod_item;");
 
         $rows = $db->rows(/** @lang MySQL */
             "SELECT numb,kod_1c FROM part_set WHERE kod_item=$kod_item");
