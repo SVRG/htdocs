@@ -7,9 +7,10 @@
                 <li><a href="../form_main.php?sgp=2">Входящие</a></li>
             </ul>
         </li>
-        <li><a href="../form_doclist.php">Договоры</a>
+        <li><a href="../form_doclist.php?<?php echo "y=".date("Y"); ?>">Договоры</a>
             <ul>
                 <li><a href="../form_doclist.php?add">Добавить</a></li>
+                <li><a href="../form_doclist.php">Все</a></li>
                 <li><a href="../form_main.php?sgp=1">Исходящие</a></li>
                 <li><a href="../form_main.php?sgp=1&pd&ost">Исходящие $</a></li>
                 <li><a href="../form_main.php?sgp=9">Исходящие ?</a></li>
