@@ -192,6 +192,7 @@ class Part
             }
 
             $pn = '<br> p/n ' . $row['kod_part']; // Идентификатор партии
+            $prc_profit = self::formPartProfitProc($row['kod_part']); // Процент прибыли
 
             //Примечание партии
             $prim = $this->formPrim();
@@ -210,7 +211,7 @@ class Part
             $btn_copy_to_doc = $this->formCopyToDoc();
             $form_copy_to_doc = $this->formCopyToDoc(false);
             $btn_pl = "<a target='_blank' href='form_invoice.php?pl&kod_part=$this->kod_part&kod_dogovora=" . $row['kod_dogovora'] . "'>PL</a>";
-            $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part . "&add", 'Комплектация', 'PartSet', "target='_blank'") . "</div>";
+            $btn_set = "<div>" . Func::ActButton("form_set.php?kod_part=" . $this->kod_part . "&add", 'Комплектация', 'PartSet', "target='_blank'") . $prc_profit . "</div>";
             $btn_add_po = "<div>" . $this->formAddPO() . "</div>";
             $form_add_po = $this->formAddPO(false);
             $form_linked_parts = "<div>" . $this->formLinkedParts() . "</div>";
@@ -1628,8 +1629,8 @@ class Part
         if (!isset($add_type) or $add_type == 1) {
             $numb = $part_data['numb'];
 
-            if (isset($_GET['min'])) // Вручную задается количество которое надо добавить в комплектацию
-                $numb = (int)$_GET['min'];
+            if (isset($_GET['numb'])) // Вручную задается количество которое надо добавить в комплектацию
+                $numb = (int)$_GET['numb'];
         } elseif ($add_type == 0)
             $numb = $numb_1c;
 

@@ -66,7 +66,7 @@ $doc_nomer = "$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQ
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="menu/print.css">
-    <title>Комплектация <?php echo $doc_nomer;?></title>
+    <title>Комплектация <?php echo $doc_nomer; ?></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -76,8 +76,17 @@ $doc_nomer = "$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQ
 </head>
 <body>
 <?php
+$part_numb_max = $part_data['numb'];
+$sum_part = $part_data['sum_part'];
+if(isset($_GET['numb']))
+    if($part_numb_max > (int)$_GET['numb'])
+        {
+            $part_numb_max = (int)$_GET['numb'];
+            $sum_part = $part_numb_max*$part_data['price_it'];
+        }
+
 echo "<h3>$doc_nomer " . $part_data['nazv_krat'] . "</h3>";
-echo "<h3>" . $elem::getNameForInvoice($part_data) . " - " . $part_data['numb'] . " шт. (Сумма: " . func::Rub($part_data['sum_part']) . ")</h3>";
+echo "<h3>" . $elem::getNameForInvoice($part_data) . " - " . $part_numb_max . " шт. (Сумма: " . func::Rub($sum_part) . ")</h3>";
 
 $db = new Db();
 
@@ -172,10 +181,10 @@ $res .= $line . "\n";
 // Сумма комплектации
 //echo func::Rub($sum); // Без НДС
 $sum_it = func::rnd($sum * (100 + config::$nds_main) / 100); // Сумма комплектации с НДС
-$ostat = $part_data['sum_part'] - $sum_it;
-if ($part_data['sum_part'] == 0)
-    $part_data['sum_part'] = 1;
-$prc = func::rnd((100 * $ostat) / $part_data['sum_part']);
+$ostat = $sum_part - $sum_it;
+if ($sum_part == 0)
+    $sum_part = 1;
+$prc = func::rnd((100 * $ostat) / $sum_part);
 $ostat_str = func::Rub($ostat); // Преобразуем в строку
 echo "Сумма комплектации с НДС: " . func::Rub($sum_it) . " (Прибыль: $ostat_str / $prc%)"; // Сумма с НДС
 echo "<br>";
@@ -185,10 +194,6 @@ echo "<br>";
 $btn = "";
 if (isset($_GET['add'])) {
     echo "<h3>Список выбора</h3>";
-    $numb_min = $part_data['numb'];
-
-    if (isset($_GET['min']))
-        $numb_min = (int)$_GET['min'];
 
     $search = "";
     if (isset($_POST['search']))
@@ -211,15 +216,15 @@ if (isset($_GET['add'])) {
         $sql = /** @lang MySQL */
             "SELECT * 
                 FROM sklad_1c 
-                WHERE numb>=$numb_min $where
+                WHERE numb>=$part_numb_max $where
                 AND kod_1c NOT IN (SELECT part_set.kod_1c FROM part_set WHERE part_set.kod_part=$kod_part AND del=0)
         ORDER BY name;";
     else {
         if (isset($_GET['n']))
             if ($where == "")
-                $where .= " WHERE numb=$numb_min ";
+                $where .= " WHERE numb=$part_numb_max ";
             else
-                $where .= " AND numb=$numb_min ";
+                $where .= " AND numb=$part_numb_max ";
 
         if (isset($_GET['w'])) // удаляем условия отбора
             $where = "";
@@ -306,17 +311,17 @@ if (isset($_GET['add'])) {
         if (isset($_GET['price']))
             $price_row = "<td align='right'>" . func::Rub($price) . "</td>"; //
 
-        if ($numb >= $part_data['numb'])
-            $sum_item = func::rnd($price * $part_data['numb']); // Сумма позиции, которая может быть добавлена к комплектации
+        if ($numb >= $part_numb_max)
+            $sum_item = func::rnd($price * $part_numb_max); // Сумма позиции, которая может быть добавлена к комплектации
         else
             $sum_item = func::rnd($price * $numb);
 
-        $ostat_p = $part_data['sum_part'] - ($sum_it + $sum_item); // Остаток
+        $ostat_p = $sum_part - ($sum_it + $sum_item); // Остаток
         if ($ostat_p < 0)
             continue;
 
-        if($part_data['sum_part'] > 0)
-            $prc_p = (int)(($ostat_p * 100) / $part_data['sum_part']); // Если добавить данную позицию то получим такой процент прибыли
+        if ($sum_part > 0)
+            $prc_p = (int)(($ostat_p * 100) / $sum_part); // Если добавить данную позицию то получим такой процент прибыли
         else
             $prc_p = 0;
 
