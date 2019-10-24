@@ -31,14 +31,12 @@ $data_sost = func::Date_from_MySQL($D->Data['data_sost']);
 
 $text = "В случае увеличения курса ЦБ РФ Евро или Доллара к рублю на момент поступления денег на расчетный счет Поставщика более чем на 3% по сравнению с курсом валют, установленным ЦБ РФ на дату выставления счета, Поставщик оставляет за собой право пересчитать цены.";
 
-if(isset($_GET['day']))
-{
+if (isset($_GET['day'])) {
     $day = func::clearNum($_GET['day']);
     $text .= "<br>Срок поставки $day рабочих дней с момента оплаты.";
 }
 
-if(isset($_GET['dl']))
-{
+if (isset($_GET['dl'])) {
     $text .= "<br>Доставка включена в стоимость.";
 }
 
@@ -127,11 +125,9 @@ if (isset($_GET['pl'])) // Paking List
     if (Doc::getPaymentFlag($D->kod_dogovora))
         echo "<h3>Оплачено $proc_pay%</h3>";
     echo "<h3>" . $D->Data['nazv_krat'] . "</h3>";
-} else
-{
+} else {
     $inn = "";
-    if($Org->Data['inn'] != "")
-    {
+    if ($Org->Data['inn'] != "") {
         $inn = "<br>ИНН " . $Org->Data['inn'];
         $inn .= " КПП " . $Org->Data['kpp'];
     }
@@ -172,6 +168,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 
     if ($cnt == 0)
         return "Нет партий";
+    $nds = 0; // Задаем НДС
     for ($i = 0; $i < $cnt; $i++) {
         $row = $rows[$i];
         $name = $row['name'];
@@ -184,17 +181,11 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
 
         $numb = func::rnd($row['numb']);                                // Количество
         $sum_part = $row["sum_part"];                      // Сумма партии с НДС
-        $nds = func::rnd($row['nds']);                            // Ставка НДС
-        $summ_nds = func::rnd($sum_part * $nds / (100 + $nds));   // Сумма НДС
-        $summ = $sum_part - $summ_nds;                               // Сумма без НДС
-
-        $total_nds += $summ_nds;
-        $total_summ += $summ;
+        $nds = (int)$row['nds'];                           // Ставка НДС
         $total_summ_with_nds += $sum_part;
 
         $price = Part::getPriceWithNDS($row);
 
-        $summ_str = func::Rub($summ);
         $price_str = func::Rub($price);
         $summ_with_nds_str = func::Rub($sum_part);
 
@@ -220,7 +211,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     }
 
     $total_summ_with_nds_text = func::num2str($total_summ_with_nds);
-    $total_summ_with_nds = func::Rub($total_summ_with_nds);
+    $total_nds = func::rnd(((int)$nds * $total_summ_with_nds) / (100 + $nds));
+    $total_summ_with_nds_str = func::Rub($total_summ_with_nds);                         // Строка
     $total_nds_text = func::num2str($total_nds);
     $total_nds = func::Rub($total_nds);
 
@@ -228,7 +220,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         echo "</table>";
         echo "<br>";
     } else {
-        echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds</b></td></tr>";
+        echo "<tr><th colspan='5' align='right'>Итого с учетом НДС</th><td align='right' nowrap><b>$total_summ_with_nds_str</b></td></tr>";
         echo "<tr><th colspan='6' align='right'>$total_summ_with_nds_text</th></tr>";
         echo "<tr><th colspan='5' align='right'>В том числе НДС</th><td align='right' nowrap>$total_nds</td></tr>";
         echo "<tr><th colspan='6' align='right'>$total_nds_text</th></tr>";
@@ -252,8 +244,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     if ($nds_scheta > 0)
         $nds = func::rnd($sum_part * $nds_scheta / (100 + $nds_scheta));     // Сумма НДС
     $summ_with_nds_str = func::Rub($schet_data['summa']);   // Строка
-    $price_str = func::Rub(func::rnd($schet_data['summa']));
-    $summ_str = $price_str;
+
     $nds_str = func::Rub($nds);
     echo "<tr>
             <td align='center'>1</td>
