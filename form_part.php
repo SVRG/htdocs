@@ -1,4 +1,16 @@
 <?php
+if(isset($_GET['help']))
+{
+    echo /** @lang HTML */
+    "
+    <b>Команды управления:</b><br>
+    help - выводит подсказку<br>
+    edit - разрешает редактирование партий после оплаты<br>
+    del - разрешает удаление партии<br>
+    hist - история по партии<br>
+    ";
+    exit("----");
+}
 include_once "security.php";
 $UserG = array('admin', 'oper', 'manager');
 $UserG1 = array('admin', 'oper');
@@ -34,7 +46,10 @@ elseif (isset($_GET['kod_dogovora'])) {
     exit("Не задан Код партии и Код договора");
 
 $Dogovor->kod_dogovora = $kod_dogovora;
-$Dogovor->Events();
+try {
+    $Dogovor->Events();
+} catch (phpmailerException $e) {
+}
 
 $Part->kod_part = $kod_part;
 $Part->kod_dogovora = $kod_dogovora;

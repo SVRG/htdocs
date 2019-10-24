@@ -1,4 +1,18 @@
 <?php
+
+if(isset($_GET['help']))
+{
+    echo /** @lang HTML */
+    "
+    <b>Команды управления:</b><br>
+    help - выводит подсказку<br>
+    edit - разрешает редактирование договора и партий после оплаты<br>
+    del - разрешает удаление партии<br>
+    hist - история по договору<br>
+    ";
+    exit("----");
+}
+
 include_once "security.php";
 
 $UserG = array('admin', 'oper');
@@ -14,7 +28,10 @@ if (isset($_GET['kod_dogovora']))
 else
     $Dogovor->kod_dogovora = (int)$_POST['kod_dogovora'];
 $Dogovor->getData();
-$Dogovor->Events();
+try {
+    $Dogovor->Events();
+} catch (phpmailerException $e) {
+}
 
 $Part = new Part();
 $Part->kod_dogovora = $Dogovor->kod_dogovora;
