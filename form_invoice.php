@@ -5,6 +5,23 @@
  * Date: 08/09/17
  * Time: 16:18
  */
+
+if(isset($_GET['help']))
+{
+    echo /** @lang HTML */
+    "
+    <b>Команды управления:</b><br>
+    help - выводит подсказку<br>
+    nds - с данной командой вычисляется НДС от общей суммы. В противном случае будет сложение НДС по каждой позиции, как в 1С<br>
+    p - формат для распечатки оригинала на принтере, без вставки подписей с печатью<br>
+    d - если счет оформлен по договору то будут выведены все партии с ценами, названиями и общая сумма<br>
+    dl - добавляет строку <b>'Доставка включена в стоимость.'</b><br>
+    days=n - добавляет строку <b>'Срок поставки n рабочих дней с момента оплаты.'</b><br>
+    pl - форма упаковочного листа<br>
+    ";
+    exit("----");
+}
+
 include_once "security.php";
 include_once "class_doc.php";
 include_once "class_org.php";
@@ -169,6 +186,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     if ($cnt == 0)
         return "Нет партий";
     $nds = 0; // Задаем НДС
+    $total_nds = 0; // Итоговый НДС
     for ($i = 0; $i < $cnt; $i++) {
         $row = $rows[$i];
         $name = $row['name'];
@@ -182,6 +200,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $numb = func::rnd($row['numb']);                                // Количество
         $sum_part = $row["sum_part"];                      // Сумма партии с НДС
         $nds = (int)$row['nds'];                           // Ставка НДС
+        if(!isset($_GET['nds']))
+            $total_nds += func::rnd(((int)$nds * $sum_part) / (100 + $nds));
         $total_summ_with_nds += $sum_part;
 
         $price = Part::getPriceWithNDS($row);
@@ -211,7 +231,8 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     }
 
     $total_summ_with_nds_text = func::num2str($total_summ_with_nds);
-    $total_nds = func::rnd(((int)$nds * $total_summ_with_nds) / (100 + $nds));
+    if(isset($_GET['nds']))
+        $total_nds = func::rnd(((int)$nds * $total_summ_with_nds) / (100 + $nds));
     $total_summ_with_nds_str = func::Rub($total_summ_with_nds);                         // Строка
     $total_nds_text = func::num2str($total_nds);
     $total_nds = func::Rub($total_nds);
