@@ -2375,6 +2375,8 @@ class Doc
         $db->query(/** @lang MySQL */
             "INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
 
+        self::setDocType($kod_dogovora,1); // Если есть платеж то это контракт
+
         // Информирование по e-mail
         if ($this->mail == 1) {
             $mail = new Mail();
@@ -3599,5 +3601,21 @@ class Doc
             $res .= func::Cansel();
         }
         return $res;
+    }
+//----------------------------------------------------------------------
+    public static function setDocType($kod_dogovora,$doc_type)
+    {
+        $kod_dogovora = (int)$kod_dogovora;
+        if($kod_dogovora<0)
+            return;
+        $doc_type = (int)$doc_type;
+        if($doc_type < 1 or $doc_type > 5)
+            return;
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */ "SELECT kod_dogovora,doc_type FROM dogovory WHERE kod_dogovora=$kod_dogovora;");
+        if($db->cnt == 0)
+            return;
+        if($rows[0]['doc_type'] != $doc_type)
+            $db->query(/** @lang MySQL */ "UPDATE dogovory SET doc_type=$doc_type WHERE kod_dogovora=$kod_dogovora;");
     }
 }// END CLASS
