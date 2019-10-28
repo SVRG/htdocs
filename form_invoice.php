@@ -6,8 +6,7 @@
  * Time: 16:18
  */
 
-if(isset($_GET['help']))
-{
+if (isset($_GET['help'])) {
     echo /** @lang HTML */
     "
     <b>Команды управления:</b><br>
@@ -103,10 +102,11 @@ $db = new Db();
 $rows = $db->rows(/** @lang MySQL */
     "SELECT * FROM adresa WHERE kod_org=$Isp->kod_org AND del=0 AND type=2");
 $adres_u = ""; // Юридический адрес
-if ($db->cnt > 0)
+if ($db->cnt > 0) {
     $adres_u = $rows[0]['adres'];
+    echo "<br>Юридический адрес: $adres_u";
+}
 
-echo "<br>Юридический адрес: $adres_u";
 $rows = $db->rows(/** @lang MySQL */
     "SELECT * FROM adresa WHERE kod_org=$Isp->kod_org AND del=0 AND type=1");
 $adres_p = ""; // Почтовый адрес
@@ -150,7 +150,8 @@ if (isset($_GET['pl'])) // Paking List
     }
     echo "Заказчик: " . $D->Data['nazv_krat'] . $inn . "<br>";
 }
-echo "Юридический адрес: " . $adres;
+if ($adres != "")
+    echo "Юридический адрес: " . $adres;
 echo $dogovor_nomer;
 echo "<table border='1' cellspacing='0' cellpadding='3' width='100%'>";
 
@@ -200,7 +201,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
         $numb = func::rnd($row['numb']);                                // Количество
         $sum_part = $row["sum_part"];                      // Сумма партии с НДС
         $nds = (int)$row['nds'];                           // Ставка НДС
-        if(!isset($_GET['nds']))
+        if (!isset($_GET['nds']))
             $total_nds += func::rnd(((int)$nds * $sum_part) / (100 + $nds));
         $total_summ_with_nds += $sum_part;
 
@@ -231,7 +232,7 @@ if (count($schet_data) == 0 or isset($_GET['d'])) { // Счет выставле
     }
 
     $total_summ_with_nds_text = func::num2str($total_summ_with_nds);
-    if(isset($_GET['nds']))
+    if (isset($_GET['nds']))
         $total_nds = func::rnd(((int)$nds * $total_summ_with_nds) / (100 + $nds));
     $total_summ_with_nds_str = func::Rub($total_summ_with_nds);                         // Строка
     $total_nds_text = func::num2str($total_nds);
