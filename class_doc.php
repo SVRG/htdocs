@@ -2373,7 +2373,7 @@ class Doc
         $kod_user = func::kod_user();
 
         $db->query(/** @lang MySQL */
-            "INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,$nomer,$summa,'$data','$prim','$user',$kod_user)");
+            "INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim','$user',$kod_user)");
 
         self::setDocType($kod_dogovora,1); // Если есть платеж то это контракт
 
