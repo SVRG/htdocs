@@ -1740,7 +1740,7 @@ class Doc
                                 $btn_set_stat1
                             </div>" . $user .
                 '</td>
-                        <td>' . $status_str . $row['text'] . '</td>
+                        <td>' . $status_str . $row['text'] . self::formCSE($row['text']) . '</td>
                      </tr>';
         }
         $res .= /** @lang HTML */
@@ -2093,7 +2093,7 @@ class Doc
             else
                 $res .= '<tr bgcolor="#d8d210">';
 
-            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] ." ". Part::formPartProfitProc((int)$row['kod_part']) . "</a>";
+            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] . " " . Part::formPartProfitProc((int)$row['kod_part']) . "</a>";
 
             $kod_org = $row['kod_org'];
             $filter_link = "";
@@ -2338,11 +2338,10 @@ class Doc
                 // переходим в форму договору
                 header('Location: http://' . $_SERVER['HTTP_HOST'] . '/form_dogovor.php?kod_dogovora=' . $kod_dogovora);
                 return;
-            }
-            elseif ($_POST['Flag'] == 'emailNotification' and isset($_POST['name'],$_POST['email'])) {
+            } elseif ($_POST['Flag'] == 'emailNotification' and isset($_POST['name'], $_POST['email'])) {
                 $text = config::$email_po_notif; // todo - менять текст в зависимости от ситуации (состояние/оплата/уведомление)
-                $this->emailNotification($this->kod_dogovora,$text,$_POST['name'],$_POST['email']);
-                $this->AddPrim("Направлено напоминание. ".$_POST['name']." - ". $_POST['email'] );
+                $this->emailNotification($this->kod_dogovora, $text, $_POST['name'], $_POST['email']);
+                $this->AddPrim("Направлено напоминание. " . $_POST['name'] . " - " . $_POST['email']);
                 $event = true;
             }
         }
@@ -2375,7 +2374,7 @@ class Doc
         $db->query(/** @lang MySQL */
             "INSERT INTO plat (kod_dogovora,nomer,summa,data,prim,user,kod_user) VALUES($kod_dogovora,'$nomer',$summa,'$data','$prim','$user',$kod_user)");
 
-        self::setDocType($kod_dogovora,1); // Если есть платеж то это контракт
+        self::setDocType($kod_dogovora, 1); // Если есть платеж то это контракт
 
         // Информирование по e-mail
         if ($this->mail == 1) {
@@ -3489,7 +3488,7 @@ class Doc
 
         $body = "Здравствуйте, $name!<br>";
 
-        $body .= $text_html."<br>";
+        $body .= $text_html . "<br>";
         $body .= "№$dog_nomer ($kod_dogovora) от $data_sost<br>";
         $body .= "$nazv_krat<br>";
 
@@ -3602,20 +3601,36 @@ class Doc
         }
         return $res;
     }
+
 //----------------------------------------------------------------------
-    public static function setDocType($kod_dogovora,$doc_type)
+    public static function setDocType($kod_dogovora, $doc_type)
     {
         $kod_dogovora = (int)$kod_dogovora;
-        if($kod_dogovora<0)
+        if ($kod_dogovora < 0)
             return;
         $doc_type = (int)$doc_type;
-        if($doc_type < 1 or $doc_type > 5)
+        if ($doc_type < 1 or $doc_type > 5)
             return;
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */ "SELECT kod_dogovora,doc_type FROM dogovory WHERE kod_dogovora=$kod_dogovora;");
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return;
-        if($rows[0]['doc_type'] != $doc_type)
+        if ($rows[0]['doc_type'] != $doc_type)
             $db->query(/** @lang MySQL */ "UPDATE dogovory SET doc_type=$doc_type WHERE kod_dogovora=$kod_dogovora;");
     }
+//----------------------------------------------------------------------
+
+    /**
+     * Выводит кнопку для провкрки статуса доставки
+     * @param $text
+     * @return string
+     */
+    public static function formCSE($text)
+    {
+        if (preg_match("/\d{3}-\d{9}/", $text, $res)) {
+            return func::ActButton2("form_cse.php", "Статус", "CheckCSE", "cse_number", $res[0], "");
+        }
+        return "";
+    }
+
 }// END CLASS
