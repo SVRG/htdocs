@@ -1,5 +1,6 @@
 <?php
 include "security.php";
+include_once "class_search.php";
 
 $UserG = array('admin', 'oper');
 include_once("class_doc.php");
@@ -30,18 +31,19 @@ $Dogovor->Events();
 <div class="style1" id="pagecell1">
     <div id="pageName">
         <?php
-        if (isset($_GET['add'])) {
-            if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
-                echo $Dogovor->formAddEdit();
-                $add = true;
-            }
+        if (isset($_POST['search'])) {
+            echo Search::formDocSerch();
+        } else {
+            if (isset($_GET['add'])) {
+                if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
+                    echo $Dogovor->formAddEdit();
+                    $add = true;
+                }
+            } elseif (isset($_GET['search'])) {
+                echo Doc::formSearch(); // Тут будет форма поиска
+            } else
+                echo $Dogovor->formDocList();
         }
-        elseif (isset($_GET['search']))
-        {
-            echo Doc::formSearch(); // Тут будет форма поиска
-        }
-        else
-            echo $Dogovor->formDocList();
         ?>
     </div>
 </div>

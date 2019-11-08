@@ -13,7 +13,7 @@ include_once "security.php";
 <div id="pagecell1">
     <?php
     $t = date('H:i:s');
-    include("class_doc.php");
+    include_once "class_doc.php";
     $D = new Doc();
 
     $sgp = 0;
