@@ -507,33 +507,7 @@ class Kontakt
         if ($cnt == 0)
             return "";
 
-        $res = /** @lang HTML */
-            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
-                    <tr bgcolor="#CCCCCC" >
-                        <td width="200">Фамилия Имя Отчество</td>
-                        <td width="200">Организация</td>
-                        <td width="200">Должность</td>
-                        <td width="200">Контакты</td>
-                    </tr>';
-
-        for ($i = 0; $i < $cnt; $i++) {
-            $row = $rows[$i];
-
-
-            $res .= /** @lang HTML */
-                '<tr>
-                            <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
-                ' ' . Func::Mstr($row['name']) .
-                ' ' . Func::Mstr($row['otch']) . '</a></td>
-                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
-                            <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
-                            <td>' . Func::Mstr($row['dolg']) . '</td>
-                 </tr>';
-        }
-
-        $res .= '</table>';
-
-        return $res;
+        return $this->getKontaktForm($rows);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -661,6 +635,47 @@ class Kontakt
                  <input type='hidden' name='email' value='$email'>
                  <input type='hidden' name='Flag' value='emailNotification'>
             </form>";
+        return $res;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * @param $rows
+     * @return string
+     */
+    public function getKontaktForm($rows)
+    {
+        $cnt = count($rows);
+
+        if ($cnt == 0)
+            return "";
+
+        $res = /** @lang HTML */
+            '<table border=1 cellspacing=0 cellpadding=0 width="100%">
+                    <tr bgcolor="#CCCCCC" >
+                        <td width="200">Фамилия Имя Отчество</td>
+                        <td width="200">Контакты</td>
+                        <td width="200">Организация</td>
+                        <td width="200">Должность</td>
+                    </tr>';
+
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+
+
+            $res .= /** @lang HTML */
+                '<tr>
+                            <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
+                ' ' . Func::Mstr($row['name']) .
+                ' ' . Func::Mstr($row['otch']) . '</a></td>
+                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
+                            <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
+                            <td>' . Func::Mstr($row['dolg']) . '</td>
+                 </tr>';
+        }
+
+        $res .= '</table>';
+
         return $res;
     }
 }

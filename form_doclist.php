@@ -31,15 +31,16 @@ $Dogovor->Events();
 <div class="style1" id="pagecell1">
     <div id="pageName">
         <?php
-        if (isset($_POST['search'])) {
+        if (isset($_SESSION['search']) and isset($_GET['search'])) {
             echo Search::formDocSerch();
+            echo Search::formKontSerch();
         } else {
             if (isset($_GET['add'])) {
                 if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
                     echo $Dogovor->formAddEdit();
                     $add = true;
                 }
-            } elseif (isset($_GET['search'])) {
+            } elseif (isset($_GET['search_sellist'])) {
                 echo Doc::formSearch(); // Тут будет форма поиска
             } else
                 echo $Dogovor->formDocList();
