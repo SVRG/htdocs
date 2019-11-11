@@ -3628,9 +3628,23 @@ class Doc
     public static function formCSE($text)
     {
         if (preg_match("/\d{3}-\d{9}/", $text, $res)) {
-            return func::ActButton2("form_cse.php", "Статус", "CheckCSE", "cse_number", $res[0], "");
+            return self::formCSEButton($res['0']);
         }
         return "";
+    }
+//----------------------------------------------------------------------
+    public static function formCSEButton($cse_id)
+    {
+        return /** @lang HTML */ "
+            <script src=\"https://lk.cse.ru/js/build/8b0efa49b621cc1c191d7a3f25bf507c1416906925.js\"></script>
+                <form method=\"GET\" action=\"https://lk.cse.ru/api/track/47cd36872d1e3eb008f80d874c70456f\" target='_blank' accept-charset=\"UTF-8\" id=\"cse-track\">
+                        <input id=\"order-type-opt-1\" name=\"type\" type=\"hidden\" value=\"order\">
+                        <input name=\"lang\" type=\"hidden\" value=\"ru\">
+                        <input name=\"number\" type=\"hidden\" value=\"$cse_id\">
+                        <input name=\"token\" type=\"hidden\" value=\"47cd36872d1e3eb008f80d874c70456f\">
+                        <button class=\"button\">Отследить</button>
+                </form>
+            <script src=\"https://lk.cse.ru/js/cse/track.js\"></script>";
     }
 
 }// END CLASS

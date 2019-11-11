@@ -28,7 +28,10 @@ class Search
 
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM view_rplan 
-                    WHERE ((nomer LIKE '%$search%') OR (ispolnit_nazv_krat LIKE '%$search%') OR (nazv_krat LIKE '%$search%')) $where
+                    WHERE ((nomer LIKE '%$search%') 
+                               OR (ispolnit_nazv_krat LIKE '%$search%') 
+                               OR (nazv_krat LIKE '%$search%'))                       
+                               $where
                     ORDER BY kod_dogovora;");
         if ($db->cnt == 0)
             return "";
