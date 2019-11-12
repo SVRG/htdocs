@@ -48,8 +48,8 @@ class Org
             $search_name = "$poisk $N";
 
             $search_name = func::clearString($search_name);
-            if(strlen($search_name)>50) // Если должность длиннее максимальной строки
-                $search_name = mb_substr($search_name,0,50,'UTF-8')."...";
+            if (strlen($search_name) > 50) // Если должность длиннее максимальной строки
+                $search_name = mb_substr($search_name, 0, 50, 'UTF-8') . "...";
 
             $res .= "<option $sel value='$kod_org'>$search_name</option>";
 
@@ -70,7 +70,7 @@ class Org
     public static function formSelList2($kod_org_selected = 0, $rows = [])
     {
         $db = new Db();
-        if(count($rows) == 0) {
+        if (count($rows) == 0) {
 
             $sql = /** @lang MySQL */
                 "SELECT * FROM org WHERE del=0 ORDER BY poisk;";
@@ -481,12 +481,13 @@ class Org
         $nazv_poln = "";
 
         $body = "";
+        $inn_kpp_ogrn = "";
 
         if ((int)$Edit > 0) {
             if ((int)$Edit == 1)
                 $this->getData();
 
-            if((int)$Edit == 2)
+            if ((int)$Edit == 2)
                 $body = /** @lang HTML */
                     "<input type='hidden' name='AddAnyway' value='AddAnyway' >";
 
@@ -495,7 +496,11 @@ class Org
             $poisk = htmlspecialchars($row['poisk']);
             $nazv_krat = htmlspecialchars($row['nazv_krat']);
             $nazv_poln = htmlspecialchars($row['nazv_poln']);
-        }
+        } else
+            $inn_kpp_ogrn = "<tr>
+                                <td>ИНН/КПП/ОГРН</td>
+                                <td><textarea name='inn_kpp_ogrn' id='inn_kpp_ogrn' cols='40' rows='3'></textarea></td>
+                            </tr>";
 
         $res = /** @lang HTML */
             "<form id='form1' name='form1' method='post' action=''>
@@ -518,6 +523,7 @@ class Org
                             <input name='nazv_poln' id='nazv_poln' size='30' value='$nazv_poln' />
                           <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
                         </tr>
+                            $inn_kpp_ogrn
                         <tr>
                           <td><input type='submit' name='button' id='button' value='Сохранить' />
                           <input type='button' value='Отмена' onClick=\"document.location.href='form_orglist.php'\" />
@@ -566,24 +572,42 @@ class Org
         $nazv_krat = $db->real_escape_string($nazv_krat);
         $nazv_poln = $db->real_escape_string($nazv_poln);
 
+        $where_inn = "";
+        $inn = "";
+        $kpp = "";
+        $ogrn = "";
+        if (isset($_POST['inn_kpp_ogrn'])) {
+            $rows = self::getINN_KPP_OGRN($_POST['inn_kpp_ogrn']);
+            if (isset($rows['inn']))
+            {
+                $where_inn = " OR (inn='" . $rows['inn'] . "')";
+                $inn = $rows['inn'];
+            }
+            if(isset($rows['kpp']))
+                $kpp = $rows['kpp'];
+            if(isset($rows['ogrn']))
+                $ogrn = $rows['ogrn'];
+        }
+
+
         // todo - Подумать как сделать красивей
         if (!isset($_POST['AddAnyway'])) {
             // Проверка на наличие контрагента
             $db->rows(/** @lang MySQL */
-                "SELECT * FROM org WHERE (poisk='$poisk') OR (nazv_krat='$nazv_krat') OR (nazv_poln='$nazv_poln')");
+                "SELECT * FROM org WHERE (poisk='$poisk') OR (nazv_krat='$nazv_krat') OR (nazv_poln='$nazv_poln') $where_inn;");
             if ($db->cnt > 0) {
                 echo "Данная организация уже сущетвует. Подтвердите добавление.";
 
-                $this->Data['poisk']=$poisk;
-                $this->Data['nazv_krat']=$nazv_krat;
-                $this->Data['nazv_poln']=$nazv_poln;
+                $this->Data['poisk'] = $poisk;
+                $this->Data['nazv_krat'] = $nazv_krat;
+                $this->Data['nazv_poln'] = $nazv_poln;
 
                 echo $this->formAddEdit(2);
                 exit("");
             }
         }
         $db->query(/** @lang MySQL */
-            "INSERT INTO org (poisk,nazv_krat,nazv_poln) VALUES('$poisk','$nazv_krat','$nazv_poln')");
+            "INSERT INTO org (poisk,nazv_krat,nazv_poln,inn,kpp,ogrn) VALUES('$poisk','$nazv_krat','$nazv_poln','$inn','$kpp','$ogrn')");
         return $db->last_id;
     }
 //----------------------------------------------------------------------
@@ -985,7 +1009,7 @@ class Org
         $kod_org = $this->kod_org;
         $nazv_krat = $this->Data['nazv_krat'];
 
-        if($form_stat)
+        if ($form_stat)
             return "<a href='form_org_stat.php?kod_org=$kod_org'>$nazv_krat</a>";
 
         return "<a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a>";
@@ -1262,7 +1286,7 @@ class Org
      */
     public static function formOGRN($ogrn)
     {
-        if($ogrn == "")
+        if ($ogrn == "")
             return "";
 
         $ogrn = func::clearNum($ogrn);
@@ -1280,7 +1304,7 @@ class Org
      */
     public static function formINN($inn)
     {
-        if($inn == "")
+        if ($inn == "")
             return "";
 
         $inn = func::clearNum($inn);
@@ -1292,4 +1316,28 @@ class Org
         return $res;
     }
     //-----------------------------------------------------------------
+
+    /**
+     * Ищет в тексте ИНН/КПП/ОРГН и формирует массив
+     * @param $text
+     * @return array
+     */
+    public static function getINN_KPP_OGRN($text)
+    {
+        $text = func::clearText($text);
+        $rows = explode("\n", $text);
+        $res = array();
+        if (count($rows) >= 1) {
+            for ($i = 0; $i < count($rows); $i++) {
+                $str = func::clearNum($rows[$i]); // Оставльяем только цифры
+                if (strlen($str) == 10)
+                    $res['inn'] = $str;
+                elseif (strlen($str) == 9)
+                    $res['kpp'] = $str;
+                elseif (strlen($str) == 13)
+                    $res['ogrn'] = $str;
+            }
+        }
+        return $res;
+    }
 }
