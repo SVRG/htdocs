@@ -26,13 +26,18 @@ class Search
             $where .= " AND kod_org=" . (int)$_GET['kod_org'];
         }
 
+        if (isset($_GET['type'])) {
+            $where .= " AND doc_type=" . (int)$_GET['type'];
+        }
+
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM view_rplan 
                     WHERE ((nomer LIKE '%$search%') 
                                OR (ispolnit_nazv_krat LIKE '%$search%') 
-                               OR (nazv_krat LIKE '%$search%'))                       
+                               OR (nazv_krat LIKE '%$search%')
+                               OR (name LIKE '%$search%' OR shifr LIKE '%$search%' OR modif LIKE '%$search%'))                   
                                $where
-                    ORDER BY kod_dogovora;");
+                    ORDER BY kod_dogovora DESC;");
         if ($db->cnt == 0)
             return "";
         return Doc::formRPlan_by_Doc($rows);
@@ -65,10 +70,36 @@ class Search
                                 WHERE kontakty.del=0 AND (famil LIKE '%$search%')
                                 ORDER BY
                                     kontakty.famil;");
-        if ($db->cnt == 0)
-            return "";
-        $kont = new Kontakt();
-        return $kont->getKontaktForm($rows);
+        $res = "";
+        if ($db->cnt > 0) {
+            $kont = new Kontakt();
+            $res .= $kont->getKontaktForm($rows);
+        }
+
+        // Попытаемся найти по e-mail
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT   `kontakty`.`kod_kontakta`,
+                                         `kontakty`.`name`,
+                                         `kontakty`.`famil`,
+                                         `kontakty`.`otch`,
+                                         `kontakty`.`dolg`,
+                                         `org`.`nazv_krat`,
+                                         `org`.`kod_org`,
+                                         `kontakty_data`.`data`
+                                FROM     `kontakty` 
+                                INNER JOIN `org`  ON `kontakty`.`kod_org` = `org`.`kod_org` 
+                                INNER JOIN `kontakty_data`  ON `kontakty`.`kod_kontakta` = `kontakty_data`.`kod_kontakta` 
+                                WHERE kontakty.del=0 AND (data LIKE '%$search%')
+                                ORDER BY
+                                    kontakty.famil;");
+
+        if ($db->cnt > 0) {
+            $kont = new Kontakt();
+            $res .= $kont->getKontaktForm($rows);
+        }
+        // todo - доьавить поиск по телефону, требуется приводить строку поиска и телефон к единому виду (нет пробелов, тире и букв).
+
+        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -88,6 +119,7 @@ class Search
             </form>";
         return $res;
     }
+
 //----------------------------------------------------------------------------------------------------------------------
 
     public static function getSearch()

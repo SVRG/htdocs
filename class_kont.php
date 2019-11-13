@@ -661,16 +661,22 @@ class Kontakt
 
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
-
+            $org = "";
+            if(isset($row['kod_org']))
+            {
+                $kod_org = $row['kod_org'];
+                $nazv_krat = $row['nazv_krat'];
+                $org = "<a href='form_org.php?kod_org=$kod_org'>$nazv_krat</a>";
+            }
 
             $res .= /** @lang HTML */
                 '<tr>
                             <td><a href="form_kont.php?kod_kontakta=' . $row['kod_kontakta'] . '">' . Func::Mstr($row['famil']) .
                 ' ' . Func::Mstr($row['name']) .
                 ' ' . Func::Mstr($row['otch']) . '</a></td>
-                            <td>' . $this->formPhones($row['kod_kontakta']) . '</td>
-                            <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
-                            <td>' . Func::Mstr($row['dolg']) . '</td>
+                            <td>' . $this->formPhones($row['kod_kontakta']) . "</td>
+                            <td>$org</td>
+                            <td>" . Func::Mstr($row['dolg']) . '</td>
                  </tr>';
         }
 
