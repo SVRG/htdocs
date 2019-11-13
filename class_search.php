@@ -54,7 +54,14 @@ class Search
         $db = new Db();
         $search = self::getSearch();
         if ($search == "" or strlen($search) < 2)
-            return "Ничего не найдено.";
+            return "Для запроса нужно не менее 2-х символов.";
+
+        $where = "";
+        if(isset($_GET['kod_org']))
+        {
+            $where .= " AND kod_org=".(int)$_GET['kod_org'];
+        }
+
         $rows = $db->rows(/** @lang MySQL */
             "SELECT
                                     kontakty.kod_kontakta,
@@ -67,7 +74,7 @@ class Search
                                 FROM
                                     kontakty
                                 INNER JOIN org ON kontakty.kod_org = org.kod_org
-                                WHERE kontakty.del=0 AND (famil LIKE '%$search%')
+                                WHERE kontakty.del=0 AND (famil LIKE '%$search%') $where
                                 ORDER BY
                                     kontakty.famil;");
         $res = "";
@@ -89,7 +96,7 @@ class Search
                                 FROM     `kontakty` 
                                 INNER JOIN `org`  ON `kontakty`.`kod_org` = `org`.`kod_org` 
                                 INNER JOIN `kontakty_data`  ON `kontakty`.`kod_kontakta` = `kontakty_data`.`kod_kontakta` 
-                                WHERE kontakty.del=0 AND (data LIKE '%$search%')
+                                WHERE kontakty.del=0 AND (data LIKE '%$search%') $where
                                 ORDER BY
                                     kontakty.famil;");
 

@@ -33,7 +33,8 @@ $Dogovor->Events();
         <?php
         if (isset($_SESSION['search']) and isset($_GET['search'])) {
             echo Search::formDocSerch();
-            echo Search::formKontSerch();
+            if(!isset($_GET['kod_elem'])) // Если не задан код элемента то поиск по контактам
+                echo Search::formKontSerch();
         } else {
             if (isset($_GET['add'])) {
                 if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
