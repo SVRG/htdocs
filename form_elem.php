@@ -58,9 +58,11 @@ if (in_array($_SESSION['MM_UserGroup'], $UserG))
             <td align="left" bgcolor="#ECEEFD">
                 <?php
                 $link_modif = "<a href='form_nomen.php?kod_elem=$E->kod_elem'><img alt='Modif' title='Посмотреть модификации' src='img/view_properties.png'></a>";
+                $E->getData();
+                $web_link = Elem::formWEBLink($E->Data);
 
                 echo $E->formPhoto() . '<br>';
-                echo $E->formName('all', 1).$link_modif;
+                echo $E->formName('all', 1) . $link_modif." $web_link";
                 echo $E->formPriceList();
                 ?>
                 <div id="CollapsiblePanel1" class="CollapsiblePanel">

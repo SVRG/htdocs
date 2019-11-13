@@ -118,7 +118,8 @@ class Elem
                                     view_elem.kod_elem,
                                     view_elem.shifr,
                                     view_elem.nomen,
-                                    photo.path
+                                    photo.path,
+                                    web_link
                                   FROM view_elem 
                                   LEFT JOIN (SELECT * FROM view_docum_elem WHERE name='Фото' ORDER BY view_docum_elem.kod_docum DESC) AS photo ON view_elem.kod_elem=photo.kod_elem
                                   GROUP BY view_elem.kod_elem,shifr
@@ -151,6 +152,8 @@ class Elem
             $link = "form_elem.php?kod_elem=$kod_elem";
             $link_modif = "<a href='form_nomen.php?kod_elem=$kod_elem'><img alt='Modif' title='Посмотреть модификации' src='img/view_properties.png'></a>";
 
+            $web_link = self::formWEBLink($row);
+
             if (isset($row['path'])) {
                 $path = $row['path'];
                 $img = "<a href='$link'><img alt='Path' src='$path' width='100' border='0' /></a>";
@@ -165,7 +168,7 @@ class Elem
             $price_list = $this->formPriceList();
 
             $row_nomen = "<tr>
-                            <td align='left' valign='top'>$img $link_modif</td>
+                            <td align='left' valign='top'>$img $link_modif $web_link</td>
                             <td valign='top'><a href='$link'><h1> $shifr </h1> $name </a></td>
                             <td valign='top'>$price_list</td>
                          </tr>";
@@ -295,8 +298,9 @@ class Elem
      * @param string $shifr
      * @param int $nomen
      * @param string $shablon
+     * @param string $web_link
      */
-    public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon = '')
+    public function AddElem($obozn, $name, $shifr, $nomen = 1, $shablon = '', $web_link = "")
     {
         if ($obozn === "" or $name === "")
             return;
@@ -312,8 +316,7 @@ class Elem
         $nomen = (int)$nomen;
 
         $db->query(/** @lang MySQL */
-            "INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user)");
-
+            "INSERT INTO elem (obozn,name,nomen, shifr,shablon,kod_user,web_link) VALUES('$obozn','$name',$nomen,'$shifr','$shablon',$kod_user,'$web_link')");
     }
 //------------------------------------------------------------------------
 //
@@ -323,8 +326,9 @@ class Elem
      * @param string $name
      * @param string $shablon
      * @param string $shifr
+     * @param string $web_link
      */
-    public function Save($obozn = '', $name = '', $shablon = '', $shifr = '')
+    public function Save($obozn = '', $name = '', $shablon = '', $shifr = '', $web_link = "")
     {
         $kod_elem = $this->kod_elem;
 
@@ -338,9 +342,10 @@ class Elem
         $name = $db->real_escape_string($name);
         $shablon = $db->real_escape_string($shablon);
         $shifr = $db->real_escape_string($shifr);
+        $web_link = $db->real_escape_string($web_link);
 
         $db->query(/** @lang MySQL */
-            "UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', kod_user=$kod_user WHERE kod_elem = $kod_elem");
+            "UPDATE elem SET obozn = '$obozn', name = '$name', shablon='$shablon', shifr='$shifr', web_link='$web_link', kod_user=$kod_user WHERE kod_elem = $kod_elem");
     }
 //------------------------------------------------------------------------
 //
@@ -414,6 +419,7 @@ class Elem
             $obozn = $row['obozn'];
             $name = $row['name'];
             $shablon = $row['shablon'];
+            $web_link = $row['web_link'];
             $FormName = "formEdit";
 
             if (isset($_SESSION['MM_UserGroup'])) // todo - придумать глобальную политику прав
@@ -458,6 +464,14 @@ class Elem
                         <td>
                           <label>
                           <textarea rows=2 cols=60 name="shablon" id="shablon">' . $shablon . '</textarea>  
+                            </label>
+                         </td>
+                      </tr>
+                       <tr>
+                        <td>WEB-Link</td>
+                        <td>
+                          <label>
+                          <textarea rows=2 cols=60 name="web_link" id="web_link">' . $web_link . '</textarea>  
                             </label>
                          </td>
                       </tr>
@@ -539,12 +553,12 @@ class Elem
         }
 
         if (isset($_POST['formEdit'], $_POST['obozn'], $_POST['name'])) {
-            $this->Save($_POST['obozn'], $_POST['name'], $_POST['shablon'], $_POST['shifr']);
+            $this->Save($_POST['obozn'], $_POST['name'], $_POST['shablon'], $_POST['shifr'], $_POST['web_link']);
             $event = true;
         }
 
         if (isset($_POST['formAdd'], $_POST['obozn'], $_POST['name'])) {
-            $this->AddElem($_POST['obozn'], $_POST['name'], $_POST['shifr'], 1, $_POST['shablon']);
+            $this->AddElem($_POST['obozn'], $_POST['name'], $_POST['shifr'], 1, $_POST['shablon'], $_POST['web_link']);
             $event = true;
         }
 
@@ -1210,5 +1224,59 @@ class Elem
         $price = func::rnd($rows[0]['price_it']);
 
         return $price;
+    }
+//------------------------------------------------------------------------
+//
+    public static function formElemRating()
+    {
+        $db = new Db();
+        $kod_org_main = config::$kod_org_main;
+        $y = date("Y");
+        $y_next = $y + 1;
+        if (isset($_GET['y']))
+            $y = (int)$_GET['y'];
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT   `view_rplan`.`name`,
+                    SUM( `view_rplan`.`sum_part` )  AS `summ`
+                    FROM     `view_rplan` 
+                    INNER JOIN `view_dogovor_summa_plat`  ON `view_rplan`.`kod_dogovora` = `view_dogovor_summa_plat`.`kod_dogovora` 
+                    WHERE    ( `view_rplan`.`data_postav` >='$y-01-01' AND `view_rplan`.`data_postav` <'$y_next-01-01'  ) AND ( `view_rplan`.`kod_ispolnit` = 683 )
+                    GROUP BY `view_rplan`.`kod_elem`
+                    ORDER BY summ DESC;");
+        if ($db->cnt == 0)
+            return "";
+        $res = "<table><tr><td>Наименование</td><td>Сумма</td></tr>";
+        $total_summ = 0;
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $name = $row['name'];
+            $total_summ += func::clearNum($row['summ']);
+            $summ = func::Rub($row['summ']);
+            $res .= /** @lang HTML */
+                "<tr>
+                    <td>$name</td>
+                    <td align='right'>$summ</td>
+                </tr>";
+        }
+        $res .= "</table>";
+        $res .= func::Rub($total_summ);
+        return $res;
+    }
+//------------------------------------------------------------------------
+//
+    /**
+     * Ссылка на сайт
+     * @param $row
+     * @return mixed|string
+     */
+    public static function formWEBLink($row)
+    {
+        if(!isset($row['web_link']))
+            return "";
+        $web_link = $row['web_link'];
+        if ($web_link != "")
+            $web_link = "<a href='$web_link' target='_blank'>www</a>";
+
+        return $web_link;
     }
 }
