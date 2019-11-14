@@ -83,9 +83,10 @@ class Search
             $res .= $kont->getKontaktForm($rows);
         }
 
-        // Попытаемся найти по e-mail
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT   `kontakty`.`kod_kontakta`,
+        // Попытаемся найти по e-mail или телефону
+        if(strlen($search) >= 6) {
+            $rows = $db->rows(/** @lang MySQL */
+                "SELECT   `kontakty`.`kod_kontakta`,
                                          `kontakty`.`name`,
                                          `kontakty`.`famil`,
                                          `kontakty`.`otch`,
@@ -100,11 +101,12 @@ class Search
                                 ORDER BY
                                     kontakty.famil;");
 
-        if ($db->cnt > 0) {
-            $kont = new Kontakt();
-            $res .= $kont->getKontaktForm($rows);
+            if ($db->cnt > 0) {
+                $kont = new Kontakt();
+                $res .= $kont->getKontaktForm($rows);
+            }
         }
-        // todo - доьавить поиск по телефону, требуется приводить строку поиска и телефон к единому виду (нет пробелов, тире и букв).
+        // todo - добавить поиск по телефону, требуется приводить строку поиска и телефон к единому виду (нет пробелов, тире и букв).
 
         return $res;
     }
