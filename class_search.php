@@ -162,13 +162,16 @@ class Search
         if ($search == "" or strlen($search) < 2)
             return "Для запроса нужно не менее 2-х символов.";
 
+        $where = "";
+        if(strlen(func::clearNum($search)) == 10) // Вероятно это ИНН
+            $where .= " OR (inn LIKE '%$search%')";
+
         $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM org WHERE 
                         (poisk LIKE '%$search%') OR 
                         (nazv_krat LIKE '%$search%') OR 
-                        (nazv_poln LIKE '%$search%') OR 
-                        (inn LIKE '%$search%')
+                        (nazv_poln LIKE '%$search%') $where
                     ORDER BY poisk;");
         return Org::formOrgListRows($rows);
     }
