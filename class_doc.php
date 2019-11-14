@@ -1856,27 +1856,31 @@ class Doc
      */
     public function formCurrentMonthPays($Month = 0, $VN = false)
     {
-        $start_data = date('Y-m-01');
+        $start_date = date('Y-m-01');
 
         $month = (int)$Month;
-        if ($month > 0) {
+
+        if ($month > 0 and $Month < 13) {
             if (isset($_GET['y'])) {
                 if ((int)$_GET['y'] > 0) {
                     $Y = (int)$_GET['y'];
-                    $start_data = date("$Y-$Month-01");
+                    $start_date = date("$Y-$Month-01");
                 }
             } else
-                $start_data = date("Y-$Month-01");
+            {
+                $start_date = date("Y-$Month-01");
+            }
         }
+        $end_date = date("Y-m-01", strtotime('+1 month',strtotime($start_date)));
 
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         if (!$VN)
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
+                "SELECT * FROM view_plat WHERE (data >= '$start_date' AND data <'$end_date') AND kod_org<>$kod_org_main ORDER BY view_plat.data DESC");
         else
             $rows = $db->rows(/** @lang MySQL */
-                "SELECT * FROM view_plat WHERE data >= '$start_data' AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
+                "SELECT * FROM view_plat WHERE (data >= '$start_date' AND data <'$end_date') AND kod_org=$kod_org_main ORDER BY view_plat.data DESC");
 
         $cnt = $db->cnt;
 
@@ -1938,7 +1942,8 @@ class Doc
                           <td>' . $row['prim'] . '</td>
                         </tr>';
 
-            $summ += $row['summa'];
+            if($row['summa'] > 0)
+                $summ += $row['summa'];
         }
 
         $res .= '</table>';

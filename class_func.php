@@ -606,4 +606,28 @@ class Func
         else
             return "";
     }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Прибавляет к текущей дате $week недель
+     * @param int $week
+     * @return false|string
+     */
+    public static function datePlusWeek($week)
+    {
+        $week = (int)$week;
+        return date("Y-m-d", strtotime("+$week week",strtotime("now")));
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Прибавляет к текущей дате $day дней
+     * @param $day
+     * @return false|string
+     */
+    public static function datePlusDay($day)
+    {
+        $week = (int)$day;
+        return date("Y-m-d", strtotime("+$day day",strtotime("now")));
+    }
 }

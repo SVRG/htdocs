@@ -715,7 +715,7 @@ class Part
     }
 
 //-----------------------------------------------------------------------
-
+//
     /**
      * Добавление или редактирование
      * @param $kod_elem - номенклатура
@@ -731,7 +731,18 @@ class Part
      */
     public function AddEdit($kod_elem, $numb, $data_postav, $price = 0., $modif = '', $nds = -1, $val = 1, $Add = 1, $price_or = 0., $data_nach = "")
     {
-        $data_postav = func::Date_to_MySQL($data_postav);
+        if(!(strpos($data_postav,'w') === false))
+        {
+            $week = (int)func::clearNum($data_postav);
+            $data_postav = func::datePlusWeek($week);
+        }
+        elseif(!(strpos($data_postav,'d') === false))
+        {
+            $day = (int)func::clearNum($data_postav);
+            $data_postav = func::datePlusDay($day);
+        }
+        else
+            $data_postav = func::Date_to_MySQL($data_postav);
 
         if ($nds < 0)
             $nds = config::$nds_main;
@@ -914,7 +925,7 @@ class Part
                   <tr>
                     <td>Дата</td>
                     <td colspan='2'>
-                         <input  name='data_postav' id='data_postav' value='$data_postav' />
+                         <input  name='data_postav' id='data_postav' value='$data_postav' />d-дней, w-недель
                      </td>
                   </tr>
                   <tr>
