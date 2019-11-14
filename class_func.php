@@ -630,4 +630,16 @@ class Func
         $week = (int)$day;
         return date("Y-m-d", strtotime("+$day day",strtotime("now")));
     }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Проверяет наличие полей в массиве
+     * @param array $rows
+     * @param array $fields
+     * @return bool
+     */
+    public static function checkArrayFields(array $rows, array $fields)
+    {
+        return !array_diff_key(array_flip($fields), $rows[0]);
+    }
 }

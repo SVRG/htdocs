@@ -328,23 +328,15 @@ class Org
     }
 //-----------------------------------------------------------
 //
-    /**
-     * Вывод списка организаций
-     * @param bool $echo
-     * @return string
-     */
-    public function formOrgList($echo = false)
+    public static function formOrgListRows(array $rows, $echo = false)
     {
-        $db = new DB();
-
-        $rows = $db->rows(/** @lang MySQL */
-            "SELECT * FROM org WHERE del=0 ORDER BY poisk;");
-
-        $cnt = $db->cnt;
-
-        if ($cnt == 0)
+        if (count($rows) == 0)
             return "Список организаций пуст";
 
+        if(!func::checkArrayFields($rows,['kod_org','nazv_krat','nazv_poln','poisk','www','inn','ogrn']))
+            exit('Ошибка: Массив не содержит требуемые поля.');
+
+        $cnt = count($rows);
         $res = /** @lang HTML */
             "<table border=1 cellspacing=0 width=\"70%\" rules=\"rows\" frame=\"void\">
 	                    <tr bgcolor=\"#CCCCCC\">
@@ -401,6 +393,22 @@ class Org
             return $res;
         }
         return "";
+    }
+//-----------------------------------------------------------
+//
+    /**
+     * Вывод списка организаций
+     * @param bool $echo
+     * @return string
+     */
+    public static function formOrgList($echo = false)
+    {
+        $db = new DB();
+
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE del=0 ORDER BY poisk;");
+
+        return self::formOrgListRows($rows,$echo);
     }
 //-----------------------------------------------------------------
 //
@@ -578,14 +586,13 @@ class Org
         $ogrn = "";
         if (isset($_POST['inn_kpp_ogrn'])) {
             $rows = self::getINN_KPP_OGRN($_POST['inn_kpp_ogrn']);
-            if (isset($rows['inn']))
-            {
+            if (isset($rows['inn'])) {
                 $where_inn = " OR (inn='" . $rows['inn'] . "')";
                 $inn = $rows['inn'];
             }
-            if(isset($rows['kpp']))
+            if (isset($rows['kpp']))
                 $kpp = $rows['kpp'];
-            if(isset($rows['ogrn']))
+            if (isset($rows['ogrn']))
                 $ogrn = $rows['ogrn'];
         }
 

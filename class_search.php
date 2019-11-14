@@ -11,7 +11,6 @@ class Search
      */
     public static function formDocSerch()
     {
-        $db = new Db();
         $search = self::getSearch();
         if ($search == "" or strlen($search) < 2)
             return "Ничего не найдено.";
@@ -30,6 +29,7 @@ class Search
             $where .= " AND doc_type=" . (int)$_GET['type'];
         }
 
+        $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM view_rplan 
                     WHERE ((nomer LIKE '%$search%') 
@@ -51,7 +51,6 @@ class Search
      */
     public static function formKontSerch()
     {
-        $db = new Db();
         $search = self::getSearch();
         if ($search == "" or strlen($search) < 2)
             return "Для запроса нужно не менее 2-х символов.";
@@ -62,6 +61,7 @@ class Search
             $where .= " AND kod_org=".(int)$_GET['kod_org'];
         }
 
+        $db = new Db();
         $rows = $db->rows(/** @lang MySQL */
             "SELECT
                                     kontakty.kod_kontakta,
@@ -129,6 +129,10 @@ class Search
 
 //----------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Получаем строку поиска из переменных
+     * @return string
+     */
     public static function getSearch()
     {
         $search = "";
@@ -145,5 +149,27 @@ class Search
         } else
             unset($_SESSION['search']);
         return $search;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Результат поиска по организациям
+     * @return string
+     */
+    public static function formOrgSearch()
+    {
+        $search = self::getSearch();
+        if ($search == "" or strlen($search) < 2)
+            return "Для запроса нужно не менее 2-х символов.";
+
+        $db = new Db();
+        $rows = $db->rows(/** @lang MySQL */
+            "SELECT * FROM org WHERE 
+                        (poisk LIKE '%$search%') OR 
+                        (nazv_krat LIKE '%$search%') OR 
+                        (nazv_poln LIKE '%$search%') OR 
+                        (inn LIKE '%$search%')
+                    ORDER BY poisk;");
+        return Org::formOrgListRows($rows);
     }
 }
