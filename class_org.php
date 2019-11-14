@@ -331,7 +331,7 @@ class Org
     public static function formOrgListRows(array $rows, $echo = false)
     {
         if (count($rows) == 0)
-            return "Список организаций пуст";
+            return "";
 
         if(!func::checkArrayFields($rows,['kod_org','nazv_krat','nazv_poln','poisk','www','inn','ogrn']))
             exit('Ошибка: Массив не содержит требуемые поля.');
