@@ -639,6 +639,9 @@ class Part
     {
         $db = new Db();
         $kod_part = $this->kod_part;
+        $dataP = self::getData($kod_part);
+        if($numb > $dataP['numb_ostat']) // Ограничение на количество
+            $numb = $dataP['numb_ostat'];
         $data = func::Date_to_MySQL($data);
         $user = func::user();
         $kod_user = func::kod_user();
