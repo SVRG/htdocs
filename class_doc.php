@@ -622,7 +622,11 @@ class Doc
 
             $form_print = "";
             if (stripos($row['nomer'], config::$dogovor_marker) === false)
-                $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PrintForm" title="Форма для печати" src="img/printer.png"></a>';
+                $form_print = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '&p"><img alt="PrintForm" title="Форма для печати" src="img/printer.png"></a>';
+
+            $form_pdf = "";
+            if (stripos($row['nomer'], config::$dogovor_marker) === false)
+                $form_pdf = '<a target="_blank" href="form_invoice.php?kod_dogovora=' . $this->kod_dogovora . '"><img alt="PrintForm" title="Форма для отправки PDF" src="img/pdf.png"></a>';
 
             $btn_edit = ""; // Редактирование тольо если не было платежей или если пользователь задаст $_GET['edit']
             if (!self::getPaymentFlag($this->kod_dogovora) or (isset($_GET['edit'])))
@@ -646,7 +650,7 @@ class Doc
                         <td width='100%'>
                         <div class='btn'>
                             <div><a href='form_dogovor.php?kod_dogovora=$kod_dogovora'><h1>" . $row['nomer'] . "</h1></a></div>
-                            <div>$form_print</div>
+                            <div>$form_print $form_pdf</div>
                             $btn_edit
                             <div>$btn_copy</div>
                             $btn_copy_as_po
