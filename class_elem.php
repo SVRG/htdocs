@@ -1246,16 +1246,24 @@ class Elem
                     ORDER BY summ DESC;");
         if ($db->cnt == 0)
             return "";
-        $res = "<table><tr><td>Наименование</td><td>Сумма</td></tr>";
+
+        $year_p = $y - 1;
+        $res = /** @lang HTML */
+            "<a href='form_nomen.php?rating&y=$year_p'>$year_p</a>
+            $y
+            <a href='form_nomen.php?rating&y=$y_next'>$y_next</a>
+                <table><tr><td>Название</td><td>Сумма за период</td></tr>
+            <table><tr><td>Наименование</td><td>Сумма</td></tr>";
         $total_summ = 0;
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $name = $row['name'];
             $total_summ += $row['summ'];
             $summ = func::Rub($row['summ']);
+            $kod_elem = $row['kod_elem'];
             $res .= /** @lang HTML */
                 "<tr>
-                    <td>$name</td>
+                    <td><a href='form_elem.php?kod_elem=$kod_elem&y=$y'>$name</td>
                     <td align='right'>$summ</td>
                 </tr>";
         }

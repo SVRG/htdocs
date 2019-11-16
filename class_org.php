@@ -1235,7 +1235,6 @@ class Org
      */
     public function formOrgPays($itog = true)
     {
-        $db = new DB();
         $year = date("Y");
         $kod_org_main = config::$kod_org_main;
 
@@ -1250,6 +1249,7 @@ class Org
             $w_kod_org .= " AND view_dogovory_nvs.kod_org=$kod_org ";
         }
 
+        $db = new DB();
         $rows = $db->rows(/** @lang MySQL */
             "SELECT sum(plat.summa) AS summ, 
                                         view_dogovory_nvs.nazv_krat,

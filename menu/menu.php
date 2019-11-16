@@ -29,7 +29,7 @@
             <ul>
                 <li><a href="../form_nomen.php?add">Добавить</a></li>
                 <li><a href="../form_set.php">Сборки</a></li>
-                <li><a href="../form_nomen.php?rating">Рейтинг</a></li>
+                <li><a href="../form_nomen.php?rating">Рейтинг <?php echo date("Y"); ?></a></li>
             </ul>
         </li>
         <li><a href="../form_pays.php">Платежи</a>
