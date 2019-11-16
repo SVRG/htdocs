@@ -1232,16 +1232,17 @@ class Elem
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
         $y = date("Y");
-        $y_next = $y + 1;
         if (isset($_GET['y']))
             $y = (int)$_GET['y'];
+        $y_next = $y + 1;
         $rows = $db->rows(/** @lang MySQL */
-            "SELECT   `view_rplan`.`name`,
-                    SUM( `view_rplan`.`sum_part` )  AS `summ`
+            "SELECT   `view_rplan`.`kod_elem`,
+                             `view_rplan`.`name`,
+                             SUM( `view_raschety_plat`.`summa_raspred` )  AS `summ`
                     FROM     `view_rplan` 
-                    INNER JOIN `view_dogovor_summa_plat`  ON `view_rplan`.`kod_dogovora` = `view_dogovor_summa_plat`.`kod_dogovora` 
-                    WHERE    ( `view_rplan`.`data_postav` >='$y-01-01' AND `view_rplan`.`data_postav` <'$y_next-01-01'  ) AND ( `view_rplan`.`kod_ispolnit` = 683 )
-                    GROUP BY `view_rplan`.`kod_elem`
+                    INNER JOIN `view_raschety_plat`  ON `view_rplan`.`kod_part` = `view_raschety_plat`.`kod_part` 
+                    WHERE    ( `view_raschety_plat`.`data_plat` BETWEEN '$y-01-01' AND '$y_next-01-01') AND kod_ispolnit = $kod_org_main
+                    GROUP BY `view_rplan`.`kod_elem`,`view_rplan`.`name`
                     ORDER BY summ DESC;");
         if ($db->cnt == 0)
             return "";
@@ -1250,7 +1251,7 @@ class Elem
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $name = $row['name'];
-            $total_summ += func::clearNum($row['summ']);
+            $total_summ += $row['summ'];
             $summ = func::Rub($row['summ']);
             $res .= /** @lang HTML */
                 "<tr>
