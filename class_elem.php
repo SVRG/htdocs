@@ -1252,7 +1252,6 @@ class Elem
             "<a href='form_nomen.php?rating&y=$year_p'>$year_p</a>
             $y
             <a href='form_nomen.php?rating&y=$y_next'>$y_next</a>
-                <table><tr><td>Название</td><td>Сумма за период</td></tr>
             <table><tr><td>Наименование</td><td>Сумма</td></tr>";
         $total_summ = 0;
         for ($i = 0; $i < $db->cnt; $i++) {
