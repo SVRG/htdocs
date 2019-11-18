@@ -21,8 +21,11 @@ class Search
             $where .= " AND kod_elem=$kod_elem";
         }
 
+        $where_org = "OR (ispolnit_nazv_krat LIKE '%$search%') 
+                               OR (nazv_krat LIKE '%$search%')";
         if (isset($_GET['kod_org'])) {
-            $where .= " AND kod_org=" . (int)$_GET['kod_org'];
+            $where .= " AND (kod_org=" . (int)$_GET['kod_org'] . " OR kod_ispolnit=".(int)$_GET['kod_org'].")";
+            $where_org = "";
         }
 
         if (isset($_GET['type'])) {
@@ -33,8 +36,7 @@ class Search
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM view_rplan 
                     WHERE ((nomer LIKE '%$search%') 
-                               OR (ispolnit_nazv_krat LIKE '%$search%') 
-                               OR (nazv_krat LIKE '%$search%')
+                               $where_org
                                OR (name LIKE '%$search%' OR shifr LIKE '%$search%' OR modif LIKE '%$search%'))                   
                                $where
                     ORDER BY kod_dogovora DESC;");

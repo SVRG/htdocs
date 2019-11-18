@@ -33,9 +33,12 @@ $Dogovor->Events();
         <?php
         if (isset($_SESSION['search']) and isset($_GET['search'])) {
             echo Search::formDocSerch();
-            echo Search::formOrgSearch();
-            if(!isset($_GET['kod_elem'])) // Если не задан код элемента то поиск по контактам
-                echo Search::formKontSerch();
+            if (!isset($_GET['kod_org'])) // Не нужно искать в компаниях, если задан код организации в фильтре
+            {
+                echo Search::formOrgSearch();
+                if (!isset($_GET['kod_elem'])) // Если не задан фильтр по коду элемента и коду организации то поиск по контактам
+                    echo Search::formKontSerch();
+            }
         } else {
             if (isset($_GET['add'])) {
                 if (in_array($_SESSION['MM_UserGroup'], $UserG)) {
