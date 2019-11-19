@@ -28,8 +28,8 @@ class Search
             $where_org = "";
         }
 
-        if (isset($_GET['type'])) {
-            $where .= " AND doc_type=" . (int)$_GET['type'];
+        if (isset($_GET['doc_type'])) {
+            $where .= " AND doc_type=" . (int)$_GET['doc_type'];
         }
 
         $db = new Db();

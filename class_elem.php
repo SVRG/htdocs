@@ -1242,7 +1242,7 @@ class Elem
                     FROM     `view_rplan` 
                     INNER JOIN `view_raschety_plat`  ON `view_rplan`.`kod_part` = `view_raschety_plat`.`kod_part` 
                     WHERE    ( `view_raschety_plat`.`data_plat` BETWEEN '$y-01-01' AND '$y_next-01-01') AND kod_ispolnit = $kod_org_main
-                    GROUP BY `view_rplan`.`kod_elem`,`view_rplan`.`name`
+                    GROUP BY `view_rplan`.`kod_elem`
                     ORDER BY summ DESC;");
         if ($db->cnt == 0)
             return "";

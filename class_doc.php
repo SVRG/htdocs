@@ -46,8 +46,8 @@ class Doc
             $where .= " AND (data_postav>='$data_s' AND data_postav<'$data_n') ";
         }
 
-        if (isset($_GET['p']))
-            $where .= " AND doc_type=1";
+        if (isset($_GET['doc_type']))
+            $where .= " AND doc_type=".(int)$_GET['doc_type'];
 
         $where_kod_org = ""; // Условия отбора организации в _GET
         if (isset($_GET['kod_org'])) {
@@ -2085,9 +2085,11 @@ class Doc
                     <td width="10%">Процент</td>
                    </tr>';
 
+        $summ_numb = 0; // итоговое количество
         for ($i = 0; $i < $cnt; $i++) {
 
             $row = $rows[$i];
+            $summ_numb += $row['numb'];
 
             $procent = 0.;
 
@@ -2137,6 +2139,8 @@ class Doc
         }
 
         $res .= '</table>';
+        if(isset($_GET['kod_elem']) or isset($_GET['kod_org']))
+            $res .= "Итого: $summ_numb<br>";
 
         return $res;
     }
