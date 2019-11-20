@@ -47,7 +47,7 @@ class Doc
         }
 
         if (isset($_GET['doc_type']))
-            $where .= " AND doc_type=".(int)$_GET['doc_type'];
+            $where .= " AND doc_type=" . (int)$_GET['doc_type'];
 
         $where_kod_org = ""; // Условия отбора организации в _GET
         if (isset($_GET['kod_org'])) {
@@ -1044,7 +1044,7 @@ class Doc
 
         // Формирование плана
         for ($i = 0; $i < $cnt; $i++) {
-            $input = false; // Входящий
+            $input = false; // тип договора - Исходящий если false, Входящий если true
 
             $row = $rplan_rows[$i];
 
@@ -1870,12 +1870,11 @@ class Doc
                     $Y = (int)$_GET['y'];
                     $start_date = date("$Y-$Month-01");
                 }
-            } else
-            {
+            } else {
                 $start_date = date("Y-$Month-01");
             }
         }
-        $end_date = date("Y-m-01", strtotime('+1 month',strtotime($start_date)));
+        $end_date = date("Y-m-01", strtotime('+1 month', strtotime($start_date)));
 
         $db = new Db();
         $kod_org_main = config::$kod_org_main;
@@ -1946,7 +1945,7 @@ class Doc
                           <td>' . $row['prim'] . '</td>
                         </tr>';
 
-            if($row['summa'] > 0)
+            if ($row['summa'] > 0)
                 $summ += $row['summa'];
         }
 
@@ -2139,7 +2138,7 @@ class Doc
         }
 
         $res .= '</table>';
-        if(isset($_GET['kod_elem']) or isset($_GET['kod_org']))
+        if (isset($_GET['kod_elem']))
             $res .= "Итого: $summ_numb<br>";
 
         return $res;

@@ -42,6 +42,8 @@ class Search
                     ORDER BY kod_dogovora DESC;");
         if ($db->cnt == 0)
             return "";
+        //if(isset($_GET['kod_elem'])) // todo - продумать как выводить по элементу, сейчас все в кучу - входящие и исходящие
+        //    return Doc::formRPlan_by_Elem($rows);
         return Doc::formRPlan_by_Doc($rows);
     }
 //----------------------------------------------------------------------------------------------------------------------

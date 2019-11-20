@@ -35,9 +35,11 @@ $Dogovor->Events();
             echo Search::formDocSerch();
             if (!isset($_GET['kod_org'])) // Не нужно искать в компаниях, если задан код организации в фильтре
             {
-                echo Search::formOrgSearch();
                 if (!isset($_GET['kod_elem'])) // Если не задан фильтр по коду элемента и коду организации то поиск по контактам
+                {
+                    echo Search::formOrgSearch();
                     echo Search::formKontSerch();
+                }
             }
         } else {
             if (isset($_GET['add'])) {
@@ -46,7 +48,7 @@ $Dogovor->Events();
                     $add = true;
                 }
             } elseif (isset($_GET['search_sellist'])) {
-                echo Doc::formSearch(); // Тут будет форма поиска
+                echo Doc::formSearch(); // Форма поиска
             } else
                 echo $Dogovor->formDocList();
         }

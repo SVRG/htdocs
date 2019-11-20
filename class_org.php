@@ -1264,24 +1264,30 @@ class Org
             "<a href='form_orglist.php?pays&y=$year_p'>$year_p</a>
             $year
             <a href='form_orglist.php?pays&y=$year_next'>$year_next</a>
-                <table><tr><td>Название</td><td>Сумма за период</td></tr>";
+                <table><tr><td>Название</td><td>Сумма за период</td><td>Процент</td></tr>";
 
         if ($db->cnt == 0)
             return $res;
 
-        $summ = 0;
+        $total_summ = 0;
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $total_summ += $row['summ'];
+        }
 
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
+            $prc = func::Proc($row['summ']/$total_summ);
+
             $res .= '<tr>
                         <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . '</a></td>
                         <td align="right"><a href="form_org_stat.php?kod_org=' . $row['kod_org'] . "&y=$year\">" . Func::Rub($row['summ']) . '</a></td>
+                        <td align="right">'.$prc.'</td>
                      </tr>';
-            $summ += $row['summ'];
         }
         $res .= '</table>';
         if ($itog)
-            $res .= '<br>Сумма: ' . Func::Rub($summ);
+            $res .= '<br>Сумма: ' . Func::Rub($total_summ);
         return $res;
     }
 //-----------------------------------------------------------

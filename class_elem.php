@@ -1252,18 +1252,27 @@ class Elem
             "<a href='form_nomen.php?rating&y=$year_p'>$year_p</a>
             $y
             <a href='form_nomen.php?rating&y=$y_next'>$y_next</a>
-            <table><tr><td>Наименование</td><td>Сумма</td></tr>";
+            <table><tr><td>Наименование</td><td>Сумма</td><td>Процент</td></tr>";
         $total_summ = 0;
+        for ($i = 0; $i < $db->cnt; $i++) { // Вычисляем сумму для расчета процента
+            $row = $rows[$i];
+            $total_summ += $row['summ'];
+        }
+
+        if($total_summ < config::$min_price)
+            return "</table>Нет данных";
+
         for ($i = 0; $i < $db->cnt; $i++) {
             $row = $rows[$i];
             $name = $row['name'];
-            $total_summ += $row['summ'];
-            $summ = func::Rub($row['summ']);
             $kod_elem = $row['kod_elem'];
+            $summ = func::Rub($row['summ']);
+            $prc = func::Proc($row['summ']/$total_summ);
             $res .= /** @lang HTML */
                 "<tr>
                     <td><a href='form_elem.php?kod_elem=$kod_elem&y=$y'>$name</td>
                     <td align='right'>$summ</td>
+                    <td align='right'>$prc</td>
                 </tr>";
         }
         $res .= "</table>";
