@@ -411,7 +411,8 @@ class Elem
         $shablon = "";
         $FormName = "formAdd";
         $btn_nomen = "";
-
+        $web_link = "";
+        
         if ($Edit == 1) {
             $this->getData();
             $row = $this->Data;
