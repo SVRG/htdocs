@@ -40,11 +40,22 @@ class Search
                                OR (name LIKE '%$search%' OR shifr LIKE '%$search%' OR modif LIKE '%$search%'))                   
                                $where
                     ORDER BY kod_dogovora DESC;");
-        if ($db->cnt == 0)
-            return "";
+
         //if(isset($_GET['kod_elem'])) // todo - продумать как выводить по элементу, сейчас все в кучу - входящие и исходящие
         //    return Doc::formRPlan_by_Elem($rows);
-        return Doc::formRPlan_by_Doc($rows);
+        $res = "";
+        if ($db->cnt > 0)
+            $res = Doc::formRPlan_by_Doc($rows);
+
+        $D = new Doc();
+        $res .= $D->formDocList(/** @lang MySQL */
+            "SELECT * FROM view_scheta_dogovory_all 
+                    WHERE (nomer LIKE '%$search%') 
+                               $where_org
+                               $where
+                    ORDER BY kod_dogovora DESC;");
+
+        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
