@@ -54,10 +54,10 @@ class Search
                                                 WHERE ((nomer LIKE '%$search%') 
                                                            $where_org
                                                            OR (name LIKE '%$search%' OR shifr LIKE '%$search%' OR modif LIKE '%$search%'))                   
-                                                           $where)
-                    AND (nomer LIKE '%$search%')                    
+                                                GROUP BY view_rplan.kod_dogovora)
+                    AND (nomer LIKE '%$search%'                    
                     $where_org
-                    $where
+                    $where)
                     ORDER BY kod_dogovora DESC;");
 
         return $res;
