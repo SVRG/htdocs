@@ -50,9 +50,14 @@ class Search
         $D = new Doc();
         $res .= $D->formDocList(/** @lang MySQL */
             "SELECT * FROM view_scheta_dogovory_all 
-                    WHERE (nomer LIKE '%$search%') 
-                               $where_org
-                               $where
+                    WHERE kod_dogovora NOT IN (SELECT view_rplan.kod_dogovora FROM view_rplan 
+                                                WHERE ((nomer LIKE '%$search%') 
+                                                           $where_org
+                                                           OR (name LIKE '%$search%' OR shifr LIKE '%$search%' OR modif LIKE '%$search%'))                   
+                                                           $where)
+                    AND (nomer LIKE '%$search%')                    
+                    $where_org
+                    $where
                     ORDER BY kod_dogovora DESC;");
 
         return $res;
