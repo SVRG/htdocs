@@ -20,9 +20,15 @@ include_once "security.php";
     if (isset($_GET['sgp'])) {
         $sgp = (int)$_GET['sgp'];
         if ($sgp == 1)
-            echo $D->formDocsOpen(); // Открытые договоры
+            try {
+                echo $D->formDocsOpen();
+            } catch (Exception $e) {
+            } // Открытые договоры
         elseif ($sgp == 2)
-            echo $D->formRPlan(1); // Внешние
+            try {
+                echo $D->formRPlan(1);
+            } catch (Exception $e) {
+            } // Внешние
         elseif ($sgp == 3)
             echo $D->formSGPHistory(); // История по складу
         elseif ($sgp == 4)
@@ -32,17 +38,32 @@ include_once "security.php";
         echo "Ошибка: formRPlanNeOplach";
         } // Не оплаченные
         elseif ($sgp == 5)
-            echo $D->formRPlanOplach(); // Оплаченные
+            try {
+                echo $D->formRPlanOplach();
+            } catch (Exception $e) {
+            } // Оплаченные
         elseif ($sgp == 6)
             echo $D->formSGPHistory(1); // История по складу
         elseif ($sgp == 7)
-            echo $D->formDocsOpen(1); // Внешние открытые договоры
+            try {
+                echo $D->formDocsOpen(1);
+            } catch (Exception $e) {
+            } // Внешние открытые договоры
         elseif ($sgp == 8)
-            echo $D->formProduction($_GET['kod_elem']);
+            try {
+                echo $D->formProduction($_GET['kod_elem']);
+            } catch (Exception $e) {
+            }
         elseif ($sgp == 9)
-            echo $D->formDocsNoDocuments();
+            try {
+                echo $D->formDocsNoDocuments();
+            } catch (Exception $e) {
+            }
     } else
-        echo $D->formRPlan(0); // Обычный
+        try {
+            echo $D->formRPlan(0);
+        } catch (Exception $e) {
+        } // Обычный
 
     echo 'begin:' . $t . ' end:' . date('H:i:s');
     ?>

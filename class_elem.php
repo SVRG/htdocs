@@ -196,6 +196,7 @@ class Elem
     /**
      * Договоры по Элементу
      * @return string
+     * @throws Exception
      */
     public function formDocs()
     {
@@ -235,8 +236,7 @@ class Elem
         $res .= /** @lang HTML */
             '</select>
             <script type="text/javascript">
-                            var kod_elem, $kod_elem;
-        
+                            let kod_elem, $kod_elem;
                             $kod_elem = $("#kod_elem").selectize({
                                 onChange: function(value) {
                 if (!value.length) return;
@@ -384,7 +384,7 @@ class Elem
                         <td><a href='$org_link'> $nazv_krat </a></td>
                         <td align='right'> $numb </td>
         		  	</tr>";
-            $sum += (int)$row['numb'];;
+            $sum += (int)$row['numb'];
         }
         $res .= '<tr bgcolor="#CCCCCC">
                     <td align="right">Сумма</td>
@@ -717,9 +717,7 @@ class Elem
         if ($cnt == 0)
             return "";
 
-        $res = $this->getSpec($rows);
-
-        return $res;
+        return $this->getSpec($rows);
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -750,9 +748,7 @@ class Elem
         if ($cnt == 0)
             return "";
 
-        $res = $this->getSpec($rows);
-
-        return $res;
+        return $this->getSpec($rows);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1038,6 +1034,7 @@ class Elem
      * @param $modif
      * @param $kod_elem
      * @return string
+     * @throws Exception
      */
     public function formNomenDocs($modif, $kod_elem)
     {
@@ -1222,9 +1219,7 @@ class Elem
         if ($db->cnt < 1)
             return 0.;
 
-        $price = func::rnd($rows[0]['price_it']);
-
-        return $price;
+        return func::rnd($rows[0]['price_it']);
     }
 //------------------------------------------------------------------------
 //

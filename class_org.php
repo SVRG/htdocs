@@ -95,7 +95,7 @@ class Org
         $res .= /** @lang HTML */
             '</select>
                 <script type="text/javascript">
-                   var kod_org, $kod_org;    
+                   let kod_org, $kod_org;    
                    $kod_org = $("#kod_org").selectize({onChange: function(value) {if (!value.length) return;}});
                    kod_org = $kod_org[0].selectize;
                 </script>';
@@ -281,6 +281,7 @@ class Org
     /**
      * Договоры по организации
      * @return string
+     * @throws Exception
      */
     public function formDocs()
     {
@@ -510,36 +511,34 @@ class Org
                                 <td><textarea name='inn_kpp_ogrn' id='inn_kpp_ogrn' cols='40' rows='3'></textarea></td>
                             </tr>";
 
-        $res = /** @lang HTML */
-            "<form id='form1' name='form1' method='post' action=''>
-                      <table border='0'>
-                        <tr>
-                          <td width='208'>Наименование для поиска</td>
-                          <td><span id='sprytextfield_poisk'>
-                            <input name='poisk' id='poisk' size='30' value='$poisk' />
-                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
-                        </tr>
-                        <tr>
-                          <td>Краткое наименование</td>
-                          <td><span id='sprytextfield_nazv_krat'>
-                            <input name='nazv_krat' id='nazv_krat' size='30' value='$nazv_krat' />
-                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
-                        </tr>
-                        <tr>
-                          <td>Полное наименование</td>
-                          <td><span id='sprytextfield_nazv_poln'>
-                            <input name='nazv_poln' id='nazv_poln' size='30' value='$nazv_poln' />
-                          <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
-                        </tr>
-                            $inn_kpp_ogrn
-                        <tr>
-                          <td><input type='submit' name='button' id='button' value='Сохранить' />
-                          <input type='button' value='Отмена' onClick=\"document.location.href='form_orglist.php'\" />
-                          <td><input type='hidden' value='FormAddEdit' name='FormName'>$body</td>
-                        </tr>
-                      </table>
-                    </form>";
-        return $res;
+        return "<form id='form1' name='form1' method='post' action=''>
+                  <table border='0'>
+                    <tr>
+                      <td width='208'>Наименование для поиска</td>
+                      <td><span id='sprytextfield_poisk'>
+                        <input name='poisk' id='poisk' size='30' value='$poisk' />
+                      <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
+                    </tr>
+                    <tr>
+                      <td>Краткое наименование</td>
+                      <td><span id='sprytextfield_nazv_krat'>
+                        <input name='nazv_krat' id='nazv_krat' size='30' value='$nazv_krat' />
+                      <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
+                    </tr>
+                    <tr>
+                      <td>Полное наименование</td>
+                      <td><span id='sprytextfield_nazv_poln'>
+                        <input name='nazv_poln' id='nazv_poln' size='30' value='$nazv_poln' />
+                      <span class='textfieldRequiredMsg'>A value is required.</span></span></td>
+                    </tr>
+                        $inn_kpp_ogrn
+                    <tr>
+                      <td><input type='submit' name='button' id='button' value='Сохранить' />
+                      <input type='button' value='Отмена' onClick=\"document.location.href='form_orglist.php'\" />
+                      <td><input type='hidden' value='FormAddEdit' name='FormName'>$body</td>
+                    </tr>
+                  </table>
+                </form>";
     }
 //----------------------------------------------------------------------
 //

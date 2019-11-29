@@ -26,8 +26,7 @@ class Func
         $now = new DateTime("now");
         $date = new DateTime($Date);
 
-        $res = $now->diff($date)->format("%r%a");
-        return $res;
+        return $now->diff($date)->format("%r%a");
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -112,8 +111,7 @@ class Func
             return date('Y-m-d');
 
         $date = date_create_from_format("d.m.Y", $Date);
-        $date_to_MySQL = $date->format("Y-m-d");
-        return $date_to_MySQL;
+        return $date->format("Y-m-d");
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,8 +129,7 @@ class Func
         }
 
         $date = strtotime($MySQL_Date);
-        $res = date('d.m.Y', $date);
-        return $res;
+        return date('d.m.Y', $date);
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -143,8 +140,7 @@ class Func
      */
     public static function rnd($numb, $precision = 2)
     {
-        $res = round((double)$numb, (int)$precision);
-        return $res;
+        return round((double)$numb, (int)$precision);
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -251,11 +247,10 @@ class Func
     {
         $btn = self::btnImage($ButtValue);
 
-        $res = "<form name='FNAME' method='POST' action='$Act ' $form_option>
+        return "<form name='FNAME' method='POST' action='$Act ' $form_option>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                    $btn
                 </form>";
-        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -271,11 +266,10 @@ class Func
 
         $btn = self::btnImage($ButtValue);
 
-        $res = "<form name='FNAME' method='POST' action='' onsubmit='return confirm(\"$Message\");' >
+        return "<form name='FNAME' method='POST' action='' onsubmit='return confirm(\"$Message\");' >
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     $btn
                 </form>";
-        return $res;
     }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -304,12 +298,11 @@ class Func
         if ($confirm_text != "")
             $confirm_code = "onsubmit='return confirm(\"$confirm_text\");'";
 
-        $res = "<form name='FNAME' method='POST' action='$Act' $confirm_code>
+        return "<form name='FNAME' method='POST' action='$Act' $confirm_code>
                     <input type='hidden' name='Flag' value='$FlagVal' />
                     <input type='hidden' name='$hidden_name' value='$hidden_val' />
                     $btn
                 </form>";
-        return $res;
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -600,7 +593,7 @@ class Func
      */
     public static function extract_email_from_text($text)
     {
-        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $text, $matches);
+        preg_match_all("/[._a-zA-Z0-9-]+@[._a-zA-Z0-9-]+/i", $text, $matches);
         if(isset($matches[0][0]))
             return $matches[0][0];
         else
@@ -627,7 +620,7 @@ class Func
      */
     public static function datePlusDay($day)
     {
-        $week = (int)$day;
+        $day = (int)$day;
         return date("Y-m-d", strtotime("+$day day",strtotime("now")));
     }
 //----------------------------------------------------------------------------------------------------------------------

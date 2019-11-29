@@ -44,9 +44,8 @@ if(func::user_group() != "admin")
                                     kontakty
                                 INNER JOIN view_rplan ON kontakty.kod_org = view_rplan.kod_org
                                 WHERE kod_elem = $kod_elem
-                                GROUP BY kontakty.kod_kontakta
+                                GROUP BY kontakty.kod_kontakta,kontakty.famil
                                 ORDER BY
-                                    view_rplan.nazv_krat,
                                     kontakty.famil;";
         }
 

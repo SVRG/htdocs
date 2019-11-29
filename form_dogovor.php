@@ -187,18 +187,17 @@ else
 </div>
 <script type="text/javascript">
     <!--
-    var sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
-    var sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
-    //var sprytextfield4 = new Spry.Widget.ValidationTextField("SSummR", "currency");
-    var sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {
+    let sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
+    let sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
+    let sprytextfield5 = new Spry.Widget.ValidationTextField("SDateNR", "date", {
         format: "dd.mm.yyyy",
         isRequired: false
     });
-    var sprytextfield6 = new Spry.Widget.ValidationTextField("STextNR", "none", {isRequired: true});
-    var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
-    var sprytextfield7 = new Spry.Widget.ValidationTextField("sprytextfield7");
-    var sprytextfield8 = new Spry.Widget.ValidationTextField("sprytextfield8");
-    var sprytextfield9 = new Spry.Widget.ValidationTextField("sprytextfield9");
+    let sprytextfield6 = new Spry.Widget.ValidationTextField("STextNR", "none", {isRequired: true});
+    let sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
+    let sprytextfield7 = new Spry.Widget.ValidationTextField("sprytextfield7");
+    let sprytextfield8 = new Spry.Widget.ValidationTextField("sprytextfield8");
+    let sprytextfield9 = new Spry.Widget.ValidationTextField("sprytextfield9");
     //-->
 </script>
 </body>

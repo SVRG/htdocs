@@ -90,7 +90,10 @@ $Org->getData();
                     <div class="CollapsiblePanelContent">
                         <?php
                         // Вывод договоров по контакту
-                        echo Doc::formDocsByKontakt($Kontakt->kod_kontakta);
+                        try {
+                            echo Doc::formDocsByKontakt($Kontakt->kod_kontakta);
+                        } catch (Exception $e) {
+                        }
                         ?>
                     </div>
                 </div>
@@ -100,9 +103,9 @@ $Org->getData();
 </div>
 <script type="text/javascript">
     <!--
-    var CollapsiblePanel1 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel1", {contentIsOpen: true});
-    var CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: true});
-    var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
+    let CollapsiblePanel1 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel1", {contentIsOpen: true});
+    let CollapsiblePanel2 = new Spry.Widget.CollapsiblePanel("CollapsiblePanel2", {contentIsOpen: true});
+    let sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
     //-->
 </script>
 </body>

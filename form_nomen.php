@@ -17,7 +17,10 @@ $E->Events();
     <?php
 
     if (isset($_POST['modif'], $_GET['kod_elem']))
-        echo $E->formNomenDocs($_POST['modif'], (int)$_GET['kod_elem']);
+        try {
+            echo $E->formNomenDocs($_POST['modif'], (int)$_GET['kod_elem']);
+        } catch (Exception $e) {
+        }
 
     if (isset($_GET['kod_elem'])) {
         echo $E->formNomenModif((int)$_GET['kod_elem']);

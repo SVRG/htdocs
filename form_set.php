@@ -274,9 +274,9 @@ if (isset($_GET['add'])) {
     $res .= /** @lang HTML */
         '</select>
                     <script type="text/javascript">
-                                    var kod_item, $kod_item_str;
+                                    let kod_item, $kod_item_str;
                 
-                                    $kod_dogovora = $("#kod_item").selectize({
+                                    $kod_item_str = $("#kod_item").selectize({
                                         onChange: function(value) {
                         if (!value.length) return "";
                     }

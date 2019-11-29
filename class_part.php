@@ -141,7 +141,7 @@ class Part
             $ind = '';// Индикатор окраски даты поставки
             if ($ost == 0) {
                 $res .= '<tr bgcolor="#ADFAC2">';
-                $data_postav_str = "<b>" . Part::getLastNaklDate($this->kod_part) . "</b>";; // Дата последней отгрузки
+                $data_postav_str = "<b>" . Part::getLastNaklDate($this->kod_part) . "</b>"; // Дата последней отгрузки
             }// Зеленый
             else {
                 $res .= '<tr>';
@@ -311,9 +311,8 @@ class Part
     public function formPart($AddNacl = 0)
     {
         // Шапка
-        $res = $this->formParts(1, /** @lang MySQL */
+        return $this->formParts(1, /** @lang MySQL */
             "SELECT * FROM view_rplan WHERE kod_part=$this->kod_part", $AddNacl);
-        return $res;
     }
 //--------------------------------------------------------------
     //
@@ -1074,9 +1073,7 @@ class Part
             return 0.;
 
         $row = $rows[0];
-        $res = (double)$row['summa_plat'];
-
-        return $res;
+        return (double)$row['summa_plat'];
     }
 //
 //-------------------------------------------------------------------------
@@ -1136,8 +1133,7 @@ class Part
         if ($nds > 0)
             $summ_nds = func::rnd($price * $nds / 100);
 
-        $price_with_nds = $price + $summ_nds;
-        return $price_with_nds;
+        return $price + $summ_nds;
     }
 //-------------------------------------------------------------------------
 
@@ -1164,9 +1160,7 @@ class Part
         if ($db->cnt == 0)
             return 0;
 
-        $res = $rows[0]['summ_numb'];
-
-        return $res;
+        return $rows[0]['summ_numb'];
     }
 //-------------------------------------------------------------------------
 
@@ -2025,7 +2019,7 @@ class Part
         $res .= /** @lang HTML */
             '</select>
                     <script type="text/javascript">
-                                    var kod_part, $kod_part;
+                                    let kod_part, $kod_part;
                 
                                     $kod_part = $("#kod_part").selectize({
                                         onChange: function(value) {

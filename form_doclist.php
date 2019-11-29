@@ -5,12 +5,14 @@ include_once "class_search.php";
 $UserG = array('admin', 'oper');
 include_once("class_doc.php");
 $Dogovor = new Doc();
-$Dogovor->Events();
+try {
+    $Dogovor->Events();
+} catch (phpmailerException $e) {
+}
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="ru">
 <head>
     <title>Список Договоров</title>
     <script src="widgets/SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
@@ -32,13 +34,19 @@ $Dogovor->Events();
     <div id="pageName">
         <?php
         if (isset($_SESSION['search']) and isset($_GET['search'])) {
-            echo Search::formDocSerch();
+            try {
+                echo Search::formDocSerch();
+            } catch (Exception $e) {
+            }
             if (!isset($_GET['kod_org'])) // Не нужно искать в компаниях, если задан код организации в фильтре
             {
                 if (!isset($_GET['kod_elem'])) // Если не задан фильтр по коду элемента и коду организации то поиск по контактам
                 {
                     echo Search::formOrgSearch();
-                    echo Search::formKontSerch();
+                    try {
+                        echo Search::formKontSerch();
+                    } catch (Exception $e) {
+                    }
                 }
             }
         } else {
@@ -57,9 +65,8 @@ $Dogovor->Events();
 </div>
 <script type="text/javascript">
     <!--
-    var sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
-    var sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
+    let sprytextfield2 = new Spry.Widget.ValidationTextField("SNumR", "none", {minChars: 1});
+    let sprytextfield3 = new Spry.Widget.ValidationTextField("SDateR", "date", {format: "dd.mm.yyyy"});
     //-->
 </script>
 </body>
-</html>

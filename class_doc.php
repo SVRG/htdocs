@@ -725,47 +725,45 @@ class Doc
             $nomer = "NEXT"; // Запрашиваем следующий номер
 
         $doc_type = $this->Data['doc_type'];
-        $res = /** @lang HTML */
-            "<form name='form1' method='post' action=''>
-                    <table width='100%' border='0'>
-                      <tr>
-                        <th width='202' >Номер</th>
-                        <td width='100%'><span id=\"SNumR\">
-                                  <input  name='nomer' id='nomer' value='$nomer' />
-                                  <span class='textfieldRequiredMsg'>Нужно ввести значение.</span><span class='textfieldMinCharsMsg'>Minimum
-                                  number of characters not met.</span></span>
-                         </td>
-                      </tr>
-                      <tr>
-                        <th >Дата</th>
-                        <td><span id='SDateR'>
-                                  <input  name='data_sost' id='data_sost' value='$data_sost' />
-                             <span class='textfieldRequiredMsg'>Нужно ввести значение.</span>
-                             <span class='textfieldInvalidFormatMsg'>Неправильный формат даты. Пример - 01.01.2001</span>
-                             </span>
+        return "<form name='form1' method='post' action=''>
+                <table width='100%' border='0'>
+                  <tr>
+                    <th width='202' >Номер</th>
+                    <td width='100%'><span id=\"SNumR\">
+                              <input  name='nomer' id='nomer' value='$nomer' />
+                              <span class='textfieldRequiredMsg'>Нужно ввести значение.</span><span class='textfieldMinCharsMsg'>Minimum
+                              number of characters not met.</span></span>
+                     </td>
+                  </tr>
+                  <tr>
+                    <th >Дата</th>
+                    <td><span id='SDateR'>
+                              <input  name='data_sost' id='data_sost' value='$data_sost' />
+                         <span class='textfieldRequiredMsg'>Нужно ввести значение.</span>
+                         <span class='textfieldInvalidFormatMsg'>Неправильный формат даты. Пример - 01.01.2001</span>
+                         </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th >Контрагент</th>
+                    <td>" . Org::formSelList2($kod_org) . "</td>
+                  </tr>
+                  <tr>
+                    <th >Тип Договора</th>
+                        <td>     
+                                <p><input name='zakup' type='radio' value='postav' $posav_checked>Поставка</p>
+                                <p><input name='zakup' type='radio' value='zakup' $zakup_checked>Закупка</p>
                         </td>
-                      </tr>
-                      <tr>
-                        <th >Контрагент</th>
-                        <td>" . Org::formSelList2($kod_org) . "</td>
-                      </tr>
-                      <tr>
-                        <th >Тип Договора</th>
-                            <td>     
-                                    <p><input name='zakup' type='radio' value='postav' $posav_checked>Поставка</p>
-                                    <p><input name='zakup' type='radio' value='zakup' $zakup_checked>Закупка</p>
-                            </td>
-                      </tr>
-                        <tr>
-                        <td>Тип Документа</td>
-                        <td>" . self::formDocType($doc_type) . "</td>
-                        </tr>
-                    </table>
-                    <input id='$FormName' type='hidden' value='$FormName' name='$FormName'/>
-                    <input type='submit' value='Сохранить' />
-                    <input type='button' value='Отмена' onClick=\"document.location.href='form_doclist.php'\" />
-                </form>";
-        return $res;
+                  </tr>
+                    <tr>
+                    <td>Тип Документа</td>
+                    <td>" . self::formDocType($doc_type) . "</td>
+                    </tr>
+                </table>
+                <input id='$FormName' type='hidden' value='$FormName' name='$FormName'/>
+                <input type='submit' value='Сохранить' />
+                <input type='button' value='Отмена' onClick=\"document.location.href='form_doclist.php'\" />
+            </form>";
     }
 //--------------------------------------------------------------------
 //
@@ -1541,7 +1539,7 @@ class Doc
         $res .= /** @lang HTML */
             '</select>
                 <script type="text/javascript">
-                        var kod_attr, $kod_attr;
+                        let kod_attr, $kod_attr;
     
                         $kod_attr = $("#kod_attr").selectize({
                             onChange: function(value) {
@@ -3112,8 +3110,7 @@ class Doc
         if ($db->cnt == 0)
             return ("");
 
-        $res = $rows[0]['famil'];
-        return $res;
+        return $rows[0]['famil'];
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -3123,14 +3120,12 @@ class Doc
      */
     public function formAttrebuteTypeSelList()
     {
-        $res = /** @lang HTML */
+        return
             "<select name='kod_type_attr'>
-                    <option value='1' selected>ИГК</option>
-                    <option value='2'>Заказ</option>
-                    <option value='3'>Приемка</option>
-                </select>";
-
-        return $res;
+                <option value='1' selected>ИГК</option>
+                <option value='2'>Заказ</option>
+                <option value='3'>Приемка</option>
+            </select>";
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -3202,8 +3197,7 @@ class Doc
         $res .= /** @lang HTML */
             '</select>
                     <script type="text/javascript">
-                                    var kod_dogovora, $kod_dogovora;
-                
+                                    let kod_dogovora, $kod_dogovora; 
                                     $kod_dogovora = $("#kod_dogovora").selectize({
                                         onChange: function(value) {
                         if (!value.length) return "";
@@ -3246,15 +3240,13 @@ class Doc
             else
                 $selected[$i] = "";
         }
-        $res = /** @lang HTML */
-            "<select name='doc_type'>
-                <option value='1' $selected[0]>$doc_types[0]</option>
-                <option value='2' $selected[1]>$doc_types[1]</option>                
-                <option value='3' $selected[2]>$doc_types[2]</option>
-                <option value='4' $selected[3]>$doc_types[3]</option>
-                <option value='5' $selected[4]>$doc_types[4]</option>
-             </select>";
-        return $res;
+        return "<select name='doc_type'>
+                    <option value='1' $selected[0]>$doc_types[0]</option>
+                    <option value='2' $selected[1]>$doc_types[1]</option>                
+                    <option value='3' $selected[2]>$doc_types[2]</option>
+                    <option value='4' $selected[3]>$doc_types[3]</option>
+                    <option value='5' $selected[4]>$doc_types[4]</option>
+                 </select>";
     }
 //----------------------------------------------------------------------
 //
@@ -3300,16 +3292,13 @@ class Doc
 
             $sel_list = self::formSelList($rows);
             $btn_cansel = func::Cansel();
-            $res = /** @lang HTML */
-                "<form action='' method='post'>
-                            $sel_list
-                            <input type='hidden' name='kod_dogovora_master' value='$kod_dogovora_master'>
-                            <input type='submit' name='OK' value='Добавить'>
-                            <input type='hidden' name='Flag' value='AddDocLink'>
-                        </form>
-                $btn_cansel";
-
-            return $res;
+            return "<form action='' method='post'>
+                        $sel_list
+                        <input type='hidden' name='kod_dogovora_master' value='$kod_dogovora_master'>
+                        <input type='submit' name='OK' value='Добавить'>
+                        <input type='hidden' name='Flag' value='AddDocLink'>
+                    </form>
+            $btn_cansel";
         }
 
         $btn_add = func::ActButton2("", "Добавить", "1", "AddDocLink", 1);
@@ -3473,12 +3462,10 @@ class Doc
             $selList = self::formSelList($rows);
         }
 
-        $res = "<form action='form_dogovor.php' method='post'>
+        return "<form action='form_dogovor.php' method='post'>
                     $selList
                     <input type='submit' value='GO'>
                 </form>";
-
-        return $res;
     }
 //----------------------------------------------------------------------
 //

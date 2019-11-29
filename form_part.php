@@ -151,12 +151,12 @@ include_once("header.php");
     ?>
 </div>
 <script type="text/javascript">
-    var sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency", {isRequired: true});
-    var sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
-    var sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");
-    var sprytextfield4 = new Spry.Widget.ValidationTextField("data", "date", {format: "dd.mm.yyyy", isRequired: true});
-    var sprytextfield5 = new Spry.Widget.ValidationTextField("naklad", "none");
-    var spryselect12 = new Spry.Widget.ValidationSelect("operator");
+    let sprytextfield_AVPr = new Spry.Widget.ValidationTextField("sprytextfield_AVPr", "currency", {isRequired: true});
+    let sprytextfield_data = new Spry.Widget.ValidationTextField("sprytextfield_data", "date", {format: "dd.mm.yyyy"});
+    let sprytextfield3 = new Spry.Widget.ValidationTextField("Numb", "currency");
+    let sprytextfield4 = new Spry.Widget.ValidationTextField("data", "date", {format: "dd.mm.yyyy", isRequired: true});
+    let sprytextfield5 = new Spry.Widget.ValidationTextField("naklad", "none");
+    let spryselect12 = new Spry.Widget.ValidationSelect("operator");
     //-->
 </script>
 </body>

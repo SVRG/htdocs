@@ -54,7 +54,10 @@ $org->getData();
     echo "<br><table width='50%'><tr><td><b>Номенклатура по договорам:</b></td></tr><tr><td>" . $org->formOrgNomen($sql) . "</td></tr></table>";
     echo "<br><b>Сумма платежей:</b><br>" . $org->formOrgPays(false); // Платежи за период
     echo "<br><b>Договоры:</b>";
-    echo $org->formDocs(); // Договоры за период
+    try {
+        echo $org->formDocs();
+    } catch (Exception $e) {
+    } // Договоры за период
     $doc = new Doc();
     $doc->kod_org = $kod_org;
     echo $doc->formSGPHistory(); // История отгрузок

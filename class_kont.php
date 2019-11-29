@@ -628,14 +628,12 @@ class Kontakt
      */
     public function formEmailNotification($name, $email)
     {
-        $res = /** @lang HTML */
-            "<form method='post' onsubmit='return confirm(\"Отправить сообщение?\");'>
-                 <input type='submit' value='Напомнить'>
-                 <input type='hidden' name='name' value='$name'>
-                 <input type='hidden' name='email' value='$email'>
-                 <input type='hidden' name='Flag' value='emailNotification'>
-            </form>";
-        return $res;
+        return "<form method='post' onsubmit='return confirm(\"Отправить сообщение?\");'>
+             <input type='submit' value='Напомнить'>
+             <input type='hidden' name='name' value='$name'>
+             <input type='hidden' name='email' value='$email'>
+             <input type='hidden' name='Flag' value='emailNotification'>
+        </form>";
     }
 //----------------------------------------------------------------------------------------------------------------------
 //

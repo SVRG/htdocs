@@ -139,14 +139,12 @@ class Search
     public static function formSearch()
     {
         $search = self::getSearch();
-        $res = /** @lang HTML */
-            "<form method='post' target='_parent' action='form_doclist.php?search'>
-                <div class='btn'>
-                    <div><input type='search' name='search' value='$search'></div>
-                    <div><input type='submit' value='Поиск'></div>
-                </div>    
-            </form>";
-        return $res;
+        return "<form method='post' target='_parent' action='form_doclist.php?search'>
+            <div class='btn'>
+                <div><input type='search' name='search' value='$search'></div>
+                <div><input type='submit' value='Поиск'></div>
+            </div>    
+        </form>";
     }
 
 //----------------------------------------------------------------------------------------------------------------------
