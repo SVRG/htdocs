@@ -332,9 +332,11 @@ class Doc
 
         // Процент оплаты по договору
         $oplacheno = self::getProcPay($kod_dogovora); // todo - медленные запросы, надо подумать как их ускорить.
-        if ($oplacheno > 0)
+        if ($oplacheno > 0) {
             $oplacheno .= "%";
-        else {
+            if (isset($_GET['npd']))
+                return "";
+        } else {
             $oplacheno = "";
             if (isset($_GET['pd'])) // Фильтруем только оплаченные
                 return "";
