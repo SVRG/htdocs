@@ -203,8 +203,8 @@ if (isset($_GET['add'])) {
     $search = "";
     if (isset($_POST['search']))
         $search = func::clearString($_POST['search']);
-    elseif (isset($_SESSION['search']))
-        $search = func::clearString($_SESSION['search']);
+    elseif (isset($_SESSION['set_search']))
+        $search = func::clearString($_SESSION['set_search']);
 
     $where = "";
     if ($search != "") {
@@ -212,9 +212,9 @@ if (isset($_GET['add'])) {
 
         if (isset($_GET['all']))
             $where = "WHERE name LIKE '%" . $db->real_escape_string($search) . "%'";
-        $_SESSION['search'] = $search;
+        $_SESSION['set_search'] = $search;
     } else
-        unset($_SESSION['search']);
+        unset($_SESSION['set_search']);
 
     // Список выбора - только те записи, которых нет в комплектации
     if (!isset($_GET['all']))
