@@ -9,6 +9,7 @@
  */
 include_once "class_config.php";
 include_once "class_func.php";
+
 class Db
 {
     // The database connection
@@ -22,6 +23,7 @@ class Db
 
     private $config = array();
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Db constructor.
      */
@@ -31,6 +33,7 @@ class Db
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Connect to the database
      *
@@ -53,6 +56,7 @@ class Db
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Query the database
      *
@@ -60,7 +64,7 @@ class Db
      * @param int $echo вывод запроса
      * @return mixed the result of the mysqli::query() function
      */
-    public function query($query,$echo=0)
+    public function query($query, $echo = 0)
     {
         // Connect to the database
         $connection = $this->connect();
@@ -78,14 +82,11 @@ class Db
         $this->last_id = $connection->insert_id;
 
         $this->cnt = 0;
-        if(isset($result->field_count))
+        if (isset($result->field_count))
             $this->cnt = $result->field_count;
 
-        if($echo==1)
-        {
-            echo $query;
-            exit("");
-        }
+        if ($echo == 1)
+            exit("$query");
 
         // Если обновление или добавление то записываем в Лог
         if ((strpos($query, 'UPDATE') !== false) or (strpos($query, 'INSERT') !== false)) {
@@ -103,6 +104,7 @@ class Db
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Fetch rows from the database (SELECT query)
      *
@@ -110,9 +112,9 @@ class Db
      * @param int $echo
      * @return array Database rows on success/ bool False on failure
      */
-    public function rows($query="",$echo=0)
+    public function rows($query = "", $echo = 0)
     {
-        if($echo==1)
+        if ($echo == 1)
             echo $query;
 
         $rows = array();
@@ -130,6 +132,7 @@ class Db
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Fetch the last error from the database
      *
@@ -142,6 +145,7 @@ class Db
     }
 
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Quote and escape value for use in a database query
      *
@@ -156,6 +160,7 @@ class Db
         return $connection->real_escape_string($value);
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * Формирует строку array_string для выбранной записи
      * @param $table
@@ -165,7 +170,7 @@ class Db
      */
     public static function getHistoryString($table, $key_field, $key_value)
     {
-        if(!isset($table,$key_field,$key_value))
+        if (!isset($table, $key_field, $key_value))
             return "";
 
         $key_value = (int)$key_value;
@@ -174,7 +179,7 @@ class Db
         $rows = $db->rows(/** @lang MySQL */
             "SELECT * FROM $table WHERE $key_field=$key_value;");
 
-        if($db->cnt == 0)
+        if ($db->cnt == 0)
             return "";
 
         $row = $rows[0];
