@@ -406,6 +406,7 @@ class Func
         return preg_split('~~u', $str, null, PREG_SPLIT_NO_EMPTY);
     }
 //----------------------------------------------------------------------------------------------------------------------
+
     /**
      * @param $s
      * @return mixed
@@ -594,7 +595,7 @@ class Func
     public static function extract_email_from_text($text)
     {
         preg_match_all("/[._a-zA-Z0-9-]+@[._a-zA-Z0-9-]+/i", $text, $matches);
-        if(isset($matches[0][0]))
+        if (isset($matches[0][0]))
             return $matches[0][0];
         else
             return "";
@@ -609,7 +610,7 @@ class Func
     public static function datePlusWeek($week)
     {
         $week = (int)$week;
-        return date("Y-m-d", strtotime("+$week week",strtotime("now")));
+        return date("Y-m-d", strtotime("+$week week", strtotime("now")));
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -621,7 +622,7 @@ class Func
     public static function datePlusDay($day)
     {
         $day = (int)$day;
-        return date("Y-m-d", strtotime("+$day day",strtotime("now")));
+        return date("Y-m-d", strtotime("+$day day", strtotime("now")));
     }
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -634,5 +635,44 @@ class Func
     public static function checkArrayFields(array $rows, array $fields)
     {
         return !array_diff_key(array_flip($fields), $rows[0]);
+    }
+//----------------------------------------------------------------------------------------------------------------------
+//
+    /**
+     * Парсер строки содержащей '+' или '-'
+     * @param $expression
+     * @return double
+     */
+    public static function expParser($expression)
+    {
+        if (strpos($expression, '+') !== FALSE) {
+            $rows = explode('+', $expression);
+            if (count($rows) == 2) {
+                $operand = func::clearNum($rows[0]);
+                return self::rnd(func::clearNum($rows[0]) + func::percentParcer($operand, $rows[1]));
+            }
+        } elseif (strpos($expression, '-')) {
+            $rows = explode('-', $expression);
+            if (count($rows) == 2) {
+                $operand = func::clearNum($rows[0]);
+                return self::rnd($operand - func::percentParcer($operand, $rows[1]));
+            }
+        }
+        return self::clearNum($expression); // Если нет + или - то возвращаем число
+    }
+//------------------------------------------------------------§----------------------------------------------------------
+//
+    /**
+     * Парсер строки с процентом '%'
+     * @param $operand
+     * @param $percentage
+     * @return double
+     */
+    public static function percentParcer($operand, $percentage)
+    {
+        if (strpos($percentage, '%') !== FALSE) {
+            return self::rnd($operand * (func::clearNum($percentage)) / 100);
+        }
+        return self::clearNum($percentage); // Если не было знака % то возвращаем число
     }
 }

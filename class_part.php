@@ -755,7 +755,7 @@ class Part
             $data_nach = "null";
 
         $numb = func::clearNum($numb);
-        $price = func::clearNum($price, 2);
+        $price = func::expParser($price);
         $price_it = func::rnd($price * (100 + $nds) / 100);
 
         if ($price < config::$min_price) { // Если цена не задана
@@ -1507,7 +1507,7 @@ class Part
     {
         $db = new Db();
         $kod_part = (int)$kod_part;
-        $sum_part = func::clearNum($sum_part, 2);
+        $sum_part = func::expParser($sum_part);
 
         $row = self::getData($kod_part);
 
