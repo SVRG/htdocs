@@ -16,8 +16,8 @@ if ((int)$_GET['kod_part'] <= 0)
     exit("Не выбрана партия");
 
 $set_id = 0;
-if(isset($_GET['set_id']))
-    if((int)$_GET['set_id'] > 0)
+if (isset($_GET['set_id']))
+    if ((int)$_GET['set_id'] > 0)
         $set_id = (int)$_GET['set_id'];
 
 $kod_part = (int)$_GET['kod_part'];
@@ -83,12 +83,11 @@ $doc_nomer = "$type №" . $part_data['nomer'] . " от " . func::Date_from_MySQ
 <?php
 $part_numb_max = $part_data['numb'];
 $sum_part = $part_data['sum_part'];
-if(isset($_GET['numb']))
-    if($part_numb_max > (int)$_GET['numb'])
-        {
-            $part_numb_max = (int)$_GET['numb'];
-            $sum_part = $part_numb_max*$part_data['price_it'];
-        }
+if (isset($_GET['numb']))
+    if ($part_numb_max > (int)$_GET['numb']) {
+        $part_numb_max = (int)$_GET['numb'];
+        $sum_part = $part_numb_max * $part_data['price_it'];
+    }
 
 echo "<h3>$doc_nomer " . $part_data['nazv_krat'] . "</h3>";
 echo "<h3>" . $elem::getNameForInvoice($part_data) . " - " . $part_numb_max . " шт. (Сумма: " . func::Rub($sum_part) . ")</h3>";
@@ -252,30 +251,31 @@ if (isset($_GET['add'])) {
      </form>";
 
     // Автокоплит
-    $res = /** @lang HTML */
-        "<form method='post'>
+    if (isset($_GET['autoc'])) {
+        $res = /** @lang HTML */
+            "<form method='post'>
          <select id='kod_item' name='kod_item' placeholder=\"Выбрать наименование...\">";
 
-    for ($i = 0; $i < $db->cnt; $i++) {
-        $row = $rows[$i];
-        $kod_item_str = $row['kod_item'];
-        $kod_1c_str = $row['kod_1c'];
-        $name = $row['name'];
-        $numb = $row['numb'];
+        for ($i = 0; $i < $db->cnt; $i++) {
+            $row = $rows[$i];
+            $kod_item_str = $row['kod_item'];
+            $kod_1c_str = $row['kod_1c'];
+            $name = $row['name'];
+            $numb = $row['numb'];
 
-        if($numb < config::$min_price)
-            continue;
+            if ($numb < config::$min_price)
+                continue;
 
+            $res .= /** @lang HTML */
+                "<option value='$kod_item_str'>$name $numb $kod_1c_str</option>\r\n";
+        }
         $res .= /** @lang HTML */
-            "<option value='$kod_item_str'>$name $numb $kod_1c_str</option>\r\n";
-    }
-    $res .= /** @lang HTML */
-        "<input type='hidden' name='Flag' value='addItemToSet'>
+            "<input type='hidden' name='Flag' value='addItemToSet'>
         <input type='submit' value='Добавить'>
         </form>";
 
-    $res .= /** @lang HTML */
-        '</select>
+        $res .= /** @lang HTML */
+            '</select>
                     <script type="text/javascript">
                                     let kod_item, $kod_item_str;
                 
@@ -286,8 +286,9 @@ if (isset($_GET['add'])) {
                                     });
                         kod_item = $kod_item_str[0].selectize;
                 </script>';
-    echo $res;
-    // Автокомплит
+        echo $res;
+        // Автокомплит
+    }
 
     if ($db->cnt == 0)
         exit("Нет данных");
@@ -313,6 +314,10 @@ if (isset($_GET['add'])) {
         $name = $row['name'];
         $kod_1c = $row['kod_1c'];
         $numb = $row['numb'];
+
+        if ($numb < config::$min_price)
+            continue;
+
         $price = func::rnd($row['price'] * (100 + config::$nds_main) / 100); // Цена позиции
 
         $price_row = ""; // Цена
