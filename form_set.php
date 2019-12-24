@@ -263,6 +263,9 @@ if (isset($_GET['add'])) {
         $name = $row['name'];
         $numb = $row['numb'];
 
+        if($numb < config::$min_price)
+            continue;
+
         $res .= /** @lang HTML */
             "<option value='$kod_item_str'>$name $numb $kod_1c_str</option>\r\n";
     }
