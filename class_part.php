@@ -1769,7 +1769,7 @@ class Part
             return "Список элементов пуст.";
 
         $res = /** @lang HTML */
-            "<table width='100%' border='1'>
+            "<table width='100%' border='1' cellspacing='0'>
                 <tr>
                     <td>№</td>
                     <td>Организация</td>

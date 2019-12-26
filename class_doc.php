@@ -2103,7 +2103,7 @@ class Doc
             else
                 $res .= '<tr bgcolor="#d8d210">';
 
-            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] . " " . Part::formPartProfitProc((int)$row['kod_part']) . "</a>";
+            $part_link = "<a href='form_part.php?kod_part=" . (int)$row['kod_part'] . "'>" . $row['naklad'] . "</a>";
 
             $kod_org = $row['kod_org'];
             $filter_link = "";
@@ -2124,13 +2124,18 @@ class Doc
             }
 
             $name = Elem::getNameForInvoice($row);
+            $naklad = $row['naklad'];
+            $numb = $row['numb'];
+            $kod_part = $row['kod_part'];
+            $ppp = Part::formPartProfitProc((int)$row['kod_part']);
+            $set_link = "<a href='form_set.php?kod_part=$kod_part&set_id=$naklad&numb=$numb'><img alt='set' src='img/view_properties.png'>$ppp</a>";
 
             $res .= '
                     <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $name . "</a>" . $elem_filter_link . '</td>
                     <td><a href="form_dogovor.php?kod_dogovora=' . $row['kod_dogovora'] . '">' . $row['nomer'] . '</a></td>
                     <td><a href="form_org.php?kod_org=' . $row['kod_org'] . '">' . $row['nazv_krat'] . "</a>" . $filter_link . '</td>
                     <td>' . (int)$row['numb'] . '</td>
-                    <td>' . $part_link . '</td>
+                    <td>' . $part_link . $set_link . '</td>
                     <td>' . Func::Date_from_MySQL($row['data']) . '</td>
                     <td>' . $row['oper'] . '</td>
                     <td align="right">' . Func::Proc($procent) . '%</td>
