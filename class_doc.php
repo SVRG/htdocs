@@ -2128,7 +2128,7 @@ class Doc
             $numb = $row['numb'];
             $kod_part = $row['kod_part'];
             $ppp = Part::formPartProfitProc((int)$row['kod_part']);
-            $set_link = "<a href='form_set.php?kod_part=$kod_part&set_id=$naklad&numb=$numb'><img alt='set' src='img/view_properties.png'>$ppp</a>";
+            $set_link = "<a href='form_set.php?kod_part=$kod_part&set_id=$naklad&numb=$numb' target='_blank'><img alt='set' src='img/view_properties.png'>$ppp</a>";
 
             $res .= '
                     <td><a href="form_elem.php?kod_elem=' . $row['kod_elem'] . '">' . $name . "</a>" . $elem_filter_link . '</td>
