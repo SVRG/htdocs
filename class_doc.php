@@ -1382,8 +1382,11 @@ class Doc
         if (count($rows) > 0)
             return ($this->formRPlan_by_Doc($rows));
 
-        return "Договоры без партий:<br>" . $this->formDocList(/** @lang SQL */
-                "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org;");
+        $docs = $this->formDocList(/** @lang SQL */
+            "SELECT * FROM view_scheta_dogovory_all WHERE kod_org=$this->kod_org;");
+        if($docs == "")
+            return "";
+        return "Договоры без партий:<br>" . $docs;
 
     }
 //-----------------------------------------------------------------------
