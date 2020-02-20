@@ -5,13 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9655314-2c9e-4bf2-ab16-fbbf5315d5ac" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.keystream" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.keystream.len" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.len" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata.values.at" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata_i" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_metadata_/metadata_i.len" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/test.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_src_/schema/trin.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/_staging_/schema/trin/view/view_elem_org.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/fc6cf4d6-de60-4f52-a100-dff7749833c5/storage.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/htdocs.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/htdocs.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/class_part.php" beforeDir="false" afterPath="$PROJECT_DIR$/class_part.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/form_set.php" beforeDir="false" afterPath="$PROJECT_DIR$/form_set.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/menu.php" beforeDir="false" afterPath="$PROJECT_DIR$/menu/menu.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/menu/menu.css" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,22 +52,22 @@
     <expand>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="trin@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="trin" type="feb32156:DbDataSourceImpl" />
       </path>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="trin@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="trin" type="feb32156:DbDataSourceImpl" />
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
       </path>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="trin@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="trin" type="feb32156:DbDataSourceImpl" />
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
         <item name="trin: schema" type="ebfa3cd1:MariaImplModel$Schema" />
       </path>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="trin@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="trin" type="feb32156:DbDataSourceImpl" />
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
         <item name="trin: schema" type="ebfa3cd1:MariaImplModel$Schema" />
         <item name="tables" type="d4e8921:DatabaseStructure$FamilyGroup" />
@@ -166,11 +178,18 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mariadb" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SearchEverywhereHistoryKey" value="cont&#9;FILE&#9;file:///Volumes/C/xampp/htdocs/contform.php&#10;Адреса&#9;null&#9;null" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="add_unversioned_files" value="$PROJECT_DIR$/settings.ini&#10;/Applications/XAMPP/xamppfiles/htdocs/Connections/roo.php&#10;/Applications/XAMPP/xamppfiles/htdocs/PHPMailer-master/examples/gmail.php&#10;/Applications/XAMPP/xamppfiles/htdocs/class_config.php&#10;/Applications/XAMPP/xamppfiles/htdocs/test.html" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/../xamppfiles/htdocs/Connections/roo.php&#10;/Applications/XAMPP/xamppfiles/htdocs/PHPMailer-master/examples/gmail.php&#10;/Applications/XAMPP/xamppfiles/htdocs/class_config.php&#10;/Applications/XAMPP/xamppfiles/htdocs/test.php&#10;/Applications/XAMPP/xamppfiles/htdocs/test.html&#10;/Applications/XAMPP/htdocs/settings.ini" />
     <property name="com.intellij.database.dataSource.DataSourceTemplate" value="MySQL" />
     <property name="database.console.LAST_STATE" value="false" />
     <property name="js.eslint.eslintPackage" value="" />
@@ -194,18 +213,6 @@
       <recent name="$PROJECT_DIR$/widgets/autocomplete" />
       <recent name="$PROJECT_DIR$/widget/autocomplete" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="PHP Script.class_org.php">
     <configuration name="class_org.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" temporary="true" path="$PROJECT_DIR$/class_org.php">
@@ -235,28 +242,15 @@
     </recent_temporary>
   </component>
   <component name="ServiceViewManager">
-    <option name="allServicesViewState">
-      <serviceView>
-        <treeState>
-          <expand>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-            </path>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@23615010" type="9fbbdea:ServiceModel$ServiceNode" />
-            </path>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@54c04cf9" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@2c9e407d" type="9fbbdea:ServiceModel$ServiceNode" />
-            </path>
-          </expand>
-          <select />
-        </treeState>
-      </serviceView>
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
     </option>
   </component>
   <component name="StructureViewFactory">
@@ -550,7 +544,29 @@
       <workItem from="1571112202320" duration="720000" />
       <workItem from="1571153244888" duration="146000" />
       <workItem from="1571219807507" duration="158000" />
-      <workItem from="1571222350834" duration="9780000" />
+      <workItem from="1571222350834" duration="19296000" />
+      <workItem from="1573041015324" duration="22000" />
+      <workItem from="1573041056667" duration="55894000" />
+      <workItem from="1574158622726" duration="4547000" />
+      <workItem from="1574344742495" duration="225000" />
+      <workItem from="1574396982737" duration="2796000" />
+      <workItem from="1574871029843" duration="80000" />
+      <workItem from="1574871132319" duration="556000" />
+      <workItem from="1574875832235" duration="1632000" />
+      <workItem from="1574948090852" duration="347000" />
+      <workItem from="1575001012533" duration="21519000" />
+      <workItem from="1576598000901" duration="11000" />
+      <workItem from="1576598019297" duration="539000" />
+      <workItem from="1577103958848" duration="4403000" />
+      <workItem from="1577182184012" duration="6215000" />
+      <workItem from="1579595770155" duration="539000" />
+      <workItem from="1579621332394" duration="207000" />
+      <workItem from="1582120084762" duration="35000" />
+      <workItem from="1582120150935" duration="162000" />
+      <workItem from="1582129707111" duration="1186000" />
+      <workItem from="1582173532492" duration="1415000" />
+      <workItem from="1582182979358" duration="289000" />
+      <workItem from="1582204332462" duration="26000" />
     </task>
     <servers />
   </component>
@@ -610,6 +626,58 @@
     <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
       <collection />
     </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="320" y="115" key="#Notifications" timestamp="1574948106778">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="320" y="115" key="#Notifications/0.0.1440.900@0.0.1440.900" timestamp="1574948106778" />
+    <state x="320" y="115" key="#SQL_Resolution_Scopes" timestamp="1582183102901">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="320" y="115" key="#SQL_Resolution_Scopes/0.0.1440.900@0.0.1440.900" timestamp="1582183102901" />
+    <state x="320" y="115" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582182382003">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="320" y="115" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900@0.0.1440.900" timestamp="1582182382003" />
+    <state x="408" y="185" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1582120092278">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="408" y="185" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1440.900@0.0.1440.900" timestamp="1582120092278" />
+    <state width="958" height="261" key="GridCell.Tab.0.bottom" timestamp="1575659462158">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="958" height="261" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1575659462158" />
+    <state width="958" height="261" key="GridCell.Tab.0.center" timestamp="1575659462157">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="958" height="261" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1575659462157" />
+    <state width="958" height="261" key="GridCell.Tab.0.left" timestamp="1575659462156">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="958" height="261" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1575659462156" />
+    <state width="958" height="261" key="GridCell.Tab.0.right" timestamp="1575659462158">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="958" height="261" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1575659462158" />
+    <state x="542" y="273" key="NewPhpClassDialog" timestamp="1575397918664">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="542" y="273" key="NewPhpClassDialog/0.0.1440.900@0.0.1440.900" timestamp="1575397918664" />
+    <state width="82" height="441" key="SqlResolveConfigurable" timestamp="1582183068034">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="82" height="441" key="SqlResolveConfigurable/0.0.1440.900@0.0.1440.900" timestamp="1582183068034" />
+    <state x="456" y="140" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog" timestamp="1575615612008">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="456" y="140" key="com.intellij.database.view.ui.AbstractDbRefactoringDialog/0.0.1440.900@0.0.1440.900" timestamp="1575615612008" />
+    <state x="399" y="251" key="com.intellij.ide.util.TipDialog" timestamp="1582182994144">
+      <screen x="0" y="23" width="1440" height="801" />
+    </state>
+    <state x="399" y="256" key="com.intellij.ide.util.TipDialog/0.0.1440.900@0.0.1440.900" timestamp="1582173533509" />
+    <state x="399" y="251" key="com.intellij.ide.util.TipDialog/0.23.1440.801@0.23.1440.801" timestamp="1582182994144" />
+    <state x="399" y="252" key="com.intellij.ide.util.TipDialog/0.23.1440.804@0.23.1440.804" timestamp="1577182224738" />
   </component>
   <component name="XPathView.XPathProjectComponent">
     <history />

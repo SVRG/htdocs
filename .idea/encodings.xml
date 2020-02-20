@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" defaultCharsetForPropertiesFiles="windows-1251" addBOMForNewFiles="with NO BOM">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="windows-1251">
     <file url="file://$PROJECT_DIR$/.htaccess" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/PHPMailer/examples/gmail.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_config.php" charset="UTF-8" />
@@ -14,6 +14,9 @@
     <file url="file://$PROJECT_DIR$/class_mail.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_org.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/class_part.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_property.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/class_search.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_cse.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_doclist.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_dogovor.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_elem.php" charset="UTF-8" />
@@ -29,8 +32,8 @@
     <file url="file://$PROJECT_DIR$/form_part.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_pays.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_plan.php" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/form_po.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_price.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/form_properties.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_set.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/form_upload.php" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/header.php" charset="UTF-8" />
@@ -41,8 +44,6 @@
     <file url="file://$PROJECT_DIR$/menu/print.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test.php" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/update_20180828.php" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/update_20181207.php" charset="UTF-8" />
     <file url="file:///Volumes/Data/svrg/Dropbox/NV08C-USB/RTK/Docs/NVS_Rover.txt" charset="windows-1251" />
     <file url="PROJECT" charset="windows-1251" />
   </component>
